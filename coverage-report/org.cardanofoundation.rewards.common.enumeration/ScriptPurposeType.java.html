@@ -7,24 +7,24 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-<span class="nc" id="L10">@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)</span>
-<span class="nc" id="L11">@RequiredArgsConstructor</span>
+<span class="fc" id="L10">@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)</span>
+<span class="fc" id="L11">@RequiredArgsConstructor</span>
 @Getter
 public enum ScriptPurposeType {
-<span class="nc" id="L14">    SPEND(&quot;spend&quot;),</span>
-<span class="nc" id="L15">    MINT(&quot;mint&quot;),</span>
-<span class="nc" id="L16">    CERT(&quot;cert&quot;),</span>
-<span class="nc" id="L17">    REWARD(&quot;reward&quot;);</span>
+<span class="fc" id="L14">    SPEND(&quot;spend&quot;),</span>
+<span class="fc" id="L15">    MINT(&quot;mint&quot;),</span>
+<span class="fc" id="L16">    CERT(&quot;cert&quot;),</span>
+<span class="fc" id="L17">    REWARD(&quot;reward&quot;);</span>
 
 <span class="nc" id="L19">    String value;</span>
 
-<span class="nc" id="L21">    private static final Map&lt;String, ScriptPurposeType&gt; rewardTypeMap = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L21">    private static final Map&lt;String, ScriptPurposeType&gt; rewardTypeMap = new HashMap&lt;&gt;();</span>
 
     static {
-<span class="nc bnc" id="L24" title="All 2 branches missed.">        for (ScriptPurposeType type : ScriptPurposeType.values()) {</span>
-<span class="nc" id="L25">            rewardTypeMap.put(type.value, type);</span>
+<span class="fc bfc" id="L24" title="All 2 branches covered.">        for (ScriptPurposeType type : ScriptPurposeType.values()) {</span>
+<span class="fc" id="L25">            rewardTypeMap.put(type.value, type);</span>
         }
-<span class="nc" id="L27">    }</span>
+<span class="fc" id="L27">    }</span>
 
     public static ScriptPurposeType fromValue(String value) {
 <span class="nc" id="L30">        return rewardTypeMap.get(value);</span>

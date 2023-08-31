@@ -18,10 +18,10 @@ public class JDBCRewardRepository {
 
   public JDBCRewardRepository(
       JdbcTemplate jdbcTemplate,
-<span class="nc" id="L21">      @Value(&quot;${spring.jpa.properties.hibernate.jdbc.batch_size}&quot;) int batchSize) {</span>
-<span class="nc" id="L22">    this.jdbcTemplate = jdbcTemplate;</span>
-<span class="nc" id="L23">    this.batchSize = batchSize;</span>
-<span class="nc" id="L24">  }</span>
+<span class="fc" id="L21">      @Value(&quot;${spring.jpa.properties.hibernate.jdbc.batch_size}&quot;) int batchSize) {</span>
+<span class="fc" id="L22">    this.jdbcTemplate = jdbcTemplate;</span>
+<span class="fc" id="L23">    this.batchSize = batchSize;</span>
+<span class="fc" id="L24">  }</span>
 
   @Transactional
   public void saveAll(Collection&lt;Reward&gt; rewards) {

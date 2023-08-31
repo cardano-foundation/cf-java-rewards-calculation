@@ -16,8 +16,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
 <span class="nc" id="L18">@Setter</span>
-<span class="nc" id="L19">@SuperBuilder(toBuilder = true)</span>
-<span class="nc" id="L20">@NoArgsConstructor</span>
+<span class="pc" id="L19">@SuperBuilder(toBuilder = true)</span>
+<span class="fc" id="L20">@NoArgsConstructor</span>
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public class BaseEntity implements Serializable {

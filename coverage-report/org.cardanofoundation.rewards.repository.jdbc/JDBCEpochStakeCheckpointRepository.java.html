@@ -19,19 +19,19 @@ public class JDBCEpochStakeCheckpointRepository {
 
   public JDBCEpochStakeCheckpointRepository(
       JdbcTemplate jdbcTemplate,
-<span class="nc" id="L22">      @Value(&quot;${spring.jpa.properties.hibernate.jdbc.batch_size}&quot;) int batchSize) {</span>
-<span class="nc" id="L23">    this.jdbcTemplate = jdbcTemplate;</span>
-<span class="nc" id="L24">    this.batchSize = batchSize;</span>
-<span class="nc" id="L25">  }</span>
+<span class="fc" id="L22">      @Value(&quot;${spring.jpa.properties.hibernate.jdbc.batch_size}&quot;) int batchSize) {</span>
+<span class="fc" id="L23">    this.jdbcTemplate = jdbcTemplate;</span>
+<span class="fc" id="L24">    this.batchSize = batchSize;</span>
+<span class="fc" id="L25">  }</span>
 
   @Transactional
   public void saveAll(List&lt;EpochStakeCheckpoint&gt; epochStakeCheckpoints) {
-<span class="nc" id="L29">    String sql =</span>
+<span class="fc" id="L29">    String sql =</span>
         &quot;INSERT INTO epoch_stake_checkpoint (id, view, epoch_checkpoint) &quot;
             + &quot; VALUES (nextval('epoch_stake_checkpoint_id_seq'), ?, ?)&quot;
             + &quot;    ON CONFLICT (view) DO NOTHING&quot;;
 
-<span class="nc" id="L34">    jdbcTemplate.batchUpdate(</span>
+<span class="fc" id="L34">    jdbcTemplate.batchUpdate(</span>
         sql,
         epochStakeCheckpoints,
         batchSize,
@@ -39,6 +39,6 @@ public class JDBCEpochStakeCheckpointRepository {
 <span class="nc" id="L39">          ps.setString(1, epochStakeCheckpoint.getStakeAddress());</span>
 <span class="nc" id="L40">          ps.setLong(2, epochStakeCheckpoint.getEpochCheckpoint());</span>
 <span class="nc" id="L41">        });</span>
-<span class="nc" id="L42">  }</span>
+<span class="fc" id="L42">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
