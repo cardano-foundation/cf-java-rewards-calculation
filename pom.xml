@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.cardanofoundation</groupId>
+  <artifactId>rewards</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>cardano-reward-calculation</name>
+  <packaging>jar</packaging>
+  <description>This project aims to be a cardano reward calculation, java formula implementation and edge case documentation</description>
+
+  <issueManagement>
+    <url>https://github.com/cardano-foundation/cf-java-rewards-calculation/issues</url>
+    <system>GitHub issues</system>
+  </issueManagement>
+
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>https://opensource.org/licenses/MIT</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <organization>Cardano Foundation</organization>
+      <organizationUrl>https://cardanofoundation.org</organizationUrl>
+    </developer>
+  </developers>
+
+  <organization>
+    <name>Cardano Foundation</name>
+    <url>https://cardanofoundation.org</url>
+  </organization>
+
+  <properties>
+    <version.java>17</version.java>
+    <version.lombok>1.18.26</version.lombok>
+    <org.projectlombok.version>1.18.24</org.projectlombok.version>
+    <koios-java-client.version>1.17.2</koios-java-client.version>
+    <version.spring-boot>3.0.5</version.spring-boot>
+    <version.flyway>9.4.0</version.flyway>
+    <version.maven-compiler-plugin>3.10.0</version.maven-compiler-plugin>
+    <version.maven-surefire-plugin>3.0.0-M5</version.maven-surefire-plugin>
+    <version.jacoco-maven-plugin>0.8.8</version.jacoco-maven-plugin>
+    <version.flatten-maven-plugin>1.2.7</version.flatten-maven-plugin>
+    <version.maven-pmd-plugin>3.17.0</version.maven-pmd-plugin>
+    <version.sonarcube-maven-plugin>3.9.1.2184</version.sonarcube-maven-plugin>
+    <version.maven-site-plugin>4.0.0-M2</version.maven-site-plugin>
+    <version.maven-project-info-reports-plugin>3.3.0</version.maven-project-info-reports-plugin>
+    <version.guava>31.1-jre</version.guava>
+    <version.spotless-maven-plugin>2.36.0</version.spotless-maven-plugin>
+    <version.google-java-format>1.15.0</version.google-java-format>
+    <version.hiberate-validator>8.0.1.Final</version.hiberate-validator>
+    <version.cardano-client-lib>0.4.3</version.cardano-client-lib>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <type>pom</type>
+        <version>${version.spring-boot}</version>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hibernate.validator</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <version>${version.hiberate-validator}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.bloxbean.cardano</groupId>
+      <artifactId>cardano-client-lib</artifactId>
+      <version>${version.cardano-client-lib}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.github.cardano-community</groupId>
+      <artifactId>koios-java-client</artifactId>
+      <version>${koios-java-client.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+      <version>${version.flyway}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${version.guava}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+            </exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <version>${version.spotless-maven-plugin}</version>
+        <configuration>
+          <java>
+            <excludes>
+              <exclude>build/**/*.java</exclude>
+            </excludes>
+            <removeUnusedImports/>
+            <replaceRegex>
+              <name>Remove wildcard imports</name>
+              <searchRegex>import\\s+[^\\*\\s]+\\*;(\\r\\n|\\r|\\n)</searchRegex>
+              <replacement>$1</replacement>
+            </replaceRegex>
+            <googleJavaFormat>
+              <version>${version.google-java-format}</version>
+              <style>GOOGLE</style>
+            </googleJavaFormat>
+            <importOrder>
+              <order>
+                java,jakarta,javax,lombok,org.springframework,,\\#,org.junit,\\#org.junit,org.cardanofoundation,\\#org.cardanofoundation
+              </order>
+            </importOrder>
+            <indent>
+              <spaces>true</spaces>
+              <spacesPerTab>2</spacesPerTab>
+            </indent>
+            <trimTrailingWhitespace/>
+            <endWithNewline/>
+          </java>
+        </configuration>
+      </plugin>
+    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <version>${version.spring-boot}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>repackage</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${version.maven-compiler-plugin}</version>
+          <configuration>
+            <source>${version.java}</source>
+            <target>${version.java}</target>
+            <annotationProcessorPaths>
+              <path>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${version.lombok}</version>
+              </path>
+            </annotationProcessorPaths>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${version.maven-surefire-plugin}</version>
+          <configuration>
+            <includes>
+              <include>**/*TestCases.java</include>
+              <include>**/*Tests.java</include>
+              <include>**/*TestCase.java</include>
+              <include>**/*Test.java</include>
+              <include>**/Test*.java</include>
+            </includes>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>${version.jacoco-maven-plugin}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>generate-code-coverage-report</id>
+              <phase>test</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>${version.maven-site-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>${version.maven-project-info-reports-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.sonarsource.scanner.maven</groupId>
+          <artifactId>sonar-maven-plugin</artifactId>
+          <version>${version.sonarcube-maven-plugin}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>
