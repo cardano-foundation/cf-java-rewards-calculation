@@ -19,10 +19,10 @@ public class JDBCEpochStakeRepository {
 
   public JDBCEpochStakeRepository(
       JdbcTemplate jdbcTemplate,
-<span class="nc" id="L22">      @Value(&quot;${spring.jpa.properties.hibernate.jdbc.batch_size}&quot;) int batchSize) {</span>
-<span class="nc" id="L23">    this.jdbcTemplate = jdbcTemplate;</span>
-<span class="nc" id="L24">    this.batchSize = batchSize;</span>
-<span class="nc" id="L25">  }</span>
+<span class="fc" id="L22">      @Value(&quot;${spring.jpa.properties.hibernate.jdbc.batch_size}&quot;) int batchSize) {</span>
+<span class="fc" id="L23">    this.jdbcTemplate = jdbcTemplate;</span>
+<span class="fc" id="L24">    this.batchSize = batchSize;</span>
+<span class="fc" id="L25">  }</span>
 
   @Transactional
   public void saveAll(Collection&lt;EpochStake&gt; epochStakeList) {

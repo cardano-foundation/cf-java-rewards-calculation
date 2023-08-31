@@ -10,9 +10,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 <span class="nc" id="L10">public class JsonConverter {</span>
   public static &lt;T&gt; ArrayList&lt;T&gt; convertJsonToArrayList(BufferedReader br, Class&lt;T&gt; clazz) {
     try {
-<span class="nc" id="L13">      ObjectMapper objectMapper = new ObjectMapper();</span>
-<span class="nc" id="L14">      return objectMapper.readValue(</span>
-<span class="nc" id="L15">          br, objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz));</span>
+<span class="fc" id="L13">      ObjectMapper objectMapper = new ObjectMapper();</span>
+<span class="fc" id="L14">      return objectMapper.readValue(</span>
+<span class="fc" id="L15">          br, objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz));</span>
 <span class="nc" id="L16">    } catch (Exception e) {</span>
 <span class="nc" id="L17">      e.printStackTrace();</span>
 <span class="nc" id="L18">      return null;</span>
@@ -22,14 +22,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
   public static &lt;T&gt; ArrayList&lt;T&gt; convertFileJsonToArrayList(String filePath, Class&lt;T&gt; clazz) {
     BufferedReader br;
     try {
-<span class="nc" id="L25">      br = new BufferedReader(new FileReader(filePath));</span>
+<span class="fc" id="L25">      br = new BufferedReader(new FileReader(filePath));</span>
 <span class="nc" id="L26">    } catch (FileNotFoundException e) {</span>
 <span class="nc" id="L27">      throw new RuntimeException(e);</span>
-<span class="nc" id="L28">    }</span>
+<span class="fc" id="L28">    }</span>
     try {
-<span class="nc" id="L30">      ObjectMapper objectMapper = new ObjectMapper();</span>
-<span class="nc" id="L31">      return objectMapper.readValue(</span>
-<span class="nc" id="L32">          br, objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz));</span>
+<span class="fc" id="L30">      ObjectMapper objectMapper = new ObjectMapper();</span>
+<span class="fc" id="L31">      return objectMapper.readValue(</span>
+<span class="fc" id="L32">          br, objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz));</span>
 <span class="nc" id="L33">    } catch (Exception e) {</span>
 <span class="nc" id="L34">      e.printStackTrace();</span>
 <span class="nc" id="L35">      return null;</span>

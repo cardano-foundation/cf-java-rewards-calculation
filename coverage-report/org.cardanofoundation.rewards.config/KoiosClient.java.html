@@ -13,8 +13,8 @@ import rest.koios.client.backend.factory.BackendFactory;
 import rest.koios.client.backend.factory.BackendService;
 
 @Component
-<span class="nc" id="L16">@Slf4j</span>
-<span class="nc" id="L17">public class KoiosClient {</span>
+<span class="fc" id="L16">@Slf4j</span>
+<span class="fc" id="L17">public class KoiosClient {</span>
 
   @Value(&quot;${application.network-magic}&quot;)
   private Integer networkMagic;
@@ -27,16 +27,16 @@ import rest.koios.client.backend.factory.BackendService;
 
   @PostConstruct
   void setBackendService() {
-<span class="nc" id="L30">    String networkName = NetworkConstants.getNetworkNameByMagicNumber(networkMagic);</span>
-<span class="nc" id="L31">    log.info(&quot;Network: {}&quot;, networkName);</span>
-<span class="nc" id="L32">    this.backendService =</span>
-<span class="nc bnc" id="L33" title="All 5 branches missed.">        switch (networkName) {</span>
-<span class="nc" id="L34">          case NetworkConstants.MAINNET_NAME -&gt; BackendFactory.getKoiosMainnetService();</span>
+<span class="fc" id="L30">    String networkName = NetworkConstants.getNetworkNameByMagicNumber(networkMagic);</span>
+<span class="fc" id="L31">    log.info(&quot;Network: {}&quot;, networkName);</span>
+<span class="fc" id="L32">    this.backendService =</span>
+<span class="pc bpc" id="L33" title="4 of 5 branches missed.">        switch (networkName) {</span>
+<span class="fc" id="L34">          case NetworkConstants.MAINNET_NAME -&gt; BackendFactory.getKoiosMainnetService();</span>
 <span class="nc" id="L35">          case NetworkConstants.PREPROD_NAME -&gt; BackendFactory.getKoiosPreprodService();</span>
 <span class="nc" id="L36">          case NetworkConstants.PREVIEW_NAME -&gt; BackendFactory.getKoiosPreviewService();</span>
 <span class="nc" id="L37">          case NetworkConstants.GUILDNET_NAME -&gt; BackendFactory.getKoiosGuildService();</span>
-<span class="nc" id="L38">          default -&gt; throw new IllegalStateException(&quot;Unexpected value: &quot; + networkName);</span>
+<span class="pc" id="L38">          default -&gt; throw new IllegalStateException(&quot;Unexpected value: &quot; + networkName);</span>
         };
-<span class="nc" id="L40">  }</span>
+<span class="fc" id="L40">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

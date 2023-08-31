@@ -28,10 +28,10 @@ import org.hibernate.Hibernate;
                 columnNames = {&quot;epoch_no&quot;, &quot;addr_id&quot;, &quot;pool_id&quot;})
 })
 @Getter
-<span class="nc" id="L31">@Setter</span>
-<span class="nc" id="L32">@NoArgsConstructor</span>
+<span class="pc" id="L31">@Setter</span>
+<span class="fc" id="L32">@NoArgsConstructor</span>
 <span class="nc" id="L33">@AllArgsConstructor</span>
-<span class="nc" id="L34">@SuperBuilder(toBuilder = true)</span>
+<span class="pc" id="L34">@SuperBuilder(toBuilder = true)</span>
 public class EpochStake extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -41,7 +41,7 @@ public class EpochStake extends BaseEntity {
 <span class="nc" id="L41">    private StakeAddress addr;</span>
 
     @Column(name = &quot;addr_id&quot;, updatable = false, insertable = false)
-<span class="nc" id="L44">    private Long stakeAddressId;</span>
+<span class="fc" id="L44">    private Long stakeAddressId;</span>
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = &quot;pool_id&quot;, nullable = false,
@@ -50,12 +50,12 @@ public class EpochStake extends BaseEntity {
 <span class="nc" id="L50">    private PoolHash pool;</span>
 
     @Column(name = &quot;pool_id&quot;, updatable = false, insertable = false)
-<span class="nc" id="L53">    private Long poolId;</span>
+<span class="fc" id="L53">    private Long poolId;</span>
 
     @Column(name = &quot;amount&quot;, nullable = false, precision = 20)
     @Lovelace
     @Digits(integer = 20, fraction = 0)
-<span class="nc" id="L58">    private BigInteger amount;</span>
+<span class="fc" id="L58">    private BigInteger amount;</span>
 
     @Column(name = &quot;epoch_no&quot;, nullable = false)
     @Word31Type

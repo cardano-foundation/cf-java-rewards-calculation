@@ -16,24 +16,24 @@ public class NetworkConstants {
   public static final String PREVIEW_NAME = &quot;preview&quot;;
   public static final String GUILDNET_NAME = &quot;guildnet&quot;;
 
-<span class="nc" id="L19">  private static final Map&lt;String, Integer&gt; mNetworkNameAndMagic =</span>
-<span class="nc" id="L20">      Map.ofEntries(</span>
-<span class="nc" id="L21">          Map.entry(MAINNET_NAME, MAINNET),</span>
-<span class="nc" id="L22">          Map.entry(PREPROD_NAME, PREPROD_TESTNET),</span>
-<span class="nc" id="L23">          Map.entry(PREVIEW_NAME, PREVIEW_TESTNET));</span>
+<span class="fc" id="L19">  private static final Map&lt;String, Integer&gt; mNetworkNameAndMagic =</span>
+<span class="fc" id="L20">      Map.ofEntries(</span>
+<span class="fc" id="L21">          Map.entry(MAINNET_NAME, MAINNET),</span>
+<span class="fc" id="L22">          Map.entry(PREPROD_NAME, PREPROD_TESTNET),</span>
+<span class="fc" id="L23">          Map.entry(PREVIEW_NAME, PREVIEW_TESTNET));</span>
 
-<span class="nc" id="L25">  private static final Map&lt;Integer, String&gt; mNetworkMagicAndName =</span>
-<span class="nc" id="L26">      Map.ofEntries(</span>
-<span class="nc" id="L27">          Map.entry(MAINNET, MAINNET_NAME),</span>
-<span class="nc" id="L28">          Map.entry(PREPROD_TESTNET, PREPROD_NAME),</span>
-<span class="nc" id="L29">          Map.entry(PREVIEW_TESTNET, PREVIEW_NAME));</span>
+<span class="fc" id="L25">  private static final Map&lt;Integer, String&gt; mNetworkMagicAndName =</span>
+<span class="fc" id="L26">      Map.ofEntries(</span>
+<span class="fc" id="L27">          Map.entry(MAINNET, MAINNET_NAME),</span>
+<span class="fc" id="L28">          Map.entry(PREPROD_TESTNET, PREPROD_NAME),</span>
+<span class="fc" id="L29">          Map.entry(PREVIEW_TESTNET, PREVIEW_NAME));</span>
 
   public static int getNetworkMagicByName(String networkName) {
 <span class="nc" id="L32">    return mNetworkNameAndMagic.get(networkName);</span>
   }
 
   public static String getNetworkNameByMagicNumber(int magicNumber) {
-<span class="nc" id="L36">    return mNetworkMagicAndName.get(magicNumber);</span>
+<span class="fc" id="L36">    return mNetworkMagicAndName.get(magicNumber);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
