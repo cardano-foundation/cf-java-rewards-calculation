@@ -1,0 +1,402 @@
+[
+  {
+    "stakeAddressId": 301,
+    "amount": 827645128882,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 32545,
+    "amount": 168806586621,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 2890,
+    "amount": 12500644138,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 46715,
+    "amount": 423594827892,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 115,
+    "amount": 5029128217,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 826,
+    "amount": 9997360277,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 36444,
+    "amount": 10501788654,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 50127,
+    "amount": 5000558231,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 41980,
+    "amount": 54373114397,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 41502,
+    "amount": 19520255780,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 65227,
+    "amount": 5754979641,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 700,
+    "amount": 376212618008,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 2287,
+    "amount": 249997825567,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 184,
+    "amount": 11239662405,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 38460,
+    "amount": 468461232,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 789,
+    "amount": 4007474490,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 62060,
+    "amount": 92391213867,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 8119,
+    "amount": 37774175513,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 48930,
+    "amount": 0,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 805,
+    "amount": 29591209123,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 465,
+    "amount": 450118441985,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 60736,
+    "amount": 22161508827,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 61,
+    "amount": 19995656854,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 5071,
+    "amount": 98691791633,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 3917,
+    "amount": 229215891006,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 2982,
+    "amount": 7920151400,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 7143,
+    "amount": 200000322332,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 1317,
+    "amount": 19255761220496,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 570,
+    "amount": 26136385329,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 607,
+    "amount": 105932123515,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 402,
+    "amount": 0,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 4124,
+    "amount": 4149532126,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 6892,
+    "amount": 610959946,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 2066,
+    "amount": 57153651272,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 7791,
+    "amount": 10737269931,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 5976,
+    "amount": 3506088551,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 60711,
+    "amount": 12842048103,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 162,
+    "amount": 132297700019,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 63381,
+    "amount": 997825743,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 42367,
+    "amount": 299997825567,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 864,
+    "amount": 4671170266,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 64488,
+    "amount": 30309574082,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 39084,
+    "amount": 52887347162,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 244,
+    "amount": 10024375528,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 2091,
+    "amount": 2006444490,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 57316,
+    "amount": 738006702,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 19495,
+    "amount": 1507644490,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 49805,
+    "amount": 7615825567,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 30002,
+    "amount": 100027575768,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 10,
+    "amount": 49997825567,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 3205,
+    "amount": 101002815630,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 3892,
+    "amount": 10000825567,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 44480,
+    "amount": 30997825567,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 44320,
+    "amount": 142510854,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 759,
+    "amount": 366777563627,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 31770,
+    "amount": 10345817031,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 116,
+    "amount": 48736563695,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 129,
+    "amount": 10576057962,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 2243,
+    "amount": 163112519303,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 729,
+    "amount": 1090901,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 3338,
+    "amount": 16589904968,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 3595,
+    "amount": 6208631390,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 1665,
+    "amount": 40519575580,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 1817,
+    "amount": 8480409879,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 35200,
+    "amount": 28713638829,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 1118,
+    "amount": 4063738271,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 58199,
+    "amount": 114385114701,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 35255,
+    "amount": 99258825567,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 813,
+    "amount": 28247548039,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 37132,
+    "amount": 181932947983,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 482,
+    "amount": 187756646282,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 46052,
+    "amount": 15310006765,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 183,
+    "amount": 1501993717,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 49229,
+    "amount": 33791191940,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 49788,
+    "amount": 2618956294,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 459,
+    "amount": 1507656854,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 719,
+    "amount": 36247244091,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 57721,
+    "amount": 1497658350,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 740,
+    "amount": 806735258376,
+    "poolId": 1
+  },
+  {
+    "stakeAddressId": 611,
+    "amount": 6548573734,
+    "poolId": 1
+  }
+]

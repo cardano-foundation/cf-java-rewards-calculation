@@ -1,0 +1,7919 @@
+[
+  {
+    "stakeAddressId": 122535,
+    "type": "MEMBER",
+    "amount": 35550206,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 11645,
+    "type": "MEMBER",
+    "amount": 92778642,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 77022,
+    "type": "MEMBER",
+    "amount": 1588033,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 95700,
+    "type": "MEMBER",
+    "amount": 5610608180,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 137370,
+    "type": "MEMBER",
+    "amount": 6892668,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 10407,
+    "type": "MEMBER",
+    "amount": 51335837,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 108167,
+    "type": "MEMBER",
+    "amount": 15116133,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 10243,
+    "type": "MEMBER",
+    "amount": 2901480487,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6926,
+    "type": "MEMBER",
+    "amount": 330052,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 139467,
+    "type": "MEMBER",
+    "amount": 12326433,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 574,
+    "type": "MEMBER",
+    "amount": 8737390,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 136253,
+    "type": "MEMBER",
+    "amount": 4360121,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5472,
+    "type": "MEMBER",
+    "amount": 68405940,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 97532,
+    "type": "MEMBER",
+    "amount": 18630407,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 132296,
+    "type": "MEMBER",
+    "amount": 1596323,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 90282,
+    "type": "MEMBER",
+    "amount": 9065073,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 109812,
+    "type": "MEMBER",
+    "amount": 632333,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 27092,
+    "type": "MEMBER",
+    "amount": 7593180,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 105228,
+    "type": "MEMBER",
+    "amount": 7623218,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 118880,
+    "type": "MEMBER",
+    "amount": 49427103,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 4671,
+    "type": "MEMBER",
+    "amount": 6684803,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 122106,
+    "type": "MEMBER",
+    "amount": 832791,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 8074,
+    "type": "MEMBER",
+    "amount": 600952038,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 120606,
+    "type": "MEMBER",
+    "amount": 61655461,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 13865,
+    "type": "MEMBER",
+    "amount": 20286405,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 88208,
+    "type": "MEMBER",
+    "amount": 24994612,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 7430,
+    "type": "MEMBER",
+    "amount": 300930572,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 96293,
+    "type": "MEMBER",
+    "amount": 55393722,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 112058,
+    "type": "MEMBER",
+    "amount": 64368658,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 118395,
+    "type": "MEMBER",
+    "amount": 3607869,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 95119,
+    "type": "MEMBER",
+    "amount": 3613109,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 13971,
+    "type": "MEMBER",
+    "amount": 18205472,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 122600,
+    "type": "MEMBER",
+    "amount": 6443756,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 82450,
+    "type": "MEMBER",
+    "amount": 432282,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 136586,
+    "type": "MEMBER",
+    "amount": 25630392,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 84069,
+    "type": "MEMBER",
+    "amount": 27821905,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 127097,
+    "type": "MEMBER",
+    "amount": 2494132,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 115023,
+    "type": "MEMBER",
+    "amount": 1860804,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 10821,
+    "type": "MEMBER",
+    "amount": 830408519,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 89451,
+    "type": "MEMBER",
+    "amount": 1902129,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 126970,
+    "type": "MEMBER",
+    "amount": 8955,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 87886,
+    "type": "MEMBER",
+    "amount": 11512124,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 11527,
+    "type": "MEMBER",
+    "amount": 106540552,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 106849,
+    "type": "MEMBER",
+    "amount": 1190828,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 73050,
+    "type": "MEMBER",
+    "amount": 85035568,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 68454,
+    "type": "MEMBER",
+    "amount": 24257642,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 10526,
+    "type": "MEMBER",
+    "amount": 30688135,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 140126,
+    "type": "MEMBER",
+    "amount": 1800104,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 134976,
+    "type": "MEMBER",
+    "amount": 21279082,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 129497,
+    "type": "MEMBER",
+    "amount": 21332370,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 134894,
+    "type": "MEMBER",
+    "amount": 21350794,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 4801,
+    "type": "MEMBER",
+    "amount": 16335849,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6351,
+    "type": "MEMBER",
+    "amount": 36352825,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 7353,
+    "type": "MEMBER",
+    "amount": 38089647,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 109966,
+    "type": "MEMBER",
+    "amount": 8723680,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 120758,
+    "type": "MEMBER",
+    "amount": 6013468,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 92084,
+    "type": "MEMBER",
+    "amount": 60251996,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 88309,
+    "type": "MEMBER",
+    "amount": 58025050,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 118318,
+    "type": "MEMBER",
+    "amount": 1003907,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 65995,
+    "type": "MEMBER",
+    "amount": 1454119110,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 134740,
+    "type": "MEMBER",
+    "amount": 25576286,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5241,
+    "type": "MEMBER",
+    "amount": 31112756,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 119513,
+    "type": "MEMBER",
+    "amount": 24035917,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 122374,
+    "type": "MEMBER",
+    "amount": 121665773,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 67628,
+    "type": "MEMBER",
+    "amount": 329514,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 121480,
+    "type": "MEMBER",
+    "amount": 661539,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 131518,
+    "type": "MEMBER",
+    "amount": 599418,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5210,
+    "type": "MEMBER",
+    "amount": 601922836,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 8994,
+    "type": "MEMBER",
+    "amount": 46770592,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 126149,
+    "type": "MEMBER",
+    "amount": 23994940,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 79233,
+    "type": "MEMBER",
+    "amount": 96483038,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 138450,
+    "type": "MEMBER",
+    "amount": 12457107,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 92811,
+    "type": "MEMBER",
+    "amount": 741606547,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 42484,
+    "type": "MEMBER",
+    "amount": 21244061,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 97970,
+    "type": "MEMBER",
+    "amount": 4813234,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 56215,
+    "type": "MEMBER",
+    "amount": 24797482,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 11348,
+    "type": "MEMBER",
+    "amount": 36610323,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 134238,
+    "type": "MEMBER",
+    "amount": 9726026,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 120534,
+    "type": "MEMBER",
+    "amount": 33646859,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 132177,
+    "type": "MEMBER",
+    "amount": 5530807,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 112135,
+    "type": "MEMBER",
+    "amount": 1144322,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 97222,
+    "type": "MEMBER",
+    "amount": 56676,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 11118,
+    "type": "MEMBER",
+    "amount": 6548076,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 95141,
+    "type": "MEMBER",
+    "amount": 30106220,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 3685,
+    "type": "MEMBER",
+    "amount": 732362674,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 13887,
+    "type": "MEMBER",
+    "amount": 60182699,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 139061,
+    "type": "MEMBER",
+    "amount": 1981823,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 68611,
+    "type": "MEMBER",
+    "amount": 120372168,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 80391,
+    "type": "MEMBER",
+    "amount": 4809183,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 121418,
+    "type": "MEMBER",
+    "amount": 6730125,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 90688,
+    "type": "MEMBER",
+    "amount": 3359607,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 137727,
+    "type": "MEMBER",
+    "amount": 1682551,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 100543,
+    "type": "MEMBER",
+    "amount": 38385,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 4172,
+    "type": "MEMBER",
+    "amount": 98063245,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 85857,
+    "type": "MEMBER",
+    "amount": 154518845,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 126273,
+    "type": "MEMBER",
+    "amount": 30052134,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 116564,
+    "type": "MEMBER",
+    "amount": 7915361,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5350,
+    "type": "MEMBER",
+    "amount": 15474896,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 91746,
+    "type": "MEMBER",
+    "amount": 51903899,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 110091,
+    "type": "MEMBER",
+    "amount": 23529755,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 121614,
+    "type": "MEMBER",
+    "amount": 4582610,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 126519,
+    "type": "MEMBER",
+    "amount": 100938526,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 83257,
+    "type": "MEMBER",
+    "amount": 59420517,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 11602,
+    "type": "MEMBER",
+    "amount": 66768561,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 99119,
+    "type": "MEMBER",
+    "amount": 21315342,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 135392,
+    "type": "MEMBER",
+    "amount": 500823,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 89455,
+    "type": "MEMBER",
+    "amount": 9169795,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 116247,
+    "type": "MEMBER",
+    "amount": 2992680,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 97499,
+    "type": "MEMBER",
+    "amount": 17313481,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 73548,
+    "type": "MEMBER",
+    "amount": 8508623,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 372,
+    "type": "MEMBER",
+    "amount": 24053095,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 66396,
+    "type": "MEMBER",
+    "amount": 99520386,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 55787,
+    "type": "MEMBER",
+    "amount": 50187173,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 85283,
+    "type": "MEMBER",
+    "amount": 175823447,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 56407,
+    "type": "MEMBER",
+    "amount": 14774186,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 78743,
+    "type": "MEMBER",
+    "amount": 61824154,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 132084,
+    "type": "MEMBER",
+    "amount": 7209476,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 76489,
+    "type": "MEMBER",
+    "amount": 20945004,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 103919,
+    "type": "MEMBER",
+    "amount": 15037555,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 100179,
+    "type": "MEMBER",
+    "amount": 11715764,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 88193,
+    "type": "MEMBER",
+    "amount": 4148149,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 65935,
+    "type": "MEMBER",
+    "amount": 229797642,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 117136,
+    "type": "MEMBER",
+    "amount": 204568238,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6598,
+    "type": "MEMBER",
+    "amount": 184715080,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 137892,
+    "type": "MEMBER",
+    "amount": 1796686,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 64868,
+    "type": "MEMBER",
+    "amount": 114410506,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6174,
+    "type": "MEMBER",
+    "amount": 36106796,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 55773,
+    "type": "MEMBER",
+    "amount": 46996100,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 106117,
+    "type": "MEMBER",
+    "amount": 50100352,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 128064,
+    "type": "MEMBER",
+    "amount": 30636818,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 125178,
+    "type": "MEMBER",
+    "amount": 5382546,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 134989,
+    "type": "MEMBER",
+    "amount": 829973219,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 113065,
+    "type": "MEMBER",
+    "amount": 43097508,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 86609,
+    "type": "MEMBER",
+    "amount": 740441,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 98824,
+    "type": "MEMBER",
+    "amount": 5011342,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5935,
+    "type": "MEMBER",
+    "amount": 7097353,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 117181,
+    "type": "MEMBER",
+    "amount": 29095726,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 55728,
+    "type": "MEMBER",
+    "amount": 11189590,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6129,
+    "type": "MEMBER",
+    "amount": 36106796,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 86533,
+    "type": "MEMBER",
+    "amount": 3067811,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 111763,
+    "type": "MEMBER",
+    "amount": 15183489,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 141107,
+    "type": "MEMBER",
+    "amount": 599642,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 76296,
+    "type": "MEMBER",
+    "amount": 1143824583,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 117997,
+    "type": "MEMBER",
+    "amount": 7991195,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 135245,
+    "type": "MEMBER",
+    "amount": 1736003,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 73443,
+    "type": "MEMBER",
+    "amount": 120508505,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 69732,
+    "type": "MEMBER",
+    "amount": 3433327,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 1803,
+    "type": "MEMBER",
+    "amount": 2957002,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 83685,
+    "type": "MEMBER",
+    "amount": 44889,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 107191,
+    "type": "MEMBER",
+    "amount": 3008615,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 75904,
+    "type": "MEMBER",
+    "amount": 12026597,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 112381,
+    "type": "MEMBER",
+    "amount": 1131504,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 103840,
+    "type": "MEMBER",
+    "amount": 3818,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 88315,
+    "type": "MEMBER",
+    "amount": 13111,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 89285,
+    "type": "MEMBER",
+    "amount": 9827984,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 117856,
+    "type": "MEMBER",
+    "amount": 2430532,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 107359,
+    "type": "MEMBER",
+    "amount": 5557345,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 118596,
+    "type": "MEMBER",
+    "amount": 580471,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 126823,
+    "type": "MEMBER",
+    "amount": 301097411,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 121582,
+    "type": "MEMBER",
+    "amount": 60093321,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 105845,
+    "type": "MEMBER",
+    "amount": 78568714,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 729,
+    "type": "MEMBER",
+    "amount": 60180263,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5194,
+    "type": "MEMBER",
+    "amount": 80703029,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5593,
+    "type": "MEMBER",
+    "amount": 7320876,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 97717,
+    "type": "MEMBER",
+    "amount": 29448181,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 107579,
+    "type": "MEMBER",
+    "amount": 3446562,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 124841,
+    "type": "MEMBER",
+    "amount": 290737341,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 69284,
+    "type": "MEMBER",
+    "amount": 125915718,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 124167,
+    "type": "MEMBER",
+    "amount": 130349,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 55303,
+    "type": "MEMBER",
+    "amount": 3335721,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 31541,
+    "type": "MEMBER",
+    "amount": 64343373,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 23054,
+    "type": "MEMBER",
+    "amount": 2654818,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 36830,
+    "type": "MEMBER",
+    "amount": 9658457,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 92641,
+    "type": "MEMBER",
+    "amount": 165478642,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 140362,
+    "type": "MEMBER",
+    "amount": 23940990,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 131247,
+    "type": "MEMBER",
+    "amount": 2848096,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 92196,
+    "type": "MEMBER",
+    "amount": 30056750,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 98067,
+    "type": "MEMBER",
+    "amount": 4025473,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 120158,
+    "type": "MEMBER",
+    "amount": 9676043,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 73748,
+    "type": "MEMBER",
+    "amount": 82288770,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 129022,
+    "type": "MEMBER",
+    "amount": 14855286,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 69188,
+    "type": "MEMBER",
+    "amount": 47125804,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 10498,
+    "type": "MEMBER",
+    "amount": 75324237,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 112269,
+    "type": "MEMBER",
+    "amount": 3141495,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 123060,
+    "type": "MEMBER",
+    "amount": 8566217,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 9052,
+    "type": "MEMBER",
+    "amount": 145886564,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 67000,
+    "type": "MEMBER",
+    "amount": 21148182,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 65858,
+    "type": "MEMBER",
+    "amount": 46501693,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 1305,
+    "type": "MEMBER",
+    "amount": 62312611,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 128005,
+    "type": "MEMBER",
+    "amount": 1561159,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 102060,
+    "type": "MEMBER",
+    "amount": 19697481,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 123217,
+    "type": "MEMBER",
+    "amount": 7538216,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 75337,
+    "type": "MEMBER",
+    "amount": 6008075,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 131998,
+    "type": "MEMBER",
+    "amount": 7092190,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 120878,
+    "type": "MEMBER",
+    "amount": 71686758,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 57334,
+    "type": "MEMBER",
+    "amount": 598530,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 128596,
+    "type": "MEMBER",
+    "amount": 9356930,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 135894,
+    "type": "MEMBER",
+    "amount": 9024177,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 67621,
+    "type": "MEMBER",
+    "amount": 145750651,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 122399,
+    "type": "MEMBER",
+    "amount": 60754395,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 139791,
+    "type": "MEMBER",
+    "amount": 396619,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 7596,
+    "type": "MEMBER",
+    "amount": 17747554,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 116533,
+    "type": "MEMBER",
+    "amount": 7732599,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 83836,
+    "type": "MEMBER",
+    "amount": 2074664,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 105687,
+    "type": "MEMBER",
+    "amount": 120082732,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 105015,
+    "type": "MEMBER",
+    "amount": 41909295,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 2037,
+    "type": "MEMBER",
+    "amount": 299864019,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 112875,
+    "type": "MEMBER",
+    "amount": 57495698,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 119293,
+    "type": "MEMBER",
+    "amount": 7960877,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 118227,
+    "type": "MEMBER",
+    "amount": 24041695,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 1216,
+    "type": "MEMBER",
+    "amount": 134717452,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 80673,
+    "type": "MEMBER",
+    "amount": 600394,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 133936,
+    "type": "MEMBER",
+    "amount": 1918149,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 122485,
+    "type": "MEMBER",
+    "amount": 14666767,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 122224,
+    "type": "MEMBER",
+    "amount": 7274171,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 65377,
+    "type": "MEMBER",
+    "amount": 1041396851,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 118304,
+    "type": "MEMBER",
+    "amount": 32039652,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 121003,
+    "type": "MEMBER",
+    "amount": 60248695,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 73074,
+    "type": "MEMBER",
+    "amount": 67118643,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 119861,
+    "type": "MEMBER",
+    "amount": 3753409,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 72748,
+    "type": "MEMBER",
+    "amount": 127283315,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 104099,
+    "type": "MEMBER",
+    "amount": 12289435,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 119021,
+    "type": "MEMBER",
+    "amount": 4806165,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 107392,
+    "type": "MEMBER",
+    "amount": 9503434,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 84996,
+    "type": "MEMBER",
+    "amount": 7244208,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 137666,
+    "type": "MEMBER",
+    "amount": 9846583,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 122519,
+    "type": "MEMBER",
+    "amount": 7210103,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 72045,
+    "type": "MEMBER",
+    "amount": 24067917,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 94638,
+    "type": "MEMBER",
+    "amount": 1534673,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 95511,
+    "type": "MEMBER",
+    "amount": 319634533,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 103006,
+    "type": "MEMBER",
+    "amount": 1414968,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 55899,
+    "type": "MEMBER",
+    "amount": 30143502,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 12779,
+    "type": "MEMBER",
+    "amount": 27492153,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 2682,
+    "type": "MEMBER",
+    "amount": 6024996,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 80512,
+    "type": "MEMBER",
+    "amount": 99434035,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 54798,
+    "type": "MEMBER",
+    "amount": 22195695,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 130660,
+    "type": "MEMBER",
+    "amount": 29370266,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 139232,
+    "type": "MEMBER",
+    "amount": 8837253,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 56627,
+    "type": "MEMBER",
+    "amount": 1652270,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 134679,
+    "type": "MEMBER",
+    "amount": 182677643,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 90492,
+    "type": "MEMBER",
+    "amount": 475803420,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 64609,
+    "type": "MEMBER",
+    "amount": 433438591,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 57370,
+    "type": "MEMBER",
+    "amount": 262079953,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 111423,
+    "type": "MEMBER",
+    "amount": 10013462,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 7339,
+    "type": "MEMBER",
+    "amount": 112315718,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 118878,
+    "type": "MEMBER",
+    "amount": 426639,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 10364,
+    "type": "MEMBER",
+    "amount": 31838686,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 96998,
+    "type": "MEMBER",
+    "amount": 5930666,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 104619,
+    "type": "MEMBER",
+    "amount": 259312907,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 134338,
+    "type": "MEMBER",
+    "amount": 3003436,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 139370,
+    "type": "MEMBER",
+    "amount": 828509,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 89096,
+    "type": "MEMBER",
+    "amount": 9691806,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 1499,
+    "type": "MEMBER",
+    "amount": 18654888,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 108027,
+    "type": "MEMBER",
+    "amount": 6254879,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 1765,
+    "type": "MEMBER",
+    "amount": 11130648,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 122753,
+    "type": "MEMBER",
+    "amount": 9253302,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 125091,
+    "type": "MEMBER",
+    "amount": 317875,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 98443,
+    "type": "MEMBER",
+    "amount": 15045301,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 113171,
+    "type": "MEMBER",
+    "amount": 1500793,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 120972,
+    "type": "MEMBER",
+    "amount": 481860938,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 70169,
+    "type": "MEMBER",
+    "amount": 61190319,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 57474,
+    "type": "MEMBER",
+    "amount": 22120870,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 7626,
+    "type": "MEMBER",
+    "amount": 108349646,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 133896,
+    "type": "MEMBER",
+    "amount": 66425670,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 9883,
+    "type": "MEMBER",
+    "amount": 8663166,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 133730,
+    "type": "MEMBER",
+    "amount": 4061280,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 101427,
+    "type": "MEMBER",
+    "amount": 249623,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 129595,
+    "type": "MEMBER",
+    "amount": 9508789,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 139075,
+    "type": "MEMBER",
+    "amount": 29215923,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 82968,
+    "type": "MEMBER",
+    "amount": 15084159,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 746,
+    "type": "MEMBER",
+    "amount": 3987998,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 109075,
+    "type": "MEMBER",
+    "amount": 10145981,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 133292,
+    "type": "MEMBER",
+    "amount": 8908335,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 204,
+    "type": "MEMBER",
+    "amount": 145048,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 54833,
+    "type": "MEMBER",
+    "amount": 6744646,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 373,
+    "type": "MEMBER",
+    "amount": 100472891,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 63863,
+    "type": "MEMBER",
+    "amount": 78247230,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 107008,
+    "type": "MEMBER",
+    "amount": 314082354,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 65531,
+    "type": "MEMBER",
+    "amount": 399598479,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 74169,
+    "type": "MEMBER",
+    "amount": 135346637,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 120328,
+    "type": "MEMBER",
+    "amount": 4506401,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 76538,
+    "type": "MEMBER",
+    "amount": 57445882,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 89925,
+    "type": "MEMBER",
+    "amount": 12036857,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6612,
+    "type": "MEMBER",
+    "amount": 7920084,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 62057,
+    "type": "MEMBER",
+    "amount": 130450157,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 131809,
+    "type": "MEMBER",
+    "amount": 30345998,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 2443,
+    "type": "MEMBER",
+    "amount": 15021993,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 129367,
+    "type": "MEMBER",
+    "amount": 75117273,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5143,
+    "type": "MEMBER",
+    "amount": 13900422,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 57358,
+    "type": "MEMBER",
+    "amount": 3244565820,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 85944,
+    "type": "MEMBER",
+    "amount": 340780401,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 54914,
+    "type": "MEMBER",
+    "amount": 84548977,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 135575,
+    "type": "MEMBER",
+    "amount": 421675,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 88881,
+    "type": "MEMBER",
+    "amount": 20148611,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 76534,
+    "type": "MEMBER",
+    "amount": 52184,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 122321,
+    "type": "MEMBER",
+    "amount": 1742761919,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 94830,
+    "type": "MEMBER",
+    "amount": 2440108,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6207,
+    "type": "MEMBER",
+    "amount": 36106796,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 38485,
+    "type": "MEMBER",
+    "amount": 199278554,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 70187,
+    "type": "MEMBER",
+    "amount": 22578427,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 82384,
+    "type": "MEMBER",
+    "amount": 10604233,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 55165,
+    "type": "MEMBER",
+    "amount": 3007809,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 110654,
+    "type": "MEMBER",
+    "amount": 99444787,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 125630,
+    "type": "MEMBER",
+    "amount": 599538,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 64574,
+    "type": "MEMBER",
+    "amount": 94093520,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 14877,
+    "type": "MEMBER",
+    "amount": 4128251,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 93550,
+    "type": "MEMBER",
+    "amount": 2721539,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 104744,
+    "type": "MEMBER",
+    "amount": 877388,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 97099,
+    "type": "MEMBER",
+    "amount": 117418236,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 117562,
+    "type": "MEMBER",
+    "amount": 3052736,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 140896,
+    "type": "MEMBER",
+    "amount": 2862561,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 106615,
+    "type": "MEMBER",
+    "amount": 20072218,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 10909,
+    "type": "MEMBER",
+    "amount": 225866805,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 123459,
+    "type": "MEMBER",
+    "amount": 1081521,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 99176,
+    "type": "MEMBER",
+    "amount": 42177049,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 112034,
+    "type": "MEMBER",
+    "amount": 92401362,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 112622,
+    "type": "MEMBER",
+    "amount": 5410747,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 100745,
+    "type": "MEMBER",
+    "amount": 1605632,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 81022,
+    "type": "MEMBER",
+    "amount": 4482347,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 133908,
+    "type": "MEMBER",
+    "amount": 8268313,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 8549,
+    "type": "MEMBER",
+    "amount": 1455086629,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 12580,
+    "type": "MEMBER",
+    "amount": 21834860,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 132118,
+    "type": "MEMBER",
+    "amount": 12017666,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 25941,
+    "type": "MEMBER",
+    "amount": 8009532,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 104118,
+    "type": "MEMBER",
+    "amount": 249303498,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 119579,
+    "type": "MEMBER",
+    "amount": 17154076,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 114824,
+    "type": "MEMBER",
+    "amount": 11026190,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 81268,
+    "type": "MEMBER",
+    "amount": 121071601,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 70291,
+    "type": "MEMBER",
+    "amount": 68407724,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 104526,
+    "type": "MEMBER",
+    "amount": 1207216,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 128601,
+    "type": "MEMBER",
+    "amount": 153767624,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6229,
+    "type": "MEMBER",
+    "amount": 108326447,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 69306,
+    "type": "MEMBER",
+    "amount": 22241724,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 121641,
+    "type": "MEMBER",
+    "amount": 1962676,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 86462,
+    "type": "MEMBER",
+    "amount": 29707601,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 69305,
+    "type": "MEMBER",
+    "amount": 11199768,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 139851,
+    "type": "MEMBER",
+    "amount": 9014917,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 140467,
+    "type": "MEMBER",
+    "amount": 6371513,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 51773,
+    "type": "MEMBER",
+    "amount": 202232114,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 110331,
+    "type": "MEMBER",
+    "amount": 4572356236,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 9201,
+    "type": "MEMBER",
+    "amount": 15633931,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 69827,
+    "type": "MEMBER",
+    "amount": 33638949,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 734,
+    "type": "MEMBER",
+    "amount": 21645918,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 103754,
+    "type": "MEMBER",
+    "amount": 37138541,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 111525,
+    "type": "MEMBER",
+    "amount": 37382006,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 11083,
+    "type": "MEMBER",
+    "amount": 51066435,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 92818,
+    "type": "MEMBER",
+    "amount": 1344874,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 88318,
+    "type": "MEMBER",
+    "amount": 601489406,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 14210,
+    "type": "MEMBER",
+    "amount": 602580764,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 115166,
+    "type": "MEMBER",
+    "amount": 246801,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 11884,
+    "type": "MEMBER",
+    "amount": 9604580,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 107779,
+    "type": "MEMBER",
+    "amount": 6760405,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6153,
+    "type": "MEMBER",
+    "amount": 36106796,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 98080,
+    "type": "MEMBER",
+    "amount": 4804097,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 8642,
+    "type": "MEMBER",
+    "amount": 30333635,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 113732,
+    "type": "MEMBER",
+    "amount": 6015161,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 115841,
+    "type": "MEMBER",
+    "amount": 15017842,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 109,
+    "type": "MEMBER",
+    "amount": 76190096,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 135568,
+    "type": "MEMBER",
+    "amount": 58788,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 68548,
+    "type": "MEMBER",
+    "amount": 28333906,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 4508,
+    "type": "MEMBER",
+    "amount": 213946,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 4496,
+    "type": "MEMBER",
+    "amount": 161128599,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 108347,
+    "type": "MEMBER",
+    "amount": 182210764,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 140137,
+    "type": "MEMBER",
+    "amount": 253722,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5580,
+    "type": "MEMBER",
+    "amount": 1518576835,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 3331,
+    "type": "MEMBER",
+    "amount": 244285004,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 12613,
+    "type": "MEMBER",
+    "amount": 39069293,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5658,
+    "type": "MEMBER",
+    "amount": 191067034,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 108742,
+    "type": "MEMBER",
+    "amount": 6972600,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 140258,
+    "type": "MEMBER",
+    "amount": 3356193,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 93970,
+    "type": "MEMBER",
+    "amount": 1914275,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 131867,
+    "type": "MEMBER",
+    "amount": 32621426,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 141047,
+    "type": "MEMBER",
+    "amount": 4373430,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 136032,
+    "type": "MEMBER",
+    "amount": 6013588,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 138916,
+    "type": "MEMBER",
+    "amount": 5904,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5695,
+    "type": "MEMBER",
+    "amount": 9893158,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 138415,
+    "type": "MEMBER",
+    "amount": 4451012,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 63947,
+    "type": "MEMBER",
+    "amount": 2401233432,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 40452,
+    "type": "MEMBER",
+    "amount": 54335272,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 116575,
+    "type": "MEMBER",
+    "amount": 997164698,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 4911,
+    "type": "MEMBER",
+    "amount": 6183066,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 126563,
+    "type": "MEMBER",
+    "amount": 49687796,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 138995,
+    "type": "MEMBER",
+    "amount": 3134799,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 69459,
+    "type": "MEMBER",
+    "amount": 61397788,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 140554,
+    "type": "MEMBER",
+    "amount": 2082998,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 99237,
+    "type": "MEMBER",
+    "amount": 602963,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5112,
+    "type": "MEMBER",
+    "amount": 6738549,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 128553,
+    "type": "MEMBER",
+    "amount": 10235801,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5574,
+    "type": "MEMBER",
+    "amount": 2895071,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 11941,
+    "type": "MEMBER",
+    "amount": 964877106,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 119857,
+    "type": "MEMBER",
+    "amount": 6008548,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 127355,
+    "type": "MEMBER",
+    "amount": 108171054,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 83197,
+    "type": "MEMBER",
+    "amount": 239874494,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 138678,
+    "type": "MEMBER",
+    "amount": 63901940,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 73845,
+    "type": "MEMBER",
+    "amount": 1441988,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 9596,
+    "type": "MEMBER",
+    "amount": 91300541,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 14239,
+    "type": "MEMBER",
+    "amount": 60185130,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 2044,
+    "type": "MEMBER",
+    "amount": 22376696,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 69990,
+    "type": "MEMBER",
+    "amount": 442641547,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 80376,
+    "type": "MEMBER",
+    "amount": 30068701,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 136268,
+    "type": "MEMBER",
+    "amount": 1174646,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 92780,
+    "type": "MEMBER",
+    "amount": 8857313,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 376,
+    "type": "MEMBER",
+    "amount": 10137867,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 66237,
+    "type": "MEMBER",
+    "amount": 397853587,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 92859,
+    "type": "MEMBER",
+    "amount": 921149,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 132260,
+    "type": "MEMBER",
+    "amount": 501078,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 133429,
+    "type": "MEMBER",
+    "amount": 775960,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 110600,
+    "type": "MEMBER",
+    "amount": 1376772,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 9928,
+    "type": "MEMBER",
+    "amount": 131568448,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 125289,
+    "type": "MEMBER",
+    "amount": 7737345,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 139408,
+    "type": "MEMBER",
+    "amount": 1494214,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 267,
+    "type": "MEMBER",
+    "amount": 12072139,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 55570,
+    "type": "MEMBER",
+    "amount": 7473670,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 123279,
+    "type": "MEMBER",
+    "amount": 12775458,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 94777,
+    "type": "MEMBER",
+    "amount": 1996150,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 88539,
+    "type": "MEMBER",
+    "amount": 473754,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 12132,
+    "type": "MEMBER",
+    "amount": 729534725,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 95605,
+    "type": "MEMBER",
+    "amount": 300438854,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 1875,
+    "type": "MEMBER",
+    "amount": 583409189,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 113282,
+    "type": "MEMBER",
+    "amount": 60094655,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 83999,
+    "type": "MEMBER",
+    "amount": 2439328,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 131965,
+    "type": "MEMBER",
+    "amount": 560580,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 118127,
+    "type": "MEMBER",
+    "amount": 899892,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 100412,
+    "type": "MEMBER",
+    "amount": 6020101,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 91403,
+    "type": "MEMBER",
+    "amount": 4808540,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 103508,
+    "type": "MEMBER",
+    "amount": 200859678,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 7177,
+    "type": "MEMBER",
+    "amount": 53031986,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 119008,
+    "type": "MEMBER",
+    "amount": 462024,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6867,
+    "type": "MEMBER",
+    "amount": 40069082,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 79085,
+    "type": "MEMBER",
+    "amount": 17731794,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 110217,
+    "type": "MEMBER",
+    "amount": 2404544,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 101471,
+    "type": "MEMBER",
+    "amount": 3113211,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 111209,
+    "type": "MEMBER",
+    "amount": 1170564550,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 72067,
+    "type": "MEMBER",
+    "amount": 2405520,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 63731,
+    "type": "MEMBER",
+    "amount": 46024895,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 124783,
+    "type": "MEMBER",
+    "amount": 5408572,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 9571,
+    "type": "MEMBER",
+    "amount": 248793,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 56270,
+    "type": "MEMBER",
+    "amount": 64861617,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 55445,
+    "type": "MEMBER",
+    "amount": 3789547,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 118898,
+    "type": "MEMBER",
+    "amount": 420664,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 1362,
+    "type": "MEMBER",
+    "amount": 9957599,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 76605,
+    "type": "MEMBER",
+    "amount": 33332957,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 135653,
+    "type": "MEMBER",
+    "amount": 30106220,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 10683,
+    "type": "MEMBER",
+    "amount": 735,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 105498,
+    "type": "MEMBER",
+    "amount": 10215304,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 75633,
+    "type": "MEMBER",
+    "amount": 35912163,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 12259,
+    "type": "MEMBER",
+    "amount": 676891,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 136538,
+    "type": "MEMBER",
+    "amount": 5407231,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 80971,
+    "type": "MEMBER",
+    "amount": 10922900,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 65704,
+    "type": "MEMBER",
+    "amount": 18061603,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 93129,
+    "type": "MEMBER",
+    "amount": 664514851,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 106717,
+    "type": "MEMBER",
+    "amount": 481193,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 73817,
+    "type": "MEMBER",
+    "amount": 96233626,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 57034,
+    "type": "MEMBER",
+    "amount": 135654,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 2826,
+    "type": "MEMBER",
+    "amount": 122777922,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 96856,
+    "type": "MEMBER",
+    "amount": 60152341,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 21837,
+    "type": "MEMBER",
+    "amount": 2260979,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 140028,
+    "type": "MEMBER",
+    "amount": 32179828,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 37284,
+    "type": "MEMBER",
+    "amount": 12720568,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 141002,
+    "type": "MEMBER",
+    "amount": 18679180,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 131734,
+    "type": "MEMBER",
+    "amount": 5686020,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 134687,
+    "type": "MEMBER",
+    "amount": 10012135,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 73601,
+    "type": "MEMBER",
+    "amount": 10934202,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 96686,
+    "type": "MEMBER",
+    "amount": 211056199,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 115445,
+    "type": "MEMBER",
+    "amount": 4204629,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 13288,
+    "type": "MEMBER",
+    "amount": 15335124,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 67142,
+    "type": "MEMBER",
+    "amount": 752885536,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 92653,
+    "type": "MEMBER",
+    "amount": 246765681,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5618,
+    "type": "MEMBER",
+    "amount": 3753619858,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 2454,
+    "type": "MEMBER",
+    "amount": 2427099929,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 115943,
+    "type": "MEMBER",
+    "amount": 21305796,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 73726,
+    "type": "MEMBER",
+    "amount": 6651748,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 13022,
+    "type": "MEMBER",
+    "amount": 1203208,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 47,
+    "type": "MEMBER",
+    "amount": 57708379,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 119964,
+    "type": "MEMBER",
+    "amount": 818347,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 116685,
+    "type": "MEMBER",
+    "amount": 63403738,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 79426,
+    "type": "MEMBER",
+    "amount": 33512720,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 81055,
+    "type": "MEMBER",
+    "amount": 78807,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 101989,
+    "type": "MEMBER",
+    "amount": 9019777,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 109698,
+    "type": "MEMBER",
+    "amount": 78181517,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 88161,
+    "type": "MEMBER",
+    "amount": 60094158,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 120598,
+    "type": "MEMBER",
+    "amount": 30921255,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 117689,
+    "type": "MEMBER",
+    "amount": 2618900,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 140804,
+    "type": "MEMBER",
+    "amount": 80546969,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 12863,
+    "type": "MEMBER",
+    "amount": 247188899,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 132532,
+    "type": "MEMBER",
+    "amount": 140565502,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 72937,
+    "type": "MEMBER",
+    "amount": 90215452,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6191,
+    "type": "MEMBER",
+    "amount": 36106796,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 121196,
+    "type": "MEMBER",
+    "amount": 3006076,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 4874,
+    "type": "MEMBER",
+    "amount": 156932487,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6366,
+    "type": "MEMBER",
+    "amount": 797865494,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 9608,
+    "type": "MEMBER",
+    "amount": 478486251,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 83511,
+    "type": "MEMBER",
+    "amount": 37101152,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 124832,
+    "type": "MEMBER",
+    "amount": 714792,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 7916,
+    "type": "MEMBER",
+    "amount": 28882082,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 134126,
+    "type": "MEMBER",
+    "amount": 6089471,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 55296,
+    "type": "MEMBER",
+    "amount": 48181658,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 3800,
+    "type": "MEMBER",
+    "amount": 60488220,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 331,
+    "type": "MEMBER",
+    "amount": 442298547,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6348,
+    "type": "MEMBER",
+    "amount": 55046220,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 78431,
+    "type": "MEMBER",
+    "amount": 2736343,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 91216,
+    "type": "MEMBER",
+    "amount": 40052605,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 66610,
+    "type": "MEMBER",
+    "amount": 1775390986,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 12177,
+    "type": "MEMBER",
+    "amount": 180738893,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 117954,
+    "type": "MEMBER",
+    "amount": 30727069,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 64407,
+    "type": "MEMBER",
+    "amount": 120764873,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 92077,
+    "type": "MEMBER",
+    "amount": 6012494,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 133727,
+    "type": "MEMBER",
+    "amount": 112873,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 67232,
+    "type": "MEMBER",
+    "amount": 599769,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 88800,
+    "type": "MEMBER",
+    "amount": 12713873,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 128104,
+    "type": "MEMBER",
+    "amount": 7193214,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 114576,
+    "type": "MEMBER",
+    "amount": 2052532,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 111466,
+    "type": "MEMBER",
+    "amount": 20812791,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 109947,
+    "type": "MEMBER",
+    "amount": 5427350,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 134791,
+    "type": "MEMBER",
+    "amount": 34961867,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 120809,
+    "type": "MEMBER",
+    "amount": 45073887,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 95429,
+    "type": "MEMBER",
+    "amount": 128199068,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 82231,
+    "type": "MEMBER",
+    "amount": 2652854542,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 3301,
+    "type": "MEMBER",
+    "amount": 5084519,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 3700,
+    "type": "MEMBER",
+    "amount": 90337178,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 101281,
+    "type": "MEMBER",
+    "amount": 15121632,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 137628,
+    "type": "MEMBER",
+    "amount": 16593531,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 71465,
+    "type": "MEMBER",
+    "amount": 36000345,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 104777,
+    "type": "MEMBER",
+    "amount": 4637132,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 136844,
+    "type": "MEMBER",
+    "amount": 2282298,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 4394,
+    "type": "MEMBER",
+    "amount": 287090359,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 95348,
+    "type": "MEMBER",
+    "amount": 2078327402,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5029,
+    "type": "MEMBER",
+    "amount": 18028425,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 10030,
+    "type": "MEMBER",
+    "amount": 6150904,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 112458,
+    "type": "MEMBER",
+    "amount": 12672970,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 66721,
+    "type": "MEMBER",
+    "amount": 21148515,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 121451,
+    "type": "MEMBER",
+    "amount": 6276541,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6411,
+    "type": "MEMBER",
+    "amount": 346493429,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 55870,
+    "type": "MEMBER",
+    "amount": 14134878,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 101639,
+    "type": "MEMBER",
+    "amount": 6103608,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 9126,
+    "type": "MEMBER",
+    "amount": 36710855,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 116131,
+    "type": "MEMBER",
+    "amount": 3450817,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 55478,
+    "type": "MEMBER",
+    "amount": 8692657,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 140226,
+    "type": "MEMBER",
+    "amount": 58176,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 98693,
+    "type": "MEMBER",
+    "amount": 46489309,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 137649,
+    "type": "MEMBER",
+    "amount": 1199989,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 84222,
+    "type": "MEMBER",
+    "amount": 150464689,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 120983,
+    "type": "MEMBER",
+    "amount": 51713949,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 125923,
+    "type": "MEMBER",
+    "amount": 806958,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 3847,
+    "type": "MEMBER",
+    "amount": 36171958,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 3536,
+    "type": "MEMBER",
+    "amount": 18611811,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 116138,
+    "type": "MEMBER",
+    "amount": 4806162,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 3546,
+    "type": "MEMBER",
+    "amount": 497068054,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 117398,
+    "type": "MEMBER",
+    "amount": 14095974,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 117164,
+    "type": "MEMBER",
+    "amount": 695122,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 117852,
+    "type": "MEMBER",
+    "amount": 262205,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 85989,
+    "type": "MEMBER",
+    "amount": 3169117,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 34873,
+    "type": "MEMBER",
+    "amount": 9157863,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 106473,
+    "type": "MEMBER",
+    "amount": 44704778,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6759,
+    "type": "MEMBER",
+    "amount": 601399653,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 121284,
+    "type": "MEMBER",
+    "amount": 5643503,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 3947,
+    "type": "MEMBER",
+    "amount": 6339023,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 139993,
+    "type": "MEMBER",
+    "amount": 599422,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 121753,
+    "type": "MEMBER",
+    "amount": 102285845,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 3264,
+    "type": "MEMBER",
+    "amount": 25150898,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 139450,
+    "type": "MEMBER",
+    "amount": 10348988,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 97452,
+    "type": "MEMBER",
+    "amount": 119778216,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 133614,
+    "type": "MEMBER",
+    "amount": 547208,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 94147,
+    "type": "MEMBER",
+    "amount": 61647624,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 87176,
+    "type": "MEMBER",
+    "amount": 63383742,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 133016,
+    "type": "MEMBER",
+    "amount": 38574942,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 28011,
+    "type": "MEMBER",
+    "amount": 26847109,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 9431,
+    "type": "MEMBER",
+    "amount": 95475728,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 127092,
+    "type": "MEMBER",
+    "amount": 13199732,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 90901,
+    "type": "MEMBER",
+    "amount": 7554,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 97085,
+    "type": "MEMBER",
+    "amount": 18243794,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 80997,
+    "type": "MEMBER",
+    "amount": 9706061,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 66151,
+    "type": "MEMBER",
+    "amount": 3005093,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 25172,
+    "type": "MEMBER",
+    "amount": 6568768,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 114538,
+    "type": "MEMBER",
+    "amount": 496717,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 86055,
+    "type": "MEMBER",
+    "amount": 7728564,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 122493,
+    "type": "MEMBER",
+    "amount": 125226,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 97690,
+    "type": "MEMBER",
+    "amount": 60182590,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 94931,
+    "type": "MEMBER",
+    "amount": 30048661,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 67357,
+    "type": "MEMBER",
+    "amount": 15864850,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 14764,
+    "type": "MEMBER",
+    "amount": 223641809,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 96994,
+    "type": "MEMBER",
+    "amount": 11210,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 103873,
+    "type": "MEMBER",
+    "amount": 6671167,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 95343,
+    "type": "MEMBER",
+    "amount": 10850117,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 13802,
+    "type": "MEMBER",
+    "amount": 1503138,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 135652,
+    "type": "MEMBER",
+    "amount": 947643,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 73235,
+    "type": "MEMBER",
+    "amount": 19623,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 124399,
+    "type": "MEMBER",
+    "amount": 15890179,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 90236,
+    "type": "MEMBER",
+    "amount": 30755647,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 90591,
+    "type": "MEMBER",
+    "amount": 4657822,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 112768,
+    "type": "MEMBER",
+    "amount": 13205472,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 89052,
+    "type": "MEMBER",
+    "amount": 194491340,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 91217,
+    "type": "MEMBER",
+    "amount": 3009920,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 2162,
+    "type": "MEMBER",
+    "amount": 6894547,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 92506,
+    "type": "MEMBER",
+    "amount": 210758,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 132328,
+    "type": "MEMBER",
+    "amount": 18695683,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 93366,
+    "type": "MEMBER",
+    "amount": 599046,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 140228,
+    "type": "MEMBER",
+    "amount": 303975,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 4494,
+    "type": "MEMBER",
+    "amount": 235678900,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 110704,
+    "type": "MEMBER",
+    "amount": 8233086,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 107017,
+    "type": "MEMBER",
+    "amount": 949054,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 125368,
+    "type": "MEMBER",
+    "amount": 33698990,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 55344,
+    "type": "MEMBER",
+    "amount": 12651061,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 15334,
+    "type": "MEMBER",
+    "amount": 18026909,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 139587,
+    "type": "MEMBER",
+    "amount": 58027495,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 89627,
+    "type": "MEMBER",
+    "amount": 5782985,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 3565,
+    "type": "MEMBER",
+    "amount": 13164554,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 135416,
+    "type": "MEMBER",
+    "amount": 58127,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 92701,
+    "type": "MEMBER",
+    "amount": 6016024,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 76498,
+    "type": "MEMBER",
+    "amount": 3029718026,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 82947,
+    "type": "MEMBER",
+    "amount": 54912094,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 99367,
+    "type": "MEMBER",
+    "amount": 7312336,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 14340,
+    "type": "MEMBER",
+    "amount": 77517795,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 99495,
+    "type": "MEMBER",
+    "amount": 9338711,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 1039,
+    "type": "MEMBER",
+    "amount": 7865907,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 81739,
+    "type": "MEMBER",
+    "amount": 76268608,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 91036,
+    "type": "MEMBER",
+    "amount": 10615870,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 108490,
+    "type": "MEMBER",
+    "amount": 39705755,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 121048,
+    "type": "MEMBER",
+    "amount": 4805080,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 82786,
+    "type": "MEMBER",
+    "amount": 3014124,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 121481,
+    "type": "MEMBER",
+    "amount": 661539,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 70229,
+    "type": "MEMBER",
+    "amount": 44089380,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 67834,
+    "type": "MEMBER",
+    "amount": 106580159,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 95142,
+    "type": "MEMBER",
+    "amount": 231812,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 77934,
+    "type": "MEMBER",
+    "amount": 19484912,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 98837,
+    "type": "MEMBER",
+    "amount": 5408331,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6451,
+    "type": "MEMBER",
+    "amount": 6339102,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 132192,
+    "type": "MEMBER",
+    "amount": 593632,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 91437,
+    "type": "MEMBER",
+    "amount": 27296721,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 11691,
+    "type": "MEMBER",
+    "amount": 69301097,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 139692,
+    "type": "MEMBER",
+    "amount": 1200590,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 88871,
+    "type": "MEMBER",
+    "amount": 97647163,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 127553,
+    "type": "MEMBER",
+    "amount": 641697,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 68181,
+    "type": "MEMBER",
+    "amount": 128186224,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 107815,
+    "type": "MEMBER",
+    "amount": 41172251,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 98835,
+    "type": "MEMBER",
+    "amount": 4498451,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 10380,
+    "type": "MEMBER",
+    "amount": 21195907,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 14073,
+    "type": "MEMBER",
+    "amount": 3153758,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 130318,
+    "type": "MEMBER",
+    "amount": 3351930,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 3395,
+    "type": "MEMBER",
+    "amount": 9057897,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 86945,
+    "type": "MEMBER",
+    "amount": 60510577,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 7965,
+    "type": "MEMBER",
+    "amount": 7677717,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 108000,
+    "type": "MEMBER",
+    "amount": 622975,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 127071,
+    "type": "MEMBER",
+    "amount": 626107,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 70676,
+    "type": "MEMBER",
+    "amount": 41169897,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 119928,
+    "type": "MEMBER",
+    "amount": 180078,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 109621,
+    "type": "MEMBER",
+    "amount": 291631,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 95206,
+    "type": "MEMBER",
+    "amount": 3539009,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 11015,
+    "type": "MEMBER",
+    "amount": 185501289,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 56562,
+    "type": "MEMBER",
+    "amount": 1936136058,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 79113,
+    "type": "MEMBER",
+    "amount": 34325377,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 10769,
+    "type": "MEMBER",
+    "amount": 86639236,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6637,
+    "type": "MEMBER",
+    "amount": 30069310,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 8151,
+    "type": "MEMBER",
+    "amount": 3316972124,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 95846,
+    "type": "MEMBER",
+    "amount": 15644454,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 112901,
+    "type": "MEMBER",
+    "amount": 6015161,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 117982,
+    "type": "MEMBER",
+    "amount": 24503661,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 57581,
+    "type": "MEMBER",
+    "amount": 38517651,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 130315,
+    "type": "MEMBER",
+    "amount": 246377,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 11319,
+    "type": "MEMBER",
+    "amount": 120410521,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 118762,
+    "type": "MEMBER",
+    "amount": 11396285,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 138899,
+    "type": "MEMBER",
+    "amount": 30616341,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 96,
+    "type": "MEMBER",
+    "amount": 19668061,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 68445,
+    "type": "MEMBER",
+    "amount": 7822718,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 104480,
+    "type": "MEMBER",
+    "amount": 32899,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 135982,
+    "type": "MEMBER",
+    "amount": 2613206,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 135549,
+    "type": "MEMBER",
+    "amount": 24407903,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 70160,
+    "type": "MEMBER",
+    "amount": 4700313,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 93444,
+    "type": "MEMBER",
+    "amount": 600312,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 77775,
+    "type": "MEMBER",
+    "amount": 1889726,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 97652,
+    "type": "MEMBER",
+    "amount": 1193065,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6656,
+    "type": "MEMBER",
+    "amount": 18561954,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 108748,
+    "type": "MEMBER",
+    "amount": 7224436,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 101441,
+    "type": "MEMBER",
+    "amount": 6893984,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 104829,
+    "type": "MEMBER",
+    "amount": 62540702,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 72894,
+    "type": "MEMBER",
+    "amount": 11615695,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 12646,
+    "type": "MEMBER",
+    "amount": 15560318,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 92222,
+    "type": "MEMBER",
+    "amount": 1674131,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 125501,
+    "type": "MEMBER",
+    "amount": 16095316,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 45416,
+    "type": "MEMBER",
+    "amount": 88123630,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 140914,
+    "type": "MEMBER",
+    "amount": 239284,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 138622,
+    "type": "MEMBER",
+    "amount": 779926,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 101028,
+    "type": "MEMBER",
+    "amount": 7526262,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 117776,
+    "type": "MEMBER",
+    "amount": 61083054,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 140693,
+    "type": "MEMBER",
+    "amount": 599642,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 120700,
+    "type": "MEMBER",
+    "amount": 164262474,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 124585,
+    "type": "MEMBER",
+    "amount": 5010373,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 65738,
+    "type": "MEMBER",
+    "amount": 60414381,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 12762,
+    "type": "MEMBER",
+    "amount": 136544579,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 131449,
+    "type": "MEMBER",
+    "amount": 1175350,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 116041,
+    "type": "MEMBER",
+    "amount": 8883968,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 2875,
+    "type": "MEMBER",
+    "amount": 1797402,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 79877,
+    "type": "MEMBER",
+    "amount": 1203580,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 135351,
+    "type": "MEMBER",
+    "amount": 10673,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 99193,
+    "type": "MEMBER",
+    "amount": 120188825,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 95138,
+    "type": "MEMBER",
+    "amount": 365568791,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 7660,
+    "type": "MEMBER",
+    "amount": 127573905,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 118047,
+    "type": "MEMBER",
+    "amount": 692090,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 85838,
+    "type": "MEMBER",
+    "amount": 8171,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 111580,
+    "type": "MEMBER",
+    "amount": 143029,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 7197,
+    "type": "MEMBER",
+    "amount": 120377480,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 108676,
+    "type": "MEMBER",
+    "amount": 312991,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 57219,
+    "type": "MEMBER",
+    "amount": 818497,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 129889,
+    "type": "MEMBER",
+    "amount": 65839035,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 115305,
+    "type": "MEMBER",
+    "amount": 339067,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6165,
+    "type": "MEMBER",
+    "amount": 879859,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 80878,
+    "type": "MEMBER",
+    "amount": 122809271,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 66690,
+    "type": "MEMBER",
+    "amount": 945824,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 107714,
+    "type": "MEMBER",
+    "amount": 1194787,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 115106,
+    "type": "MEMBER",
+    "amount": 8240767,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6928,
+    "type": "MEMBER",
+    "amount": 48402610,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 123851,
+    "type": "MEMBER",
+    "amount": 198659,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 113835,
+    "type": "MEMBER",
+    "amount": 423155833,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 91560,
+    "type": "MEMBER",
+    "amount": 3191560,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 118337,
+    "type": "MEMBER",
+    "amount": 1795529,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 118016,
+    "type": "MEMBER",
+    "amount": 33827392,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 122022,
+    "type": "MEMBER",
+    "amount": 88735,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 108066,
+    "type": "MEMBER",
+    "amount": 6008673,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 110524,
+    "type": "MEMBER",
+    "amount": 4969576,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 93684,
+    "type": "MEMBER",
+    "amount": 46718253,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 12360,
+    "type": "MEMBER",
+    "amount": 14446476,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 136889,
+    "type": "MEMBER",
+    "amount": 118883,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 15331,
+    "type": "MEMBER",
+    "amount": 61127585,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 132658,
+    "type": "MEMBER",
+    "amount": 2357618,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 93432,
+    "type": "MEMBER",
+    "amount": 119833966,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 4244,
+    "type": "MEMBER",
+    "amount": 1023227913,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 2145,
+    "type": "MEMBER",
+    "amount": 142058217,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 116069,
+    "type": "MEMBER",
+    "amount": 2227944,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 123120,
+    "type": "MEMBER",
+    "amount": 24036638,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 91547,
+    "type": "MEMBER",
+    "amount": 392932942,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 35306,
+    "type": "MEMBER",
+    "amount": 24124337,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 97626,
+    "type": "MEMBER",
+    "amount": 24676335,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 107159,
+    "type": "MEMBER",
+    "amount": 144095290,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 118983,
+    "type": "MEMBER",
+    "amount": 3002134,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 1819,
+    "type": "MEMBER",
+    "amount": 11063749,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 7622,
+    "type": "MEMBER",
+    "amount": 1152785651,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 4802,
+    "type": "MEMBER",
+    "amount": 35893917,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 106747,
+    "type": "MEMBER",
+    "amount": 620087,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 14596,
+    "type": "MEMBER",
+    "amount": 8873899,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 66455,
+    "type": "MEMBER",
+    "amount": 12036581,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 137228,
+    "type": "MEMBER",
+    "amount": 6591110,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 138506,
+    "type": "MEMBER",
+    "amount": 21033609,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 103257,
+    "type": "MEMBER",
+    "amount": 3154533,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 13744,
+    "type": "MEMBER",
+    "amount": 184994732,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 66267,
+    "type": "MEMBER",
+    "amount": 2550342,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 96784,
+    "type": "MEMBER",
+    "amount": 128559,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 122711,
+    "type": "MEMBER",
+    "amount": 210088719,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 75554,
+    "type": "MEMBER",
+    "amount": 15547629,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 124271,
+    "type": "MEMBER",
+    "amount": 1807019,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 83407,
+    "type": "MEMBER",
+    "amount": 116584811,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 79477,
+    "type": "MEMBER",
+    "amount": 63535609,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 113324,
+    "type": "MEMBER",
+    "amount": 53665050,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 12511,
+    "type": "MEMBER",
+    "amount": 30091424,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 96816,
+    "type": "MEMBER",
+    "amount": 48136651,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 12299,
+    "type": "MEMBER",
+    "amount": 30091146,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 120933,
+    "type": "MEMBER",
+    "amount": 24636641,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 86395,
+    "type": "MEMBER",
+    "amount": 12035447,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5563,
+    "type": "MEMBER",
+    "amount": 61679162,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 122198,
+    "type": "MEMBER",
+    "amount": 1075704,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 86679,
+    "type": "MEMBER",
+    "amount": 19394440,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 131271,
+    "type": "MEMBER",
+    "amount": 778608,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 101867,
+    "type": "MEMBER",
+    "amount": 20010281,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 103295,
+    "type": "MEMBER",
+    "amount": 599041,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 38018,
+    "type": "MEMBER",
+    "amount": 36093604,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 7509,
+    "type": "MEMBER",
+    "amount": 19141587,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 131953,
+    "type": "MEMBER",
+    "amount": 1301488,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 71003,
+    "type": "MEMBER",
+    "amount": 124755785,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 120302,
+    "type": "MEMBER",
+    "amount": 5326729,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 88630,
+    "type": "MEMBER",
+    "amount": 1213924,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 87832,
+    "type": "MEMBER",
+    "amount": 11692479,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 12909,
+    "type": "MEMBER",
+    "amount": 931472,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 9835,
+    "type": "MEMBER",
+    "amount": 29110070,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 71048,
+    "type": "MEMBER",
+    "amount": 8906462,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 38567,
+    "type": "MEMBER",
+    "amount": 8902375,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 83493,
+    "type": "MEMBER",
+    "amount": 297838825,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 98743,
+    "type": "MEMBER",
+    "amount": 74112856,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 127083,
+    "type": "MEMBER",
+    "amount": 882688,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 123055,
+    "type": "MEMBER",
+    "amount": 5980565,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 68535,
+    "type": "MEMBER",
+    "amount": 72590938,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 141010,
+    "type": "MEMBER",
+    "amount": 58784,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 83537,
+    "type": "MEMBER",
+    "amount": 7192752,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 9616,
+    "type": "MEMBER",
+    "amount": 21065526,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 58937,
+    "type": "MEMBER",
+    "amount": 2118,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 56260,
+    "type": "MEMBER",
+    "amount": 2757113,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 126873,
+    "type": "MEMBER",
+    "amount": 5406510,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 74444,
+    "type": "MEMBER",
+    "amount": 72620510,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 89624,
+    "type": "MEMBER",
+    "amount": 4195391,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 65600,
+    "type": "MEMBER",
+    "amount": 284852809,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 96624,
+    "type": "MEMBER",
+    "amount": 96523615,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 55281,
+    "type": "MEMBER",
+    "amount": 34210357,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 132090,
+    "type": "MEMBER",
+    "amount": 30067847,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 129184,
+    "type": "MEMBER",
+    "amount": 232586148,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 104849,
+    "type": "MEMBER",
+    "amount": 840289,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 117766,
+    "type": "MEMBER",
+    "amount": 13698144,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 56289,
+    "type": "MEMBER",
+    "amount": 76247187,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5489,
+    "type": "MEMBER",
+    "amount": 804918131,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 120391,
+    "type": "MEMBER",
+    "amount": 43812486,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 128116,
+    "type": "MEMBER",
+    "amount": 6748438,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 121464,
+    "type": "MEMBER",
+    "amount": 300970,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 121214,
+    "type": "MEMBER",
+    "amount": 3071344,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 86182,
+    "type": "MEMBER",
+    "amount": 22901,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 427,
+    "type": "MEMBER",
+    "amount": 209224225,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 111928,
+    "type": "MEMBER",
+    "amount": 9895221,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 97478,
+    "type": "MEMBER",
+    "amount": 1503695,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 73941,
+    "type": "MEMBER",
+    "amount": 7536531,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 133315,
+    "type": "MEMBER",
+    "amount": 562408,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6302,
+    "type": "MEMBER",
+    "amount": 37944983,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 127670,
+    "type": "MEMBER",
+    "amount": 31704299,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 557,
+    "type": "MEMBER",
+    "amount": 60275686,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 118503,
+    "type": "MEMBER",
+    "amount": 13372322,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 14763,
+    "type": "MEMBER",
+    "amount": 37334393,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 140891,
+    "type": "MEMBER",
+    "amount": 12805201,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 69701,
+    "type": "MEMBER",
+    "amount": 23091215,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 100426,
+    "type": "MEMBER",
+    "amount": 90743030,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 94367,
+    "type": "MEMBER",
+    "amount": 5728578,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 139506,
+    "type": "MEMBER",
+    "amount": 15418769,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 139292,
+    "type": "MEMBER",
+    "amount": 628311,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 124282,
+    "type": "MEMBER",
+    "amount": 63602789,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 107425,
+    "type": "MEMBER",
+    "amount": 22363805,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 117644,
+    "type": "MEMBER",
+    "amount": 6068264,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 55890,
+    "type": "MEMBER",
+    "amount": 86844364,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 60130,
+    "type": "MEMBER",
+    "amount": 184749208,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 1496,
+    "type": "MEMBER",
+    "amount": 60191419,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 119587,
+    "type": "MEMBER",
+    "amount": 42064377,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 57369,
+    "type": "MEMBER",
+    "amount": 279284488,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 121536,
+    "type": "MEMBER",
+    "amount": 12017054,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 65701,
+    "type": "MEMBER",
+    "amount": 120470937,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 4533,
+    "type": "MEMBER",
+    "amount": 1011303,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 77312,
+    "type": "MEMBER",
+    "amount": 649224158,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 116122,
+    "type": "MEMBER",
+    "amount": 2396478,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 117299,
+    "type": "MEMBER",
+    "amount": 8075140,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 79453,
+    "type": "MEMBER",
+    "amount": 8423750,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 49091,
+    "type": "MEMBER",
+    "amount": 7012893,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 38017,
+    "type": "MEMBER",
+    "amount": 250509986,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 12081,
+    "type": "MEMBER",
+    "amount": 165831157,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 14658,
+    "type": "MEMBER",
+    "amount": 39116413,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 64953,
+    "type": "MEMBER",
+    "amount": 36808515,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 113529,
+    "type": "MEMBER",
+    "amount": 37305975,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 123693,
+    "type": "MEMBER",
+    "amount": 175412922,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 131045,
+    "type": "MEMBER",
+    "amount": 58684,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 91388,
+    "type": "MEMBER",
+    "amount": 66120780,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 77066,
+    "type": "MEMBER",
+    "amount": 4,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 119287,
+    "type": "MEMBER",
+    "amount": 60256950,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 121792,
+    "type": "MEMBER",
+    "amount": 15023010,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 138472,
+    "type": "MEMBER",
+    "amount": 808149148,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 68347,
+    "type": "MEMBER",
+    "amount": 26078061,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 102015,
+    "type": "MEMBER",
+    "amount": 7210477,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 2411,
+    "type": "MEMBER",
+    "amount": 15074388,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 4970,
+    "type": "MEMBER",
+    "amount": 1139766874,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 93847,
+    "type": "MEMBER",
+    "amount": 481031563,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 56725,
+    "type": "MEMBER",
+    "amount": 134374792,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 88536,
+    "type": "MEMBER",
+    "amount": 30088404,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 122789,
+    "type": "MEMBER",
+    "amount": 5240780,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 12035,
+    "type": "MEMBER",
+    "amount": 316686457,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 71366,
+    "type": "MEMBER",
+    "amount": 48301125,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 119131,
+    "type": "MEMBER",
+    "amount": 9006973,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 90735,
+    "type": "MEMBER",
+    "amount": 66334197,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 93408,
+    "type": "MEMBER",
+    "amount": 57012719,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 115696,
+    "type": "MEMBER",
+    "amount": 10351,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 120850,
+    "type": "MEMBER",
+    "amount": 180294857,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 139183,
+    "type": "MEMBER",
+    "amount": 32150664,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 87805,
+    "type": "MEMBER",
+    "amount": 9919392,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 70246,
+    "type": "MEMBER",
+    "amount": 411522,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 108271,
+    "type": "MEMBER",
+    "amount": 9501162,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 26444,
+    "type": "MEMBER",
+    "amount": 134793553,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 131559,
+    "type": "MEMBER",
+    "amount": 1204092,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5534,
+    "type": "MEMBER",
+    "amount": 603415377,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 58549,
+    "type": "MEMBER",
+    "amount": 2366,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 95266,
+    "type": "MEMBER",
+    "amount": 4803,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 119115,
+    "type": "MEMBER",
+    "amount": 25114793,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 84803,
+    "type": "MEMBER",
+    "amount": 6009700,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 63650,
+    "type": "MEMBER",
+    "amount": 47455081,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 132610,
+    "type": "MEMBER",
+    "amount": 49123424,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 68154,
+    "type": "MEMBER",
+    "amount": 72127385,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5098,
+    "type": "MEMBER",
+    "amount": 9895539,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 86572,
+    "type": "MEMBER",
+    "amount": 35283695,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 80066,
+    "type": "MEMBER",
+    "amount": 235935482,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 87993,
+    "type": "MEMBER",
+    "amount": 6012136,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 57213,
+    "type": "MEMBER",
+    "amount": 53221933,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 124272,
+    "type": "MEMBER",
+    "amount": 60098862,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6242,
+    "type": "MEMBER",
+    "amount": 36106900,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 96750,
+    "type": "MEMBER",
+    "amount": 462075612,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 110741,
+    "type": "MEMBER",
+    "amount": 21280702,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 119697,
+    "type": "MEMBER",
+    "amount": 1177116,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 135858,
+    "type": "MEMBER",
+    "amount": 60105956,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 19811,
+    "type": "MEMBER",
+    "amount": 4595879,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 7148,
+    "type": "MEMBER",
+    "amount": 60240754,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 104704,
+    "type": "MEMBER",
+    "amount": 26178139,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6255,
+    "type": "MEMBER",
+    "amount": 36106900,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 55994,
+    "type": "MEMBER",
+    "amount": 62027896,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 51531,
+    "type": "MEMBER",
+    "amount": 15761310,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 138057,
+    "type": "MEMBER",
+    "amount": 4695694,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 76579,
+    "type": "MEMBER",
+    "amount": 2100586879,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 109690,
+    "type": "MEMBER",
+    "amount": 66382829,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 123987,
+    "type": "MEMBER",
+    "amount": 9554336,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 140375,
+    "type": "MEMBER",
+    "amount": 6007161,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 99366,
+    "type": "MEMBER",
+    "amount": 2339735,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 67237,
+    "type": "MEMBER",
+    "amount": 120189807,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 90942,
+    "type": "MEMBER",
+    "amount": 25277374,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 103941,
+    "type": "MEMBER",
+    "amount": 1367493,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 114167,
+    "type": "MEMBER",
+    "amount": 706638,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 678,
+    "type": "MEMBER",
+    "amount": 264385181,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 134959,
+    "type": "MEMBER",
+    "amount": 6609249,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 123225,
+    "type": "MEMBER",
+    "amount": 40212010,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 4224,
+    "type": "MEMBER",
+    "amount": 29769244,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 120281,
+    "type": "MEMBER",
+    "amount": 2399259,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 138492,
+    "type": "MEMBER",
+    "amount": 362857,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 103231,
+    "type": "MEMBER",
+    "amount": 60093557,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 68641,
+    "type": "MEMBER",
+    "amount": 120371570,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 64013,
+    "type": "MEMBER",
+    "amount": 838800,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 99872,
+    "type": "MEMBER",
+    "amount": 48495244,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 83015,
+    "type": "MEMBER",
+    "amount": 210651229,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 56501,
+    "type": "MEMBER",
+    "amount": 54974278,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 57404,
+    "type": "MEMBER",
+    "amount": 40798316,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 88366,
+    "type": "MEMBER",
+    "amount": 2973955,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 138858,
+    "type": "MEMBER",
+    "amount": 4709890,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 117815,
+    "type": "MEMBER",
+    "amount": 13696347,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 106266,
+    "type": "MEMBER",
+    "amount": 72356910,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 4666,
+    "type": "MEMBER",
+    "amount": 40562397,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 4732,
+    "type": "MEMBER",
+    "amount": 117559843,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5046,
+    "type": "MEMBER",
+    "amount": 8440879,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 133351,
+    "type": "MEMBER",
+    "amount": 3006441,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 70677,
+    "type": "MEMBER",
+    "amount": 1605576,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 86329,
+    "type": "MEMBER",
+    "amount": 2133289,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 85424,
+    "type": "MEMBER",
+    "amount": 37699581,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 131505,
+    "type": "MEMBER",
+    "amount": 9125256,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 75361,
+    "type": "MEMBER",
+    "amount": 2402294,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 7795,
+    "type": "MEMBER",
+    "amount": 145253518,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 122646,
+    "type": "MEMBER",
+    "amount": 1517939,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 64949,
+    "type": "MEMBER",
+    "amount": 379848092,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 110507,
+    "type": "MEMBER",
+    "amount": 150233946,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 4771,
+    "type": "MEMBER",
+    "amount": 1143245142,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 56075,
+    "type": "MEMBER",
+    "amount": 1009351,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 116821,
+    "type": "MEMBER",
+    "amount": 1591889,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 120982,
+    "type": "MEMBER",
+    "amount": 18388130,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 140110,
+    "type": "MEMBER",
+    "amount": 11297968,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 110680,
+    "type": "MEMBER",
+    "amount": 305300,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 2340,
+    "type": "MEMBER",
+    "amount": 30430567,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 131381,
+    "type": "MEMBER",
+    "amount": 32822790,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 129506,
+    "type": "MEMBER",
+    "amount": 644567,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 71486,
+    "type": "MEMBER",
+    "amount": 78698264,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 1532,
+    "type": "MEMBER",
+    "amount": 31494083,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 88868,
+    "type": "MEMBER",
+    "amount": 5863,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 138588,
+    "type": "MEMBER",
+    "amount": 8963645,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 67768,
+    "type": "MEMBER",
+    "amount": 44257846,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 97756,
+    "type": "MEMBER",
+    "amount": 9935084,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 66211,
+    "type": "MEMBER",
+    "amount": 1567669,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 101730,
+    "type": "MEMBER",
+    "amount": 55842707,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 91432,
+    "type": "MEMBER",
+    "amount": 8669534,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 7856,
+    "type": "MEMBER",
+    "amount": 20140036,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 110421,
+    "type": "MEMBER",
+    "amount": 5198349,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 103239,
+    "type": "MEMBER",
+    "amount": 521131,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 88223,
+    "type": "MEMBER",
+    "amount": 16847204,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 3348,
+    "type": "MEMBER",
+    "amount": 601641,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 114934,
+    "type": "MEMBER",
+    "amount": 12241665,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 69249,
+    "type": "MEMBER",
+    "amount": 9636025,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 140324,
+    "type": "MEMBER",
+    "amount": 2930787,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 62818,
+    "type": "MEMBER",
+    "amount": 8677313,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 112758,
+    "type": "MEMBER",
+    "amount": 655530,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 3478,
+    "type": "MEMBER",
+    "amount": 30153314,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 65594,
+    "type": "MEMBER",
+    "amount": 7106955,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 76029,
+    "type": "MEMBER",
+    "amount": 4499988,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 108058,
+    "type": "MEMBER",
+    "amount": 18094397,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6131,
+    "type": "MEMBER",
+    "amount": 19797175,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 110432,
+    "type": "MEMBER",
+    "amount": 60139326,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 119460,
+    "type": "MEMBER",
+    "amount": 21084757,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5179,
+    "type": "MEMBER",
+    "amount": 11057970,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5343,
+    "type": "MEMBER",
+    "amount": 42787423,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 122223,
+    "type": "MEMBER",
+    "amount": 1242052,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 2260,
+    "type": "MEMBER",
+    "amount": 30359539,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 140815,
+    "type": "MEMBER",
+    "amount": 1685755,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 43455,
+    "type": "MEMBER",
+    "amount": 64725478,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 76492,
+    "type": "MEMBER",
+    "amount": 301142750,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6539,
+    "type": "MEMBER",
+    "amount": 462024943,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 118286,
+    "type": "MEMBER",
+    "amount": 2766715,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 36572,
+    "type": "MEMBER",
+    "amount": 2300159,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 122300,
+    "type": "MEMBER",
+    "amount": 2517740,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 11495,
+    "type": "MEMBER",
+    "amount": 30343188,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 97506,
+    "type": "MEMBER",
+    "amount": 1063526,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 107287,
+    "type": "MEMBER",
+    "amount": 30837015,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 119939,
+    "type": "MEMBER",
+    "amount": 5407231,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 4539,
+    "type": "MEMBER",
+    "amount": 1407758718,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 68654,
+    "type": "MEMBER",
+    "amount": 58674451,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 73970,
+    "type": "MEMBER",
+    "amount": 49995632,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 132398,
+    "type": "MEMBER",
+    "amount": 30046726,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 110519,
+    "type": "MEMBER",
+    "amount": 40289585,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 76754,
+    "type": "MEMBER",
+    "amount": 644067361,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 92168,
+    "type": "MEMBER",
+    "amount": 208621,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 91536,
+    "type": "MEMBER",
+    "amount": 3004534,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 8980,
+    "type": "MEMBER",
+    "amount": 75118578,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 134880,
+    "type": "MEMBER",
+    "amount": 3862614,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 83384,
+    "type": "MEMBER",
+    "amount": 455371004,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 118786,
+    "type": "MEMBER",
+    "amount": 58943467,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 64963,
+    "type": "MEMBER",
+    "amount": 60179620,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5015,
+    "type": "MEMBER",
+    "amount": 140789573,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 108405,
+    "type": "MEMBER",
+    "amount": 8807721,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 12267,
+    "type": "MEMBER",
+    "amount": 24087596,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 101571,
+    "type": "MEMBER",
+    "amount": 854832,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 82406,
+    "type": "MEMBER",
+    "amount": 4014108,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 7947,
+    "type": "MEMBER",
+    "amount": 153492289,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 87314,
+    "type": "MEMBER",
+    "amount": 778452,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 77562,
+    "type": "MEMBER",
+    "amount": 145023711,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 85166,
+    "type": "MEMBER",
+    "amount": 356243,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 4501,
+    "type": "MEMBER",
+    "amount": 35546366,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 75425,
+    "type": "MEMBER",
+    "amount": 10231691515,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 139298,
+    "type": "MEMBER",
+    "amount": 319684516,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 124309,
+    "type": "MEMBER",
+    "amount": 6386768,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 102609,
+    "type": "MEMBER",
+    "amount": 264993,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 54865,
+    "type": "MEMBER",
+    "amount": 15042964,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 136642,
+    "type": "MEMBER",
+    "amount": 7260487,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 138140,
+    "type": "MEMBER",
+    "amount": 2546715,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 130459,
+    "type": "MEMBER",
+    "amount": 60092854,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 112413,
+    "type": "MEMBER",
+    "amount": 4817701,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 117960,
+    "type": "MEMBER",
+    "amount": 27764921,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 56264,
+    "type": "MEMBER",
+    "amount": 13378662,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 88282,
+    "type": "MEMBER",
+    "amount": 2890597,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 84774,
+    "type": "MEMBER",
+    "amount": 127767274,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 98904,
+    "type": "MEMBER",
+    "amount": 15761612,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 118587,
+    "type": "MEMBER",
+    "amount": 6016769,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 99131,
+    "type": "MEMBER",
+    "amount": 120280562,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 97715,
+    "type": "MEMBER",
+    "amount": 185966290,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 106650,
+    "type": "MEMBER",
+    "amount": 16224306,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 76148,
+    "type": "MEMBER",
+    "amount": 344870403,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 121558,
+    "type": "MEMBER",
+    "amount": 6008179,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 93558,
+    "type": "MEMBER",
+    "amount": 8777330,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 131115,
+    "type": "MEMBER",
+    "amount": 1617571,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5599,
+    "type": "MEMBER",
+    "amount": 41854688,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 111618,
+    "type": "MEMBER",
+    "amount": 6012394,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 129201,
+    "type": "MEMBER",
+    "amount": 1450948,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 122098,
+    "type": "MEMBER",
+    "amount": 59592645,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 103272,
+    "type": "MEMBER",
+    "amount": 60086121,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 118865,
+    "type": "MEMBER",
+    "amount": 31637934,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 123439,
+    "type": "MEMBER",
+    "amount": 12068501,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 88177,
+    "type": "MEMBER",
+    "amount": 45138521,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 132231,
+    "type": "MEMBER",
+    "amount": 12023074,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 7940,
+    "type": "MEMBER",
+    "amount": 69810063,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 6225,
+    "type": "MEMBER",
+    "amount": 36106900,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 122622,
+    "type": "MEMBER",
+    "amount": 598336,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 9938,
+    "type": "MEMBER",
+    "amount": 84674861,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 109214,
+    "type": "MEMBER",
+    "amount": 6917315,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 119027,
+    "type": "MEMBER",
+    "amount": 4836730,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 78337,
+    "type": "MEMBER",
+    "amount": 30129711,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 101530,
+    "type": "MEMBER",
+    "amount": 51247,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 96889,
+    "type": "MEMBER",
+    "amount": 10637994,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 118171,
+    "type": "MEMBER",
+    "amount": 3667374,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 110778,
+    "type": "MEMBER",
+    "amount": 349178351,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 73379,
+    "type": "MEMBER",
+    "amount": 120279961,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 138523,
+    "type": "MEMBER",
+    "amount": 4187210,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 101108,
+    "type": "MEMBER",
+    "amount": 902092882,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 99372,
+    "type": "MEMBER",
+    "amount": 5329233,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 82885,
+    "type": "MEMBER",
+    "amount": 22084352,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 91381,
+    "type": "MEMBER",
+    "amount": 17159064,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 123972,
+    "type": "MEMBER",
+    "amount": 98259721,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 92514,
+    "type": "MEMBER",
+    "amount": 58443232,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 69457,
+    "type": "MEMBER",
+    "amount": 122855612,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 104422,
+    "type": "MEMBER",
+    "amount": 30069009,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 88387,
+    "type": "MEMBER",
+    "amount": 989800,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 70985,
+    "type": "MEMBER",
+    "amount": 37482929,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 127166,
+    "type": "MEMBER",
+    "amount": 1138092,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 137248,
+    "type": "MEMBER",
+    "amount": 1967641,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 73641,
+    "type": "MEMBER",
+    "amount": 27623552,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 54923,
+    "type": "MEMBER",
+    "amount": 962037,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 136302,
+    "type": "MEMBER",
+    "amount": 2166366,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 65788,
+    "type": "MEMBER",
+    "amount": 30307178,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 96506,
+    "type": "MEMBER",
+    "amount": 427099536,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 95873,
+    "type": "MEMBER",
+    "amount": 6108877,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 138848,
+    "type": "MEMBER",
+    "amount": 39422126,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 119759,
+    "type": "MEMBER",
+    "amount": 2315399,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 56913,
+    "type": "MEMBER",
+    "amount": 12005164,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 59385,
+    "type": "MEMBER",
+    "amount": 2140,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 93945,
+    "type": "MEMBER",
+    "amount": 17141283,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 68657,
+    "type": "MEMBER",
+    "amount": 31875151,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 95375,
+    "type": "MEMBER",
+    "amount": 180151,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 114200,
+    "type": "MEMBER",
+    "amount": 11535201,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 12806,
+    "type": "MEMBER",
+    "amount": 12032040,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 2956,
+    "type": "MEMBER",
+    "amount": 704677106,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 1062,
+    "type": "MEMBER",
+    "amount": 51254547,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 14311,
+    "type": "MEMBER",
+    "amount": 13838777,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5509,
+    "type": "MEMBER",
+    "amount": 88902871,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 117783,
+    "type": "MEMBER",
+    "amount": 15419575,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 97055,
+    "type": "MEMBER",
+    "amount": 443942,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 84054,
+    "type": "MEMBER",
+    "amount": 4603540,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 5305,
+    "type": "MEMBER",
+    "amount": 2413534669,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 14654,
+    "type": "MEMBER",
+    "amount": 579109603,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 12325,
+    "type": "MEMBER",
+    "amount": 12037950,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 111622,
+    "type": "MEMBER",
+    "amount": 30143133,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 104688,
+    "type": "MEMBER",
+    "amount": 5687065,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 82904,
+    "type": "MEMBER",
+    "amount": 201617578,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 69257,
+    "type": "MEMBER",
+    "amount": 6097930,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 3231,
+    "type": "MEMBER",
+    "amount": 36894752,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 100761,
+    "type": "MEMBER",
+    "amount": 45661551,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 106132,
+    "type": "MEMBER",
+    "amount": 1335758,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 66213,
+    "type": "MEMBER",
+    "amount": 18312,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 132669,
+    "type": "MEMBER",
+    "amount": 32381406,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 57222,
+    "type": "MEMBER",
+    "amount": 6080998,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 9625,
+    "type": "MEMBER",
+    "amount": 2269766,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 92833,
+    "type": "MEMBER",
+    "amount": 1151224,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 71657,
+    "type": "MEMBER",
+    "amount": 6052839,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 70073,
+    "type": "MEMBER",
+    "amount": 115800106,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 71169,
+    "type": "MEMBER",
+    "amount": 120785910,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 99409,
+    "type": "MEMBER",
+    "amount": 166341,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 57,
+    "type": "MEMBER",
+    "amount": 18093224,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 4846,
+    "type": "MEMBER",
+    "amount": 10293640,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 105897,
+    "type": "MEMBER",
+    "amount": 22664740,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 135292,
+    "type": "MEMBER",
+    "amount": 607737,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 78131,
+    "type": "MEMBER",
+    "amount": 24493058,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 3771,
+    "type": "MEMBER",
+    "amount": 4396615,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 12892,
+    "type": "MEMBER",
+    "amount": 97731668,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 123815,
+    "type": "MEMBER",
+    "amount": 32967,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 65249,
+    "type": "MEMBER",
+    "amount": 118178183,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 75074,
+    "type": "MEMBER",
+    "amount": 1304579,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 118037,
+    "type": "MEMBER",
+    "amount": 1001771,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 120427,
+    "type": "MEMBER",
+    "amount": 1606942,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 113611,
+    "type": "MEMBER",
+    "amount": 192746,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 4167,
+    "type": "MEMBER",
+    "amount": 18107931,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 117135,
+    "type": "MEMBER",
+    "amount": 13355023,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 3661,
+    "type": "MEMBER",
+    "amount": 65343559,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 133332,
+    "type": "MEMBER",
+    "amount": 1622934,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 133719,
+    "type": "MEMBER",
+    "amount": 121365167,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 121165,
+    "type": "MEMBER",
+    "amount": 6008169,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 106707,
+    "type": "MEMBER",
+    "amount": 18993283,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 11198,
+    "type": "MEMBER",
+    "amount": 8287007,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 7864,
+    "type": "MEMBER",
+    "amount": 66846226,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 8888,
+    "type": "MEMBER",
+    "amount": 6007400,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 101543,
+    "type": "MEMBER",
+    "amount": 1986971369,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 10958,
+    "type": "MEMBER",
+    "amount": 3333137,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 113240,
+    "type": "MEMBER",
+    "amount": 360489,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 117736,
+    "type": "MEMBER",
+    "amount": 1837276,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 117651,
+    "type": "MEMBER",
+    "amount": 6007992,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 14221,
+    "type": "MEMBER",
+    "amount": 284042912,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  },
+  {
+    "stakeAddressId": 2501,
+    "type": "LEADER",
+    "amount": 1901712546,
+    "earnedEpoch": 215,
+    "spendableEpoch": 217
+  }
+]
