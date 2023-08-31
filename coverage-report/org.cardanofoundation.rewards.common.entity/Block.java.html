@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Block.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cardano-reward-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.common.entity</a> &gt; <span class="el_source">Block.java</span></div><h1>Block.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.common.entity;
+
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Objects;
+import jakarta.persistence.Column;
+import jakarta.persistence.ConstraintMode;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.hibernate.Hibernate;
+
+@Entity
+@Table(name = &quot;block&quot;, uniqueConstraints = {
+        @UniqueConstraint(name = &quot;unique_block&quot;, columnNames = {&quot;hash&quot;})})
+@Getter
+<span class="nc" id="L31">@Setter</span>
+<span class="nc" id="L32">@NoArgsConstructor</span>
+<span class="nc" id="L33">@AllArgsConstructor</span>
+<span class="nc" id="L34">@SuperBuilder(toBuilder = true)</span>
+public class Block extends BaseEntity {
+
+
+    @Column(name = &quot;hash&quot;, nullable = false, length = 64)
+<span class="nc" id="L39">    private String hash;</span>
+
+    @Column(name = &quot;epoch_no&quot;)
+<span class="nc" id="L42">    private Integer epochNo;</span>
+
+    @Column(name = &quot;slot_no&quot;)
+<span class="nc" id="L45">    private Long slotNo;</span>
+
+    @Column(name = &quot;epoch_slot_no&quot;)
+<span class="nc" id="L48">    private Integer epochSlotNo;</span>
+
+    @Column(name = &quot;block_no&quot;)
+<span class="nc" id="L51">    private Long blockNo;</span>
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = &quot;previous_id&quot;,
+            foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = &quot;none&quot;))
+    @EqualsAndHashCode.Exclude
+<span class="nc" id="L57">    private Block previous;</span>
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = &quot;slot_leader_id&quot;,
+            foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = &quot;none&quot;))
+    @EqualsAndHashCode.Exclude
+<span class="nc" id="L63">    private SlotLeader slotLeader;</span>
+
+    @Column(name = &quot;slot_leader_id&quot;, updatable = false, insertable = false)
+<span class="nc" id="L66">    private Long slotLeaderId;</span>
+
+    @Column(name = &quot;size&quot;)
+<span class="nc" id="L69">    private Integer size;</span>
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = &quot;yyyy-MM-dd HH:mm:ss&quot;)
+    @Column(name = &quot;time&quot;)
+<span class="nc" id="L73">    private Timestamp time;</span>
+
+    @Column(name = &quot;tx_count&quot;)
+<span class="nc" id="L76">    private Long txCount;</span>
+
+    @Column(name = &quot;proto_major&quot;)
+<span class="nc" id="L79">    private Integer protoMajor;</span>
+
+    @Column(name = &quot;proto_minor&quot;)
+<span class="nc" id="L82">    private Integer protoMinor;</span>
+
+    @Column(name = &quot;vrf_key&quot;, length = 65535)
+<span class="nc" id="L85">    private String vrfKey;</span>
+
+    @Column(name = &quot;op_cert&quot;, length = 64)
+<span class="nc" id="L88">    private String opCert;</span>
+
+    @Column(name = &quot;op_cert_counter&quot;)
+<span class="nc" id="L91">    private Long opCertCounter;</span>
+
+
+    @OneToMany(mappedBy = &quot;block&quot;)
+<span class="nc" id="L95">    private List&lt;Tx&gt; txList;</span>
+
+    @Override
+    public boolean equals(Object o) {
+<span class="nc bnc" id="L99" title="All 2 branches missed.">        if (this == o) {</span>
+<span class="nc" id="L100">            return true;</span>
+        }
+<span class="nc bnc" id="L102" title="All 4 branches missed.">        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {</span>
+<span class="nc" id="L103">            return false;</span>
+        }
+<span class="nc" id="L105">        Block block = (Block) o;</span>
+<span class="nc bnc" id="L106" title="All 4 branches missed.">        return id != null &amp;&amp; Objects.equals(id, block.id);</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L111">        return getClass().hashCode();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

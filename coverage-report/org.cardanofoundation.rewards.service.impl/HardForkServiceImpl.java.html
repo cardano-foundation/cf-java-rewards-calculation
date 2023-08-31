@@ -1,0 +1,761 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HardForkServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cardano-reward-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.service.impl</a> &gt; <span class="el_source">HardForkServiceImpl.java</span></div><h1>HardForkServiceImpl.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.service.impl;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+
+import org.cardanofoundation.rewards.common.entity.PoolHash;
+import org.cardanofoundation.rewards.common.entity.Reward;
+import org.cardanofoundation.rewards.common.entity.RewardType;
+import org.cardanofoundation.rewards.common.entity.StakeAddress;
+import org.cardanofoundation.rewards.constants.RewardConstants;
+import org.springframework.stereotype.Service;
+
+import org.cardanofoundation.rewards.common.MissingReward;
+import org.cardanofoundation.rewards.repository.PoolHashRepository;
+import org.cardanofoundation.rewards.repository.StakeAddressRepository;
+import org.cardanofoundation.rewards.service.HardForkService;
+
+<span class="nc" id="L28">@Slf4j</span>
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+<span class="nc" id="L30">@RequiredArgsConstructor</span>
+@Service
+public class HardForkServiceImpl implements HardForkService {
+
+  PoolHashRepository poolHashRepository;
+  StakeAddressRepository stakeAddressRepository;
+
+  @Override
+  public Collection&lt;Reward&gt; handleRewardIssueForEachEpoch(
+      int networkMagic, int epoch, Collection&lt;Reward&gt; rewards) {
+<span class="nc bnc" id="L40" title="All 2 branches missed.">    if (networkMagic == RewardConstants.MAINNET_NETWORK_MAGIC) {</span>
+<span class="nc bnc" id="L41" title="All 20 branches missed.">      switch (epoch) {</span>
+        case 212:
+<span class="nc" id="L43">          return removeRewardAddressDidNotReceiveInEpoch212(rewards);</span>
+        case 213:
+<span class="nc" id="L45">          return removeRewardAddressDidNotReceiveInEpoch213(rewards);</span>
+        case 214:
+<span class="nc" id="L47">          return removeRewardAddressDidNotReceiveInEpoch214(rewards);</span>
+        case 216:
+<span class="nc" id="L49">          return removeRewardAddressDidNotReceiveInEpoch216(rewards);</span>
+        case 217:
+<span class="nc" id="L51">          return removeRewardAddressDidNotReceiveInEpoch217(rewards);</span>
+        case 218:
+<span class="nc" id="L53">          return removeRewardAddressDidNotReceiveInEpoch218(rewards);</span>
+        case 219:
+<span class="nc" id="L55">          return removeRewardAddressDidNotReceiveInEpoch219(rewards);</span>
+        case 220:
+<span class="nc" id="L57">          return removeRewardAddressDidNotReceiveInEpoch220(rewards);</span>
+        case 221:
+<span class="nc" id="L59">          return removeRewardAddressDidNotReceiveInEpoch221(rewards);</span>
+        case 222:
+<span class="nc" id="L61">          return removeRewardAddressDidNotReceiveInEpoch222(rewards);</span>
+        case 223:
+<span class="nc" id="L63">          return removeRewardAddressDidNotReceiveInEpoch223(rewards);</span>
+        case 224:
+<span class="nc" id="L65">          return removeRewardAddressDidNotReceiveInEpoch224(rewards);</span>
+        case 225:
+<span class="nc" id="L67">          return removeRewardAddressDidNotReceiveInEpoch225(rewards);</span>
+        case 226:
+<span class="nc" id="L69">          return removeRewardAddressDidNotReceiveInEpoch226(rewards);</span>
+        case 227:
+<span class="nc" id="L71">          return removeRewardAddressDidNotReceiveInEpoch227(rewards);</span>
+        case 228:
+<span class="nc" id="L73">          return removeRewardAddressDidNotReceiveInEpoch228(rewards);</span>
+        case 229:
+<span class="nc" id="L75">          return removeRewardAddressDidNotReceiveInEpoch229(rewards);</span>
+        case 230:
+<span class="nc" id="L77">          return removeRewardAddressDidNotReceiveInEpoch230(rewards);</span>
+        case 231:
+<span class="nc" id="L79">          return removeRewardAddressDidNotReceiveInEpoch231(rewards);</span>
+      }
+    }
+<span class="nc" id="L82">    return rewards;</span>
+  }
+
+  //    public Map&lt;Long, List&lt;Reward&gt;&gt; getRewardEpoch215() {
+  //        List&lt;StakingReward&gt; stakingRewards =
+  //                JsonConverter.convertFileJsonToArrayList(
+  //                        &quot;./src/main/resources/epoch215/reward.json&quot;, StakingReward.class);
+  //
+  //        // map pool hash to with pool id
+  //        Set&lt;String&gt; poolHashes =
+  //
+  // stakingRewards.stream().map(StakingReward::getPoolId).collect(Collectors.toSet());
+  //        Map&lt;String, Long&gt; mPools =
+  //                poolHashRepository.findByViewIn(poolHashes).stream()
+  //                        .collect(Collectors.toMap(PoolHash::getView, PoolHash::getId));
+  //
+  //        // map stake address view with stake address id
+  //        Set&lt;String&gt; stakeAddresses =
+  //
+  // stakingRewards.stream().map(StakingReward::getStakeAddress).collect(Collectors.toSet());
+  //
+  //        Map&lt;String, Long&gt; mStakeAddresses =
+  //                stakeAddressRepository.findByAddressesViewIn(stakeAddresses).stream()
+  //                        .collect(
+  //                                Collectors.toMap(
+  //                                        StakeAddressAndIdProjection::getView,
+  // StakeAddressAndIdProjection::getId));
+  //
+  //        return stakingRewards.stream()
+  //                .map(
+  //                        stakingReward -&gt;
+  //                                Reward.builder()
+  //                                        .amount(stakingReward.getAmount())
+  //                                        .type(stakingReward.getRewardType())
+  //                                        .addr(
+  //                                                StakeAddress.builder()
+  //
+  // .id(mStakeAddresses.get(stakingReward.getStakeAddress()))
+  //                                                        .build())
+  //
+  // .stakeAddressId(mStakeAddresses.get(stakingReward.getStakeAddress()))
+  //
+  // .pool(PoolHash.builder().id(mPools.get(stakingReward.getPoolId())).build())
+  //                                        .poolId(mPools.get(stakingReward.getPoolId()))
+  //                                        .earnedEpoch(stakingReward.getEarnedEpoch())
+  //                                        .spendableEpoch(stakingReward.getSpendableEpoch())
+  //                                        .build())
+  //                .filter(
+  //                        reward -&gt;
+  //                                Objects.nonNull(reward.getPoolId()) &amp;&amp;
+  // Objects.nonNull(reward.getStakeAddressId()))
+  //                .collect(Collectors.groupingBy(Reward::getPoolId));
+  //    }
+
+  private Collection&lt;Reward&gt; modifyRewards(
+      Collection&lt;Reward&gt; rewards, List&lt;MissingReward&gt; missingRewards) {
+    // mapping stake address view  to a map has value is stakeId
+<span class="nc" id="L139">    var mStakeAddressViews =</span>
+<span class="nc" id="L140">        missingRewards.stream().map(MissingReward::getStakeAddress).collect(Collectors.toSet());</span>
+
+<span class="nc" id="L142">    Map&lt;String, Long&gt; mStakeAddresses =</span>
+<span class="nc" id="L143">        stakeAddressRepository.findByViewIn(mStakeAddressViews).stream()</span>
+<span class="nc" id="L144">            .collect(Collectors.toMap(StakeAddress::getView, StakeAddress::getId));</span>
+
+    // mapping pool view  to a map has value is poolId
+<span class="nc" id="L147">    var poolHashes =</span>
+<span class="nc" id="L148">        missingRewards.stream().map(MissingReward::getPoolHash).collect(Collectors.toSet());</span>
+
+<span class="nc" id="L150">    Map&lt;String, Long&gt; mPools =</span>
+<span class="nc" id="L151">        poolHashRepository.findByViewIn(poolHashes).stream()</span>
+<span class="nc" id="L152">            .collect(Collectors.toMap(PoolHash::getView, PoolHash::getId));</span>
+<span class="nc" id="L153">    missingRewards.forEach(</span>
+        missingReward -&gt; {
+<span class="nc" id="L155">          missingReward.setPoolId(mPools.get(missingReward.getPoolHash()));</span>
+<span class="nc" id="L156">          missingReward.setStakeAddressId(mStakeAddresses.get(missingReward.getStakeAddress()));</span>
+<span class="nc" id="L157">        });</span>
+
+<span class="nc" id="L159">    Set&lt;MissingReward&gt; sMissingReward = new HashSet&lt;&gt;(missingRewards);</span>
+
+<span class="nc" id="L161">    return rewards.stream()</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">        .filter(reward -&gt; !sMissingReward.contains(convertRewardToRewardMissing(reward)))</span>
+<span class="nc" id="L163">        .collect(Collectors.toList());</span>
+  }
+
+  public MissingReward convertRewardToRewardMissing(Reward reward) {
+<span class="nc" id="L167">    return MissingReward.builder()</span>
+<span class="nc" id="L168">        .stakeAddressId(reward.getStakeAddressId())</span>
+<span class="nc" id="L169">        .poolId(reward.getPoolId())</span>
+<span class="nc" id="L170">        .rewardType(reward.getType())</span>
+<span class="nc" id="L171">        .build();</span>
+  }
+
+  public Collection&lt;Reward&gt; removeRewardAddressDidNotReceiveInEpoch212(Collection&lt;Reward&gt; rewards) {
+<span class="nc" id="L175">    List&lt;MissingReward&gt; missingRewards = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L176">    missingRewards.add(</span>
+<span class="nc" id="L177">        MissingReward.builder()</span>
+<span class="nc" id="L178">            .stakeAddress(&quot;stake1u8qj0ax56ntjnvaghgffwexrvmr6jmyepqz5d4ql8vv22xc90092t&quot;)</span>
+<span class="nc" id="L179">            .poolHash(&quot;pool166dkk9kx5y6ug9tnvh0dnvxhwt2yca3g5pd5jaqa8t39cgyqqlr&quot;)</span>
+<span class="nc" id="L180">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L181">            .build());</span>
+<span class="nc" id="L182">    missingRewards.add(</span>
+<span class="nc" id="L183">        MissingReward.builder()</span>
+<span class="nc" id="L184">            .stakeAddress(&quot;stake1u99gkx28kt8n4nwygw5fqg4y2d5rc7pmlpj03vr6t8v5xecqwdemh&quot;)</span>
+<span class="nc" id="L185">            .poolHash(&quot;pool13l0j202yexqh6l0awtee9g354244gmfze09utxz0sn7p7r3ev3m&quot;)</span>
+<span class="nc" id="L186">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L187">            .build());</span>
+<span class="nc" id="L188">    return modifyRewards(rewards, missingRewards);</span>
+  }
+
+  public Collection&lt;Reward&gt; removeRewardAddressDidNotReceiveInEpoch213(Collection&lt;Reward&gt; rewards) {
+<span class="nc" id="L192">    List&lt;MissingReward&gt; missingRewards = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L193">    missingRewards.add(</span>
+<span class="nc" id="L194">        MissingReward.builder()</span>
+<span class="nc" id="L195">            .stakeAddress(&quot;stake1u8qj0ax56ntjnvaghgffwexrvmr6jmyepqz5d4ql8vv22xc90092t&quot;)</span>
+<span class="nc" id="L196">            .poolHash(&quot;pool166dkk9kx5y6ug9tnvh0dnvxhwt2yca3g5pd5jaqa8t39cgyqqlr&quot;)</span>
+<span class="nc" id="L197">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L198">            .build());</span>
+<span class="nc" id="L199">    missingRewards.add(</span>
+<span class="nc" id="L200">        MissingReward.builder()</span>
+<span class="nc" id="L201">            .stakeAddress(&quot;stake1u9p26xk0cnjccs2an3qsm6fqca3uqp3e94l6dxu6pxvxkyqxa7q82&quot;)</span>
+<span class="nc" id="L202">            .poolHash(&quot;pool17rns3wjyql9jg9xkzw9h88f0kstd693pm6urwxmvejqgsyjw7ta&quot;)</span>
+<span class="nc" id="L203">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L204">            .build());</span>
+<span class="nc" id="L205">    return modifyRewards(rewards, missingRewards);</span>
+  }
+
+  public Collection&lt;Reward&gt; removeRewardAddressDidNotReceiveInEpoch214(Collection&lt;Reward&gt; rewards) {
+<span class="nc" id="L209">    List&lt;MissingReward&gt; missingRewards = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L210">    missingRewards.add(</span>
+<span class="nc" id="L211">        MissingReward.builder()</span>
+<span class="nc" id="L212">            .stakeAddress(&quot;stake1ux0hx0hyhlplsrzewj6r3c64guymjqptw4qmt64c7yey6pcxzx895&quot;)</span>
+<span class="nc" id="L213">            .poolHash(&quot;pool1h0524mtazrjnzqh5e4u060jsfk8lpsqqjfpa5gygjwuhqu34wvt&quot;)</span>
+<span class="nc" id="L214">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L215">            .build());</span>
+<span class="nc" id="L216">    missingRewards.add(</span>
+<span class="nc" id="L217">        MissingReward.builder()</span>
+<span class="nc" id="L218">            .stakeAddress(&quot;stake1u99gkx28kt8n4nwygw5fqg4y2d5rc7pmlpj03vr6t8v5xecqwdemh&quot;)</span>
+<span class="nc" id="L219">            .poolHash(&quot;pool13l0j202yexqh6l0awtee9g354244gmfze09utxz0sn7p7r3ev3m&quot;)</span>
+<span class="nc" id="L220">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L221">            .build());</span>
+<span class="nc" id="L222">    missingRewards.add(</span>
+<span class="nc" id="L223">        MissingReward.builder()</span>
+<span class="nc" id="L224">            .stakeAddress(&quot;stake1u8qj0ax56ntjnvaghgffwexrvmr6jmyepqz5d4ql8vv22xc90092t&quot;)</span>
+<span class="nc" id="L225">            .poolHash(&quot;pool166dkk9kx5y6ug9tnvh0dnvxhwt2yca3g5pd5jaqa8t39cgyqqlr&quot;)</span>
+<span class="nc" id="L226">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L227">            .build());</span>
+<span class="nc" id="L228">    return modifyRewards(rewards, missingRewards);</span>
+  }
+
+  public Collection&lt;Reward&gt; removeRewardAddressDidNotReceiveInEpoch216(Collection&lt;Reward&gt; rewards) {
+<span class="nc" id="L232">    List&lt;MissingReward&gt; missingRewards = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L233">    missingRewards.add(</span>
+<span class="nc" id="L234">        MissingReward.builder()</span>
+<span class="nc" id="L235">            .stakeAddress(&quot;stake1uyfmkfyp5arc4yfr7s0m3pc2adtrvmyhp279w9pcvzggkcgxzjd5y&quot;)</span>
+<span class="nc" id="L236">            .poolHash(&quot;pool1qqlf3epa7m8780p2jx5689u2ql06tw026l5377tptk2zswrc645&quot;)</span>
+<span class="nc" id="L237">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L238">            .build());</span>
+<span class="nc" id="L239">    missingRewards.add(</span>
+<span class="nc" id="L240">        MissingReward.builder()</span>
+<span class="nc" id="L241">            .stakeAddress(&quot;stake1u9ng4zh0gm3r2j70tffgq7k5xkzr4w5wa08qvje2mslxf6gaqayk2&quot;)</span>
+<span class="nc" id="L242">            .poolHash(&quot;pool1gclysx2h7fndj0jdajlmwvqr8q9tzu3rurjknacu0ff954fsg9a&quot;)</span>
+<span class="nc" id="L243">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L244">            .build());</span>
+<span class="nc" id="L245">    missingRewards.add(</span>
+<span class="nc" id="L246">        MissingReward.builder()</span>
+<span class="nc" id="L247">            .stakeAddress(&quot;stake1u9p26xk0cnjccs2an3qsm6fqca3uqp3e94l6dxu6pxvxkyqxa7q82&quot;)</span>
+<span class="nc" id="L248">            .poolHash(&quot;pool17rns3wjyql9jg9xkzw9h88f0kstd693pm6urwxmvejqgsyjw7ta&quot;)</span>
+<span class="nc" id="L249">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L250">            .build());</span>
+<span class="nc" id="L251">    missingRewards.add(</span>
+<span class="nc" id="L252">        MissingReward.builder()</span>
+<span class="nc" id="L253">            .stakeAddress(&quot;stake1u99gkx28kt8n4nwygw5fqg4y2d5rc7pmlpj03vr6t8v5xecqwdemh&quot;)</span>
+<span class="nc" id="L254">            .poolHash(&quot;pool13l0j202yexqh6l0awtee9g354244gmfze09utxz0sn7p7r3ev3m&quot;)</span>
+<span class="nc" id="L255">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L256">            .build());</span>
+<span class="nc" id="L257">    return modifyRewards(rewards, missingRewards);</span>
+  }
+
+  public Collection&lt;Reward&gt; removeRewardAddressDidNotReceiveInEpoch217(Collection&lt;Reward&gt; rewards) {
+<span class="nc" id="L261">    List&lt;MissingReward&gt; missingRewards = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L262">    missingRewards.add(</span>
+<span class="nc" id="L263">        MissingReward.builder()</span>
+<span class="nc" id="L264">            .stakeAddress(&quot;stake1uxtz2pr9zchzvhkzs9qee0fhdm2jha45stuezqgwdxxj4nsywslda&quot;)</span>
+<span class="nc" id="L265">            .poolHash(&quot;pool15yyxtkhz64p7a8cnax9l7u82s9t9hdhyxsa3tdm977qhgpnsuhq&quot;)</span>
+<span class="nc" id="L266">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L267">            .build());</span>
+<span class="nc" id="L268">    missingRewards.add(</span>
+<span class="nc" id="L269">        MissingReward.builder()</span>
+<span class="nc" id="L270">            .stakeAddress(&quot;stake1uxnjclll73p94nvu7r69l5ykv5gvm0gprkkjdp428a7sf0cxf5k6e&quot;)</span>
+<span class="nc" id="L271">            .poolHash(&quot;pool1dxkf7k3qwnpgpxqfye8y9jvk7lver3fk8dq7c4dpzezyyx8cf5c&quot;)</span>
+<span class="nc" id="L272">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L273">            .build());</span>
+<span class="nc" id="L274">    missingRewards.add(</span>
+<span class="nc" id="L275">        MissingReward.builder()</span>
+<span class="nc" id="L276">            .stakeAddress(&quot;stake1u94uryf7q43pvq8ntvysx9l5kzqpgcluudw4dcrr6gngxnq62qv74&quot;)</span>
+<span class="nc" id="L277">            .poolHash(&quot;pool1aqg6fvhcaulvss2ruvpx6ur9vj7pejvdcxv6xp0qlwuwx94evf0&quot;)</span>
+<span class="nc" id="L278">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L279">            .build());</span>
+<span class="nc" id="L280">    missingRewards.add(</span>
+<span class="nc" id="L281">        MissingReward.builder()</span>
+<span class="nc" id="L282">            .stakeAddress(&quot;stake1u9rhwql753l8u3086wnlnw66dndsyrtk74egmqemz8ymk5gpxdzeu&quot;)</span>
+<span class="nc" id="L283">            .poolHash(&quot;pool136wr0g23dw9daekuyqtgk366vywms6meespgpm3hdguxqczaaug&quot;)</span>
+<span class="nc" id="L284">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L285">            .build());</span>
+<span class="nc" id="L286">    missingRewards.add(</span>
+<span class="nc" id="L287">        MissingReward.builder()</span>
+<span class="nc" id="L288">            .stakeAddress(&quot;stake1u8qj0ax56ntjnvaghgffwexrvmr6jmyepqz5d4ql8vv22xc90092t&quot;)</span>
+<span class="nc" id="L289">            .poolHash(&quot;pool166dkk9kx5y6ug9tnvh0dnvxhwt2yca3g5pd5jaqa8t39cgyqqlr&quot;)</span>
+<span class="nc" id="L290">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L291">            .build());</span>
+<span class="nc" id="L292">    missingRewards.add(</span>
+<span class="nc" id="L293">        MissingReward.builder()</span>
+<span class="nc" id="L294">            .stakeAddress(&quot;stake1u99gkx28kt8n4nwygw5fqg4y2d5rc7pmlpj03vr6t8v5xecqwdemh&quot;)</span>
+<span class="nc" id="L295">            .poolHash(&quot;pool13l0j202yexqh6l0awtee9g354244gmfze09utxz0sn7p7r3ev3m&quot;)</span>
+<span class="nc" id="L296">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L297">            .build());</span>
+<span class="nc" id="L298">    return modifyRewards(rewards, missingRewards);</span>
+  }
+
+  public Collection&lt;Reward&gt; removeRewardAddressDidNotReceiveInEpoch218(Collection&lt;Reward&gt; rewards) {
+<span class="nc" id="L302">    List&lt;MissingReward&gt; missingRewards = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L303">    missingRewards.add(</span>
+<span class="nc" id="L304">        MissingReward.builder()</span>
+<span class="nc" id="L305">            .stakeAddress(&quot;stake1u8842x9ekgaf06xyekkne846567cvza0r8u0xykskspechgg4r9zr&quot;)</span>
+<span class="nc" id="L306">            .poolHash(&quot;pool1gclysx2h7fndj0jdajlmwvqr8q9tzu3rurjknacu0ff954fsg9a&quot;)</span>
+<span class="nc" id="L307">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L308">            .build());</span>
+<span class="nc" id="L309">    missingRewards.add(</span>
+<span class="nc" id="L310">        MissingReward.builder()</span>
+<span class="nc" id="L311">            .stakeAddress(&quot;stake1u99gkx28kt8n4nwygw5fqg4y2d5rc7pmlpj03vr6t8v5xecqwdemh&quot;)</span>
+<span class="nc" id="L312">            .poolHash(&quot;pool13l0j202yexqh6l0awtee9g354244gmfze09utxz0sn7p7r3ev3m&quot;)</span>
+<span class="nc" id="L313">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L314">            .build());</span>
+<span class="nc" id="L315">    return modifyRewards(rewards, missingRewards);</span>
+  }
+
+  public Collection&lt;Reward&gt; removeRewardAddressDidNotReceiveInEpoch219(Collection&lt;Reward&gt; rewards) {
+<span class="nc" id="L319">    List&lt;MissingReward&gt; missingRewards = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L320">    missingRewards.add(</span>
+<span class="nc" id="L321">        MissingReward.builder()</span>
+<span class="nc" id="L322">            .stakeAddress(&quot;stake1uxkmdzry75vn45xglzc8kvqzas64829qm3py4u4znnlvnvgauvm4h&quot;)</span>
+<span class="nc" id="L323">            .poolHash(&quot;pool1qqqyv9pn9typyqwcxqk5ewpxy5p27g5j2ms58hpp2c2kuzs5z77&quot;)</span>
+<span class="nc" id="L324">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L325">            .build());</span>
+<span class="nc" id="L326">    missingRewards.add(</span>
+<span class="nc" id="L327">        MissingReward.builder()</span>
+<span class="nc" id="L328">            .stakeAddress(&quot;stake1u99gkx28kt8n4nwygw5fqg4y2d5rc7pmlpj03vr6t8v5xecqwdemh&quot;)</span>
+<span class="nc" id="L329">            .poolHash(&quot;pool13l0j202yexqh6l0awtee9g354244gmfze09utxz0sn7p7r3ev3m&quot;)</span>
+<span class="nc" id="L330">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L331">            .build());</span>
+<span class="nc" id="L332">    missingRewards.add(</span>
+<span class="nc" id="L333">        MissingReward.builder()</span>
+<span class="nc" id="L334">            .stakeAddress(&quot;stake1u8qj0ax56ntjnvaghgffwexrvmr6jmyepqz5d4ql8vv22xc90092t&quot;)</span>
+<span class="nc" id="L335">            .poolHash(&quot;pool166dkk9kx5y6ug9tnvh0dnvxhwt2yca3g5pd5jaqa8t39cgyqqlr&quot;)</span>
+<span class="nc" id="L336">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L337">            .build());</span>
+<span class="nc" id="L338">    return modifyRewards(rewards, missingRewards);</span>
+  }
+
+  public Collection&lt;Reward&gt; removeRewardAddressDidNotReceiveInEpoch220(Collection&lt;Reward&gt; rewards) {
+<span class="nc" id="L342">    List&lt;MissingReward&gt; missingRewards = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L343">    missingRewards.add(</span>
+<span class="nc" id="L344">        MissingReward.builder()</span>
+<span class="nc" id="L345">            .stakeAddress(&quot;stake1u8qj0ax56ntjnvaghgffwexrvmr6jmyepqz5d4ql8vv22xc90092t&quot;)</span>
+<span class="nc" id="L346">            .poolHash(&quot;pool166dkk9kx5y6ug9tnvh0dnvxhwt2yca3g5pd5jaqa8t39cgyqqlr&quot;)</span>
+<span class="nc" id="L347">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L348">            .build());</span>
+<span class="nc" id="L349">    missingRewards.add(</span>
+<span class="nc" id="L350">        MissingReward.builder()</span>
+<span class="nc" id="L351">            .stakeAddress(&quot;stake1uxjmepf6mf0j3ufvdla96c9vu8gqfu2qk5v4hz5rz6hvvlsqsjwy6&quot;)</span>
+<span class="nc" id="L352">            .poolHash(&quot;pool1hntu7agmt8u5j9c20ejen7dvq0jfkvkpnul3mrdd8tppqvwfvt2&quot;)</span>
+<span class="nc" id="L353">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L354">            .build());</span>
+<span class="nc" id="L355">    missingRewards.add(</span>
+<span class="nc" id="L356">        MissingReward.builder()</span>
+<span class="nc" id="L357">            .stakeAddress(&quot;stake1uy58u98406966ckjt06zmr7ehfyerr6uqccy45cr8342t8cqq40nx&quot;)</span>
+<span class="nc" id="L358">            .poolHash(&quot;pool1cduc7ut6grhqyavrmm3gzcdf4qfdsjk7vdwcxy9c0r5fyaxh2sq&quot;)</span>
+<span class="nc" id="L359">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L360">            .build());</span>
+<span class="nc" id="L361">    return modifyRewards(rewards, missingRewards);</span>
+  }
+
+  public Collection&lt;Reward&gt; removeRewardAddressDidNotReceiveInEpoch221(Collection&lt;Reward&gt; rewards) {
+<span class="nc" id="L365">    List&lt;MissingReward&gt; missingRewards = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L366">    missingRewards.add(</span>
+<span class="nc" id="L367">        MissingReward.builder()</span>
+<span class="nc" id="L368">            .stakeAddress(&quot;stake1u9580h9cv6zck2jfgy63exxdvuszyc4lmq4qzm9m4grnjfcprdah4&quot;)</span>
+<span class="nc" id="L369">            .poolHash(&quot;pool150n38x8gquu4yt5s0s6m3ajjqe89y68x96dh32tq8a4es2l6dvp&quot;)</span>
+<span class="nc" id="L370">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L371">            .build());</span>
+<span class="nc" id="L372">    missingRewards.add(</span>
+<span class="nc" id="L373">        MissingReward.builder()</span>
+<span class="nc" id="L374">            .stakeAddress(&quot;stake1u9580h9cv6zck2jfgy63exxdvuszyc4lmq4qzm9m4grnjfcprdah4&quot;)</span>
+<span class="nc" id="L375">            .poolHash(&quot;pool19066qvd5dv6vq7fh5a5l7muzk6nc5fw8zq3w4tclyrhvjvlyeuc&quot;)</span>
+<span class="nc" id="L376">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L377">            .build());</span>
+<span class="nc" id="L378">    missingRewards.add(</span>
+<span class="nc" id="L379">        MissingReward.builder()</span>
+<span class="nc" id="L380">            .stakeAddress(&quot;stake1u9580h9cv6zck2jfgy63exxdvuszyc4lmq4qzm9m4grnjfcprdah4&quot;)</span>
+<span class="nc" id="L381">            .poolHash(&quot;pool1xt7mjrtnsew3v33lu8sf93upf20sxhmcrfnpm82ra46yxk7uy45&quot;)</span>
+<span class="nc" id="L382">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L383">            .build());</span>
+<span class="nc" id="L384">    missingRewards.add(</span>
+<span class="nc" id="L385">        MissingReward.builder()</span>
+<span class="nc" id="L386">            .stakeAddress(&quot;stake1u85egvvcnr0nm3rskyua8jv630t59xldmsg0jw9nm3kt3csvawqv8&quot;)</span>
+<span class="nc" id="L387">            .poolHash(&quot;pool1ljlmfg7p37ysmea9ra5xqwccue203dpj40w6zlzn5r2cvjrf6tw&quot;)</span>
+<span class="nc" id="L388">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L389">            .build());</span>
+<span class="nc" id="L390">    missingRewards.add(</span>
+<span class="nc" id="L391">        MissingReward.builder()</span>
+<span class="nc" id="L392">            .stakeAddress(&quot;stake1u82jgggp0sxrkjmvns6gfsrptc3457xx2ppv4gsr9jawwzgpk9afx&quot;)</span>
+<span class="nc" id="L393">            .poolHash(&quot;pool1z7n2ruhmxmv77f6cqhd3wsy6774h2wuay77agxuf2y9mj8q55vw&quot;)</span>
+<span class="nc" id="L394">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L395">            .build());</span>
+<span class="nc" id="L396">    missingRewards.add(</span>
+<span class="nc" id="L397">        MissingReward.builder()</span>
+<span class="nc" id="L398">            .stakeAddress(&quot;stake1uxndcr4g08w80hefhacuuw854vwvqvtfgevl9xtgs4u72wchyyfs3&quot;)</span>
+<span class="nc" id="L399">            .poolHash(&quot;pool1qqqqpanw9zc0rzh0yp247nzf2s35uvnsm7aaesfl2nnejaev0uc&quot;)</span>
+<span class="nc" id="L400">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L401">            .build());</span>
+<span class="nc" id="L402">    missingRewards.add(</span>
+<span class="nc" id="L403">        MissingReward.builder()</span>
+<span class="nc" id="L404">            .stakeAddress(&quot;stake1uyvu34wrlst772jsu5ftlly5mdk2tc95atrggl24flj7tngpmqsmp&quot;)</span>
+<span class="nc" id="L405">            .poolHash(&quot;pool1qqqqpanw9zc0rzh0yp247nzf2s35uvnsm7aaesfl2nnejaev0uc&quot;)</span>
+<span class="nc" id="L406">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L407">            .build());</span>
+<span class="nc" id="L408">    return modifyRewards(rewards, missingRewards);</span>
+  }
+
+  public Collection&lt;Reward&gt; removeRewardAddressDidNotReceiveInEpoch222(Collection&lt;Reward&gt; rewards) {
+<span class="nc" id="L412">    List&lt;MissingReward&gt; missingRewards = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L413">    missingRewards.add(</span>
+<span class="nc" id="L414">        MissingReward.builder()</span>
+<span class="nc" id="L415">            .stakeAddress(&quot;stake1u8ra0dcr53je95vdhmm0q0lfgjys428fhy4w4dp6lelfavg7lmae7&quot;)</span>
+<span class="nc" id="L416">            .poolHash(&quot;pool12vs4c3cm0tr49c7alrevfs0xa5g3s4al4fn46h33e69uusat04v&quot;)</span>
+<span class="nc" id="L417">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L418">            .build());</span>
+<span class="nc" id="L419">    missingRewards.add(</span>
+<span class="nc" id="L420">        MissingReward.builder()</span>
+<span class="nc" id="L421">            .stakeAddress(&quot;stake1u9580h9cv6zck2jfgy63exxdvuszyc4lmq4qzm9m4grnjfcprdah4&quot;)</span>
+<span class="nc" id="L422">            .poolHash(&quot;pool150n38x8gquu4yt5s0s6m3ajjqe89y68x96dh32tq8a4es2l6dvp&quot;)</span>
+<span class="nc" id="L423">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L424">            .build());</span>
+<span class="nc" id="L425">    missingRewards.add(</span>
+<span class="nc" id="L426">        MissingReward.builder()</span>
+<span class="nc" id="L427">            .stakeAddress(&quot;stake1u9580h9cv6zck2jfgy63exxdvuszyc4lmq4qzm9m4grnjfcprdah4&quot;)</span>
+<span class="nc" id="L428">            .poolHash(&quot;pool1xt7mjrtnsew3v33lu8sf93upf20sxhmcrfnpm82ra46yxk7uy45&quot;)</span>
+<span class="nc" id="L429">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L430">            .build());</span>
+<span class="nc" id="L431">    return modifyRewards(rewards, missingRewards);</span>
+  }
+
+  public Collection&lt;Reward&gt; removeRewardAddressDidNotReceiveInEpoch223(Collection&lt;Reward&gt; rewards) {
+<span class="nc" id="L435">    List&lt;MissingReward&gt; missingRewards = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L436">    missingRewards.add(</span>
+<span class="nc" id="L437">        MissingReward.builder()</span>
+<span class="nc" id="L438">            .stakeAddress(&quot;stake1u8qj0ax56ntjnvaghgffwexrvmr6jmyepqz5d4ql8vv22xc90092t&quot;)</span>
+<span class="nc" id="L439">            .poolHash(&quot;pool166dkk9kx5y6ug9tnvh0dnvxhwt2yca3g5pd5jaqa8t39cgyqqlr&quot;)</span>
+<span class="nc" id="L440">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L441">            .build());</span>
+<span class="nc" id="L442">    missingRewards.add(</span>
+<span class="nc" id="L443">        MissingReward.builder()</span>
+<span class="nc" id="L444">            .stakeAddress(&quot;stake1u9580h9cv6zck2jfgy63exxdvuszyc4lmq4qzm9m4grnjfcprdah4&quot;)</span>
+<span class="nc" id="L445">            .poolHash(&quot;pool150n38x8gquu4yt5s0s6m3ajjqe89y68x96dh32tq8a4es2l6dvp&quot;)</span>
+<span class="nc" id="L446">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L447">            .build());</span>
+<span class="nc" id="L448">    missingRewards.add(</span>
+<span class="nc" id="L449">        MissingReward.builder()</span>
+<span class="nc" id="L450">            .stakeAddress(&quot;stake1u9580h9cv6zck2jfgy63exxdvuszyc4lmq4qzm9m4grnjfcprdah4&quot;)</span>
+<span class="nc" id="L451">            .poolHash(&quot;pool1xt7mjrtnsew3v33lu8sf93upf20sxhmcrfnpm82ra46yxk7uy45&quot;)</span>
+<span class="nc" id="L452">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L453">            .build());</span>
+<span class="nc" id="L454">    missingRewards.add(</span>
+<span class="nc" id="L455">        MissingReward.builder()</span>
+<span class="nc" id="L456">            .stakeAddress(&quot;stake1u8g2g367tpazed2mgu8aaewdszfd3rerxv5gxlh9uuwj9qqaklxem&quot;)</span>
+<span class="nc" id="L457">            .poolHash(&quot;pool1myvgx4ef424e6nw2strqq7dxcepav52plyyhxrk0avaw7y098l2&quot;)</span>
+<span class="nc" id="L458">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L459">            .build());</span>
+<span class="nc" id="L460">    return modifyRewards(rewards, missingRewards);</span>
+  }
+
+  public Collection&lt;Reward&gt; removeRewardAddressDidNotReceiveInEpoch224(Collection&lt;Reward&gt; rewards) {
+<span class="nc" id="L464">    List&lt;MissingReward&gt; missingRewards = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L465">    missingRewards.add(</span>
+<span class="nc" id="L466">        MissingReward.builder()</span>
+<span class="nc" id="L467">            .stakeAddress(&quot;stake1u9580h9cv6zck2jfgy63exxdvuszyc4lmq4qzm9m4grnjfcprdah4&quot;)</span>
+<span class="nc" id="L468">            .poolHash(&quot;pool150n38x8gquu4yt5s0s6m3ajjqe89y68x96dh32tq8a4es2l6dvp&quot;)</span>
+<span class="nc" id="L469">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L470">            .build());</span>
+<span class="nc" id="L471">    missingRewards.add(</span>
+<span class="nc" id="L472">        MissingReward.builder()</span>
+<span class="nc" id="L473">            .stakeAddress(&quot;stake1u9580h9cv6zck2jfgy63exxdvuszyc4lmq4qzm9m4grnjfcprdah4&quot;)</span>
+<span class="nc" id="L474">            .poolHash(&quot;pool1xt7mjrtnsew3v33lu8sf93upf20sxhmcrfnpm82ra46yxk7uy45&quot;)</span>
+<span class="nc" id="L475">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L476">            .build());</span>
+<span class="nc" id="L477">    missingRewards.add(</span>
+<span class="nc" id="L478">        MissingReward.builder()</span>
+<span class="nc" id="L479">            .stakeAddress(&quot;stake1u8pzuph8xp8qqgh2tjp5ngm5gvgrhg784twmyj0cv2hkfsg0upea2&quot;)</span>
+<span class="nc" id="L480">            .poolHash(&quot;pool1hht4pctn70tqdsd0zwuxv8d8cz6l5scjzaquty7vamyzy78eqvc&quot;)</span>
+<span class="nc" id="L481">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L482">            .build());</span>
+<span class="nc" id="L483">    return modifyRewards(rewards, missingRewards);</span>
+  }
+
+  public Collection&lt;Reward&gt; removeRewardAddressDidNotReceiveInEpoch225(Collection&lt;Reward&gt; rewards) {
+<span class="nc" id="L487">    List&lt;MissingReward&gt; missingRewards = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L488">    missingRewards.add(</span>
+<span class="nc" id="L489">        MissingReward.builder()</span>
+<span class="nc" id="L490">            .stakeAddress(&quot;stake1u9580h9cv6zck2jfgy63exxdvuszyc4lmq4qzm9m4grnjfcprdah4&quot;)</span>
+<span class="nc" id="L491">            .poolHash(&quot;pool150n38x8gquu4yt5s0s6m3ajjqe89y68x96dh32tq8a4es2l6dvp&quot;)</span>
+<span class="nc" id="L492">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L493">            .build());</span>
+<span class="nc" id="L494">    missingRewards.add(</span>
+<span class="nc" id="L495">        MissingReward.builder()</span>
+<span class="nc" id="L496">            .stakeAddress(&quot;stake1u9580h9cv6zck2jfgy63exxdvuszyc4lmq4qzm9m4grnjfcprdah4&quot;)</span>
+<span class="nc" id="L497">            .poolHash(&quot;pool1xt7mjrtnsew3v33lu8sf93upf20sxhmcrfnpm82ra46yxk7uy45&quot;)</span>
+<span class="nc" id="L498">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L499">            .build());</span>
+<span class="nc" id="L500">    missingRewards.add(</span>
+<span class="nc" id="L501">        MissingReward.builder()</span>
+<span class="nc" id="L502">            .stakeAddress(&quot;stake1uxcc3whk9uwt8rpp4tgjt0hj9l3u0mrn2h52n747qlwayyc23crfu&quot;)</span>
+<span class="nc" id="L503">            .poolHash(&quot;pool12nz4esgsex6zdq9q0208gw9zkdrt3f42rrkefzaxqaqzzlwjku7&quot;)</span>
+<span class="nc" id="L504">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L505">            .build());</span>
+<span class="nc" id="L506">    missingRewards.add(</span>
+<span class="nc" id="L507">        MissingReward.builder()</span>
+<span class="nc" id="L508">            .stakeAddress(&quot;stake1u9e4uepavzls0xemezld9rqjqj9nef70ytcpt8ppl0fjatqvlam8p&quot;)</span>
+<span class="nc" id="L509">            .poolHash(&quot;pool1qqqqrwzy7njvjq9wph7usj5gghm3py9c97688ek8pgc7uem9cfz&quot;)</span>
+<span class="nc" id="L510">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L511">            .build());</span>
+<span class="nc" id="L512">    missingRewards.add(</span>
+<span class="nc" id="L513">        MissingReward.builder()</span>
+<span class="nc" id="L514">            .stakeAddress(&quot;stake1u9e4uepavzls0xemezld9rqjqj9nef70ytcpt8ppl0fjatqvlam8p&quot;)</span>
+<span class="nc" id="L515">            .poolHash(&quot;pool1qqqqrwzy7njvjq9wph7usj5gghm3py9c97688ek8pgc7uem9cfz&quot;)</span>
+<span class="nc" id="L516">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L517">            .build());</span>
+<span class="nc" id="L518">    missingRewards.add(</span>
+<span class="nc" id="L519">        MissingReward.builder()</span>
+<span class="nc" id="L520">            .stakeAddress(&quot;stake1uxdmmmx8jfhx2jeyn8qpd4zdge8nva97mkaze3nru6wkhngp232j0&quot;)</span>
+<span class="nc" id="L521">            .poolHash(&quot;pool1vquhv3kh6xkklckaenl8alyuhfsld57ef5573aqauueyqacx4ak&quot;)</span>
+<span class="nc" id="L522">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L523">            .build());</span>
+<span class="nc" id="L524">    missingRewards.add(</span>
+<span class="nc" id="L525">        MissingReward.builder()</span>
+<span class="nc" id="L526">            .stakeAddress(&quot;stake1uxly7krmu7v5taf6yzmqmamtwp673t5m0j5ed4a3rcjty9cgwdrh4&quot;)</span>
+<span class="nc" id="L527">            .poolHash(&quot;pool1qqqyv9pn9typyqwcxqk5ewpxy5p27g5j2ms58hpp2c2kuzs5z77&quot;)</span>
+<span class="nc" id="L528">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L529">            .build());</span>
+<span class="nc" id="L530">    missingRewards.add(</span>
+<span class="nc" id="L531">        MissingReward.builder()</span>
+<span class="nc" id="L532">            .stakeAddress(&quot;stake1uyepuk9gcscsnjmtnwl0u097p88zrgvt44t23wtucql22pgwvaznw&quot;)</span>
+<span class="nc" id="L533">            .poolHash(&quot;pool1ddgcpgjcyawxw95se9x8qnc8gxgwjr4fqrk4vk6v9x47s0ggpjp&quot;)</span>
+<span class="nc" id="L534">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L535">            .build());</span>
+<span class="nc" id="L536">    missingRewards.add(</span>
+<span class="nc" id="L537">        MissingReward.builder()</span>
+<span class="nc" id="L538">            .stakeAddress(&quot;stake1uyse6jl27hfm3kw92yus7wmtr62gdjxy55fpdnz7ydn6m9qhnk4qn&quot;)</span>
+<span class="nc" id="L539">            .poolHash(&quot;pool1vx9tzlkgafernd9vpjpxkenutx2gncj4yn88fpq69823qlwcqrt&quot;)</span>
+<span class="nc" id="L540">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L541">            .build());</span>
+<span class="nc" id="L542">    missingRewards.add(</span>
+<span class="nc" id="L543">        MissingReward.builder()</span>
+<span class="nc" id="L544">            .stakeAddress(&quot;stake1u8wyeqvkw5m6ef8tjnqxyv8p9mhnc4z7lvh2cm46748jmtgtrr6p0&quot;)</span>
+<span class="nc" id="L545">            .poolHash(&quot;pool1v4xevkf7fx08pzy7atsk59dds6p0sdyl6xmhwf4mh79x6l5p6kx&quot;)</span>
+<span class="nc" id="L546">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L547">            .build());</span>
+<span class="nc" id="L548">    missingRewards.add(</span>
+<span class="nc" id="L549">        MissingReward.builder()</span>
+<span class="nc" id="L550">            .stakeAddress(&quot;stake1u9n5hhru384pmg86a4y92qlmdnlrupe8wyu8tsrhpxgc89q6q0ed3&quot;)</span>
+<span class="nc" id="L551">            .poolHash(&quot;pool1e556526sqwugxwnmeumt9lhj5jukklg8vv3ynk75xt9vs7adr5y&quot;)</span>
+<span class="nc" id="L552">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L553">            .build());</span>
+<span class="nc" id="L554">    return modifyRewards(rewards, missingRewards);</span>
+  }
+
+  public Collection&lt;Reward&gt; removeRewardAddressDidNotReceiveInEpoch226(Collection&lt;Reward&gt; rewards) {
+<span class="nc" id="L558">    List&lt;MissingReward&gt; missingRewards = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L559">    missingRewards.add(</span>
+<span class="nc" id="L560">        MissingReward.builder()</span>
+<span class="nc" id="L561">            .stakeAddress(&quot;stake1u99gkx28kt8n4nwygw5fqg4y2d5rc7pmlpj03vr6t8v5xecqwdemh&quot;)</span>
+<span class="nc" id="L562">            .poolHash(&quot;pool13l0j202yexqh6l0awtee9g354244gmfze09utxz0sn7p7r3ev3m&quot;)</span>
+<span class="nc" id="L563">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L564">            .build());</span>
+<span class="nc" id="L565">    missingRewards.add(</span>
+<span class="nc" id="L566">        MissingReward.builder()</span>
+<span class="nc" id="L567">            .stakeAddress(&quot;stake1u9580h9cv6zck2jfgy63exxdvuszyc4lmq4qzm9m4grnjfcprdah4&quot;)</span>
+<span class="nc" id="L568">            .poolHash(&quot;pool150n38x8gquu4yt5s0s6m3ajjqe89y68x96dh32tq8a4es2l6dvp&quot;)</span>
+<span class="nc" id="L569">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L570">            .build());</span>
+<span class="nc" id="L571">    missingRewards.add(</span>
+<span class="nc" id="L572">        MissingReward.builder()</span>
+<span class="nc" id="L573">            .stakeAddress(&quot;stake1u9580h9cv6zck2jfgy63exxdvuszyc4lmq4qzm9m4grnjfcprdah4&quot;)</span>
+<span class="nc" id="L574">            .poolHash(&quot;pool1xt7mjrtnsew3v33lu8sf93upf20sxhmcrfnpm82ra46yxk7uy45&quot;)</span>
+<span class="nc" id="L575">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L576">            .build());</span>
+<span class="nc" id="L577">    missingRewards.add(</span>
+<span class="nc" id="L578">        MissingReward.builder()</span>
+<span class="nc" id="L579">            .stakeAddress(&quot;stake1u8d3pdradkydnm4k8x9a7h9erzxt5au72td5nukrw5m5ans75yg78&quot;)</span>
+<span class="nc" id="L580">            .poolHash(&quot;pool1cduc7ut6grhqyavrmm3gzcdf4qfdsjk7vdwcxy9c0r5fyaxh2sq&quot;)</span>
+<span class="nc" id="L581">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L582">            .build());</span>
+<span class="nc" id="L583">    return modifyRewards(rewards, missingRewards);</span>
+  }
+
+  public Collection&lt;Reward&gt; removeRewardAddressDidNotReceiveInEpoch227(Collection&lt;Reward&gt; rewards) {
+<span class="nc" id="L587">    List&lt;MissingReward&gt; missingRewards = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L588">    missingRewards.add(</span>
+<span class="nc" id="L589">        MissingReward.builder()</span>
+<span class="nc" id="L590">            .stakeAddress(&quot;stake1u9x2llh3f8a9snrdhwmguwncqnsczccx73jm2mty2cc5f6qm7ucz9&quot;)</span>
+<span class="nc" id="L591">            .poolHash(&quot;pool1jg3fmnmc9n52sgzslhhvhye5e3xeqmrwkekdhh82sma47r47zg0&quot;)</span>
+<span class="nc" id="L592">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L593">            .build());</span>
+<span class="nc" id="L594">    missingRewards.add(</span>
+<span class="nc" id="L595">        MissingReward.builder()</span>
+<span class="nc" id="L596">            .stakeAddress(&quot;stake1uxjrcf86k4yuczp2r7hw8uy30raur6863a6eprpjr3juz6clgute2&quot;)</span>
+<span class="nc" id="L597">            .poolHash(&quot;pool1v4xevkf7fx08pzy7atsk59dds6p0sdyl6xmhwf4mh79x6l5p6kx&quot;)</span>
+<span class="nc" id="L598">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L599">            .build());</span>
+<span class="nc" id="L600">    missingRewards.add(</span>
+<span class="nc" id="L601">        MissingReward.builder()</span>
+<span class="nc" id="L602">            .stakeAddress(&quot;stake1u97h59ht8c565e4yv6e7tztwr8clax935n6w2rqfzts0rgqdce73x&quot;)</span>
+<span class="nc" id="L603">            .poolHash(&quot;pool1qqqqqdk4zhsjuxxd8jyvwncf5eucfskz0xjjj64fdmlgj735lr9&quot;)</span>
+<span class="nc" id="L604">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L605">            .build());</span>
+<span class="nc" id="L606">    return modifyRewards(rewards, missingRewards);</span>
+  }
+
+  public Collection&lt;Reward&gt; removeRewardAddressDidNotReceiveInEpoch228(Collection&lt;Reward&gt; rewards) {
+<span class="nc" id="L610">    List&lt;MissingReward&gt; missingRewards = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L611">    missingRewards.add(</span>
+<span class="nc" id="L612">        MissingReward.builder()</span>
+<span class="nc" id="L613">            .stakeAddress(&quot;stake1u8qj0ax56ntjnvaghgffwexrvmr6jmyepqz5d4ql8vv22xc90092t&quot;)</span>
+<span class="nc" id="L614">            .poolHash(&quot;pool166dkk9kx5y6ug9tnvh0dnvxhwt2yca3g5pd5jaqa8t39cgyqqlr&quot;)</span>
+<span class="nc" id="L615">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L616">            .build());</span>
+<span class="nc" id="L617">    missingRewards.add(</span>
+<span class="nc" id="L618">        MissingReward.builder()</span>
+<span class="nc" id="L619">            .stakeAddress(&quot;stake1uydzd8jgucw9zzy2xhpk9e7ra27m6xzqa6cyghcu8dkf09qs4v2sl&quot;)</span>
+<span class="nc" id="L620">            .poolHash(&quot;pool12mmcc4rc2fzfv7gyv8h06nvnsrm3m7erzdv8x6gzvjxlu2lf09n&quot;)</span>
+<span class="nc" id="L621">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L622">            .build());</span>
+<span class="nc" id="L623">    missingRewards.add(</span>
+<span class="nc" id="L624">        MissingReward.builder()</span>
+<span class="nc" id="L625">            .stakeAddress(&quot;stake1u99jtwe0zgq4yq9ehexqpvpu4j0hgs5sdwy7u85acz280ncvkv7cw&quot;)</span>
+<span class="nc" id="L626">            .poolHash(&quot;pool1nudasuv0lljpe0tswcverqvlh0v4226vgnpsuxn0e9nkvnvcvne&quot;)</span>
+<span class="nc" id="L627">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L628">            .build());</span>
+<span class="nc" id="L629">    missingRewards.add(</span>
+<span class="nc" id="L630">        MissingReward.builder()</span>
+<span class="nc" id="L631">            .stakeAddress(&quot;stake1u9pnva6rkcmlt4hem202v2w65zn2ggsn9reuzlwczvwu05q2lcngu&quot;)</span>
+<span class="nc" id="L632">            .poolHash(&quot;pool1ell3xjtspzzz4vtsatscan6rheltf7j3hh2s8qsam2h3jvcxzm9&quot;)</span>
+<span class="nc" id="L633">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L634">            .build());</span>
+<span class="nc" id="L635">    return modifyRewards(rewards, missingRewards);</span>
+  }
+
+  public Collection&lt;Reward&gt; removeRewardAddressDidNotReceiveInEpoch229(Collection&lt;Reward&gt; rewards) {
+<span class="nc" id="L639">    List&lt;MissingReward&gt; missingRewards = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L640">    missingRewards.add(</span>
+<span class="nc" id="L641">        MissingReward.builder()</span>
+<span class="nc" id="L642">            .stakeAddress(&quot;stake1u9wra8z90zj9anj79vzn99sd90jlynwnjkkmtjg6nvx9xjs7mzup4&quot;)</span>
+<span class="nc" id="L643">            .poolHash(&quot;pool14skj6e4rpjanzclx3fc880xnl8xafgg63tmw93t9xspvwx985qu&quot;)</span>
+<span class="nc" id="L644">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L645">            .build());</span>
+<span class="nc" id="L646">    missingRewards.add(</span>
+<span class="nc" id="L647">        MissingReward.builder()</span>
+<span class="nc" id="L648">            .stakeAddress(&quot;stake1u89yfe2048cyf9f2cs0f7gswerlh4s32gmnw6r97lw7pyvqt85nmt&quot;)</span>
+<span class="nc" id="L649">            .poolHash(&quot;pool1vxz0deezj5c2950e7arpzfqxzq8zd9kawsullrzjw5rsq0yhxgr&quot;)</span>
+<span class="nc" id="L650">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L651">            .build());</span>
+<span class="nc" id="L652">    missingRewards.add(</span>
+<span class="nc" id="L653">        MissingReward.builder()</span>
+<span class="nc" id="L654">            .stakeAddress(&quot;stake1uyy2whe25ts5qzllulgk4dfsjr9qzks8dz2uzfcgz5j5mhqh5rzjh&quot;)</span>
+<span class="nc" id="L655">            .poolHash(&quot;pool1vx9tzlkgafernd9vpjpxkenutx2gncj4yn88fpq69823qlwcqrt&quot;)</span>
+<span class="nc" id="L656">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L657">            .build());</span>
+<span class="nc" id="L658">    missingRewards.add(</span>
+<span class="nc" id="L659">        MissingReward.builder()</span>
+<span class="nc" id="L660">            .stakeAddress(&quot;stake1u8zg7h8tvpjclndj5l4zuhtjvpd833mu5c8n39q9gr89knsl5j6qz&quot;)</span>
+<span class="nc" id="L661">            .poolHash(&quot;pool1qvhss6kxmtl27nr4ugvypayhvt4a4vzll8p9csdg2v8q7d22llu&quot;)</span>
+<span class="nc" id="L662">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L663">            .build());</span>
+<span class="nc" id="L664">    return modifyRewards(rewards, missingRewards);</span>
+  }
+
+  public Collection&lt;Reward&gt; removeRewardAddressDidNotReceiveInEpoch230(Collection&lt;Reward&gt; rewards) {
+<span class="nc" id="L668">    List&lt;MissingReward&gt; missingRewards = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L669">    missingRewards.add(</span>
+<span class="nc" id="L670">        MissingReward.builder()</span>
+<span class="nc" id="L671">            .stakeAddress(&quot;stake1u8qj0ax56ntjnvaghgffwexrvmr6jmyepqz5d4ql8vv22xc90092t&quot;)</span>
+<span class="nc" id="L672">            .poolHash(&quot;pool166dkk9kx5y6ug9tnvh0dnvxhwt2yca3g5pd5jaqa8t39cgyqqlr&quot;)</span>
+<span class="nc" id="L673">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L674">            .build());</span>
+<span class="nc" id="L675">    missingRewards.add(</span>
+<span class="nc" id="L676">        MissingReward.builder()</span>
+<span class="nc" id="L677">            .stakeAddress(&quot;stake1uxrkez465cmpdrragd3rhcgrc6lllnasxd7qtl735l489egx9yfxe&quot;)</span>
+<span class="nc" id="L678">            .poolHash(&quot;pool19w5khsnmu27au0kprw0kjm8jr7knneysj7lfkqvnu66hyz0jxsx&quot;)</span>
+<span class="nc" id="L679">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L680">            .build());</span>
+<span class="nc" id="L681">    missingRewards.add(</span>
+<span class="nc" id="L682">        MissingReward.builder()</span>
+<span class="nc" id="L683">            .stakeAddress(&quot;stake1uygyqumaaaxrdq5z0p8q9tw8tsz7760ascknheqrs2ylx2qgmgrk7&quot;)</span>
+<span class="nc" id="L684">            .poolHash(&quot;pool1yxhf37v04q6cyrf8a4g64xsmvepwg5t2zc0qcquqjlph55ye2ef&quot;)</span>
+<span class="nc" id="L685">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L686">            .build());</span>
+<span class="nc" id="L687">    missingRewards.add(</span>
+<span class="nc" id="L688">        MissingReward.builder()</span>
+<span class="nc" id="L689">            .stakeAddress(&quot;stake1u8jv4f0823el83azk528uqcu8f5kdjxvfpw7fvtf6nvuyjs794w6u&quot;)</span>
+<span class="nc" id="L690">            .poolHash(&quot;pool1rvng7n968748udkc5rxy4h9zp9hms4s3jsfwuues76ft28uc056&quot;)</span>
+<span class="nc" id="L691">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L692">            .build());</span>
+<span class="nc" id="L693">    missingRewards.add(</span>
+<span class="nc" id="L694">        MissingReward.builder()</span>
+<span class="nc" id="L695">            .stakeAddress(&quot;stake1u8xq7a8jyknqudx7dcph3ldvqpt3ecnwc7a2vl3te6397cc2m38z4&quot;)</span>
+<span class="nc" id="L696">            .poolHash(&quot;pool14skj6e4rpjanzclx3fc880xnl8xafgg63tmw93t9xspvwx985qu&quot;)</span>
+<span class="nc" id="L697">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L698">            .build());</span>
+<span class="nc" id="L699">    missingRewards.add(</span>
+<span class="nc" id="L700">        MissingReward.builder()</span>
+<span class="nc" id="L701">            .stakeAddress(&quot;stake1uy5kcpd3ja0hx3ud0xd3s6jr5e2dvkyfhec0z4xm6vg6sssx520vg&quot;)</span>
+<span class="nc" id="L702">            .poolHash(&quot;pool1m62sl6rauje9cknrkhwl39tc4hujudkd7gp478dpz7tagmjr8wm&quot;)</span>
+<span class="nc" id="L703">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L704">            .build());</span>
+<span class="nc" id="L705">    missingRewards.add(</span>
+<span class="nc" id="L706">        MissingReward.builder()</span>
+<span class="nc" id="L707">            .stakeAddress(&quot;stake1u9d5af7g6zm3j23f0j37my24xrdfl95lv6eft9sycq4n88cy9ujvf&quot;)</span>
+<span class="nc" id="L708">            .poolHash(&quot;pool18v9r8afalh50l4lstct2awdc3zspnvurcs7t45nv29uc2mnxc6c&quot;)</span>
+<span class="nc" id="L709">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L710">            .build());</span>
+<span class="nc" id="L711">    missingRewards.add(</span>
+<span class="nc" id="L712">        MissingReward.builder()</span>
+<span class="nc" id="L713">            .stakeAddress(&quot;stake1uyga7tyr8dtsa6fg7a9ncq692330j8m44gmz4jn82p07ueqd67szv&quot;)</span>
+<span class="nc" id="L714">            .poolHash(&quot;pool1pnzwgsgzd6t4788sfr7dxjyusepyq9xaxnpyfcngewqf29t9ayd&quot;)</span>
+<span class="nc" id="L715">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L716">            .build());</span>
+<span class="nc" id="L717">    missingRewards.add(</span>
+<span class="nc" id="L718">        MissingReward.builder()</span>
+<span class="nc" id="L719">            .stakeAddress(&quot;stake1u85w6uns0rk899p78sa3wu3yd3t97ku5pjyvsths0cn7sxqyft0f9&quot;)</span>
+<span class="nc" id="L720">            .poolHash(&quot;pool12mmcc4rc2fzfv7gyv8h06nvnsrm3m7erzdv8x6gzvjxlu2lf09n&quot;)</span>
+<span class="nc" id="L721">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L722">            .build());</span>
+<span class="nc" id="L723">    missingRewards.add(</span>
+<span class="nc" id="L724">        MissingReward.builder()</span>
+<span class="nc" id="L725">            .stakeAddress(&quot;stake1u8r60srves2r3evyyumrju3r8y8r0ccd96xgulwcdul7s4gerc8mf&quot;)</span>
+<span class="nc" id="L726">            .poolHash(&quot;pool1lkpj6fa4l0sy39qfvyl4pcsnnd22y8np8j98vzwula2kuxgers4&quot;)</span>
+<span class="nc" id="L727">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L728">            .build());</span>
+<span class="nc" id="L729">    return modifyRewards(rewards, missingRewards);</span>
+  }
+
+  public Collection&lt;Reward&gt; removeRewardAddressDidNotReceiveInEpoch231(Collection&lt;Reward&gt; rewards) {
+<span class="nc" id="L733">    List&lt;MissingReward&gt; missingRewards = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L734">    missingRewards.add(</span>
+<span class="nc" id="L735">        MissingReward.builder()</span>
+<span class="nc" id="L736">            .stakeAddress(&quot;stake1uxrkez465cmpdrragd3rhcgrc6lllnasxd7qtl735l489egx9yfxe&quot;)</span>
+<span class="nc" id="L737">            .poolHash(&quot;pool1qqqqqdk4zhsjuxxd8jyvwncf5eucfskz0xjjj64fdmlgj735lr9&quot;)</span>
+<span class="nc" id="L738">            .rewardType(RewardType.LEADER)</span>
+<span class="nc" id="L739">            .build());</span>
+<span class="nc" id="L740">    missingRewards.add(</span>
+<span class="nc" id="L741">        MissingReward.builder()</span>
+<span class="nc" id="L742">            .stakeAddress(&quot;stake1u89yfe2048cyf9f2cs0f7gswerlh4s32gmnw6r97lw7pyvqt85nmt&quot;)</span>
+<span class="nc" id="L743">            .poolHash(&quot;pool1vxz0deezj5c2950e7arpzfqxzq8zd9kawsullrzjw5rsq0yhxgr&quot;)</span>
+<span class="nc" id="L744">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L745">            .build());</span>
+<span class="nc" id="L746">    missingRewards.add(</span>
+<span class="nc" id="L747">        MissingReward.builder()</span>
+<span class="nc" id="L748">            .stakeAddress(&quot;stake1uyy2whe25ts5qzllulgk4dfsjr9qzks8dz2uzfcgz5j5mhqh5rzjh&quot;)</span>
+<span class="nc" id="L749">            .poolHash(&quot;pool1vx9tzlkgafernd9vpjpxkenutx2gncj4yn88fpq69823qlwcqrt&quot;)</span>
+<span class="nc" id="L750">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L751">            .build());</span>
+<span class="nc" id="L752">    missingRewards.add(</span>
+<span class="nc" id="L753">        MissingReward.builder()</span>
+<span class="nc" id="L754">            .stakeAddress(&quot;stake1u8zg7h8tvpjclndj5l4zuhtjvpd833mu5c8n39q9gr89knsl5j6qz&quot;)</span>
+<span class="nc" id="L755">            .poolHash(&quot;pool1qvhss6kxmtl27nr4ugvypayhvt4a4vzll8p9csdg2v8q7d22llu&quot;)</span>
+<span class="nc" id="L756">            .rewardType(RewardType.MEMBER)</span>
+<span class="nc" id="L757">            .build());</span>
+<span class="nc" id="L758">    return modifyRewards(rewards, missingRewards);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PoolRetireServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cardano-reward-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.service.impl</a> &gt; <span class="el_source">PoolRetireServiceImpl.java</span></div><h1>PoolRetireServiceImpl.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.service.impl;
+
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+
+import org.cardanofoundation.rewards.common.entity.RewardType;
+import org.cardanofoundation.rewards.constants.RewardConstants;
+import org.cardanofoundation.rewards.service.PoolRetireService;
+import org.cardanofoundation.rewards.service.StakeAddressService;
+import org.cardanofoundation.rewards.service.TxService;
+import org.springframework.stereotype.Service;
+
+import org.cardanofoundation.rewards.common.entity.PoolHash;
+import org.cardanofoundation.rewards.common.entity.Reward;
+import org.cardanofoundation.rewards.common.entity.StakeAddress;
+import org.cardanofoundation.rewards.common.PoolRetiredReward;
+import org.cardanofoundation.rewards.projection.PoolUpdateRewardProjection;
+import org.cardanofoundation.rewards.repository.PoolRetireRepository;
+import org.cardanofoundation.rewards.repository.PoolUpdateRepository;
+
+<span class="nc" id="L28">@Slf4j</span>
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+<span class="nc" id="L30">@RequiredArgsConstructor</span>
+@Service
+public class PoolRetireServiceImpl implements PoolRetireService {
+
+  PoolUpdateRepository poolUpdateRepository;
+  PoolRetireRepository poolRetireRepository;
+  StakeAddressService stakeAddressService;
+  TxService txService;
+
+  @Override
+  public PoolRetiredReward getRefundRewards(int epochNo) {
+<span class="nc" id="L41">    var txId = txService.getTxIdLedgerSnapshotOfEpoch(epochNo);</span>
+<span class="nc" id="L42">    var poolRetireIds = poolRetireRepository.getPoolIdRetiredTilTxInEpoch(txId, epochNo);</span>
+<span class="nc" id="L43">    log.info(&quot;Epoch no {}, tx snapshot {}&quot;, epochNo, txId);</span>
+    // 1. find the certificate applied in the epoch
+<span class="nc" id="L45">    var poolUpdates =</span>
+<span class="nc" id="L46">        poolUpdateRepository.findLastPoolsRegistrationActivatedInEpoch(poolRetireIds, txId);</span>
+
+<span class="nc" id="L48">    var rewardAddrs =</span>
+<span class="nc" id="L49">        poolUpdates.stream()</span>
+<span class="nc" id="L50">            .map(PoolUpdateRewardProjection::getRewardAddrId)</span>
+<span class="nc" id="L51">            .collect(Collectors.toSet());</span>
+
+    // 2. Filter reward account of the pool.
+<span class="nc" id="L54">    var rewardAddrsRegistered =</span>
+<span class="nc" id="L55">        stakeAddressService.getStakeAddressRegisteredTilEpoch(txId, rewardAddrs, epochNo);</span>
+
+    // 2.1 If it is not registered then the refund of that pool will go to the treasury
+<span class="nc" id="L58">    var poolDoNotHaveRegisteredRewardAddressAvailable =</span>
+<span class="nc" id="L59">        poolUpdates.stream()</span>
+<span class="nc" id="L60">            .filter(</span>
+                poolUpdateRewardProjection -&gt;
+<span class="nc bnc" id="L62" title="All 2 branches missed.">                    !rewardAddrsRegistered.contains(poolUpdateRewardProjection.getRewardAddrId()))</span>
+<span class="nc" id="L63">            .count();</span>
+<span class="nc" id="L64">    var additionTreasury =</span>
+<span class="nc" id="L65">        BigInteger.valueOf(poolDoNotHaveRegisteredRewardAddressAvailable)</span>
+<span class="nc" id="L66">            .multiply(RewardConstants.REFUND_ADA);</span>
+
+    // 2.2 If it is registered then it will get refund back
+<span class="nc" id="L69">    List&lt;Reward&gt; refunds =</span>
+<span class="nc" id="L70">        poolUpdates.stream()</span>
+<span class="nc" id="L71">            .filter(</span>
+                poolUpdateRewardProjection -&gt;
+<span class="nc" id="L73">                    rewardAddrsRegistered.contains(poolUpdateRewardProjection.getRewardAddrId()))</span>
+<span class="nc" id="L74">            .map(</span>
+                poolUpdate -&gt;
+<span class="nc" id="L76">                    Reward.builder() // TODO set refund ada with parameter of epoch param</span>
+<span class="nc" id="L77">                        .pool(PoolHash.builder().id(poolUpdate.getPoolHashId()).build())</span>
+<span class="nc" id="L78">                        .poolId(poolUpdate.getPoolHashId())</span>
+<span class="nc" id="L79">                        .addr(StakeAddress.builder().id(poolUpdate.getRewardAddrId()).build())</span>
+<span class="nc" id="L80">                        .stakeAddressId(poolUpdate.getRewardAddrId())</span>
+<span class="nc" id="L81">                        .amount(RewardConstants.REFUND_ADA)</span>
+<span class="nc" id="L82">                        .type(RewardType.REFUND)</span>
+<span class="nc" id="L83">                        .earnedEpoch(epochNo)</span>
+<span class="nc" id="L84">                        .spendableEpoch(epochNo)</span>
+<span class="nc" id="L85">                        .build())</span>
+<span class="nc" id="L86">            .collect(Collectors.toList());</span>
+<span class="nc" id="L87">    return PoolRetiredReward.builder()</span>
+<span class="nc" id="L88">        .refundRewards(refunds)</span>
+<span class="nc" id="L89">        .additionTreasury(additionTreasury)</span>
+<span class="nc" id="L90">        .build();</span>
+  }
+
+  @Override
+  public Set&lt;Long&gt; getPoolRetiredIdTilEpoch(int epoch) {
+<span class="nc" id="L95">    var txId = txService.getTxIdLedgerSnapshotOfEpoch(epoch);</span>
+<span class="nc" id="L96">    var poolRetireIds = poolRetireRepository.getPoolIdRetiredTilEpoch(txId, epoch);</span>
+<span class="nc" id="L97">    log.info(</span>
+        &quot;Epoch {} pool retire size {} txId {} epochNo {}&quot;,
+<span class="nc" id="L99">        epoch,</span>
+<span class="nc" id="L100">        poolRetireIds.size(),</span>
+<span class="nc" id="L101">        txId,</span>
+<span class="nc" id="L102">        epoch);</span>
+<span class="nc" id="L103">    return poolRetireIds;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
