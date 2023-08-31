@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EpochEndServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cardano-reward-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.service.impl</a> &gt; <span class="el_source">EpochEndServiceImpl.java</span></div><h1>EpochEndServiceImpl.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.service.impl;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+import java.util.Collection;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+
+import org.cardanofoundation.rewards.constants.RewardConstants;
+import org.cardanofoundation.rewards.exception.PreviousAdaPotsNotFoundException;
+import org.cardanofoundation.rewards.exception.RewardWithdrawalException;
+import org.cardanofoundation.rewards.service.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
+
+import rest.koios.client.backend.api.base.exception.ApiException;
+
+import org.cardanofoundation.rewards.common.entity.EpochStake;
+import org.cardanofoundation.rewards.common.entity.Reward;
+import org.cardanofoundation.rewards.common.EpochEndData;
+import org.cardanofoundation.rewards.exception.RefundConflictException;
+import org.cardanofoundation.rewards.exception.StakeBalanceException;
+import org.cardanofoundation.rewards.repository.EpochRepository;
+import org.cardanofoundation.rewards.repository.PoolHistoryRepository;
+import org.cardanofoundation.rewards.repository.TxRepository;
+import org.cardanofoundation.rewards.repository.jdbc.JDBCEpochStakeRepository;
+import org.cardanofoundation.rewards.repository.jdbc.JDBCRewardRepository;
+
+<span class="nc" id="L35">@Slf4j</span>
+@Service
+@FieldDefaults(level = AccessLevel.PRIVATE)
+<span class="nc" id="L38">@RequiredArgsConstructor</span>
+public class EpochEndServiceImpl implements EpochEndService {
+
+  final AdaPotsService adaPotsService;
+  final RewardService rewardService;
+  final EpochStakeService epochStakeService;
+  final EpochRepository epochRepository;
+  final PoolRetireService poolRetireService;
+  final TxRepository txRepository;
+  final HardForkService hardForkService;
+  final JDBCRewardRepository jdbcRewardRepository;
+  final JDBCEpochStakeRepository jdbcEpochStakeRepository;
+  final PoolHistoryRepository poolHistoryRepository;
+
+  @Value(&quot;${application.network-magic}&quot;)
+  int networkMagic;
+
+  @Override
+  public EpochEndData getEpochEndData(int adaPotsEpoch) throws ApiException {
+    // epoch has past (n)
+<span class="nc" id="L58">    int epochHasPast = adaPotsEpoch - 1;</span>
+
+    try {
+<span class="nc" id="L61">      var adaPots = adaPotsService.calculateAdaPots(adaPotsEpoch); // n+1</span>
+
+      // activate stake of epoch n + 2 is balance of stake address in last block of epoch n
+      // Refund reward is paid when cardano network change to new epoch.
+<span class="nc" id="L65">      var poolRetiredReward = poolRetireService.getRefundRewards(adaPotsEpoch);</span>
+      // Current deposit = total deposit has calculated - refund reward
+<span class="nc" id="L67">      adaPotsService.updateRefundDeposit(adaPots, poolRetiredReward);</span>
+<span class="nc" id="L68">      log.info(</span>
+          &quot;Earned epoch {} refund size {}&quot;,
+<span class="nc" id="L70">          adaPots.getEpochNo(),</span>
+<span class="nc" id="L71">          poolRetiredReward.getRefundRewards().size());</span>
+<span class="nc" id="L72">      var epochStakes = epochStakeService.calculateEpochStakeOfEpoch(epochHasPast);</span>
+      // Calculate reward member, leader will be earned in adaPotsEpoch
+<span class="nc" id="L74">      var fee = txRepository.getFeeOfEpoch(epochHasPast);</span>
+<span class="nc" id="L75">      var stakeRewards =</span>
+<span class="nc" id="L76">          rewardService.calculateReward(adaPots.getEpochNo(), adaPots.getReserves(), fee);</span>
+
+<span class="nc" id="L78">      stakeRewards = hardForkService.handleRewardIssueForEachEpoch(</span>
+<span class="nc" id="L79">          networkMagic, adaPots.getEpochNo() - 1, stakeRewards);</span>
+
+<span class="nc" id="L81">      var totalStakeReward =</span>
+<span class="nc" id="L82">          stakeRewards.stream().map(Reward::getAmount).reduce(BigInteger.ZERO, BigInteger::add);</span>
+<span class="nc" id="L83">      log.info(&quot;Ada pot final {}&quot;, adaPots);</span>
+<span class="nc" id="L84">      var totalStake =</span>
+<span class="nc" id="L85">          epochStakes.stream().map(EpochStake::getAmount).reduce(BigInteger.ZERO, BigInteger::add);</span>
+<span class="nc" id="L86">      log.info(</span>
+          &quot;Epoch {}, stake size: {}, total stake: {}&quot;,
+<span class="nc" id="L88">          adaPots.getEpochNo(),</span>
+<span class="nc" id="L89">          epochStakes.size(),</span>
+          totalStake);
+<span class="nc" id="L91">      log.info(</span>
+          &quot;Earned epoch {} reward leader and member size {} total stake reward {}&quot;,
+<span class="nc" id="L93">          adaPots.getEpochNo() - 1,</span>
+<span class="nc" id="L94">          stakeRewards.size(),</span>
+          totalStakeReward);
+<span class="nc" id="L96">      return EpochEndData.builder()</span>
+<span class="nc" id="L97">          .adaPots(adaPots)</span>
+<span class="nc" id="L98">          .epochStakes(epochStakes)</span>
+<span class="nc" id="L99">          .refunds(poolRetiredReward.getRefundRewards())</span>
+<span class="nc" id="L100">          .stakeRewards(stakeRewards)</span>
+<span class="nc" id="L101">          .build();</span>
+<span class="nc" id="L102">    } catch (StakeBalanceException</span>
+             | RewardWithdrawalException
+             | RefundConflictException
+             | PreviousAdaPotsNotFoundException e) {
+<span class="nc" id="L106">      e.printStackTrace();</span>
+<span class="nc" id="L107">      System.exit(1);</span>
+<span class="nc" id="L108">    } catch (ApiException e) {</span>
+<span class="nc" id="L109">      throw e;</span>
+<span class="nc" id="L110">    }</span>
+<span class="nc" id="L111">    return new EpochEndData();</span>
+  }
+
+  @Override
+  @Transactional
+  public void saveEpochEndData(EpochEndData epochEndData) {
+    // collect reward
+<span class="nc" id="L118">    Collection&lt;Reward&gt; rewards = epochEndData.getStakeRewards();</span>
+<span class="nc" id="L119">    rewards.addAll(epochEndData.getRefunds());</span>
+
+<span class="nc bnc" id="L121" title="All 2 branches missed.">    if (!ObjectUtils.isEmpty(epochEndData.getAdaPots())) {</span>
+<span class="nc" id="L122">      adaPotsService.save(epochEndData.getAdaPots());</span>
+    }
+<span class="nc bnc" id="L124" title="All 2 branches missed.">    if (!ObjectUtils.isEmpty(rewards)) {</span>
+<span class="nc" id="L125">      jdbcRewardRepository.saveAll(rewards);</span>
+    }
+<span class="nc bnc" id="L127" title="All 2 branches missed.">    if (!ObjectUtils.isEmpty(epochEndData.getEpochStakes())) {</span>
+<span class="nc" id="L128">      jdbcEpochStakeRepository.saveAll(epochEndData.getEpochStakes());</span>
+    }
+<span class="nc" id="L130">    var epochOpt = epochRepository.findEpochByNo(epochEndData.getAdaPots().getEpochNo() - 1);</span>
+<span class="nc bnc" id="L131" title="All 2 branches missed.">    if (epochOpt.isPresent()) {</span>
+<span class="nc" id="L132">      var epoch = epochOpt.get();</span>
+<span class="nc" id="L133">      epoch.setRewardsDistributed(rewardService.getDistributedReward(epoch.getNo()));</span>
+<span class="nc" id="L134">      epochRepository.save(epoch);</span>
+    }
+<span class="nc" id="L136">  }</span>
+
+  private Double calculateRos(BigInteger totalDistributeReward, BigInteger totalActivateStake) {
+<span class="nc" id="L139">    return new BigDecimal(totalDistributeReward)</span>
+<span class="nc" id="L140">        .divide(new BigDecimal(totalActivateStake), 18, RoundingMode.HALF_EVEN)</span>
+<span class="nc" id="L141">        .multiply(new BigDecimal(RewardConstants.EPOCH_PER_YEAR))</span>
+<span class="nc" id="L142">        .multiply(new BigDecimal(100))</span>
+<span class="nc" id="L143">        .doubleValue();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

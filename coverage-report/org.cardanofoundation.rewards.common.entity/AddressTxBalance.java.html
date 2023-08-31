@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AddressTxBalance.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cardano-reward-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.common.entity</a> &gt; <span class="el_source">AddressTxBalance.java</span></div><h1>AddressTxBalance.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.common.entity;
+
+import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.util.Objects;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.ConstraintMode;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Digits;
+
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+
+import org.cardanofoundation.rewards.common.validator.Word128Type;
+import org.hibernate.Hibernate;
+
+@Entity
+@Table(name = &quot;address_tx_balance&quot;)
+@Getter
+<span class="nc" id="L30">@Setter</span>
+<span class="nc" id="L31">@NoArgsConstructor</span>
+<span class="nc" id="L32">@AllArgsConstructor</span>
+<span class="nc" id="L33">@SuperBuilder(toBuilder = true)</span>
+public class AddressTxBalance extends BaseEntity {
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = &quot;address_id&quot;, nullable = false,
+            foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = &quot;none&quot;))
+    @EqualsAndHashCode.Exclude
+<span class="nc" id="L40">    private Address address;</span>
+
+    @Column(name = &quot;address_id&quot;, updatable = false, insertable = false)
+<span class="nc" id="L43">    private Long addressId;</span>
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = &quot;tx_id&quot;, nullable = false,
+            foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = &quot;none&quot;))
+    @EqualsAndHashCode.Exclude
+<span class="nc" id="L49">    private Tx tx;</span>
+
+    @Column(name = &quot;tx_id&quot;, updatable = false, insertable = false)
+<span class="nc" id="L52">    private Long txId;</span>
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = &quot;stake_address_id&quot;,
+            foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = &quot;none&quot;))
+<span class="nc" id="L57">    private StakeAddress stakeAddress;</span>
+
+    @Column(name = &quot;balance&quot;, nullable = false, precision = 39)
+    @Word128Type
+    @Digits(integer = 39, fraction = 0)
+<span class="nc" id="L62">    private BigInteger balance;</span>
+
+    @Column(name = &quot;time&quot;)
+<span class="nc" id="L65">    private Timestamp time;</span>
+
+    @Override
+    public boolean equals(Object o) {
+<span class="nc bnc" id="L69" title="All 2 branches missed.">        if (this == o) {</span>
+<span class="nc" id="L70">            return true;</span>
+        }
+<span class="nc bnc" id="L72" title="All 4 branches missed.">        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {</span>
+<span class="nc" id="L73">            return false;</span>
+        }
+<span class="nc" id="L75">        AddressTxBalance that = (AddressTxBalance) o;</span>
+<span class="nc bnc" id="L76" title="All 4 branches missed.">        return id != null &amp;&amp; Objects.equals(id, that.id);</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L81">        return getClass().hashCode();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

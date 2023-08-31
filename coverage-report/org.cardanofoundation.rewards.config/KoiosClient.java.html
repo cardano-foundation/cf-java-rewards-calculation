@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>KoiosClient.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cardano-reward-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.config</a> &gt; <span class="el_source">KoiosClient.java</span></div><h1>KoiosClient.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.config;
+
+import javax.annotation.PostConstruct;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.cardanofoundation.rewards.constants.NetworkConstants;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import rest.koios.client.backend.api.network.NetworkService;
+import rest.koios.client.backend.factory.BackendFactory;
+import rest.koios.client.backend.factory.BackendService;
+
+@Component
+<span class="nc" id="L16">@Slf4j</span>
+<span class="nc" id="L17">public class KoiosClient {</span>
+
+  @Value(&quot;${application.network-magic}&quot;)
+  private Integer networkMagic;
+
+  private BackendService backendService;
+
+  public NetworkService networkService() {
+<span class="nc" id="L25">    return this.backendService.getNetworkService();</span>
+  }
+
+  @PostConstruct
+  void setBackendService() {
+<span class="nc" id="L30">    String networkName = NetworkConstants.getNetworkNameByMagicNumber(networkMagic);</span>
+<span class="nc" id="L31">    log.info(&quot;Network: {}&quot;, networkName);</span>
+<span class="nc" id="L32">    this.backendService =</span>
+<span class="nc bnc" id="L33" title="All 5 branches missed.">        switch (networkName) {</span>
+<span class="nc" id="L34">          case NetworkConstants.MAINNET_NAME -&gt; BackendFactory.getKoiosMainnetService();</span>
+<span class="nc" id="L35">          case NetworkConstants.PREPROD_NAME -&gt; BackendFactory.getKoiosPreprodService();</span>
+<span class="nc" id="L36">          case NetworkConstants.PREVIEW_NAME -&gt; BackendFactory.getKoiosPreviewService();</span>
+<span class="nc" id="L37">          case NetworkConstants.GUILDNET_NAME -&gt; BackendFactory.getKoiosGuildService();</span>
+<span class="nc" id="L38">          default -&gt; throw new IllegalStateException(&quot;Unexpected value: &quot; + networkName);</span>
+        };
+<span class="nc" id="L40">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

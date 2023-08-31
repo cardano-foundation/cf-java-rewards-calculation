@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Redeemer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cardano-reward-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.common.entity</a> &gt; <span class="el_source">Redeemer.java</span></div><h1>Redeemer.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.common.entity;
+
+import java.math.BigInteger;
+import java.util.Objects;
+import jakarta.persistence.Column;
+import jakarta.persistence.ConstraintMode;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.Digits;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import org.cardanofoundation.rewards.common.enumeration.ScriptPurposeType;
+import org.cardanofoundation.rewards.common.validator.Hash28Type;
+import org.cardanofoundation.rewards.common.validator.Lovelace;
+import org.cardanofoundation.rewards.common.validator.Word31Type;
+import org.cardanofoundation.rewards.common.validator.Word63Type;
+import org.hibernate.Hibernate;
+
+@Entity
+@Table(name = &quot;redeemer&quot;, uniqueConstraints = {
+        @UniqueConstraint(name = &quot;unique_redeemer&quot;,
+                columnNames = {&quot;tx_id&quot;, &quot;purpose&quot;, &quot;index&quot;})
+})
+@Getter
+<span class="nc" id="L34">@Setter</span>
+<span class="nc" id="L35">@NoArgsConstructor</span>
+<span class="nc" id="L36">@AllArgsConstructor</span>
+<span class="nc" id="L37">@SuperBuilder(toBuilder = true)</span>
+public class Redeemer extends BaseEntity {
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = &quot;tx_id&quot;, nullable = false,
+            foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = &quot;none&quot;))
+    @EqualsAndHashCode.Exclude
+<span class="nc" id="L44">    private Tx tx;</span>
+
+    @Column(name = &quot;unit_mem&quot;, nullable = false)
+    @Word63Type
+<span class="nc" id="L48">    private Long unitMem;</span>
+
+    @Column(name = &quot;unit_steps&quot;, nullable = false)
+    @Word63Type
+<span class="nc" id="L52">    private Long unitSteps;</span>
+
+    @Column(name = &quot;fee&quot;, precision = 20)
+    @Lovelace
+    @Digits(integer = 20, fraction = 0)
+<span class="nc" id="L57">    private BigInteger fee;</span>
+
+    @Column(name = &quot;purpose&quot;, nullable = false)
+<span class="nc" id="L60">    private ScriptPurposeType purpose;</span>
+
+    @Column(name = &quot;index&quot;, nullable = false)
+    @Word31Type
+<span class="nc" id="L64">    private Integer index;</span>
+
+    @Column(name = &quot;script_hash&quot;, length = 56)
+    @Hash28Type
+<span class="nc" id="L68">    private String scriptHash;</span>
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = &quot;redeemer_data_id&quot;, nullable = false,
+            foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = &quot;none&quot;))
+    @EqualsAndHashCode.Exclude
+<span class="nc" id="L74">    private RedeemerData redeemerData;</span>
+
+    @Override
+    public boolean equals(Object o) {
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        if (this == o) {</span>
+<span class="nc" id="L79">            return true;</span>
+        }
+<span class="nc bnc" id="L81" title="All 4 branches missed.">        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {</span>
+<span class="nc" id="L82">            return false;</span>
+        }
+<span class="nc" id="L84">        Redeemer redeemer = (Redeemer) o;</span>
+<span class="nc bnc" id="L85" title="All 4 branches missed.">        return id != null &amp;&amp; Objects.equals(id, redeemer.id);</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L90">        return getClass().hashCode();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

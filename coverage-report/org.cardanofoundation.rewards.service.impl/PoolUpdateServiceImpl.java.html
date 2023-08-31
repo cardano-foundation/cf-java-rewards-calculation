@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PoolUpdateServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cardano-reward-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.service.impl</a> &gt; <span class="el_source">PoolUpdateServiceImpl.java</span></div><h1>PoolUpdateServiceImpl.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+
+import org.cardanofoundation.rewards.projection.PoolConfigProjection;
+import org.cardanofoundation.rewards.service.PoolRetireService;
+import org.cardanofoundation.rewards.service.PoolUpdateService;
+import org.springframework.stereotype.Service;
+
+import org.cardanofoundation.rewards.repository.PoolUpdateRepository;
+
+<span class="nc" id="L20">@Slf4j</span>
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+<span class="nc" id="L22">@RequiredArgsConstructor</span>
+@Service
+public class PoolUpdateServiceImpl implements PoolUpdateService {
+
+  PoolRetireService poolRetireService;
+  PoolUpdateRepository poolUpdateRepository;
+
+  @Override
+  public List&lt;PoolConfigProjection&gt; findAllActivePoolConfig(int epoch) {
+<span class="nc" id="L31">    var poolRetiredIds = poolRetireService.getPoolRetiredIdTilEpoch(epoch);</span>
+<span class="nc" id="L32">    log.info(&quot;Epoch {}, pool ids size {}&quot;, epoch, poolRetiredIds.size());</span>
+<span class="nc" id="L33">    var poolConfig = poolUpdateRepository.findAllActivePoolConfig(epoch, poolRetiredIds);</span>
+<span class="nc" id="L34">    return getLatestPoolConfiguration(poolConfig, epoch);</span>
+  }
+
+  @Override
+  public List&lt;PoolConfigProjection&gt; findPoolHasMintedBlockInEpoch(int epoch) {
+<span class="nc" id="L39">    var poolConfig = poolUpdateRepository.findAllPoolConfigHasMintedBlockInEpoch(epoch);</span>
+<span class="nc" id="L40">    return getLatestPoolConfiguration(poolConfig, epoch);</span>
+  }
+
+  // make sure that even in the same tx has many pool update of the same certificate
+  // then we will take the latest pool update has certificate index is biggest
+  private List&lt;PoolConfigProjection&gt; getLatestPoolConfiguration(
+      List&lt;PoolConfigProjection&gt; poolConfigProjections, int epoch) {
+<span class="nc" id="L47">    return new ArrayList&lt;&gt;(</span>
+<span class="nc" id="L48">        poolConfigProjections.stream()</span>
+<span class="nc" id="L49">            .collect(</span>
+<span class="nc" id="L50">                Collectors.toMap(</span>
+                    PoolConfigProjection::getPoolId,
+<span class="nc" id="L52">                    Function.identity(),</span>
+                    (a, b) -&gt; {
+<span class="nc bnc" id="L54" title="All 2 branches missed.">                      if (a.getActivateEpochNo() &gt; b.getActivateEpochNo()</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">                          &amp;&amp; a.getActivateEpochNo() &lt;= epoch) {</span>
+<span class="nc" id="L56">                        return a;</span>
+<span class="nc bnc" id="L57" title="All 2 branches missed.">                      } else if (b.getActivateEpochNo() &gt; a.getActivateEpochNo()</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">                          &amp;&amp; b.getActivateEpochNo() &lt;= epoch) {</span>
+<span class="nc" id="L59">                        return b;</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">                      } else if (a.getTxId() &gt; b.getTxId()) {</span>
+<span class="nc" id="L61">                        return a;</span>
+                      } else {
+<span class="nc bnc" id="L63" title="All 2 branches missed.">                        if (a.getCertIndex() &gt; b.getCertIndex()) return a;</span>
+<span class="nc" id="L64">                        return b;</span>
+                      }
+                    }))
+<span class="nc" id="L67">            .values());</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

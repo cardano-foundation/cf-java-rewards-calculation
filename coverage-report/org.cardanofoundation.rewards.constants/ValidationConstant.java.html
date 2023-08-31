@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ValidationConstant.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cardano-reward-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.constants</a> &gt; <span class="el_source">ValidationConstant.java</span></div><h1>ValidationConstant.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.constants;
+
+import java.math.BigInteger;
+
+public class ValidationConstant {
+
+    private ValidationConstant() {
+
+    }
+
+    public static final long MINUS_ONE = -1L;
+    public static final double TWO = 2D;
+    public static final double INT_65_BYTES = 65D;
+    public static final double LOVE_LACE_BYTES = 64D;
+    public static final double WORD_128_BYTES = 128D;
+    public static final int ADDRESS_MAX_BYTES = 58;
+    public static final int ASSET_MAX_BYTES = 32;
+    public static final int HASH_28 = 56;
+    public static final int HASH_32 = 64;
+
+    public static BigInteger getMaxInt65() {
+<span class="nc" id="L22">        return BigInteger.valueOf((long) Math.pow(TWO, INT_65_BYTES));</span>
+    }
+
+    public static BigInteger getMinInt65() {
+<span class="nc" id="L26">        return BigInteger.valueOf(MINUS_ONE).multiply(getMaxInt65());</span>
+    }
+
+    public static BigInteger getMaxLoveLace() {
+<span class="nc" id="L30">        return BigInteger.valueOf((long) Math.pow(TWO, LOVE_LACE_BYTES));</span>
+    }
+
+    public static BigInteger getMaxWord128() {
+<span class="nc" id="L34">        return BigInteger.valueOf((long) Math.pow(TWO, WORD_128_BYTES));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

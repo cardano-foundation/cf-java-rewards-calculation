@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EpochStakeServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cardano-reward-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.service.impl</a> &gt; <span class="el_source">EpochStakeServiceImpl.java</span></div><h1>EpochStakeServiceImpl.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.service.impl;
+
+import java.math.BigInteger;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+
+import org.cardanofoundation.rewards.exception.RewardWithdrawalException;
+import org.cardanofoundation.rewards.exception.StakeBalanceException;
+import org.cardanofoundation.rewards.projection.DelegatorReceivedRewardProjection;
+import org.cardanofoundation.rewards.projection.DelegatorWithdrawalProjection;
+import org.cardanofoundation.rewards.service.PoolService;
+import org.cardanofoundation.rewards.service.TxService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import org.cardanofoundation.rewards.common.entity.EpochStake;
+import org.cardanofoundation.rewards.common.entity.PoolHash;
+import org.cardanofoundation.rewards.common.entity.StakeAddress;
+import org.cardanofoundation.rewards.repository.DelegationRepository;
+import org.cardanofoundation.rewards.repository.EpochStakeRepository;
+import org.cardanofoundation.rewards.repository.RewardRepository;
+import org.cardanofoundation.rewards.repository.WithdrawalRepository;
+import org.cardanofoundation.rewards.service.EpochStakeService;
+
+@Service
+<span class="nc" id="L30">@Slf4j</span>
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+public class EpochStakeServiceImpl implements EpochStakeService {
+
+  DelegationRepository delegationRepository;
+  EpochStakeRepository epochStakeRepository;
+  TxService txService;
+
+  WithdrawalRepository withdrawalRepository;
+
+  RewardRepository rewardRepository;
+
+  HashMap&lt;Integer, List&lt;EpochStake&gt;&gt; cacheEpochStake;
+
+  PoolService poolService;
+
+  public EpochStakeServiceImpl(
+      DelegationRepository delegationRepository,
+      EpochStakeRepository epochStakeRepository,
+      TxService txService,
+      PoolService poolService,
+      WithdrawalRepository withdrawalRepository,
+<span class="nc" id="L52">      RewardRepository rewardRepository) {</span>
+<span class="nc" id="L53">    this.delegationRepository = delegationRepository;</span>
+<span class="nc" id="L54">    this.epochStakeRepository = epochStakeRepository;</span>
+<span class="nc" id="L55">    this.txService = txService;</span>
+<span class="nc" id="L56">    this.poolService = poolService;</span>
+<span class="nc" id="L57">    this.withdrawalRepository = withdrawalRepository;</span>
+<span class="nc" id="L58">    this.rewardRepository = rewardRepository;</span>
+<span class="nc" id="L59">    this.cacheEpochStake = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L60">  }</span>
+
+  @Override
+  @Transactional(readOnly = true)
+  public Collection&lt;EpochStake&gt; calculateEpochStakeOfEpoch(int epochStake) {
+<span class="nc" id="L65">    var lastTxId = txService.getTxIdLedgerSnapshotOfEpoch(epochStake);</span>
+<span class="nc" id="L66">    log.info(</span>
+        &quot;Epoch stake from Tx snapshot {} epoch snapshot {} epoch activate stake {}&quot;,
+<span class="nc" id="L68">        lastTxId,</span>
+<span class="nc" id="L69">        epochStake - 1,</span>
+<span class="nc" id="L70">        epochStake + 1);</span>
+<span class="nc" id="L71">    var poolActivateIds = poolService.getPoolCanStakeFromEpoch(epochStake - 1);</span>
+<span class="nc" id="L72">    var totalStakes =</span>
+<span class="nc" id="L73">        delegationRepository.findTotalStakedTilTx(lastTxId, epochStake + 1, poolActivateIds);</span>
+<span class="nc" id="L74">    var totalReceivedRewards = rewardRepository.findTotalReceivedRewardsTilEpochNo(epochStake - 1);</span>
+<span class="nc" id="L75">    var totalWithdrawals = withdrawalRepository.findTotalWithdrawalsTilTx(lastTxId);</span>
+
+<span class="nc" id="L77">    Map&lt;Long, BigInteger&gt; totalReceivedRewardsMap =</span>
+<span class="nc" id="L78">        totalReceivedRewards.stream()</span>
+<span class="nc" id="L79">            .collect(</span>
+<span class="nc" id="L80">                Collectors.toMap(</span>
+                    DelegatorReceivedRewardProjection::getStakeAddressId,
+                    DelegatorReceivedRewardProjection::getTotalReceivedReward));
+
+<span class="nc" id="L84">    Map&lt;Long, BigInteger&gt; totalWithdrawalsMap =</span>
+<span class="nc" id="L85">        totalWithdrawals.stream()</span>
+<span class="nc" id="L86">            .collect(</span>
+<span class="nc" id="L87">                Collectors.toMap(</span>
+                    DelegatorWithdrawalProjection::getStakeAddressId,
+                    DelegatorWithdrawalProjection::getTotalWithdrawal));
+<span class="nc" id="L90">    List&lt;EpochStake&gt; epochStakes =</span>
+<span class="nc" id="L91">        totalStakes.stream()</span>
+<span class="nc" id="L92">            .map(</span>
+                stakeBalance -&gt; {
+<span class="nc" id="L94">                  var stakeAddressId = stakeBalance.getStakeAddressId();</span>
+<span class="nc" id="L95">                  var totalStaked = stakeBalance.getTotalUXTOStake();</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">                  if (Objects.isNull(totalStaked)) {</span>
+<span class="nc" id="L97">                    totalStaked = BigInteger.ZERO;</span>
+                  }
+<span class="nc" id="L99">                  var poolId = stakeBalance.getPoolId();</span>
+
+                  // get total received reward for current stake address id
+<span class="nc" id="L102">                  var receivedReward = totalReceivedRewardsMap.get(stakeAddressId);</span>
+<span class="nc bnc" id="L103" title="All 2 branches missed.">                  if (Objects.isNull(receivedReward)) {</span>
+<span class="nc" id="L104">                    receivedReward = BigInteger.ZERO;</span>
+                  }
+
+                  // get total withdrawal for current stake address id
+<span class="nc" id="L108">                  var totalWithdrawal = totalWithdrawalsMap.get(stakeAddressId);</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">                  if (Objects.isNull(totalWithdrawal)) {</span>
+<span class="nc" id="L110">                    totalWithdrawal = BigInteger.ZERO;</span>
+                  }
+
+<span class="nc" id="L113">                  var balance = totalStaked.add(receivedReward).subtract(totalWithdrawal);</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">                  if (totalWithdrawal.compareTo(receivedReward) &gt; 0) {</span>
+<span class="nc" id="L115">                    log.warn(</span>
+                        &quot;Stake key {} received reward {}, total withdrawal {}&quot;,
+                        stakeAddressId,
+                        receivedReward,
+                        totalWithdrawal);
+<span class="nc" id="L120">                    throw new RewardWithdrawalException(</span>
+<span class="nc" id="L121">                        String.format(</span>
+                            &quot;Withdrawal is %s greater than received reward %s&quot;,
+                            totalWithdrawal, receivedReward));
+                  }
+<span class="nc bnc" id="L125" title="All 2 branches missed.">                  if (balance.compareTo(BigInteger.ZERO) &lt; 0) {</span>
+<span class="nc" id="L126">                    log.warn(</span>
+                        &quot;Stake key {}, utxo balance {}, received reward {}, total withdrawal {}&quot;,
+                        stakeAddressId,
+                        totalStaked,
+                        receivedReward,
+                        totalWithdrawal);
+<span class="nc" id="L132">                    throw new StakeBalanceException(&quot;Stake balance must be greater or equal 0&quot;);</span>
+                  }
+<span class="nc" id="L134">                  return EpochStake.builder()</span>
+<span class="nc" id="L135">                      .epochNo(epochStake + 1)</span>
+<span class="nc" id="L136">                      .addr(StakeAddress.builder().id(stakeAddressId).build())</span>
+<span class="nc" id="L137">                      .stakeAddressId(stakeAddressId)</span>
+<span class="nc" id="L138">                      .poolId(poolId)</span>
+<span class="nc" id="L139">                      .pool(PoolHash.builder().id(poolId).build())</span>
+<span class="nc" id="L140">                      .amount(balance)</span>
+<span class="nc" id="L141">                      .build();</span>
+                })
+<span class="nc" id="L143">            .collect(Collectors.toList());</span>
+<span class="nc" id="L144">    cacheEpochStake.put(epochStake + 1, epochStakes);</span>
+    //
+<span class="nc" id="L146">    return epochStakes;</span>
+  }
+
+  @Override
+  public List&lt;EpochStake&gt; getAllEpochStakeByEpochNo(int epoch) {
+<span class="nc bnc" id="L151" title="All 2 branches missed.">    if (cacheEpochStake.containsKey(epoch)) {</span>
+<span class="nc" id="L152">      return cacheEpochStake.get(epoch);</span>
+    }
+<span class="nc" id="L154">    return epochStakeRepository.findEpochStakeByEpochNo(epoch);</span>
+  }
+
+  @Override
+  public void removeCacheEpochStakeByEpochNo(int epoch) {
+<span class="nc" id="L159">    List&lt;Integer&gt; epochWillBeDeleted = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L160" title="All 2 branches missed.">    for (Integer epochKey : cacheEpochStake.keySet()) {</span>
+<span class="nc bnc" id="L161" title="All 2 branches missed.">      if (epochKey &lt;= epoch) {</span>
+<span class="nc" id="L162">        epochWillBeDeleted.add(epochKey);</span>
+      }
+<span class="nc" id="L164">    }</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">    for (Integer epochKey : epochWillBeDeleted) {</span>
+<span class="nc" id="L166">      cacheEpochStake.remove(epochKey);</span>
+<span class="nc" id="L167">    }</span>
+<span class="nc" id="L168">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
