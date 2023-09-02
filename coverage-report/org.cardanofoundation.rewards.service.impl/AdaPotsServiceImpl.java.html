@@ -2,308 +2,54 @@
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
-import java.util.Objects;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-
-import org.cardanofoundation.rewards.common.entity.*;
-import org.cardanofoundation.rewards.common.enumeration.EraType;
-
-import org.cardanofoundation.rewards.constants.RewardConstants;
-import org.cardanofoundation.rewards.exception.PreviousAdaPotsNotFoundException;
-import org.cardanofoundation.rewards.repository.*;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import rest.koios.client.backend.api.base.exception.ApiException;
-import org.cardanofoundation.rewards.common.PoolRetiredReward;
-import org.cardanofoundation.rewards.config.KoiosClient;
-import org.cardanofoundation.rewards.exception.RefundConflictException;
 import org.cardanofoundation.rewards.service.AdaPotsService;
-import org.cardanofoundation.rewards.service.EpochParamService;
-import org.cardanofoundation.rewards.service.RewardService;
-import org.cardanofoundation.rewards.service.TxService;
 
-<span class="fc" id="L32">@Slf4j</span>
-@FieldDefaults(level = AccessLevel.PRIVATE)
-<span class="fc" id="L34">@RequiredArgsConstructor</span>
+<span class="fc" id="L9">@Slf4j</span>
 @Service
-public class AdaPotsServiceImpl implements AdaPotsService {
+<span class="fc" id="L11">public class AdaPotsServiceImpl implements AdaPotsService {</span>
 
-  final EpochRepository epochRepository;
-  final TxRepository txRepository;
-  final AddressTxBalanceRepository addressTxBalanceRepository;
-  final EpochParamService epochParamService;
-  final BlockRepository blockRepository;
-  final AdaPotsRepository adaPotsRepository;
-  final RewardService rewardService;
-  final TxService txService;
-  final KoiosClient koiosClient;
-
-  @Override
-  public AdaPots calculateAdaPots(int epochNo) throws PreviousAdaPotsNotFoundException {
-<span class="nc" id="L50">    log.warn(&quot;Calculate ada pots for epoch: {}&quot;, epochNo);</span>
-<span class="nc" id="L51">    var lastEpochNo = epochNo - 1;</span>
-<span class="nc" id="L52">    var lastEpochOptional = epochRepository.findEpochByNo(lastEpochNo);</span>
-<span class="nc" id="L53">    var currentEpochOptional = epochRepository.findEpochByNo(epochNo);</span>
-<span class="nc bnc" id="L54" title="All 4 branches missed.">    if (lastEpochOptional.isPresent() &amp;&amp; currentEpochOptional.isPresent()) {</span>
-<span class="nc" id="L55">      var epochParam =</span>
-          epochParamService
-<span class="nc" id="L57">              .getEpochParam(lastEpochNo)</span>
-<span class="nc" id="L58">              .orElse(EpochParam.builder().treasuryGrowthRate(0d).monetaryExpandRate(0d).build());</span>
-<span class="nc" id="L59">      long startTime = System.currentTimeMillis();</span>
-
-      // Ada pots of epoch n is the ledger snapshot of first block of epoch n
-<span class="nc" id="L62">      var block = blockRepository.getFirstBlockByEpochNo(epochNo);</span>
-<span class="nc" id="L63">      Epoch lastEpoch = lastEpochOptional.get();</span>
-<span class="nc" id="L64">      var txId = txService.getTxIdAdaPotsOfEpoch(epochNo);</span>
-<span class="nc" id="L65">      BigInteger totalAdaSupplyOnChain =</span>
-<span class="nc" id="L66">          addressTxBalanceRepository.getTotalSupplyOfLovelaceFromBeginToTxId(txId);</span>
-<span class="nc" id="L67">      log.info(&quot;Calculate from tx id: {} last epoch {}&quot;, txId, lastEpoch.getNo());</span>
-      AdaPots adaPots;
-<span class="nc bnc" id="L69" title="All 2 branches missed.">      if (lastEpoch.getEra() == EraType.BYRON) {</span>
-        // if last epoch was byron then it will have no treasury, reward, deposit, fee (for reward calculation)
-        adaPots =
-<span class="nc" id="L72">            AdaPots.builder()</span>
-<span class="nc" id="L73">                .blockId(block.getId())</span>
-<span class="nc" id="L74">                .block(block)</span>
-<span class="nc" id="L75">                .epochNo(epochNo)</span>
-<span class="nc" id="L76">                .deposits(BigInteger.ZERO)</span>
-<span class="nc" id="L77">                .fees(BigInteger.ZERO)</span>
-<span class="nc" id="L78">                .reserves(RewardConstants.TOTAL_ADA.subtract(totalAdaSupplyOnChain))</span>
-<span class="nc" id="L79">                .utxo(totalAdaSupplyOnChain)</span>
-<span class="nc" id="L80">                .treasury(BigInteger.ZERO)</span>
-<span class="nc" id="L81">                .slotNo(block.getSlotNo())</span>
-<span class="nc" id="L82">                .rewards(BigInteger.ZERO)</span>
-<span class="nc" id="L83">                .build();</span>
-      } else {
-<span class="nc" id="L85">        BigInteger fee = lastEpoch.getFees();</span>
-<span class="nc" id="L86">        var lastAdaPotsTxId = txService.getTxIdAdaPotsOfEpoch(lastEpochNo);</span>
-<span class="nc" id="L87">        BigInteger deposit = txRepository.getDepositFromTxIdToTxId(lastAdaPotsTxId, txId);</span>
-<span class="nc bnc" id="L88" title="All 2 branches missed.">        if (Objects.isNull(fee)) {</span>
-<span class="nc" id="L89">          fee = BigInteger.ZERO;</span>
-        }
-<span class="nc bnc" id="L91" title="All 2 branches missed.">        if (Objects.isNull(deposit)) {</span>
-<span class="nc" id="L92">          deposit = BigInteger.ZERO;</span>
-        }
-
-<span class="nc" id="L95">        var blockFee = txRepository.getFeeOfBlock(block.getId());</span>
-<span class="nc" id="L96">        fee = addLovelace(fee, blockFee);</span>
-
-<span class="nc" id="L98">        var lastAdaPots = getAdaPotByEpochNo(lastEpochNo);</span>
-<span class="nc bnc" id="L99" title="All 2 branches missed.">        if (Objects.isNull(lastAdaPots.getBlockId())) {</span>
-<span class="nc" id="L100">          throw new PreviousAdaPotsNotFoundException(</span>
-<span class="nc" id="L101">              String.format(&quot;Information ada pots of epoch %s not found&quot;, lastEpochNo));</span>
-        }
-<span class="nc" id="L103">        var reserve = lastAdaPots.getReserves();</span>
-
-        // reserve of previous epoch
-<span class="nc" id="L106">        var rewardPotsFee = lastAdaPots.getFees();</span>
-<span class="nc" id="L107">        rewardPotsFee =</span>
-<span class="nc" id="L108">            subtractLovelace(rewardPotsFee, txRepository.getFeeOfBlock(lastAdaPots.getBlockId()));</span>
-<span class="nc bnc" id="L109" title="All 2 branches missed.">        if (rewardPotsFee.compareTo(BigInteger.ZERO) &lt; 0) {</span>
-<span class="nc" id="L110">          rewardPotsFee = BigInteger.ZERO;</span>
-        }
-
-<span class="nc" id="L113">        var treasury =</span>
-<span class="nc" id="L114">            calculateTreasury(epochParam, reserve, rewardPotsFee, lastAdaPots.getTreasury());</span>
-
-<span class="nc" id="L116">        log.info(</span>
-            &quot;Calculate treasury param: reserve {}, fee {}, last treasury {}&quot;,
-            reserve,
-<span class="nc" id="L119">            lastEpoch.getFees(),</span>
-<span class="nc" id="L120">            lastAdaPots.getTreasury());</span>
-        adaPots =
-<span class="nc" id="L122">            AdaPots.builder()</span>
-<span class="nc" id="L123">                .blockId(block.getId())</span>
-<span class="nc" id="L124">                .block(block)</span>
-<span class="nc" id="L125">                .epochNo(epochNo)</span>
-<span class="nc" id="L126">                .deposits(deposit.add(lastAdaPots.getDeposits()))</span>
-<span class="nc" id="L127">                .fees(fee)</span>
-<span class="nc" id="L128">                .rewards(BigInteger.ZERO)</span>
-<span class="nc" id="L129">                .utxo(totalAdaSupplyOnChain)</span>
-<span class="nc" id="L130">                .treasury(treasury)</span>
-<span class="nc" id="L131">                .slotNo(block.getSlotNo())</span>
-<span class="nc" id="L132">                .build();</span>
-      }
-
-<span class="nc" id="L135">      long endTime = System.currentTimeMillis();</span>
-<span class="nc" id="L136">      long totalTime = endTime - startTime;</span>
-<span class="nc" id="L137">      log.warn(</span>
-<span class="nc" id="L138">          &quot;Calculation ada pots time elapsed: {} ms, {} second(s)&quot;, totalTime, totalTime / 1000f);</span>
-<span class="nc" id="L139">      return adaPots;</span>
-    } else {
-<span class="nc" id="L141">      log.warn(&quot;Found no epoch with number {}&quot;, epochNo);</span>
-<span class="nc" id="L142">      return null;</span>
-    }
+  /*
+   * Calculate the treasury for epoch e with the formula:
+   *
+   * treasury(e) = treasury_growth_rate * (reward_pot * 0.2) + treasury(e - 1)
+   * treasury(e) = 0, if e &lt; 209
+   */
+  public BigDecimal calculateTreasury(double treasuryGrowRate, BigDecimal rewardPot, BigDecimal lastTreasury) {
+<span class="fc" id="L20">    BigDecimal treasury = rewardPot.multiply(new BigDecimal(treasuryGrowRate));</span>
+<span class="fc" id="L21">    return treasury.add(lastTreasury);</span>
   }
 
-  public BigInteger calculateTreasury(
-      EpochParam epochParam, BigInteger reserve, BigInteger rewardPotFee, BigInteger lastTreasury) {
-<span class="nc" id="L148">    var rewardPot = calculateRewardPot(epochParam, reserve, rewardPotFee);</span>
-<span class="nc" id="L149">    var treasury =</span>
-<span class="nc" id="L150">        calculateWithRate(</span>
-<span class="nc" id="L151">            new BigDecimal(rewardPot).toBigInteger(), epochParam.getTreasuryGrowthRate());</span>
-<span class="nc" id="L152">    return treasury.add(lastTreasury);</span>
-  }
-
-  public BigInteger calculateTreasuryWithEta(
-      EpochParam epochParam,
-      BigInteger reserve,
-      BigInteger rewardPotFee,
-      BigInteger lastTreasury,
-      int totalBlockMinted) {
-<span class="nc" id="L161">    var rewardPot = calculateRewardPot(epochParam, reserve, rewardPotFee);</span>
-    // addition treasury
-<span class="nc" id="L163">    var slotPerEpoch = new BigDecimal(RewardConstants.EXPECTED_SLOT_PER_EPOCH);</span>
-<span class="nc" id="L164">    var eta =</span>
-        new BigDecimal(totalBlockMinted)
-<span class="nc" id="L166">            .divide(</span>
-                BigDecimal.ONE
-<span class="nc" id="L168">                    .subtract(new BigDecimal(epochParam.getDecentralisation().toString()))</span>
-<span class="nc" id="L169">                    .multiply(slotPerEpoch),</span>
-                30,
-                RoundingMode.DOWN);
-<span class="nc" id="L172">    rewardPot = new BigDecimal(rewardPot).multiply(eta).toBigInteger();</span>
-<span class="nc" id="L173">    var treasury =</span>
-<span class="nc" id="L174">        calculateWithRate(</span>
-<span class="nc" id="L175">            new BigDecimal(rewardPot).toBigInteger(), epochParam.getTreasuryGrowthRate());</span>
-<span class="nc" id="L176">    System.out.println(rewardPot);</span>
-<span class="nc" id="L177">    System.out.println(&quot;Addition treasury with eta: &quot; + treasury);</span>
-<span class="nc" id="L178">    return treasury.add(lastTreasury);</span>
+  /*
+   * Calculate the reward pot for epoch e with the formula:
+   *
+   * rewards(e) = monetary_expand_rate * reserve(e - 1) + fee(e - 1)
+   * rewards(e) = 0, if e &lt; 209
+   */
+  public BigDecimal calculateTotalRewardPot(double monetaryExpandRate, BigDecimal reserve, BigDecimal fee) {
+<span class="fc" id="L31">    BigDecimal totalRewardPot = reserve.multiply(new BigDecimal(monetaryExpandRate));</span>
+<span class="fc" id="L32">    return totalRewardPot.add(fee);</span>
   }
 
   @Override
-  public void updateRefundDeposit(AdaPots adaPots, PoolRetiredReward poolRetiredReward)
-      throws RefundConflictException, ApiException {
-
-<span class="nc" id="L185">    var totalRefund =</span>
-<span class="nc" id="L186">        poolRetiredReward.getRefundRewards().stream()</span>
-<span class="nc" id="L187">            .map(Reward::getAmount)</span>
-<span class="nc" id="L188">            .reduce(BigInteger.ZERO, BigInteger::add);</span>
-<span class="nc" id="L189">    var additionRefund = getRefundRewardIsNotDuplicate(adaPots.getEpochNo(), totalRefund);</span>
-<span class="nc" id="L190">    var rewardRemain =</span>
-<span class="nc" id="L191">        rewardService.getTotalRemainRewardOfEpoch(adaPots.getEpochNo()).add(additionRefund);</span>
-<span class="nc" id="L192">    adaPots.setRewards(rewardRemain);</span>
-
-<span class="nc" id="L194">    var deposit =</span>
-        adaPots
-<span class="nc" id="L196">            .getDeposits()</span>
-<span class="nc" id="L197">            .subtract(poolRetiredReward.getAdditionTreasury())</span>
-<span class="nc" id="L198">            .subtract(totalRefund);</span>
-<span class="nc" id="L199">    adaPots.setDeposits(deposit);</span>
-    // TODO this part is currently blocked by an accurate treasury calculation
-    // var treasury = adaPots.getTreasury().add(poolRetiredReward.getAdditionTreasury());
-    // adaPots.setTreasury(treasury);
-<span class="nc" id="L203">    updateTreasury(adaPots);</span>
-<span class="nc" id="L204">    updateReserve(adaPots);</span>
-<span class="nc" id="L205">  }</span>
-
-  public void updateTreasury(AdaPots adaPots) throws ApiException {
-<span class="nc" id="L208">    var result =</span>
-        koiosClient
-<span class="nc" id="L210">            .networkService()</span>
-<span class="nc" id="L211">            .getHistoricalTokenomicStatsByEpoch(adaPots.getEpochNo())</span>
-<span class="nc" id="L212">            .getValue();</span>
-<span class="nc" id="L213">    adaPots.setRewards(new BigInteger(result.getReward()));</span>
-<span class="nc" id="L214">    adaPots.setTreasury(new BigInteger(result.getTreasury()));</span>
-<span class="nc" id="L215">  }</span>
-
-  public void updateReserve(AdaPots adaPots) {
-<span class="nc" id="L218">    var reserve =</span>
-        RewardConstants.TOTAL_ADA
-<span class="nc" id="L220">            .subtract(adaPots.getUtxo())</span>
-<span class="nc" id="L221">            .subtract(adaPots.getFees())</span>
-<span class="nc" id="L222">            .subtract(adaPots.getDeposits())</span>
-<span class="nc" id="L223">            .subtract(adaPots.getTreasury())</span>
-<span class="nc" id="L224">            .subtract(adaPots.getRewards());</span>
-<span class="nc" id="L225">    adaPots.setReserves(reserve);</span>
-<span class="nc" id="L226">  }</span>
-
-  private BigInteger getRefundRewardIsNotDuplicate(int epoch, BigInteger calculationRefund)
-      throws RefundConflictException {
-<span class="nc" id="L230">    var currentRefundAmount = rewardService.getTotalRewardOfEpochByType(epoch, RewardType.REFUND);</span>
-<span class="nc bnc" id="L231" title="All 2 branches missed.">    if (!currentRefundAmount.equals(BigInteger.ZERO)</span>
-<span class="nc bnc" id="L232" title="All 2 branches missed.">        &amp;&amp; !calculationRefund.equals(currentRefundAmount)) {</span>
-<span class="nc" id="L233">      throw new RefundConflictException(</span>
-<span class="nc" id="L234">          String.format(</span>
-              &quot;Epoch %d Calculation refund reward %s conflict with current refund in db %s&quot;,
-<span class="nc" id="L236">              epoch, calculationRefund, currentRefundAmount));</span>
-    }
-<span class="nc bnc" id="L238" title="All 2 branches missed.">    if (currentRefundAmount.equals(BigInteger.ZERO)) {</span>
-<span class="nc" id="L239">      return calculationRefund;</span>
-    }
-<span class="nc" id="L241">    return BigInteger.ZERO;</span>
+  public BigInteger calculateReserves(int epochNo) {
+<span class="nc" id="L37">    return null;</span>
   }
 
   @Override
-  public int getLastEpochHasUpdated() {
-<span class="nc" id="L246">    int epochNo = adaPotsRepository.getTheLatestEpochHasAdaPots().orElse(0);</span>
-<span class="nc bnc" id="L247" title="All 2 branches missed.">    if (epochNo == 0) {</span>
-<span class="nc" id="L248">      Pageable pageable = PageRequest.of(0, 1);</span>
-<span class="nc" id="L249">      var epoch = epochRepository.getNextEpochByEraTypeGreater(EraType.BYRON, pageable);</span>
-<span class="nc bnc" id="L250" title="All 2 branches missed.">      if (epoch.isEmpty()) {</span>
-<span class="nc" id="L251">        log.warn(&quot;Found no epoch has era greater than byron&quot;);</span>
-        // set max value for epoch no, so end epoch schedule won't update anything
-<span class="nc" id="L253">        epochNo = Integer.MAX_VALUE;</span>
-      } else {
-<span class="nc" id="L255">        var e = epoch.get(0);</span>
-<span class="nc" id="L256">        epochNo = e.getNo() - 1; // It will take snapshot balance before first shelley era 2 epoch</span>
-      }
-    }
-
-<span class="nc" id="L260">    return epochNo;</span>
+  public BigInteger calculateUTXO(int epochNo) {
+<span class="nc" id="L42">    return null;</span>
   }
 
   @Override
-  public void save(AdaPots adaPots) {
-<span class="nc" id="L265">    adaPotsRepository.save(adaPots);</span>
-<span class="nc" id="L266">  }</span>
-
-  private BigInteger addLovelace(BigInteger result, BigInteger addition) {
-<span class="nc bnc" id="L269" title="All 2 branches missed.">    if (Objects.isNull(result)) {</span>
-<span class="nc" id="L270">      result = BigInteger.ZERO;</span>
-    }
-<span class="nc bnc" id="L272" title="All 2 branches missed.">    if (Objects.isNull(addition)) {</span>
-<span class="nc" id="L273">      addition = BigInteger.ZERO;</span>
-    }
-<span class="nc" id="L275">    return result.add(addition);</span>
+  public BigInteger calculateDeposits(int epochNo) {
+<span class="nc" id="L47">    return null;</span>
   }
 
-  private BigInteger subtractLovelace(BigInteger result, BigInteger subtraction) {
-<span class="nc bnc" id="L279" title="All 2 branches missed.">    if (Objects.isNull(result)) {</span>
-<span class="nc" id="L280">      result = BigInteger.ZERO;</span>
-    }
-<span class="nc bnc" id="L282" title="All 2 branches missed.">    if (Objects.isNull(subtraction)) {</span>
-<span class="nc" id="L283">      subtraction = BigInteger.ZERO;</span>
-    }
-<span class="nc" id="L285">    return result.subtract(subtraction);</span>
-  }
-
-  public BigInteger calculateRewardPot(EpochParam epochParam, BigInteger reserve, BigInteger fee) {
-<span class="nc" id="L289">    var rewardPot = calculateWithRate(reserve, epochParam.getMonetaryExpandRate());</span>
-<span class="nc" id="L290">    return rewardPot.add(fee);</span>
-  }
-
-  private BigInteger calculateWithRate(BigInteger no, Double rate) {
-<span class="nc" id="L294">    BigDecimal noDecimal = new BigDecimal(no);</span>
-<span class="nc" id="L295">    return noDecimal.multiply(new BigDecimal(rate)).toBigInteger();</span>
-  }
-
-  private AdaPots getAdaPotByEpochNo(int epochNo) {
-<span class="nc" id="L299">    return adaPotsRepository</span>
-<span class="nc" id="L300">        .getAdaPotsByEpochNo(epochNo)</span>
-<span class="nc" id="L301">        .orElse(</span>
-<span class="nc" id="L302">            AdaPots.builder()</span>
-<span class="nc" id="L303">                .treasury(BigInteger.ZERO)</span>
-<span class="nc" id="L304">                .deposits(BigInteger.ZERO)</span>
-<span class="nc" id="L305">                .reserves(BigInteger.ZERO)</span>
-<span class="nc" id="L306">                .build());</span>
+  @Override
+  public BigInteger calculateFees(int epochNo) {
+<span class="nc" id="L52">    return null;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
