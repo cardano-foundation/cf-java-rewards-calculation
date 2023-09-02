@@ -1,15 +1,17 @@
 package org.cardanofoundation.rewards.config;
 
 import javax.annotation.PostConstruct;
-
 import lombok.extern.slf4j.Slf4j;
 
 import org.cardanofoundation.rewards.constants.NetworkConstants;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import rest.koios.client.backend.api.account.AccountService;
 import rest.koios.client.backend.api.epoch.EpochService;
 import rest.koios.client.backend.api.network.NetworkService;
+import rest.koios.client.backend.api.pool.PoolService;
 import rest.koios.client.backend.factory.BackendFactory;
 import rest.koios.client.backend.factory.BackendService;
 
@@ -28,6 +30,14 @@ public class KoiosClient {
 
   public EpochService epochService() {
     return this.backendService.getEpochService();
+  }
+
+  public AccountService accountService() {
+    return this.backendService.getAccountService();
+  }
+
+  public PoolService poolService() {
+    return this.backendService.getPoolService();
   }
 
   @PostConstruct

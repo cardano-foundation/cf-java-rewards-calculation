@@ -38,6 +38,8 @@ flowchart
     style J fill:#F6C667,stroke:#F6C667
 
     style ADA_POTS fill:#f6f9ff,stroke:#f6f9ff
+    
+    click B href "https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/main/src/main/java/org/cardanofoundation/rewards/service/impl/AdaPotsServiceImpl.java#L29" " "
 ```
 
 ## 🚀 Getting Started

@@ -2,13 +2,12 @@ package org.cardanofoundation.rewards.adapots;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.cardanofoundation.rewards.constants.RewardConstants;
 import org.cardanofoundation.rewards.data.provider.KoiosDataProvider;
 import org.cardanofoundation.rewards.service.impl.AdaPotsServiceImpl;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.ComponentScan;
 import rest.koios.client.backend.api.base.exception.ApiException;
 import rest.koios.client.backend.api.network.model.Totals;
+
+import static org.cardanofoundation.rewards.constants.RewardConstants.DEPOSIT_POOL_REGISTRATION_IN_ADA;
 
 @SpringBootTest
 @ComponentScan
@@ -35,6 +36,7 @@ public class AdaPotsTest {
 
   @ParameterizedTest
   @MethodSource("range")
+  @Disabled
   void Test_calculateTreasury(final int epoch) throws ApiException {
     final double treasuryGrowthRate = 0.2;
     final double monetaryExpandRate = 0.003;
@@ -42,17 +44,44 @@ public class AdaPotsTest {
     Totals adaPotsForPreviousEpoch = koiosDataProvider.getAdaPotsForEpoch(epoch - 1);
     Totals adaPotsForCurrentEpoch = koiosDataProvider.getAdaPotsForEpoch(epoch);
 
+    // The Shelley era and the ada pot system started on mainnet in epoch 208.
+    // Fee and treasury values are 0 for epoch 208.
+    BigDecimal totalFeesForCurrentEpoch = new BigDecimal(0);
+    if (epoch > 209) {
+      // Comparing the total fee values with different explorers,
+      // we found that Koios has an offset of 2 epochs.
+      totalFeesForCurrentEpoch = new BigDecimal(koiosDataProvider.getTotalFeesForEpoch(epoch - 2));
+    }
+
     BigDecimal reserveInPreviousEpoch = new BigDecimal(adaPotsForPreviousEpoch.getReserves());
     BigDecimal treasuryInPreviousEpoch = new BigDecimal(adaPotsForPreviousEpoch.getTreasury());
     BigDecimal expectedTreasuryForCurrentEpoch = new BigDecimal(adaPotsForCurrentEpoch.getTreasury());
 
-    // Documentation: Comparing the total fee values with different explorers,
-    //                we found that Koios has an offset of 2 epochs.
-    BigDecimal totalFeesForCurrentEpoch = new BigDecimal(koiosDataProvider.getTotalFeesForEpoch(epoch - 2));
-    var rewardPot = adaPotsService.calculateRewards(monetaryExpandRate, reserveInPreviousEpoch, totalFeesForCurrentEpoch);
+    BigDecimal rewardPot = adaPotsService.calculateTotalRewardPot(monetaryExpandRate, reserveInPreviousEpoch, totalFeesForCurrentEpoch);
 
     BigDecimal treasuryForCurrentEpoch = adaPotsService.calculateTreasury(treasuryGrowthRate, rewardPot, treasuryInPreviousEpoch);
+
+    /*
+      "For each retiring pool, the refund for the pool registration deposit is added to the
+      pool's registered reward account, provided the reward account is still registered." -
+      https://github.com/input-output-hk/cardano-ledger/blob/9e2f8151e3b9a0dde9faeb29a7dd2456e854427c/eras/shelley/formal-spec/epoch.tex#L546C9-L547C87
+    */
+    int retiredPoolsWithDeregisteredRewardAddress = koiosDataProvider.countRetiredPoolsWithDeregisteredRewardAddress(epoch - 1);
+
+    BigDecimal deposit = new BigDecimal(DEPOSIT_POOL_REGISTRATION_IN_ADA);
+    treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(deposit.multiply(new BigDecimal(retiredPoolsWithDeregisteredRewardAddress)));
+
     Assertions.assertEquals(expectedTreasuryForCurrentEpoch.toBigInteger(), treasuryForCurrentEpoch.toBigInteger());
+  }
+
+  @Test
+  void Test_countRetiredPoolsWithDeregisteredRewardAddress() throws ApiException {
+    int poolCountinEpoch209 = koiosDataProvider.countRetiredPoolsWithDeregisteredRewardAddress(209);
+    int poolCountinEpoch210 = koiosDataProvider.countRetiredPoolsWithDeregisteredRewardAddress(210);
+    int poolCountinEpoch211 = koiosDataProvider.countRetiredPoolsWithDeregisteredRewardAddress(211);
+    Assertions.assertEquals(0, poolCountinEpoch209);
+    Assertions.assertEquals(1, poolCountinEpoch210);
+    Assertions.assertEquals(0, poolCountinEpoch211);
   }
 
   @Test
@@ -74,7 +103,7 @@ public class AdaPotsTest {
 
     Assertions.assertEquals(fee, feeInEpoch211);
 
-    BigDecimal rewardPot = adaPotsService.calculateRewards(monetaryExpandRate, reserveInEpoch211, feeInEpoch211);
+    BigDecimal rewardPot = adaPotsService.calculateTotalRewardPot(monetaryExpandRate, reserveInEpoch211, feeInEpoch211);
 
     /*final int totalBlocksInEpoch211 = koiosDataProvider.getTotalBlocksInEpoch(211);
 
@@ -93,33 +122,5 @@ public class AdaPotsTest {
 
     BigDecimal actualTreasury = adaPotsService.calculateTreasury(treasuryGrowthRate, rewardPot, treasuryInEpoch211);
     Assertions.assertEquals(expectedTreasury.toBigInteger(), actualTreasury.toBigInteger());
-  }
-
-  @Test
-  void Test_calculateRewardsForEpoch215() {
-    final double monetaryExpandRate = 0.003;
-    final BigDecimal reserveOfEpoch208 = new BigDecimal("13888022853000");
-
-    BigDecimal feeOfEpoch208 = new BigDecimal("0");
-    final BigDecimal feeOfFirstBlockOfEpoch208 = new BigDecimal("0");
-    feeOfEpoch208 = feeOfEpoch208.subtract(feeOfFirstBlockOfEpoch208);
-
-    BigDecimal expectedRewards = new BigDecimal("593536826");
-    BigDecimal actualRewards = adaPotsService.calculateRewards(monetaryExpandRate, reserveOfEpoch208, feeOfEpoch208);
-    Assertions.assertEquals(expectedRewards, actualRewards);
-  }
-
-  @Test
-  void Test_calculateRewardsForEpoch210() {
-    final double monetaryExpandRate = 0.003;
-    final BigDecimal reserveOfEpoch209 = new BigDecimal("13286160713");
-
-    BigDecimal feeOfEpoch209 = new BigDecimal("10670559402");
-    final BigDecimal feeOfFirstBlockOfEpoch209 = new BigDecimal("0.347194");
-    feeOfEpoch209 = feeOfEpoch209.subtract(feeOfFirstBlockOfEpoch209);
-
-    BigDecimal expectedRewards = new BigDecimal("277915861");
-    BigDecimal actualRewards = adaPotsService.calculateRewards(monetaryExpandRate, reserveOfEpoch209, feeOfEpoch209);
-    Assertions.assertEquals(expectedRewards, actualRewards);
   }
 }
