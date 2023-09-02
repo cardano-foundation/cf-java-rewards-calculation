@@ -1,19 +1,26 @@
 package org.cardanofoundation.rewards.service;
 
 import org.cardanofoundation.rewards.common.entity.AdaPots;
+import org.cardanofoundation.rewards.common.entity.EpochParam;
 import org.cardanofoundation.rewards.exception.PreviousAdaPotsNotFoundException;
 import org.cardanofoundation.rewards.exception.RefundConflictException;
 import rest.koios.client.backend.api.base.exception.ApiException;
 
 import org.cardanofoundation.rewards.common.PoolRetiredReward;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 public interface AdaPotsService {
-  AdaPots calculateAdaPots(int epochNo) throws PreviousAdaPotsNotFoundException;
+  BigInteger calculateReserves(int epochNo);
 
-  void save(AdaPots adaPots);
+  BigDecimal calculateTreasury(double treasuryGrowRate, BigDecimal rewardPot, BigDecimal lastTreasury);
 
-  int getLastEpochHasUpdated();
+  BigDecimal calculateRewards(double monetaryExpandRate, BigDecimal reserve, BigDecimal fee);
 
-  void updateRefundDeposit(AdaPots adaPots, PoolRetiredReward poolRetiredReward)
-      throws RefundConflictException, ApiException;
+  BigInteger calculateUTXO(int epochNo);
+
+  BigInteger calculateDeposits(int epochNo);
+
+  BigInteger calculateFees(int epochNo);
 }
