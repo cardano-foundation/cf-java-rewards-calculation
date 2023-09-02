@@ -2,12 +2,7 @@ package org.cardanofoundation.rewards.service.impl;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
-
 import lombok.extern.slf4j.Slf4j;
-
-import org.cardanofoundation.rewards.common.entity.*;
-import org.cardanofoundation.rewards.constants.RewardConstants;
 import org.springframework.stereotype.Service;
 import org.cardanofoundation.rewards.service.AdaPotsService;
 
@@ -26,14 +21,15 @@ public class AdaPotsServiceImpl implements AdaPotsService {
     return treasury.add(lastTreasury);
   }
 
-  private BigInteger calculateWithRate(BigInteger no, Double rate) {
-    BigDecimal noDecimal = new BigDecimal(no);
-    return noDecimal.multiply(new BigDecimal(rate)).toBigInteger();
-  }
-
-  public BigDecimal calculateRewards(double monetaryExpandRate, BigDecimal reserve, BigDecimal fee) {
-    BigDecimal rewards = reserve.multiply(new BigDecimal(monetaryExpandRate));
-    return rewards.add(fee);
+  /*
+   * Calculate the reward pot for epoch e with the formula:
+   *
+   * rewards(e) = monetary_expand_rate * reserve(e - 1) + fee(e - 1)
+   * rewards(e) = 0, if e < 209
+   */
+  public BigDecimal calculateTotalRewardPot(double monetaryExpandRate, BigDecimal reserve, BigDecimal fee) {
+    BigDecimal totalRewardPot = reserve.multiply(new BigDecimal(monetaryExpandRate));
+    return totalRewardPot.add(fee);
   }
 
   @Override
