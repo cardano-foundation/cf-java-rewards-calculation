@@ -40,11 +40,6 @@ flowchart
     style ADA_POTS fill:#f6f9ff,stroke:#f6f9ff
 ```
 
-classDef class1 fill: white, stroke: white
-class s1,s2 class1
-style Process fill: white, stroke: black
-
-
 ## 🚀 Getting Started
 
 #### Prerequisites
