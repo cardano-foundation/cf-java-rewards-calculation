@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>KoiosDataProvider.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cardano-reward-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.data.provider</a> &gt; <span class="el_source">KoiosDataProvider.java</span></div><h1>KoiosDataProvider.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.data.provider;
+
+import lombok.RequiredArgsConstructor;
+import org.cardanofoundation.rewards.config.KoiosClient;
+import org.springframework.stereotype.Service;
+import rest.koios.client.backend.api.account.model.AccountUpdate;
+import rest.koios.client.backend.api.account.model.AccountUpdates;
+import rest.koios.client.backend.api.base.exception.ApiException;
+import rest.koios.client.backend.api.network.model.Totals;
+import rest.koios.client.backend.api.pool.model.Pool;
+import rest.koios.client.backend.api.pool.model.PoolUpdate;
+import rest.koios.client.backend.factory.options.Options;
+import rest.koios.client.backend.factory.options.filters.Filter;
+import rest.koios.client.backend.factory.options.filters.FilterType;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+<span class="fc" id="L21">@RequiredArgsConstructor</span>
+public class KoiosDataProvider {
+    final KoiosClient koiosClient;
+
+    public Totals getAdaPotsForEpoch(int epoch) throws ApiException {
+<span class="fc" id="L26">        return koiosClient.networkService()</span>
+<span class="fc" id="L27">                .getHistoricalTokenomicStatsByEpoch(epoch)</span>
+<span class="fc" id="L28">                .getValue();</span>
+    }
+
+    public String getTotalFeesForEpoch(int epoch) throws ApiException {
+<span class="fc" id="L32">        return koiosClient.epochService().getEpochInformationByEpoch(epoch).getValue().getFees();</span>
+    }
+
+    public int getTotalBlocksInEpoch(int epoch) throws ApiException {
+<span class="nc" id="L36">        return koiosClient.epochService().getEpochInformationByEpoch(epoch).getValue().getBlkCount();</span>
+    }
+
+    public int countRetiredPoolsWithDeregisteredRewardAddress(int epoch) throws ApiException {
+<span class="fc" id="L40">        List&lt;PoolUpdate&gt; poolUpdates = koiosClient.poolService()</span>
+<span class="fc" id="L41">                .getPoolUpdates(Options.builder()</span>
+<span class="fc" id="L42">                        .option(Filter.of(&quot;active_epoch_no&quot;, FilterType.LTE, String.valueOf(epoch)))</span>
+<span class="fc" id="L43">                        .option(Filter.of(&quot;retiring_epoch&quot;, FilterType.EQ, String.valueOf(epoch)))</span>
+<span class="fc" id="L44">                        .build()).getValue();</span>
+<span class="pc bpc" id="L45" title="1 of 4 branches missed.">        if (poolUpdates == null || poolUpdates.isEmpty()) {</span>
+<span class="fc" id="L46">            return 0;</span>
+        }
+
+<span class="fc" id="L49">        List&lt;String&gt; rewardAddresses = poolUpdates.stream()</span>
+<span class="fc" id="L50">                .map(PoolUpdate::getRewardAddr)</span>
+<span class="fc" id="L51">                .toList();</span>
+
+<span class="fc" id="L53">        List&lt;AccountUpdates&gt; accountUpdates = koiosClient.accountService()</span>
+<span class="fc" id="L54">                .getAccountUpdates(rewardAddresses, null).getValue();</span>
+
+<span class="fc" id="L56">        int poolCount = 0;</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        for (AccountUpdates accountUpdate : accountUpdates) {</span>
+<span class="fc" id="L58">            List&lt;AccountUpdate&gt; updates = accountUpdate.getUpdates();</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">            for (AccountUpdate update : updates) {</span>
+<span class="fc bfc" id="L60" title="All 4 branches covered.">                if (update.getActionType().equals(&quot;deregistration&quot;) &amp;&amp; update.getEpochNo() == epoch) {</span>
+<span class="fc" id="L61">                    poolCount = poolCount + 1;</span>
+<span class="fc" id="L62">                    break;</span>
+                }
+<span class="fc" id="L64">            }</span>
+<span class="fc" id="L65">        }</span>
+<span class="fc" id="L66">        return poolCount;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
