@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PoolRewardCalculation.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cardano-reward-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.calculation</a> &gt; <span class="el_source">PoolRewardCalculation.java</span></div><h1>PoolRewardCalculation.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.calculation;
+
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+
+<span class="nc" id="L7">public class PoolRewardCalculation {</span>
+
+    /*
+    * https://github.com/input-output-hk/cardano-ledger/releases/latest/download/shelley-delegation.pdf
+    *
+    * Calculate the apparent pool performance with the formula (shelley-delegation.pdf page 36):
+    *
+    * performance = relativeBlocksCreatedInEpoch / relativeActiveStake
+    *
+    * hint: shelley-delegation.pdf 3.8.3
+    *       As long as we have d &gt;= 0.8, we set the apparent performance of any pool to 1
+    */
+    public static BigDecimal calculateApparentPoolPerformance(BigDecimal poolStake, BigDecimal totalEpochStake,
+                                                              int blocksMintedByPool, int totalBlocksInEpoch,
+                                                              double decentralizationParam) {
+<span class="pc bpc" id="L22" title="1 of 2 branches missed.">        if (decentralizationParam &gt;= 0.8) {</span>
+<span class="fc" id="L23">            return BigDecimal.ONE;</span>
+        }
+
+<span class="nc" id="L26">        BigDecimal relativeBlocksCreatedInEpoch = new BigDecimal(blocksMintedByPool).divide(new BigDecimal(totalBlocksInEpoch), 30, RoundingMode.DOWN);</span>
+<span class="nc" id="L27">        BigDecimal relativeActiveStake = poolStake.divide(totalEpochStake, 30, RoundingMode.DOWN);</span>
+<span class="nc" id="L28">        return relativeBlocksCreatedInEpoch.divide(relativeActiveStake, 30, RoundingMode.DOWN);</span>
+    }
+
+    /*
+     * https://github.com/input-output-hk/cardano-ledger/releases/latest/download/shelley-delegation.pdf
+     *
+     * Calculate the pool reward with the formula (shelley-delegation.pdf 5.5.3):
+     *
+     * optimalPoolCount (nOpt &quot;k&quot;) and influence (a0) are
+     * protocol parameters: https://cips.cardano.org/cips/cip9/
+     *
+     * sizeOfASaturatedPool = 1 / optimalPoolCount
+     * cappedRelativeStake = min(relativeStakeOfPool, sizeOfASaturatedPool)
+     * cappedRelativeStakeOfPoolOwner = min(relativeStakeOfPoolOwner, sizeOfASaturatedPool)
+     *
+     * rewards = (totalAvailableRewards / (1 + influence)) * (
+     *      cappedRelativeStake +
+     *      cappedRelativeStakeOfPoolOwner * influence * ((
+     *          cappedRelativeStake - cappedRelativeStakeOfPoolOwner *
+     *          (( sizeOfASaturatedPool - cappedRelativeStake ) / sizeOfASaturatedPool))
+     *          / sizeOfASaturatedPool)
+     *      )
+     */
+    public static BigDecimal calculateOptimalPoolReward(
+            BigDecimal totalAvailableRewards,
+            int optimalPoolCount,
+            double influenceParam,
+            BigDecimal relativeStakeOfPool,
+            BigDecimal relativeStakeOfPoolOwner) {
+<span class="fc" id="L57">        var influence = new BigDecimal(influenceParam);</span>
+<span class="fc" id="L58">        var sizeOfASaturatedPool =</span>
+<span class="fc" id="L59">                BigDecimal.ONE.divide(</span>
+                        new BigDecimal(optimalPoolCount), 30, RoundingMode.DOWN);
+
+<span class="fc" id="L62">        var cappedRelativeStake = sizeOfASaturatedPool.min(relativeStakeOfPool);</span>
+<span class="fc" id="L63">        var cappedRelativeStakeOfPoolOwner = sizeOfASaturatedPool.min(relativeStakeOfPoolOwner);</span>
+<span class="fc" id="L64">        MathContext mathContext = new MathContext(30, RoundingMode.DOWN);</span>
+
+        // R / (1 + a0)
+<span class="fc" id="L67">        var rewardsDividedByOnePlusInfluence = totalAvailableRewards.divide(BigDecimal.ONE.add(influence), 30, RoundingMode.DOWN);</span>
+
+        // s' * a0
+<span class="fc" id="L70">        var influenceOfOwner = cappedRelativeStakeOfPoolOwner.multiply(influence, mathContext);</span>
+
+        // s'((z0 - o')/ z0)
+<span class="fc" id="L73">        var relativeStakeOfSaturatedPool = cappedRelativeStakeOfPoolOwner.multiply(</span>
+<span class="fc" id="L74">                sizeOfASaturatedPool.subtract(cappedRelativeStake, mathContext).divide(sizeOfASaturatedPool, 30, RoundingMode.DOWN));</span>
+
+        // o' - (s' * (z0 - o')/ z0) / z0)
+<span class="fc" id="L77">        var saturatedPoolWeight = cappedRelativeStake.subtract(relativeStakeOfSaturatedPool, mathContext)</span>
+<span class="fc" id="L78">                .divide(sizeOfASaturatedPool, 30, RoundingMode.DOWN);</span>
+
+<span class="fc" id="L80">        return rewardsDividedByOnePlusInfluence.multiply(cappedRelativeStake.add(influenceOfOwner.multiply(saturatedPoolWeight)));</span>
+    }
+
+    /*
+     *  Calculate the pool reward with the formula (shelley-delegation.pdf 5.5.3 page 37 below):
+     *  actualRewards = poolPerformance * optimalPoolReward
+     */
+    public static BigDecimal calculatePoolReward(BigDecimal optimalPoolReward, BigDecimal poolPerformance) {
+<span class="fc" id="L88">        return optimalPoolReward.multiply(poolPerformance);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
