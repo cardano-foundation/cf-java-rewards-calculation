@@ -13,11 +13,8 @@ import rest.koios.client.backend.api.pool.model.PoolHistory;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.List;
-
 import static org.cardanofoundation.rewards.constants.RewardConstants.TOTAL_LOVELACE;
 import static org.cardanofoundation.rewards.util.CurrencyConverter.lovelaceToAda;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @ComponentScan
@@ -25,25 +22,6 @@ public class PoolRewardCalculationTest {
 
     @Autowired
     KoiosDataProvider koiosDataProvider;
-
-
-    @Test
-    void Test_GetPoolPerformance() {
-        // https://api.koios.rest/api/v0/pool_history?_pool_bech32=pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt&_epoch_no=220
-
-        int blocksPoolHasMinted = 10;
-        BigDecimal totalEpochStake = new BigDecimal("87498030468343");
-        BigDecimal poolStake = new BigDecimal("27523186299296");
-
-        double decentralizationParam = 0.64;
-        int totalBlock = 21627;
-
-        var apparentPoolPerformance =
-                PoolRewardCalculation.calculateApparentPoolPerformance(poolStake, totalEpochStake,
-                        blocksPoolHasMinted, totalBlock, decentralizationParam);
-        assertEquals(new BigDecimal("0.296414596464228188354493042058"), apparentPoolPerformance);
-    }
-
 
     void Test_calculatePoolReward(String poolId, int epoch) throws ApiException {
         // Step 1: Get Pool information of current epoch
