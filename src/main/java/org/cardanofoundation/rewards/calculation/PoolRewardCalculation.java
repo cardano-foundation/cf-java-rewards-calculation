@@ -69,9 +69,6 @@ public class PoolRewardCalculation {
         // s' * a0
         var influenceOfOwner = cappedRelativeStakeOfPoolOwner.multiply(influence, mathContext);
 
-        // o' + s' * a0
-        var sumRelativeWeightedStakes = cappedRelativeStake.add(influenceOfOwner, mathContext);
-
         // s'((z0 - o')/ z0)
         var relativeStakeOfSaturatedPool = cappedRelativeStakeOfPoolOwner.multiply(
                 sizeOfASaturatedPool.subtract(cappedRelativeStake, mathContext).divide(sizeOfASaturatedPool, 30, RoundingMode.DOWN));
@@ -80,7 +77,7 @@ public class PoolRewardCalculation {
         var saturatedPoolWeight = cappedRelativeStake.subtract(relativeStakeOfSaturatedPool, mathContext)
                 .divide(sizeOfASaturatedPool, 30, RoundingMode.DOWN);
 
-        return rewardsDividedByOnePlusInfluence.multiply(sumRelativeWeightedStakes.multiply(saturatedPoolWeight));
+        return rewardsDividedByOnePlusInfluence.multiply(cappedRelativeStake.add(influenceOfOwner.multiply(saturatedPoolWeight)));
     }
 
     /*

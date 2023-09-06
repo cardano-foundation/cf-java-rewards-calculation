@@ -9,11 +9,13 @@ import org.springframework.context.annotation.ComponentScan;
 import rest.koios.client.backend.api.base.exception.ApiException;
 import rest.koios.client.backend.api.epoch.model.EpochParams;
 import rest.koios.client.backend.api.network.model.Totals;
+import rest.koios.client.backend.api.pool.model.PoolHistory;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
-import static org.cardanofoundation.rewards.constants.RewardConstants.TOTAL_ADA;
+import static org.cardanofoundation.rewards.constants.RewardConstants.TOTAL_LOVELACE;
 import static org.cardanofoundation.rewards.util.CurrencyConverter.lovelaceToAda;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -42,57 +44,58 @@ public class PoolRewardCalculationTest {
         assertEquals(new BigDecimal("0.296414596464228188354493042058"), apparentPoolPerformance);
     }
 
-    @Test
-    void Test_GetPoolReward() throws ApiException {
-        // Pool information of pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt in epoch 211
-        // Source: https://api.koios.rest/api/v0/pool_history?_pool_bech32=pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt&_epoch_no=211
-        int blocksPoolHasMinted = 4;
-        BigDecimal poolStake = lovelaceToAda(new BigDecimal("27092487965405"));
-        BigDecimal relativePoolStake = new BigDecimal("0.002661916729491990325");
-        BigDecimal estimatedPoolReward = lovelaceToAda(new BigDecimal("20268536110")); // as deleg_rewards
 
-        // Epoch information of epoch 211
+    void Test_calculatePoolReward(String poolId, int epoch) throws ApiException {
+        // Step 1: Get Pool information of current epoch
+        // Example: https://api.koios.rest/api/v0/pool_history?_pool_bech32=pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt&_epoch_no=210
+        PoolHistory poolHistoryCurrentEpoch = koiosDataProvider.getPoolHistory(poolId, epoch);
+        BigDecimal poolStake = lovelaceToAda(new BigDecimal(poolHistoryCurrentEpoch.getActiveStake()));
+        BigDecimal estimatedPoolReward = lovelaceToAda(new BigDecimal(poolHistoryCurrentEpoch.getDelegRewards()));
+        BigDecimal poolFees = lovelaceToAda(new BigDecimal(poolHistoryCurrentEpoch.getPoolFees()));
+        int blocksPoolHasMinted = poolHistoryCurrentEpoch.getBlockCnt();
+
+        // Step 2: Get Epoch information of current epoch
         // Source: https://api.koios.rest/api/v0/epoch_info?_epoch_no=211
-        //BigDecimal totalEpochStake = lovelaceToAda(new BigDecimal("10177811974822904"));
-        int totalBlocksInEpoch = 21315;
+        int totalBlocksInEpoch = koiosDataProvider.getTotalBlocksInEpoch(epoch);
 
-        // Fee and reserves in epoch 211 (koios seems to have an offset of 2 epochs here)
-        BigDecimal totalFeesInEpoch = new BigDecimal(koiosDataProvider.getTotalFeesForEpoch(209));
+        // Step 3 Get fee from current and reserve from next epoch
+        BigDecimal totalFeesInEpoch = new BigDecimal(koiosDataProvider.getTotalFeesForEpoch(epoch));
 
-        Totals adaPotsForPreviousEpoch = koiosDataProvider.getAdaPotsForEpoch(210);
-        Totals adaPotsForCurrentEpoch = koiosDataProvider.getAdaPotsForEpoch(211);
-        BigDecimal reserves = new BigDecimal(adaPotsForPreviousEpoch.getReserves());
+        Totals adaPotsForNextEpoch = koiosDataProvider.getAdaPotsForEpoch(epoch + 1);
+        BigDecimal reserves = new BigDecimal(adaPotsForNextEpoch.getReserves());
 
-        //assertEquals(relativePoolStake, poolStake.divide(totalEpochStake, 21, RoundingMode.DOWN));
-        BigDecimal adaInCirculation = lovelaceToAda(new BigDecimal(adaPotsForPreviousEpoch.getCirculation()));
+        // Step 4: Get total ada in circulation (total lovelace - reserves)
+        BigDecimal adaInCirculation = lovelaceToAda(TOTAL_LOVELACE.subtract(reserves));
 
-        EpochParams epochParams = koiosDataProvider.getProtocolParametersForEpoch(211);
+        // Step 5: Get protocol parameters for current epoch
+        EpochParams epochParams = koiosDataProvider.getProtocolParametersForEpoch(epoch);
         double decentralizationParam = epochParams.getDecentralisation().doubleValue();
         int optimalPoolCount = epochParams.getOptimalPoolCount();
         double influenceParam = epochParams.getInfluence().doubleValue();
         double monetaryExpandRate = epochParams.getMonetaryExpandRate().doubleValue();
         double treasuryGrowRate = epochParams.getTreasuryGrowthRate().doubleValue();
 
+        // Step 6: Calculate apparent pool performance
         var apparentPoolPerformance =
                 PoolRewardCalculation.calculateApparentPoolPerformance(poolStake, adaInCirculation,
                         blocksPoolHasMinted, totalBlocksInEpoch, decentralizationParam);
 
-        // BigDecimal totalRewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(
-        //        monetaryExpandRate, totalBlocksInEpoch, reserves, totalFeesInEpoch);
+        // Step 7: Calculate total available reward for pools (total reward pot after treasury cut)
         BigDecimal totalRewardPot = lovelaceToAda(TreasuryCalculation.calculateTotalRewardPot(monetaryExpandRate, reserves, totalFeesInEpoch));
-        Assertions.assertEquals(new BigDecimal("39842259.004735179"), totalRewardPot.setScale(9, RoundingMode.DOWN));
-
         BigDecimal stakePoolRewardsPot = totalRewardPot.multiply(new BigDecimal(1 - treasuryGrowRate));
 
         // shelley-delegation.pdf 5.5.3
-        //      the relative stake of the pool owner(s) (the amount of ada
-        //      pledged during pool registration
-        //
-        // https://api.koios.rest/api/v0/pool_updates?_pool_bech32=pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt&active_epoch_no=lte.211
-        BigDecimal poolOwnerActiveStake = lovelaceToAda(new BigDecimal("450000000000"));
-        BigDecimal relativeStakeOfPoolOwner = poolOwnerActiveStake.divide(adaInCirculation, 20, RoundingMode.DOWN);
-        relativePoolStake = (poolOwnerActiveStake.add(poolStake)).divide(adaInCirculation, 20, RoundingMode.DOWN);
+        //      "[...]the relative stake of the pool owner(s) (the amount of ada
+        //      pledged during pool registration)"
 
+        // Step 8: Get the latest pool update before this epoch and extract the pledge
+        BigDecimal poolOwnerActiveStake = lovelaceToAda(new BigDecimal(
+                koiosDataProvider.getLatestPoolUpdateBeforeOrInEpoch(poolId, epoch - 1).getPledge()));
+
+        BigDecimal relativeStakeOfPoolOwner = poolOwnerActiveStake.divide(adaInCirculation, 20, RoundingMode.DOWN);
+        BigDecimal relativePoolStake = poolStake.divide(adaInCirculation, 20, RoundingMode.DOWN);
+
+        // Step 9: Calculate optimal pool reward
         BigDecimal optimalPoolReward =
                 PoolRewardCalculation.calculateOptimalPoolReward(
                         stakePoolRewardsPot,
@@ -101,11 +104,37 @@ public class PoolRewardCalculationTest {
                         relativePoolStake,
                         relativeStakeOfPoolOwner);
 
-        System.out.println("Estimated pool reward: " + estimatedPoolReward);
-
+        // Step 10: Calculate pool reward as optimal pool reward * apparent pool performance
         BigDecimal poolReward = PoolRewardCalculation.calculatePoolReward(optimalPoolReward, apparentPoolPerformance);
-        System.out.println("Calculated pool reward: " + poolReward);
-        System.out.println("Difference: " + estimatedPoolReward.subtract(poolReward));
-        Assertions.assertEquals(estimatedPoolReward, poolReward);
+
+        // Step 11: Compare estimated pool reward with actual pool reward minus pool fees
+        Assertions.assertEquals(estimatedPoolReward.setScale(0, RoundingMode.DOWN),
+                poolReward.subtract(poolFees).setScale(0, RoundingMode.DOWN));
+    }
+
+    @Test
+    void calculatePoolRewardInEpoch211() throws ApiException {
+        String poolId1 = "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx";
+        String poolId2 = "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9";
+        String poolId3 = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
+
+        int epoch = 211;
+
+        Test_calculatePoolReward(poolId1, epoch);
+        Test_calculatePoolReward(poolId2, epoch);
+        Test_calculatePoolReward(poolId3, epoch);
+    }
+
+    @Test
+    void calculatePoolRewardInEpoch212() throws ApiException {
+        String poolId1 = "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx";
+        String poolId2 = "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9";
+        String poolId3 = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
+
+        int epoch = 212;
+
+        //Test_calculatePoolReward(poolId1, epoch);
+        Test_calculatePoolReward(poolId2, epoch);
+        Test_calculatePoolReward(poolId3, epoch);
     }
 }

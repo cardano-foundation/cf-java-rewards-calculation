@@ -11,7 +11,10 @@ import rest.koios.client.backend.api.pool.model.PoolHistory;
 import rest.koios.client.backend.api.pool.model.PoolUpdate;
 import rest.koios.client.backend.factory.BackendFactory;
 import rest.koios.client.backend.factory.BackendService;
+import rest.koios.client.backend.factory.options.Limit;
 import rest.koios.client.backend.factory.options.Options;
+import rest.koios.client.backend.factory.options.Order;
+import rest.koios.client.backend.factory.options.SortType;
 import rest.koios.client.backend.factory.options.filters.Filter;
 import rest.koios.client.backend.factory.options.filters.FilterType;
 
@@ -93,5 +96,46 @@ public class KoiosDataProvider {
     public BigDecimal getDistributedRewardsInEpoch(int epoch) throws ApiException {
         return new BigDecimal(koiosBackendService.getEpochService()
                 .getEpochInformationByEpoch(epoch).getValue().getTotalRewards());
+    }
+
+    public PoolHistory getPoolHistory(String poolId, int epoch) throws ApiException {
+        return koiosBackendService.getPoolService()
+                .getPoolHistoryByEpoch(poolId, epoch, Options.EMPTY).getValue();
+    }
+
+    public PoolUpdate getLatestPoolUpdateBeforeOrInEpoch(String poolId, int epoch) throws ApiException {
+        List<PoolUpdate> poolUpdates = koiosBackendService.getPoolService().getPoolUpdatesByPoolBech32(poolId, Options.builder()
+                .option(Filter.of("active_epoch_no", FilterType.LTE, String.valueOf(epoch)))
+                .option(Order.by("block_time", SortType.DESC))
+                .option(Limit.of(1))
+                .build()).getValue();
+
+        if (poolUpdates.isEmpty()) {
+            return null;
+        } else {
+            return poolUpdates.get(0);
+        }
+    }
+
+    public List<String> getPoolOwners(String poolId, int epoch) throws ApiException {
+        List<PoolUpdate> poolUpdates = koiosBackendService.getPoolService().getPoolUpdatesByPoolBech32(poolId, Options.builder()
+                .option(Filter.of("active_epoch_no", FilterType.LTE, String.valueOf(epoch)))
+                .option(Order.by("block_time", SortType.DESC))
+                .option(Limit.of(1))
+                .build()).getValue();
+
+        if(poolUpdates.isEmpty()) {
+            return List.of();
+        } else {
+            return poolUpdates.get(0).getOwners();
+        }
+    }
+
+    public BigDecimal getActiveStakesOfAddressesInEpoch(List<String> stakeAddresses, int epoch) throws ApiException {
+        return koiosBackendService.getAccountService()
+                .getAccountHistory(stakeAddresses, epoch, Options.EMPTY)
+                .getValue().stream().map(accountHistory ->
+                        new BigDecimal(accountHistory.getHistory().get(0).getActiveStake()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }
