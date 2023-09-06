@@ -1,48 +1,70 @@
 package org.cardanofoundation.rewards.data.provider;
 
 import lombok.RequiredArgsConstructor;
-import org.cardanofoundation.rewards.config.KoiosClient;
 import org.springframework.stereotype.Service;
 import rest.koios.client.backend.api.account.model.AccountUpdate;
 import rest.koios.client.backend.api.account.model.AccountUpdates;
 import rest.koios.client.backend.api.base.exception.ApiException;
+import rest.koios.client.backend.api.epoch.model.EpochParams;
 import rest.koios.client.backend.api.network.model.Totals;
-import rest.koios.client.backend.api.pool.model.Pool;
+import rest.koios.client.backend.api.pool.model.PoolHistory;
 import rest.koios.client.backend.api.pool.model.PoolUpdate;
+import rest.koios.client.backend.factory.BackendFactory;
+import rest.koios.client.backend.factory.BackendService;
 import rest.koios.client.backend.factory.options.Options;
 import rest.koios.client.backend.factory.options.filters.Filter;
 import rest.koios.client.backend.factory.options.filters.FilterType;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class KoiosDataProvider {
-    final KoiosClient koiosClient;
+    private final BackendService koiosBackendService;
+
+    public KoiosDataProvider() {
+        this.koiosBackendService = BackendFactory.getKoiosMainnetService();
+    }
+
 
     public Totals getAdaPotsForEpoch(int epoch) throws ApiException {
-        return koiosClient.networkService()
+        return koiosBackendService.getNetworkService()
                 .getHistoricalTokenomicStatsByEpoch(epoch)
                 .getValue();
     }
 
     public String getTotalFeesForEpoch(int epoch) throws ApiException {
-        return koiosClient.epochService().getEpochInformationByEpoch(epoch).getValue().getFees();
+        return koiosBackendService.getEpochService()
+                .getEpochInformationByEpoch(epoch).getValue().getFees();
     }
 
     public int getTotalBlocksInEpoch(int epoch) throws ApiException {
-        return koiosClient.epochService().getEpochInformationByEpoch(epoch).getValue().getBlkCount();
+        return koiosBackendService.getEpochService()
+                .getEpochInformationByEpoch(epoch).getValue().getBlkCount();
     }
 
+    public EpochParams getProtocolParametersForEpoch(int epoch) throws ApiException {
+        return koiosBackendService.getEpochService()
+                .getEpochParametersByEpoch(epoch).getValue();
+    }
+
+    public double getRelativeStakeForPool(String poolId, int epoch) throws ApiException {
+        PoolHistory poolHistory = koiosBackendService.getPoolService().getPoolHistoryByEpoch(poolId, epoch, Options.EMPTY).getValue();
+        return poolHistory.getActiveStakePct();
+    }
+    /*
+       The deposit for pool registration is 500 ADA. The deposit is returned 2 epochs later when the pool is retired.
+       If the stake address associated with the pool has been deregistered, the deposit is returned to the treasury.
+     */
     public int countRetiredPoolsWithDeregisteredRewardAddress(int epoch) throws ApiException {
-        List<PoolUpdate> poolUpdates = koiosClient.poolService()
+        List<PoolUpdate> poolUpdates = koiosBackendService.getPoolService()
                 .getPoolUpdates(Options.builder()
-                        .option(Filter.of("active_epoch_no", FilterType.LTE, String.valueOf(epoch)))
-                        .option(Filter.of("retiring_epoch", FilterType.EQ, String.valueOf(epoch)))
+                        .option(Filter.of("retiring_epoch", FilterType.LTE, String.valueOf(epoch)))
+                        .option(Filter.of("retiring_epoch", FilterType.GTE, String.valueOf(epoch - 2)))
                         .build()).getValue();
-        if (poolUpdates == null || poolUpdates.isEmpty()) {
+
+        if (poolUpdates.isEmpty()) {
             return 0;
         }
 
@@ -50,19 +72,26 @@ public class KoiosDataProvider {
                 .map(PoolUpdate::getRewardAddr)
                 .toList();
 
-        List<AccountUpdates> accountUpdates = koiosClient.accountService()
-                .getAccountUpdates(rewardAddresses, null).getValue();
+        List<AccountUpdates> accountUpdates = koiosBackendService.getAccountService()
+                .getAccountUpdates(rewardAddresses, Options.EMPTY).getValue();
 
         int poolCount = 0;
         for (AccountUpdates accountUpdate : accountUpdates) {
             List<AccountUpdate> updates = accountUpdate.getUpdates();
             for (AccountUpdate update : updates) {
-                if (update.getActionType().equals("deregistration") && update.getEpochNo() == epoch) {
+                if (update.getActionType().equals("deregistration") && update.getEpochNo() <= epoch) {
+                    System.out.println("Epoch: " + epoch);
+                    System.out.println(accountUpdate.getStakeAddress());
                     poolCount = poolCount + 1;
                     break;
                 }
             }
         }
         return poolCount;
+    }
+
+    public BigDecimal getDistributedRewardsInEpoch(int epoch) throws ApiException {
+        return new BigDecimal(koiosBackendService.getEpochService()
+                .getEpochInformationByEpoch(epoch).getValue().getTotalRewards());
     }
 }
