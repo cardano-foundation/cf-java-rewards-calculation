@@ -39,7 +39,14 @@ flowchart
 
     style ADA_POTS fill:#f6f9ff,stroke:#f6f9ff
     
-    click B href "https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/main/src/main/java/org/cardanofoundation/rewards/service/impl/AdaPotsServiceImpl.java#L29" " "
+    click B href "./src/main/java/org/cardanofoundation/rewards/calculation/TreasuryCalculation.java#L42" " "
+    click C href "./src/main/java/org/cardanofoundation/rewards/calculation/TreasuryCalculation.java#L17" " "
+    click D href "/src/test/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculationTest.java#L63" " "
+    
+    click G href "./src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87" " "
+    click H href "./src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87" " "
+    click I href "./src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87" " "
+    click J href "./src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87" " "
 ```
 
 ## 🚀 Getting Started
