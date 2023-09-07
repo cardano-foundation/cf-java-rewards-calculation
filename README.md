@@ -12,17 +12,17 @@ This java project is used to calculate the rewards of the Cardano network. It ai
 
 ```mermaid
 flowchart
-    A[Total Transaction Fees <br />at Epoch n] --> B[Total Reward Pot <br />at Epoch n]
-    B --> | treasuryGrowthRate | C[Treasury]
-    B --> | 1 - treasuryGrowthRate | D[Stake Pool Rewards Pot <br />at Epoch n]
+    A[Total Transaction Fees <br />at Epoch n] --> B[<a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/TreasuryCalculation.java#L42'>Total Reward Pot <br />at Epoch n</a/>]
+    B --> | treasuryGrowthRate | C[<a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/TreasuryCalculation.java#L17'>Treasury</a/>]
+    B --> | 1 - treasuryGrowthRate | D[<a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/test/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculationTest.java#L63'>Stake Pool Rewards Pot <br />at Epoch n</a/>]
     subgraph ADA_POTS[" "]
     D --> | Unclaimed Rewards | E["ADA Reserves<br /> (monetary expansion) <br /> Started at ~14B ADA"]
     E --> | monetaryExpandRate * apparent performance of all stake pools | B
     C --> F[Payouts e.g. for Catalyst]
-    D --> | Rewards Equation<br /> for Pool 1 | G[Stake Pool 1]
-    D --> | Rewards Equation<br /> for Pool 2 | H[Stake Pool 2]
-    D --> I[...]
-    D --> | Rewards Equation<br /> for Pool n | J[Stake Pool n]
+    D --> | Rewards Equation<br /> for Pool 1 | G[<a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87'>Stake Pool 1</a>]
+    D --> | Rewards Equation<br /> for Pool 2 | H[<a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87'>Stake Pool 2</a>]
+    D --> I[<a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87'>...</a>]
+    D --> | Rewards Equation<br /> for Pool n | J[<a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87'>Stake Pool n</a>]
     end
 
     style A fill:#5C8DFF,stroke:#5C8DFF
@@ -38,15 +38,6 @@ flowchart
     style J fill:#F6C667,stroke:#F6C667
 
     style ADA_POTS fill:#f6f9ff,stroke:#f6f9ff
-    
-    click B href "./src/main/java/org/cardanofoundation/rewards/calculation/TreasuryCalculation.java#L42" " "
-    click C href "./src/main/java/org/cardanofoundation/rewards/calculation/TreasuryCalculation.java#L17" " "
-    click D href "/src/test/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculationTest.java#L63" " "
-    
-    click G href "./src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87" " "
-    click H href "./src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87" " "
-    click I href "./src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87" " "
-    click J href "./src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87" " "
 ```
 
 ## 🚀 Getting Started
