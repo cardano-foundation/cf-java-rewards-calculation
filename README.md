@@ -13,16 +13,16 @@ This java project is used to calculate the rewards of the Cardano network. It ai
 ```mermaid
 flowchart
     A[Total Transaction Fees <br />at Epoch n] --> B[<a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/TreasuryCalculation.java#L42'>Total Reward Pot <br />at Epoch n</a/>]
-    B --> | treasuryGrowthRate | C[<a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/TreasuryCalculation.java#L17'>Treasury</a/>]
-    B --> | 1 - treasuryGrowthRate | D[<a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/test/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculationTest.java#L63'>Stake Pool Rewards Pot <br />at Epoch n</a/>]
+    B --> | <a href='https://cips.cardano.org/cips/cip9/#updatableprotocolparameters'>treasuryGrowthRate</a> | C[<a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/TreasuryCalculation.java#L17'>Treasury</a/>]
+    B --> | 1 - <a href='https://cips.cardano.org/cips/cip9/#updatableprotocolparameters'>treasuryGrowthRate</a> | D[<a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/test/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculationTest.java#L63'>Stake Pool Rewards Pot <br />at Epoch n</a/>]
     subgraph ADA_POTS[" "]
     D --> | Unclaimed Rewards | E["ADA Reserves<br /> (monetary expansion) <br /> Started at ~14B ADA"]
-    E --> | monetaryExpandRate * apparent performance of all stake pools | B
-    C --> F[Payouts e.g. for Catalyst]
-    D --> | Rewards Equation<br /> for Pool 1 | G[<a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87'>Stake Pool 1</a>]
-    D --> | Rewards Equation<br /> for Pool 2 | H[<a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87'>Stake Pool 2</a>]
-    D --> I[<a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87'>...</a>]
-    D --> | Rewards Equation<br /> for Pool n | J[<a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87'>Stake Pool n</a>]
+    E --> | <a href='https://cips.cardano.org/cips/cip9/#updatableprotocolparameters'>monetaryExpandRate</a> * <a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/main/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L19'>apparent performance of all stake pools</a> | B
+    C --> F[Payouts e.g. for <br /><a href='https://projectcatalyst.io/'>Project Catalyst</a>]
+    D --> | <a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87'>Rewards Equation<br /> for Pool 1</a> | G[Stake Pool 1]
+    D --> | <a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87'>Rewards Equation<br /> for Pool 2</a> | H[Stake Pool 2]
+    D --> I[...]
+    D --> | <a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87'>Rewards Equation<br /> for Pool n</a> | J[Stake Pool n]
     end
 
     style A fill:#5C8DFF,stroke:#5C8DFF
