@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
+import static org.cardanofoundation.rewards.constants.RewardConstants.EXPECTED_BLOCKS_PER_EPOCH;
+
 public class PoolRewardCalculation {
 
     /*
@@ -23,9 +25,12 @@ public class PoolRewardCalculation {
             return BigDecimal.ONE;
         }
 
-        BigDecimal relativeBlocksCreatedInEpoch = new BigDecimal(blocksMintedByPool).divide(new BigDecimal(totalBlocksInEpoch), 30, RoundingMode.DOWN);
-        BigDecimal relativeActiveStake = poolStake.divide(totalEpochStake, 30, RoundingMode.DOWN);
-        return relativeBlocksCreatedInEpoch.divide(relativeActiveStake, 30, RoundingMode.DOWN);
+        MathContext mathContext = new MathContext(30, RoundingMode.HALF_UP);
+        BigDecimal blocksMintedInNonOBFTSlots = new BigDecimal(totalBlocksInEpoch * (1 - decentralizationParam));
+
+        BigDecimal relativeBlocksCreatedInEpoch = new BigDecimal(blocksMintedByPool).divide(blocksMintedInNonOBFTSlots, mathContext);
+        BigDecimal relativeActiveStake = poolStake.divide(totalEpochStake, mathContext);
+        return relativeBlocksCreatedInEpoch.divide(relativeActiveStake, mathContext);
     }
 
     /*
@@ -54,28 +59,30 @@ public class PoolRewardCalculation {
             double influenceParam,
             BigDecimal relativeStakeOfPool,
             BigDecimal relativeStakeOfPoolOwner) {
+        MathContext mathContext = new MathContext(30, RoundingMode.HALF_UP);
         var influence = new BigDecimal(influenceParam);
         var sizeOfASaturatedPool =
                 BigDecimal.ONE.divide(
-                        new BigDecimal(optimalPoolCount), 30, RoundingMode.DOWN);
+                        new BigDecimal(optimalPoolCount), mathContext);
 
         var cappedRelativeStake = sizeOfASaturatedPool.min(relativeStakeOfPool);
         var cappedRelativeStakeOfPoolOwner = sizeOfASaturatedPool.min(relativeStakeOfPoolOwner);
-        MathContext mathContext = new MathContext(30, RoundingMode.DOWN);
 
         // R / (1 + a0)
-        var rewardsDividedByOnePlusInfluence = totalAvailableRewards.divide(BigDecimal.ONE.add(influence), 30, RoundingMode.DOWN);
+        // "R are the total available rewards for the epoch (in ada)." (shelley-delegation.pdf 5.5.3)
+        var totalAvailableRewardsInAda = totalAvailableRewards.setScale(0, RoundingMode.HALF_UP);
+        var rewardsDividedByOnePlusInfluence = totalAvailableRewardsInAda.divide(BigDecimal.ONE.add(influence), mathContext);
 
         // s' * a0
         var influenceOfOwner = cappedRelativeStakeOfPoolOwner.multiply(influence, mathContext);
 
         // s'((z0 - o')/ z0)
         var relativeStakeOfSaturatedPool = cappedRelativeStakeOfPoolOwner.multiply(
-                sizeOfASaturatedPool.subtract(cappedRelativeStake, mathContext).divide(sizeOfASaturatedPool, 30, RoundingMode.DOWN));
+                sizeOfASaturatedPool.subtract(cappedRelativeStake, mathContext).divide(sizeOfASaturatedPool, mathContext));
 
         // o' - (s' * (z0 - o')/ z0) / z0)
         var saturatedPoolWeight = cappedRelativeStake.subtract(relativeStakeOfSaturatedPool, mathContext)
-                .divide(sizeOfASaturatedPool, 30, RoundingMode.DOWN);
+                .divide(sizeOfASaturatedPool, mathContext);
 
         return rewardsDividedByOnePlusInfluence.multiply(cappedRelativeStake.add(influenceOfOwner.multiply(saturatedPoolWeight)));
     }
@@ -86,5 +93,37 @@ public class PoolRewardCalculation {
      */
     public static BigDecimal calculatePoolReward(BigDecimal optimalPoolReward, BigDecimal poolPerformance) {
         return optimalPoolReward.multiply(poolPerformance);
+    }
+
+    /*
+     *  Calculate the total reward pot (R) with transposing the equation from above:
+     */
+    public static BigDecimal calculateRewardPotByOptimalPoolReward(
+            BigDecimal poolReward,
+            int optimalPoolCount,
+            double influenceParam,
+            BigDecimal relativeStakeOfPool,
+            BigDecimal relativeStakeOfPoolOwner,
+            BigDecimal poolPerformance) {
+        MathContext mathContext = new MathContext(30, RoundingMode.HALF_UP);
+        var influence = new BigDecimal(influenceParam);
+        var sizeOfASaturatedPool =
+                BigDecimal.ONE.divide(
+                        new BigDecimal(optimalPoolCount), mathContext);
+        var cappedRelativeStake = sizeOfASaturatedPool.min(relativeStakeOfPool);
+        var cappedRelativeStakeOfPoolOwner = sizeOfASaturatedPool.min(relativeStakeOfPoolOwner);
+        // s' * a0
+        var influenceOfOwner = cappedRelativeStakeOfPoolOwner.multiply(influence, mathContext);
+
+        // s'((z0 - o')/ z0)
+        var relativeStakeOfSaturatedPool = cappedRelativeStakeOfPoolOwner.multiply(
+                sizeOfASaturatedPool.subtract(cappedRelativeStake, mathContext).divide(sizeOfASaturatedPool, mathContext));
+
+        // o' - (s' * (z0 - o')/ z0) / z0)
+        var saturatedPoolWeight = cappedRelativeStake.subtract(relativeStakeOfSaturatedPool, mathContext)
+                .divide(sizeOfASaturatedPool, mathContext);
+
+        var poolWeightsWithPerformance = poolPerformance.multiply(cappedRelativeStake.add(influenceOfOwner.multiply(saturatedPoolWeight)));
+        return ((BigDecimal.ONE.add(influence)).multiply(poolReward)).divide(poolWeightsWithPerformance, mathContext);
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import rest.koios.client.backend.api.account.model.AccountUpdate;
 import rest.koios.client.backend.api.account.model.AccountUpdates;
 import rest.koios.client.backend.api.base.exception.ApiException;
+import rest.koios.client.backend.api.epoch.model.EpochInfo;
 import rest.koios.client.backend.api.epoch.model.EpochParams;
 import rest.koios.client.backend.api.network.model.Totals;
 import rest.koios.client.backend.api.pool.model.PoolHistory;
@@ -35,6 +36,11 @@ public class KoiosDataProvider {
         return koiosBackendService.getNetworkService()
                 .getHistoricalTokenomicStatsByEpoch(epoch)
                 .getValue();
+    }
+
+    public EpochInfo getEpochInfo(int epoch) throws ApiException {
+        return koiosBackendService.getEpochService()
+                .getEpochInformationByEpoch(epoch).getValue();
     }
 
     public String getTotalFeesForEpoch(int epoch) throws ApiException {
