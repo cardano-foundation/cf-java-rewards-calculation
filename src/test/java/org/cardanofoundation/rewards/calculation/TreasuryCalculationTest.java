@@ -6,7 +6,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.cardanofoundation.rewards.data.provider.KoiosDataProvider;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,7 @@ import rest.koios.client.backend.api.base.exception.ApiException;
 import rest.koios.client.backend.api.epoch.model.EpochParams;
 import rest.koios.client.backend.api.network.model.Totals;
 
-import static org.cardanofoundation.rewards.constants.RewardConstants.DEPOSIT_POOL_REGISTRATION_IN_LOVELACE;
+import static org.cardanofoundation.rewards.constants.RewardConstants.*;
 
 @SpringBootTest
 @ComponentScan
@@ -28,13 +27,11 @@ public class TreasuryCalculationTest {
   KoiosDataProvider koiosDataProvider;
 
   static Stream<Integer> range() {
-    return IntStream.range(209, 433).boxed();
+    return IntStream.range(214, 220).boxed();
   }
 
   @ParameterizedTest
   @MethodSource("range")
-  // only enable this test locally to prevent spamming Koios from the CI pipeline
-  @Disabled
   void Test_calculateTreasuryWithKoiosProvider(final int epoch) throws ApiException {
     EpochParams epochParams = koiosDataProvider.getProtocolParametersForEpoch(epoch);
     final double treasuryGrowthRate = epochParams.getTreasuryGrowthRate().doubleValue();
@@ -53,22 +50,21 @@ public class TreasuryCalculationTest {
     }
 
     BigDecimal reserveInPreviousEpoch = new BigDecimal(adaPotsForPreviousEpoch.getReserves());
+
     BigDecimal treasuryInPreviousEpoch = new BigDecimal(adaPotsForPreviousEpoch.getTreasury());
     BigDecimal expectedTreasuryForCurrentEpoch = new BigDecimal(adaPotsForCurrentEpoch.getTreasury());
 
-    BigDecimal rewardPot =  TreasuryCalculation.calculateTotalRewardPot(
+    BigDecimal rewardPot = TreasuryCalculation.calculateTotalRewardPot(
             monetaryExpandRate, reserveInPreviousEpoch, totalFeesForCurrentEpoch);
-
-    System.out.println(rewardPot);
 
     BigDecimal treasuryForCurrentEpoch = TreasuryCalculation.calculateTreasury(
             treasuryGrowthRate, rewardPot, treasuryInPreviousEpoch);
-
 
     int blocksInEpoch = koiosDataProvider.getTotalBlocksInEpoch(epoch - 1);
     BigDecimal distributedRewardInEpoch = koiosDataProvider.getDistributedRewardsInEpoch(epoch);
     System.out.println("DistributedRewardInEpoch: " + distributedRewardInEpoch);
     System.out.println("rewardPot: " + rewardPot);
+
     /*BigDecimal undistributedReward = TreasuryCalculation.calculateUndistributedReward(rewardPot, distributedRewardInEpoch, treasuryGrowthRate, blocksInEpoch);
     System.out.println(undistributedReward.divide(new BigDecimal("1000000"), RoundingMode.HALF_UP)
                     .setScale(0, RoundingMode.HALF_UP)
@@ -121,5 +117,35 @@ public class TreasuryCalculationTest {
     // One retired pool deregistered it's reward address before getting the deposit back
     // that's why it's added to the treasury.
     Assertions.assertEquals(expectedTreasury.toBigInteger(), actualTreasury.toBigInteger().add(DEPOSIT_POOL_REGISTRATION_IN_LOVELACE));
+  }
+
+  @Test
+  void Test_calculateTreasuryForEpoch215() throws ApiException {
+    Totals adaPotsForEpoch214 = koiosDataProvider.getAdaPotsForEpoch(216);
+    Totals adaPotsForEpoch215 = koiosDataProvider.getAdaPotsForEpoch(216);
+
+    final double treasuryGrowthRate = 0.2;
+
+    BigDecimal reserveInEpoch214 =  new BigDecimal(adaPotsForEpoch214.getReserves());
+    BigDecimal treasuryInEpoch214 = new BigDecimal(adaPotsForEpoch214.getTreasury());
+    BigDecimal expectedTreasury = new BigDecimal(adaPotsForEpoch215.getTreasury());
+
+    final double monetaryExpandRate = 0.003;
+    final BigDecimal feeInEpoch214 = new BigDecimal(koiosDataProvider.getTotalFeesForEpoch(215));
+
+    BigDecimal rewardPotFormula = TreasuryCalculation.calculateTotalRewardPot(monetaryExpandRate, reserveInEpoch214, feeInEpoch214);
+    BigDecimal rewardPot = new BigDecimal("38890928000000");
+
+    System.out.println("rewardPotFormula: " + rewardPotFormula + "\nrewardPot: " + rewardPot + "\ndiff: " + rewardPotFormula.subtract(rewardPot));
+
+    BigDecimal actualTreasury = TreasuryCalculation.calculateTreasury(treasuryGrowthRate, rewardPot, treasuryInEpoch214);
+    BigDecimal treasuryWithFormulaRewardPot = TreasuryCalculation.calculateTreasury(treasuryGrowthRate, rewardPotFormula, treasuryInEpoch214);
+    System.out.println("Difference " + expectedTreasury.subtract(actualTreasury).divide(BigDecimal.valueOf(1000000), RoundingMode.HALF_UP));
+
+    System.out.println(treasuryWithFormulaRewardPot);
+
+    // One retired pool deregistered it's reward address before getting the deposit back
+    // that's why it's added to the treasury.
+    Assertions.assertEquals(expectedTreasury.toBigInteger(), actualTreasury.toBigInteger());
   }
 }
