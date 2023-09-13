@@ -25,12 +25,12 @@ public class TreasuryCalculation {
    * rewards(e) = monetary_expand_rate * eta * reserve(e - 1) + fee(e - 1)
    * rewards(e) = 0, if e < 209
    */
-  public static BigDecimal calculateTotalRewardPotWithEta(double monetaryExpandRate,
-                                                   int totalBlockInEpoch, BigDecimal reserve, BigDecimal fee) {
-    BigDecimal eta = calculateEta(totalBlockInEpoch);
-    System.out.println("eta: " + eta);
+  public static BigDecimal calculateTotalRewardPotWithEta(double monetaryExpandRate, int totalBlockInEpoch,
+                                                         double decentralizationParameter, BigDecimal reserve, BigDecimal fee) {
+    BigDecimal eta = calculateEta(totalBlockInEpoch, decentralizationParameter);
+    System.out.println(eta);
     BigDecimal totalRewardPot = reserve.multiply(new BigDecimal(monetaryExpandRate).multiply(eta));
-    return totalRewardPot.add(fee);
+    return totalRewardPot.add(fee).setScale(0, RoundingMode.FLOOR);
   }
 
   /*
@@ -50,17 +50,21 @@ public class TreasuryCalculation {
   * eta(totalBlocksInEpoch, decentralisation) =
   *   min(1, totalBlocksInEpoch / ((1 - decentralisation) * expectedSlotPerEpoch))
   */
-  private static BigDecimal calculateEta(int totalBlocksInEpoch) {
+  private static BigDecimal calculateEta(int totalBlocksInEpoch, double decentralizationParameter) {
     // shelley-delegation.pdf 5.4.3
+
+    if (decentralizationParameter >= 0.8) {
+      return BigDecimal.ONE;
+    }
 
     // The number of expected blocks will be the number of slots per epoch times the active slots coefficient
     double activeSlotsCoeff = 0.05; // See: Non-Updatable Parameters: https://cips.cardano.org/cips/cip9/
-    double expectedBlocks = EXPECTED_SLOT_PER_EPOCH * activeSlotsCoeff;
+    double expectedBlocksInNonOBFTSlots = Math.floor(EXPECTED_SLOT_PER_EPOCH * activeSlotsCoeff * (1 - decentralizationParameter));
 
     // eta is the ratio between the number of blocks that have been produced during the epoch, and
     // the expectation value of blocks that should have been produced during the epoch under
     // ideal conditions.
-    BigDecimal eta = new BigDecimal(totalBlocksInEpoch).divide(new BigDecimal(expectedBlocks), 18, RoundingMode.DOWN);;
+    BigDecimal eta = new BigDecimal(totalBlocksInEpoch).divide(new BigDecimal(expectedBlocksInNonOBFTSlots), 30, RoundingMode.HALF_UP);;
     return eta.min(BigDecimal.ONE);
   }
 }
