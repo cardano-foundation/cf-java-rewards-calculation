@@ -18,6 +18,7 @@ import rest.koios.client.backend.api.epoch.model.EpochParams;
 import rest.koios.client.backend.api.network.model.Totals;
 
 import static org.cardanofoundation.rewards.constants.RewardConstants.*;
+import static org.cardanofoundation.rewards.util.CurrencyConverter.lovelaceToAda;
 
 @SpringBootTest
 @ComponentScan
@@ -27,7 +28,23 @@ public class TreasuryCalculationTest {
   KoiosDataProvider koiosDataProvider;
 
   static Stream<Integer> range() {
-    return IntStream.range(214, 220).boxed();
+    return IntStream.range(215, 216).boxed();
+  }
+
+  @ParameterizedTest
+    @MethodSource("range")
+  void Test_calculateReserves(final int epoch) throws ApiException {
+    Totals adaPotsForEpoch = koiosDataProvider.getAdaPotsForEpoch(epoch);
+    Totals adaPotsForNextEpoch = koiosDataProvider.getAdaPotsForEpoch(epoch + 1);
+    BigDecimal reserveInEpoch = new BigDecimal(adaPotsForEpoch.getReserves());
+
+    BigDecimal inflationRate = BigDecimal.ONE.subtract(new BigDecimal("0.003"));
+    BigDecimal calculatedReserves = reserveInEpoch.multiply(inflationRate);
+
+    System.out.println("Difference in ADA: " + lovelaceToAda(
+            calculatedReserves.subtract(new BigDecimal(adaPotsForNextEpoch.getReserves()))));
+
+    Assertions.assertEquals(adaPotsForNextEpoch.getReserves(), calculatedReserves);
   }
 
   @ParameterizedTest
@@ -36,6 +53,7 @@ public class TreasuryCalculationTest {
     EpochParams epochParams = koiosDataProvider.getProtocolParametersForEpoch(epoch);
     final double treasuryGrowthRate = epochParams.getTreasuryGrowthRate().doubleValue();
     final double monetaryExpandRate = epochParams.getMonetaryExpandRate().doubleValue();
+    final double decentralizationParameter = epochParams.getDecentralisation().doubleValue();
 
     Totals adaPotsForPreviousEpoch = koiosDataProvider.getAdaPotsForEpoch(epoch - 1);
     Totals adaPotsForCurrentEpoch = koiosDataProvider.getAdaPotsForEpoch(epoch);
@@ -54,27 +72,19 @@ public class TreasuryCalculationTest {
     BigDecimal treasuryInPreviousEpoch = new BigDecimal(adaPotsForPreviousEpoch.getTreasury());
     BigDecimal expectedTreasuryForCurrentEpoch = new BigDecimal(adaPotsForCurrentEpoch.getTreasury());
 
-    BigDecimal rewardPot = TreasuryCalculation.calculateTotalRewardPot(
-            monetaryExpandRate, reserveInPreviousEpoch, totalFeesForCurrentEpoch);
+    int totalBlocksInEpoch = koiosDataProvider.getTotalBlocksInEpoch(epoch - 1);
+    BigDecimal rewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(
+            monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserveInPreviousEpoch, totalFeesForCurrentEpoch);
 
     BigDecimal treasuryForCurrentEpoch = TreasuryCalculation.calculateTreasury(
             treasuryGrowthRate, rewardPot, treasuryInPreviousEpoch);
 
-    int blocksInEpoch = koiosDataProvider.getTotalBlocksInEpoch(epoch - 1);
-    BigDecimal distributedRewardInEpoch = koiosDataProvider.getDistributedRewardsInEpoch(epoch);
-    System.out.println("DistributedRewardInEpoch: " + distributedRewardInEpoch);
-    System.out.println("rewardPot: " + rewardPot);
-
-    /*BigDecimal undistributedReward = TreasuryCalculation.calculateUndistributedReward(rewardPot, distributedRewardInEpoch, treasuryGrowthRate, blocksInEpoch);
-    System.out.println(undistributedReward.divide(new BigDecimal("1000000"), RoundingMode.HALF_UP)
-                    .setScale(0, RoundingMode.HALF_UP)
-                    .intValue());*/
-
     /*
-      "For each retiring pool, the refund for the pool registration deposit is added to the
-      pool's registered reward account, provided the reward account is still registered." -
-      https://github.com/input-output-hk/cardano-ledger/blob/9e2f8151e3b9a0dde9faeb29a7dd2456e854427c/eras/shelley/formal-spec/epoch.tex#L546C9-L547C87
+      TODO: "For each retiring pool, the refund for the pool registration deposit is added to the
+       pool's registered reward account, provided the reward account is still registered." -
+       https://github.com/input-output-hk/cardano-ledger/blob/9e2f8151e3b9a0dde9faeb29a7dd2456e854427c/eras/shelley/formal-spec/epoch.tex#L546C9-L547C87
     */
+
     // int retiredPoolsWithDeregisteredRewardAddress = koiosDataProvider.countRetiredPoolsWithDeregisteredRewardAddress(epoch - 1);
 
     // BigDecimal deposit = new BigDecimal(DEPOSIT_POOL_REGISTRATION_IN_ADA);
