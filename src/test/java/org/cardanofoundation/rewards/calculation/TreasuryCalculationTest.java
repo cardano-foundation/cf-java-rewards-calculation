@@ -106,8 +106,9 @@ public class TreasuryCalculationTest {
     Test_calculateTreasury(epoch, DataProviderType.KOIOS);
   }
 
-  @Test
-  void Test_calculateTreasuryWithJsonDataProviderForEpoch209() {
-    Test_calculateTreasury(209, DataProviderType.JSON);
+  @ParameterizedTest
+  @MethodSource("range")
+  void Test_calculateTreasuryWithJsonDataProviderForEpoch209(int epoch) {
+    Test_calculateTreasury(epoch, DataProviderType.JSON);
   }
 }
