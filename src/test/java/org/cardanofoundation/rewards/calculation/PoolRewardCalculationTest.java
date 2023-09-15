@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
+import rest.koios.client.backend.api.base.exception.ApiException;
 
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -23,7 +24,11 @@ public class PoolRewardCalculationTest {
     @Autowired
     KoiosDataProvider koiosDataProvider;
 
-    PoolCalculationResult Test_calculatePoolReward(String poolId, int epoch, boolean skipTest, Double totalRewardPotOverride) {
+
+    PoolCalculationResult Test_calculatePoolReward(final String poolId,
+                                                   final int epoch,
+                                                   final boolean skipTest,
+                                                   final Double totalRewardPotOverride) throws ApiException {
         // Step 1: Get Pool information of current epoch
         // Example: https://api.koios.rest/api/v0/pool_history?_pool_bech32=pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt&_epoch_no=210
         PoolHistory poolHistoryCurrentEpoch = koiosDataProvider.getPoolHistory(poolId, epoch);
@@ -96,7 +101,7 @@ public class PoolRewardCalculationTest {
             System.out.println("Difference between expected pool reward and actual pool reward: " +
                     (expectedPoolReward - (poolReward - poolFees)));
             Assertions.assertEquals(Math.round(expectedPoolReward),
-                Math.round(poolReward - poolFees));
+                    Math.round(poolReward - poolFees));
         }
 
         return PoolCalculationResult.builder()
@@ -113,16 +118,16 @@ public class PoolRewardCalculationTest {
                 .build();
     }
 
-    void Test_calculatePoolReward(String poolId, int epoch) {
+    void Test_calculatePoolReward(String poolId, int epoch) throws ApiException {
         Test_calculatePoolReward(poolId, epoch, false, null);
     }
 
-    void Test_calculatePoolReward(String poolId, int epoch, Double totalRewardPotOverride) {
+    void Test_calculatePoolReward(String poolId, int epoch, Double totalRewardPotOverride) throws ApiException {
         Test_calculatePoolReward(poolId, epoch, false, totalRewardPotOverride);
     }
 
     @Test
-    void calculatePoolRewardInEpoch211() {
+    void calculatePoolRewardInEpoch211() throws ApiException {
         String poolId1 = "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx";
         String poolId2 = "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9";
         String poolId3 = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
@@ -135,12 +140,51 @@ public class PoolRewardCalculationTest {
     }
 
     @Test
-    void calculatePoolRewardInEpoch212() {
+    void calculatePoolRewardInEpoch212() throws ApiException {
         String poolId1 = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
         String poolId2 = "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9";
         String poolId3 = "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx";
 
         int epoch = 212;
+
+        Test_calculatePoolReward(poolId1, epoch);
+        Test_calculatePoolReward(poolId2, epoch);
+        Test_calculatePoolReward(poolId3, epoch);
+    }
+
+    @Test
+    void calculatePoolRewardInEpoch213() throws ApiException {
+        String poolId1 = "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx";
+        String poolId2 = "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9";
+        String poolId3 = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
+
+        int epoch = 213;
+
+        Test_calculatePoolReward(poolId1, epoch);
+        Test_calculatePoolReward(poolId2, epoch);
+        Test_calculatePoolReward(poolId3, epoch);
+    }
+
+    @Test
+    void calculatePoolRewardInEpoch214() throws ApiException {
+        String poolId1 = "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx";
+        String poolId2 = "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9";
+        String poolId3 = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
+
+        int epoch = 214;
+
+        Test_calculatePoolReward(poolId1, epoch);
+        Test_calculatePoolReward(poolId2, epoch);
+        Test_calculatePoolReward(poolId3, epoch);
+    }
+
+    @Test
+    void calculatePoolRewardInEpoch215() throws ApiException {
+        String poolId1 = "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx";
+        String poolId2 = "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9";
+        String poolId3 = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
+
+        int epoch = 215;
 
         Test_calculatePoolReward(poolId1, epoch);
         Test_calculatePoolReward(poolId2, epoch);
@@ -153,14 +197,14 @@ public class PoolRewardCalculationTest {
 
     @ParameterizedTest
     @MethodSource("testPoolRewardRange")
-    void calculateSwimPoolRewardFromEpoch211To216(int epoch) {
+    void calculateSwimPoolRewardFromEpoch211To216(int epoch) throws ApiException {
         String poolId = "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9";
         Test_calculatePoolReward(poolId, epoch);
     }
 
     @ParameterizedTest
     @MethodSource("testPoolRewardRange")
-    void calculateOCTASPoolRewardFromEpoch211To216(int epoch) {
+    void calculateOCTASPoolRewardFromEpoch211To216(int epoch) throws ApiException {
         String poolId = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
         Test_calculatePoolReward(poolId, epoch);
 
@@ -168,14 +212,14 @@ public class PoolRewardCalculationTest {
 
     // TODO: Works with: totalRewardPot = new BigDecimal("38941407");
     @Test
-    void calculateSWIMPoolRewardFromEpoch215() {
+    void calculateSWIMPoolRewardFromEpoch215() throws ApiException {
         String poolId = "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9";
         Test_calculatePoolReward(poolId, 215);
     }
 
     // TODO: Works with: totalRewardPot = new BigDecimal("38941375");
     @Test
-    void calculateOCTASPoolRewardFromEpoch215() {
+    void calculateOCTASPoolRewardFromEpoch215() throws ApiException {
         String poolId = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
         Test_calculatePoolReward(poolId, 215);
     }
@@ -187,11 +231,11 @@ public class PoolRewardCalculationTest {
      */
     @ParameterizedTest
     @MethodSource("testPoolRewardRange")
-    void figureOutATotalRewardPot(int epoch) {
-        String poolId = "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9";
+    void figureOutATotalRewardPot(final int epoch) throws ApiException {
+        final String poolId = "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9";
         PoolCalculationResult poolCalculationResult = Test_calculatePoolReward(poolId, epoch, true, null);
 
-        double totalStakePoolRewardPot = PoolRewardCalculation.calculateRewardPotByOptimalPoolReward(
+        final double totalStakePoolRewardPot = PoolRewardCalculation.calculateRewardPotByOptimalPoolReward(
                 poolCalculationResult.getActualPoolRewardWithFee(),
                 poolCalculationResult.getOptimalPoolCount(),
                 poolCalculationResult.getInfluenceParam(),
@@ -201,7 +245,7 @@ public class PoolRewardCalculationTest {
         );
 
         double totalRewardPot = totalStakePoolRewardPot / 0.8;
-        double totalRewardPotInAda = Math.round(totalRewardPot);
+        double totalRewardPotInAda = Math.floor(totalRewardPot);
 
         //Assertions.assertEquals(totalRewardPotInAda,
         //        poolCalculationResult.getTotalRewardPot().setScale(0, mathContext.getRoundingMode()));
@@ -214,7 +258,7 @@ public class PoolRewardCalculationTest {
                 poolCalculationResult.getRelativeStakeOfPoolOwner(),
                 poolCalculationResult.getPoolPerformance()
         ) / 0.8;
-        totalRewardPotInAda = Math.round(totalRewardPot);
+        totalRewardPotInAda = Math.floor(totalRewardPot);
 
         System.out.println("Calculating total reward pot for epoch: " + epoch);
         System.out.println("The formula gives a total reward pot of: " +

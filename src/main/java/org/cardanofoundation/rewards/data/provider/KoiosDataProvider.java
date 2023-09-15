@@ -28,7 +28,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class KoiosDataProvider implements DataProvider{
+public class KoiosDataProvider implements DataProvider {
     private final BackendService koiosBackendService;
 
     public KoiosDataProvider() {
