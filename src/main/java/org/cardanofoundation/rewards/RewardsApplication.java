@@ -37,7 +37,8 @@ public class RewardsApplication implements ApplicationRunner {
         List<String> action = args.getOptionValues("action");
         if (action == null) {
           logger.warn("No action specified. Example usage: --action=fetch --override");
-          return;
+          int exitCode = SpringApplication.exit(context, (ExitCodeGenerator) () -> 0);
+          System.exit(exitCode);
         }
 
         if (action.get(0).equals("fetch")) {
@@ -55,11 +56,10 @@ public class RewardsApplication implements ApplicationRunner {
       }
     }
 
-    if (args.getOptionNames().size() == 0) {
-      logger.warn("No options specified. Example usage: --action=fetch");
+    if (!args.getOptionNames().isEmpty()) {
+      logger.warn("Finished the specified actions. Exiting...");
+      int exitCode = SpringApplication.exit(context, (ExitCodeGenerator) () -> 0);
+      System.exit(exitCode);
     }
-
-    int exitCode = SpringApplication.exit(context, (ExitCodeGenerator) () -> 0);
-    System.exit(exitCode);
   }
 }
