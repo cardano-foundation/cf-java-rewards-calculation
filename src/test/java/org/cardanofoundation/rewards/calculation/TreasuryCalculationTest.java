@@ -3,10 +3,13 @@ package org.cardanofoundation.rewards.calculation;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.cardanofoundation.rewards.data.provider.DataProvider;
+import org.cardanofoundation.rewards.data.provider.JsonDataProvider;
 import org.cardanofoundation.rewards.data.provider.KoiosDataProvider;
 import org.cardanofoundation.rewards.entity.AdaPots;
 import org.cardanofoundation.rewards.entity.Epoch;
 import org.cardanofoundation.rewards.entity.ProtocolParameters;
+import org.cardanofoundation.rewards.enums.DataProviderType;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,25 +27,32 @@ public class TreasuryCalculationTest {
   @Autowired
   KoiosDataProvider koiosDataProvider;
 
-  static Stream<Integer> range() {
-    return IntStream.range(209, 215).boxed();
-  }
+  @Autowired
+  JsonDataProvider jsonDataProvider;
 
-  @ParameterizedTest
-  @MethodSource("range")
-  void Test_calculateTreasuryWithKoiosProvider(final int epoch) {
-    ProtocolParameters protocolParameters = koiosDataProvider.getProtocolParametersForEpoch(epoch);
+  void Test_calculateTreasury(final int epoch, DataProviderType dataProviderType) {
+
+    DataProvider dataProvider = null;
+    if (dataProviderType == DataProviderType.KOIOS) {
+      dataProvider = koiosDataProvider;
+    } else if (dataProviderType == DataProviderType.JSON) {
+      dataProvider = jsonDataProvider;
+    } else {
+      throw new RuntimeException("Unknown data provider type: " + dataProviderType);
+    }
+
+    ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch);
     final double treasuryGrowthRate = protocolParameters.getTreasuryGrowRate();
     final double monetaryExpandRate = protocolParameters.getMonetaryExpandRate();
     final double decentralizationParameter = protocolParameters.getDecentralisation();
 
-    AdaPots adaPotsForPreviousEpoch = koiosDataProvider.getAdaPotsForEpoch(epoch - 1);
-    AdaPots adaPotsForCurrentEpoch = koiosDataProvider.getAdaPotsForEpoch(epoch);
+    AdaPots adaPotsForPreviousEpoch = dataProvider.getAdaPotsForEpoch(epoch - 1);
+    AdaPots adaPotsForCurrentEpoch = dataProvider.getAdaPotsForEpoch(epoch);
 
     // The Shelley era and the ada pot system started on mainnet in epoch 208.
     // Fee and treasury values are 0 for epoch 208.
     double totalFeesForCurrentEpoch = 0.0;
-    Epoch epochInfo = koiosDataProvider.getEpochInfo(epoch - 2);
+    Epoch epochInfo = dataProvider.getEpochInfo(epoch - 2);
     if (epoch > 209) {
       totalFeesForCurrentEpoch = epochInfo.getFees();
     }
@@ -86,31 +96,18 @@ public class TreasuryCalculationTest {
     }
   }
 
+  static Stream<Integer> range() {
+    return IntStream.range(209, 215).boxed();
+  }
+
+  @ParameterizedTest
+  @MethodSource("range")
+  void Test_calculateTreasuryWithKoiosDataProvider(int epoch) {
+    Test_calculateTreasury(epoch, DataProviderType.KOIOS);
+  }
+
   @Test
-  void Test_calculateTreasuryForEpoch214() {
-    AdaPots adaPotsForEpoch213 = koiosDataProvider.getAdaPotsForEpoch(213);
-    AdaPots adaPotsForEpoch214 = koiosDataProvider.getAdaPotsForEpoch(214);
-
-    final double treasuryGrowthRate = 0.2;
-
-    double reserveInEpoch213 = adaPotsForEpoch213.getReserves();
-    double treasuryInEpoch213 = adaPotsForEpoch213.getTreasury();
-    double expectedTreasury = adaPotsForEpoch214.getTreasury();
-
-    final double monetaryExpandRate = 0.003;
-
-    Epoch epochInfo = koiosDataProvider.getEpochInfo(212);
-    final double feeInEpoch214 = epochInfo.getFees();
-
-    ProtocolParameters protocolParameters = koiosDataProvider.getProtocolParametersForEpoch(213);
-    double decentralizationParameter = protocolParameters.getDecentralisation();
-
-    double rewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(
-            monetaryExpandRate, epochInfo.getBlockCount(), decentralizationParameter, reserveInEpoch213, feeInEpoch214);
-    double actualTreasury = TreasuryCalculation.calculateTreasury(treasuryGrowthRate, rewardPot, treasuryInEpoch213);
-
-    // One retired pool deregistered it's reward address before getting the deposit back
-    // that's why it's added to the treasury.
-    Assertions.assertEquals(Math.floor(expectedTreasury), Math.floor(actualTreasury) + DEPOSIT_POOL_REGISTRATION_IN_LOVELACE);
+  void Test_calculateTreasuryWithJsonDataProviderForEpoch209() {
+    Test_calculateTreasury(209, DataProviderType.JSON);
   }
 }

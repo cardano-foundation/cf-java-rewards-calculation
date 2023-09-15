@@ -1,0 +1,7 @@
+{
+  "decentralisation": 1,
+  "treasuryGrowRate": 0.2,
+  "monetaryExpandRate": 0.003,
+  "optimalPoolCount": 150,
+  "poolOwnerInfluence": 0.3
+}
