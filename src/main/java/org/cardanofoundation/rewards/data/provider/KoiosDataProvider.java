@@ -13,16 +13,14 @@ import org.springframework.stereotype.Service;
 import rest.koios.client.backend.api.account.model.AccountUpdate;
 import rest.koios.client.backend.api.account.model.AccountUpdates;
 import rest.koios.client.backend.api.base.exception.ApiException;
+import rest.koios.client.backend.api.block.model.Block;
 import rest.koios.client.backend.api.epoch.model.EpochInfo;
 import rest.koios.client.backend.api.epoch.model.EpochParams;
 import rest.koios.client.backend.api.network.model.Totals;
 import rest.koios.client.backend.api.pool.model.PoolUpdate;
 import rest.koios.client.backend.factory.BackendFactory;
 import rest.koios.client.backend.factory.BackendService;
-import rest.koios.client.backend.factory.options.Limit;
-import rest.koios.client.backend.factory.options.Options;
-import rest.koios.client.backend.factory.options.Order;
-import rest.koios.client.backend.factory.options.SortType;
+import rest.koios.client.backend.factory.options.*;
 import rest.koios.client.backend.factory.options.filters.Filter;
 import rest.koios.client.backend.factory.options.filters.FilterType;
 import java.util.ArrayList;
@@ -53,16 +51,37 @@ public class KoiosDataProvider implements DataProvider{
     }
 
     public Epoch getEpochInfo(int epoch) {
-        EpochInfo epochInfo = null;
+        Epoch epochEntity = null;
 
         try {
-            epochInfo = koiosBackendService.getEpochService()
+            EpochInfo epochInfo = koiosBackendService.getEpochService()
                     .getEpochInformationByEpoch(epoch).getValue();
+
+            epochEntity = EpochMapper.fromKoiosEpochInfo(epochInfo);
+            if (epoch < 211) {
+                epochEntity.setOBFTBlockCount(epochEntity.getBlockCount());
+                epochEntity.setNonOBFTBlockCount(0);
+            } else if (epoch > 256) {
+                epochEntity.setOBFTBlockCount(0);
+                epochEntity.setNonOBFTBlockCount(epochEntity.getBlockCount());
+            } else {
+                List<Block> blocks = new ArrayList<>();
+                for (int offset = 0; offset < epochEntity.getBlockCount(); offset += 1000) {
+                    blocks.addAll(koiosBackendService.getBlockService().getBlockList(Options.builder()
+                            .option(Filter.of("epoch_no", FilterType.EQ, String.valueOf(epoch)))
+                            .option(Offset.of(offset))
+                            .build()).getValue());
+                }
+
+                epochEntity.setOBFTBlockCount((int) blocks.stream().filter(block -> block.getPool() == null).count());
+                epochEntity.setNonOBFTBlockCount((int) blocks.stream().filter(block -> block.getPool() != null).count());
+            }
         } catch (ApiException e) {
             e.printStackTrace();
+            epochEntity = null;
         }
 
-        return EpochMapper.fromKoiosEpochInfo(epochInfo);
+        return epochEntity;
     }
 
     public ProtocolParameters getProtocolParametersForEpoch(int epoch) {
