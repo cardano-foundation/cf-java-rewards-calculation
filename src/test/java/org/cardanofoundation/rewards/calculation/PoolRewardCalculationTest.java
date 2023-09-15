@@ -1,7 +1,7 @@
 package org.cardanofoundation.rewards.calculation;
 
 import org.cardanofoundation.rewards.data.provider.KoiosDataProvider;
-import org.cardanofoundation.rewards.entity.PoolCalculationResult;
+import org.cardanofoundation.rewards.entity.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -9,20 +9,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
-import rest.koios.client.backend.api.base.exception.ApiException;
-import rest.koios.client.backend.api.epoch.model.EpochInfo;
-import rest.koios.client.backend.api.epoch.model.EpochParams;
-import rest.koios.client.backend.api.network.model.Totals;
-import rest.koios.client.backend.api.pool.model.PoolHistory;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.cardanofoundation.rewards.constants.RewardConstants.TOTAL_LOVELACE;
-import static org.cardanofoundation.rewards.util.CurrencyConverter.adaToLovelace;
 import static org.cardanofoundation.rewards.util.CurrencyConverter.lovelaceToAda;
 
 @SpringBootTest
@@ -32,66 +23,64 @@ public class PoolRewardCalculationTest {
     @Autowired
     KoiosDataProvider koiosDataProvider;
 
-    PoolCalculationResult Test_calculatePoolReward(String poolId, int epoch, boolean skipTest, BigDecimal totalRewardPotOverride) throws ApiException {
-        MathContext mathContext = new MathContext(30, RoundingMode.HALF_UP);
+    PoolCalculationResult Test_calculatePoolReward(String poolId, int epoch, boolean skipTest, Double totalRewardPotOverride) {
         // Step 1: Get Pool information of current epoch
         // Example: https://api.koios.rest/api/v0/pool_history?_pool_bech32=pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt&_epoch_no=210
         PoolHistory poolHistoryCurrentEpoch = koiosDataProvider.getPoolHistory(poolId, epoch);
-        BigDecimal poolStake = lovelaceToAda(new BigDecimal(poolHistoryCurrentEpoch.getActiveStake()));
-        BigDecimal expectedPoolReward = lovelaceToAda(new BigDecimal(poolHistoryCurrentEpoch.getDelegRewards()));
-        BigDecimal poolFees = lovelaceToAda(new BigDecimal(poolHistoryCurrentEpoch.getPoolFees()));
-        int blocksPoolHasMinted = poolHistoryCurrentEpoch.getBlockCnt();
+        double poolStake = lovelaceToAda(poolHistoryCurrentEpoch.getActiveStake());
+        double expectedPoolReward = lovelaceToAda(poolHistoryCurrentEpoch.getDelegatorRewards());
+        double poolFees = lovelaceToAda(poolHistoryCurrentEpoch.getPoolFees());
+        int blocksPoolHasMinted = poolHistoryCurrentEpoch.getBlockCount();
 
         // Step 2: Get Epoch information of current epoch
         // Source: https://api.koios.rest/api/v0/epoch_info?_epoch_no=211
-        EpochInfo epochInfo = koiosDataProvider.getEpochInfo(epoch);
-        int totalBlocksInEpoch = epochInfo.getBlkCount();
-        BigDecimal activeStakeInEpoch = lovelaceToAda(new BigDecimal(epochInfo.getActiveStake()));
+        Epoch epochInfo = koiosDataProvider.getEpochInfo(epoch);
+        int totalBlocksInEpoch = epochInfo.getBlockCount();
+        double activeStakeInEpoch = lovelaceToAda(epochInfo.getActiveStake());
+        double totalFeesInEpoch = epochInfo.getFees();
 
-        // Step 3 Get fee from current and reserve from next epoch
-        BigDecimal totalFeesInEpoch = new BigDecimal(koiosDataProvider.getTotalFeesForEpoch(epoch));
+        AdaPots adaPotsForNextEpoch = koiosDataProvider.getAdaPotsForEpoch(epoch + 1);
+        double reserves = adaPotsForNextEpoch.getReserves();
 
-        Totals adaPotsForNextEpoch = koiosDataProvider.getAdaPotsForEpoch(epoch + 1);
-        BigDecimal reserves = new BigDecimal(adaPotsForNextEpoch.getReserves());
+        // Step 3: Get total ada in circulation
+        double adaInCirculation = lovelaceToAda(TOTAL_LOVELACE - reserves);
 
-        // Step 4: Get total ada in circulation (total lovelace - reserves)
-        BigDecimal adaInCirculation = lovelaceToAda(TOTAL_LOVELACE.subtract(reserves));
+        // Step 4: Get protocol parameters for current epoch
+        ProtocolParameters protocolParameters = koiosDataProvider.getProtocolParametersForEpoch(epoch);
+        double decentralizationParam = protocolParameters.getDecentralisation();
+        int optimalPoolCount = protocolParameters.getOptimalPoolCount();
+        double influenceParam = protocolParameters.getPoolOwnerInfluence();
+        double monetaryExpandRate = protocolParameters.getMonetaryExpandRate();
+        double treasuryGrowRate = protocolParameters.getTreasuryGrowRate();
 
-        // Step 5: Get protocol parameters for current epoch
-        EpochParams epochParams = koiosDataProvider.getProtocolParametersForEpoch(epoch);
-        double decentralizationParam = epochParams.getDecentralisation().doubleValue();
-        int optimalPoolCount = epochParams.getOptimalPoolCount();
-        double influenceParam = epochParams.getInfluence().doubleValue();
-        double monetaryExpandRate = epochParams.getMonetaryExpandRate().doubleValue();
-        double treasuryGrowRate = epochParams.getTreasuryGrowthRate().doubleValue();
-
-        // Step 6: Calculate apparent pool performance
+        // Step 5: Calculate apparent pool performance
         var apparentPoolPerformance =
                 PoolRewardCalculation.calculateApparentPoolPerformance(poolStake, activeStakeInEpoch,
                         blocksPoolHasMinted, totalBlocksInEpoch, decentralizationParam);
 
-        // Step 7: Calculate total available reward for pools (total reward pot after treasury cut)
-        BigDecimal totalRewardPot = lovelaceToAda(TreasuryCalculation.calculateTotalRewardPot(monetaryExpandRate, reserves, totalFeesInEpoch));
+        // Step 6: Calculate total available reward for pools (total reward pot after treasury cut)
+        int totalBlocksTwoEpochsBefore = koiosDataProvider.getEpochInfo(epoch - 2).getBlockCount();
+        double totalRewardPot = lovelaceToAda(TreasuryCalculation.calculateTotalRewardPotWithEta(monetaryExpandRate,
+                totalBlocksTwoEpochsBefore, decentralizationParam, reserves, totalFeesInEpoch));
 
         if (totalRewardPotOverride != null) {
             totalRewardPot = totalRewardPotOverride;
         }
 
-        BigDecimal stakePoolRewardsPot = totalRewardPot.multiply(new BigDecimal(1 - treasuryGrowRate));
+        double stakePoolRewardsPot = totalRewardPot * (1 - treasuryGrowRate);
 
         // shelley-delegation.pdf 5.5.3
         //      "[...]the relative stake of the pool owner(s) (the amount of ada
         //      pledged during pool registration)"
 
-        // Step 8: Get the latest pool update before this epoch and extract the pledge
-        BigDecimal poolOwnerActiveStake = lovelaceToAda(new BigDecimal(
-                koiosDataProvider.getLatestPoolUpdateBeforeOrInEpoch(poolId, epoch - 1).getPledge()));
+        // Step 7: Get the latest pool update before this epoch and extract the pledge
+        double poolOwnerActiveStake = lovelaceToAda(koiosDataProvider.getPoolPledgeInEpoch(poolId, epoch - 1));
 
-        BigDecimal relativeStakeOfPoolOwner = poolOwnerActiveStake.divide(adaInCirculation, mathContext);
-        BigDecimal relativePoolStake = poolStake.divide(adaInCirculation, mathContext);
+        double relativeStakeOfPoolOwner = poolOwnerActiveStake / adaInCirculation;
+        double relativePoolStake = poolStake / adaInCirculation;
 
-        // Step 9: Calculate optimal pool reward
-        BigDecimal optimalPoolReward =
+        // Step 8: Calculate optimal pool reward
+        double optimalPoolReward =
                 PoolRewardCalculation.calculateOptimalPoolReward(
                         stakePoolRewardsPot,
                         optimalPoolCount,
@@ -99,19 +88,19 @@ public class PoolRewardCalculationTest {
                         relativePoolStake,
                         relativeStakeOfPoolOwner);
 
-        // Step 10: Calculate pool reward as optimal pool reward * apparent pool performance
-        BigDecimal poolReward = PoolRewardCalculation.calculatePoolReward(optimalPoolReward, apparentPoolPerformance);
+        // Step 9: Calculate pool reward as optimal pool reward * apparent pool performance
+        double poolReward = PoolRewardCalculation.calculatePoolReward(optimalPoolReward, apparentPoolPerformance);
 
-        // Step 11: Compare estimated pool reward with actual pool reward minus pool fees
+        // Step 10: Compare estimated pool reward with actual pool reward minus pool fees
         if (!skipTest) {
             System.out.println("Difference between expected pool reward and actual pool reward: " +
-                    expectedPoolReward.subtract(poolReward.subtract(poolFees)));
-            Assertions.assertEquals(expectedPoolReward.setScale(0, mathContext.getRoundingMode()),
-                poolReward.subtract(poolFees).setScale(0, mathContext.getRoundingMode()));
+                    (expectedPoolReward - (poolReward - poolFees)));
+            Assertions.assertEquals(Math.round(expectedPoolReward),
+                Math.round(poolReward - poolFees));
         }
 
         return PoolCalculationResult.builder()
-                .actualPoolReward(poolReward.subtract(poolFees))
+                .actualPoolReward(poolReward - poolFees)
                 .expectedPoolReward(expectedPoolReward)
                 .stakePoolRewardsPot(stakePoolRewardsPot)
                 .totalRewardPot(totalRewardPot)
@@ -124,16 +113,16 @@ public class PoolRewardCalculationTest {
                 .build();
     }
 
-    void Test_calculatePoolReward(String poolId, int epoch) throws ApiException {
+    void Test_calculatePoolReward(String poolId, int epoch) {
         Test_calculatePoolReward(poolId, epoch, false, null);
     }
 
-    void Test_calculatePoolReward(String poolId, int epoch, BigDecimal totalRewardPotOverride) throws  ApiException {
+    void Test_calculatePoolReward(String poolId, int epoch, Double totalRewardPotOverride) {
         Test_calculatePoolReward(poolId, epoch, false, totalRewardPotOverride);
     }
 
     @Test
-    void calculatePoolRewardInEpoch211() throws ApiException {
+    void calculatePoolRewardInEpoch211() {
         String poolId1 = "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx";
         String poolId2 = "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9";
         String poolId3 = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
@@ -146,10 +135,10 @@ public class PoolRewardCalculationTest {
     }
 
     @Test
-    void calculatePoolRewardInEpoch212() throws ApiException {
-        String poolId1 = "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx";
+    void calculatePoolRewardInEpoch212() {
+        String poolId1 = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
         String poolId2 = "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9";
-        String poolId3 = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
+        String poolId3 = "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx";
 
         int epoch = 212;
 
@@ -164,14 +153,14 @@ public class PoolRewardCalculationTest {
 
     @ParameterizedTest
     @MethodSource("testPoolRewardRange")
-    void calculateSwimPoolRewardFromEpoch211To216(int epoch) throws ApiException {
+    void calculateSwimPoolRewardFromEpoch211To216(int epoch) {
         String poolId = "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9";
         Test_calculatePoolReward(poolId, epoch);
     }
 
     @ParameterizedTest
     @MethodSource("testPoolRewardRange")
-    void calculateOCTASPoolRewardFromEpoch211To216(int epoch) throws ApiException {
+    void calculateOCTASPoolRewardFromEpoch211To216(int epoch) {
         String poolId = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
         Test_calculatePoolReward(poolId, epoch);
 
@@ -179,14 +168,14 @@ public class PoolRewardCalculationTest {
 
     // TODO: Works with: totalRewardPot = new BigDecimal("38941407");
     @Test
-    void calculateSWIMPoolRewardFromEpoch215() throws ApiException {
+    void calculateSWIMPoolRewardFromEpoch215() {
         String poolId = "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9";
         Test_calculatePoolReward(poolId, 215);
     }
 
     // TODO: Works with: totalRewardPot = new BigDecimal("38941375");
     @Test
-    void calculateOCTASPoolRewardFromEpoch215() throws ApiException {
+    void calculateOCTASPoolRewardFromEpoch215() {
         String poolId = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
         Test_calculatePoolReward(poolId, 215);
     }
@@ -198,12 +187,11 @@ public class PoolRewardCalculationTest {
      */
     @ParameterizedTest
     @MethodSource("testPoolRewardRange")
-    void figureOutATotalRewardPot(int epoch) throws ApiException {
+    void figureOutATotalRewardPot(int epoch) {
         String poolId = "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9";
         PoolCalculationResult poolCalculationResult = Test_calculatePoolReward(poolId, epoch, true, null);
-        MathContext mathContext = new MathContext(30, RoundingMode.HALF_UP);
 
-        BigDecimal totalStakePoolRewardPot = PoolRewardCalculation.calculateRewardPotByOptimalPoolReward(
+        double totalStakePoolRewardPot = PoolRewardCalculation.calculateRewardPotByOptimalPoolReward(
                 poolCalculationResult.getActualPoolRewardWithFee(),
                 poolCalculationResult.getOptimalPoolCount(),
                 poolCalculationResult.getInfluenceParam(),
@@ -212,36 +200,36 @@ public class PoolRewardCalculationTest {
                 poolCalculationResult.getPoolPerformance()
         );
 
-        BigDecimal totalRewardPot = totalStakePoolRewardPot.divide(new BigDecimal("0.8"), mathContext);
-        BigDecimal totalRewardPotInAda = totalRewardPot.setScale(0, mathContext.getRoundingMode());
+        double totalRewardPot = totalStakePoolRewardPot / 0.8;
+        double totalRewardPotInAda = Math.round(totalRewardPot);
 
         //Assertions.assertEquals(totalRewardPotInAda,
         //        poolCalculationResult.getTotalRewardPot().setScale(0, mathContext.getRoundingMode()));
 
         totalRewardPot = PoolRewardCalculation.calculateRewardPotByOptimalPoolReward(
-                poolCalculationResult.getExpectedPoolReward().add(poolCalculationResult.getPoolFee()),
+                poolCalculationResult.getExpectedPoolReward() + poolCalculationResult.getPoolFee(),
                 poolCalculationResult.getOptimalPoolCount(),
                 poolCalculationResult.getInfluenceParam(),
                 poolCalculationResult.getRelativeStakeOfPool(),
                 poolCalculationResult.getRelativeStakeOfPoolOwner(),
                 poolCalculationResult.getPoolPerformance()
-        ).divide(new BigDecimal("0.8"), mathContext);
-        totalRewardPotInAda = totalRewardPot.setScale(0, mathContext.getRoundingMode());
+        ) / 0.8;
+        totalRewardPotInAda = Math.round(totalRewardPot);
 
         System.out.println("Calculating total reward pot for epoch: " + epoch);
         System.out.println("The formula gives a total reward pot of: " +
-                poolCalculationResult.getTotalRewardPot().setScale(0, mathContext.getRoundingMode()));
+                Math.round(poolCalculationResult.getTotalRewardPot()));
         System.out.println("But the reverse formula with the expected pool reward gives a total reward pot of: " +
                 totalRewardPotInAda);
         System.out.println("The difference is: " +
-                poolCalculationResult.getTotalRewardPot().setScale(0, mathContext.getRoundingMode()).subtract(totalRewardPotInAda));
+                (Math.round(poolCalculationResult.getTotalRewardPot()) - totalRewardPotInAda));
 
         String poolId2 = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
         poolCalculationResult = Test_calculatePoolReward(poolId2, epoch, true, totalRewardPotInAda);
-        BigDecimal difference = poolCalculationResult.getActualPoolReward().setScale(0, mathContext.getRoundingMode())
-                .subtract(poolCalculationResult.getExpectedPoolReward().setScale(0, mathContext.getRoundingMode()));
+        double difference = Math.round(poolCalculationResult.getActualPoolReward()) -
+                Math.round(poolCalculationResult.getExpectedPoolReward());
 
-        System.out.println("Difference between expected pool reward and actual pool reward: " + difference.abs());
-        assert(difference.abs().compareTo(new BigDecimal("25")) < 0);
+        System.out.println("Difference between expected pool reward and actual pool reward: " + Math.abs(difference));
+        assert(Math.abs(difference) < 25.0);
     }
 }
