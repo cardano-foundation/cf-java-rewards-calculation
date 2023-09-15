@@ -8,18 +8,18 @@ import java.math.BigDecimal;
 @Builder
 @Getter
 public class PoolCalculationResult {
-    BigDecimal expectedPoolReward;
-    BigDecimal actualPoolReward;
-    BigDecimal totalRewardPot;
-    BigDecimal stakePoolRewardsPot;
-    BigDecimal poolFee;
+    Double expectedPoolReward;
+    Double actualPoolReward;
+    Double totalRewardPot;
+    Double stakePoolRewardsPot;
+    Double poolFee;
     int optimalPoolCount;
-    double influenceParam;
-    BigDecimal relativeStakeOfPool;
-    BigDecimal relativeStakeOfPoolOwner;
-    BigDecimal poolPerformance;
+    Double influenceParam;
+    Double relativeStakeOfPool;
+    Double relativeStakeOfPoolOwner;
+    Double poolPerformance;
 
-    public BigDecimal getActualPoolRewardWithFee() {
-        return this.actualPoolReward.add(this.poolFee);
+    public Double getActualPoolRewardWithFee() {
+        return this.actualPoolReward + this.poolFee;
     }
 }
