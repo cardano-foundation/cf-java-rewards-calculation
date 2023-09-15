@@ -22,6 +22,13 @@ public class JsonConverter {
         return objectMapper.readValue(new File(filePath), targetClass);
     }
 
+    public static <T> void writeObjectToJsonFile(T objectToWrite, String filePath) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        File outputFile = new File(filePath);
+        objectMapper.writeValue(outputFile, objectToWrite);
+    }
+
+
     public static <T> ArrayList<T> convertFileJsonToArrayList(String filePath, Class<T> objectClass) {
         BufferedReader br;
         try {
