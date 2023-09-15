@@ -1,35 +1,28 @@
 package org.cardanofoundation.rewards.calculation;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
-
-import static org.cardanofoundation.rewards.constants.RewardConstants.EXPECTED_BLOCKS_PER_EPOCH;
-
 public class PoolRewardCalculation {
 
     /*
-    * https://github.com/input-output-hk/cardano-ledger/releases/latest/download/shelley-delegation.pdf
-    *
-    * Calculate the apparent pool performance with the formula (shelley-delegation.pdf page 36):
-    *
-    * performance = relativeBlocksCreatedInEpoch / relativeActiveStake
-    *
-    * hint: shelley-delegation.pdf 3.8.3
-    *       As long as we have d >= 0.8, we set the apparent performance of any pool to 1
-    */
-    public static double calculateApparentPoolPerformance(double poolStake, double totalEpochStake,
-                                                          int blocksMintedByPool, int totalBlocksInEpoch,
-                                                          double decentralizationParam) {
+     * https://github.com/input-output-hk/cardano-ledger/releases/latest/download/shelley-delegation.pdf
+     *
+     * Calculate the apparent pool performance with the formula (shelley-delegation.pdf page 36):
+     *
+     * performance = relativeBlocksCreatedInEpoch / relativeActiveStake
+     *
+     * hint: shelley-delegation.pdf 3.8.3
+     *       As long as we have d >= 0.8, we set the apparent performance of any pool to 1
+     */
+    public static double calculateApparentPoolPerformance(final double activePoolStake, final double totalActiveEpochStake, final int blocksMintedByPool, final int totalBlocksInEpoch, final double decentralizationParam) {
         if (decentralizationParam >= 0.8) {
             return 1.0;
+        } else if (activePoolStake == 0.0 || totalActiveEpochStake == 0.0) {
+            return 0.0;
+        } else {
+            final double blocksMintedInNonOBFTSlots = (double) totalBlocksInEpoch * (1.0 - decentralizationParam);
+            final double relativeBlocksCreatedInEpoch = blocksMintedByPool / blocksMintedInNonOBFTSlots;
+            final double relativeActiveStake = activePoolStake / totalActiveEpochStake;
+            return relativeBlocksCreatedInEpoch / relativeActiveStake;
         }
-
-        double blocksMintedInNonOBFTSlots = totalBlocksInEpoch * (1 - decentralizationParam);
-
-        double relativeBlocksCreatedInEpoch = blocksMintedByPool / blocksMintedInNonOBFTSlots;
-        double relativeActiveStake = poolStake / totalEpochStake;
-        return relativeBlocksCreatedInEpoch / relativeActiveStake;
     }
 
     /*
@@ -52,12 +45,7 @@ public class PoolRewardCalculation {
      *          / sizeOfASaturatedPool)
      *      )
      */
-    public static double calculateOptimalPoolReward(
-            double totalAvailableRewards,
-            int optimalPoolCount,
-            double influence,
-            double relativeStakeOfPool,
-            double relativeStakeOfPoolOwner) {
+    public static double calculateOptimalPoolReward(double totalAvailableRewards, int optimalPoolCount, double influence, double relativeStakeOfPool, double relativeStakeOfPoolOwner) {
 
         double sizeOfASaturatedPool = 1.0 / optimalPoolCount;
         double cappedRelativeStake = Math.min(relativeStakeOfPool, sizeOfASaturatedPool);
@@ -72,12 +60,12 @@ public class PoolRewardCalculation {
         double influenceOfOwner = cappedRelativeStakeOfPoolOwner * influence;
 
         // s'((z0 - o')/ z0)
-        double relativeStakeOfSaturatedPool = cappedRelativeStakeOfPoolOwner * (
-                (sizeOfASaturatedPool - cappedRelativeStake) / sizeOfASaturatedPool);
+        double relativeStakeOfSaturatedPool = cappedRelativeStakeOfPoolOwner * ((sizeOfASaturatedPool - cappedRelativeStake) / sizeOfASaturatedPool);
 
         // o' - ((s' * (z0 - o')/ z0) / z0)
         double saturatedPoolWeight = cappedRelativeStake - (relativeStakeOfSaturatedPool / sizeOfASaturatedPool);
 
+        // R/(1+a0) (s'a0(o' - (s'(z0 - o') / z0)) / z0)
         return rewardsDividedByOnePlusInfluence * (cappedRelativeStake + influenceOfOwner * saturatedPoolWeight);
     }
 
@@ -92,23 +80,17 @@ public class PoolRewardCalculation {
     /*
      *  Calculate the total reward pot (R) with transposing the equation from above:
      */
-    public static double calculateRewardPotByOptimalPoolReward(
-            double poolReward,
-            int optimalPoolCount,
-            double influence,
-            double relativeStakeOfPool,
-            double relativeStakeOfPoolOwner,
-            double poolPerformance) {
+    public static double calculateRewardPotByOptimalPoolReward(double poolReward, int optimalPoolCount, double influence, double relativeStakeOfPool, double relativeStakeOfPoolOwner, double poolPerformance) {
 
         double sizeOfASaturatedPool = 1.0 / optimalPoolCount;
         double cappedRelativeStake = Math.min(sizeOfASaturatedPool, relativeStakeOfPool);
         double cappedRelativeStakeOfPoolOwner = Math.min(sizeOfASaturatedPool, relativeStakeOfPoolOwner);
+
         // s' * a0
         double influenceOfOwner = cappedRelativeStakeOfPoolOwner * influence;
 
         // s'((z0 - o')/ z0)
-        double relativeStakeOfSaturatedPool = cappedRelativeStakeOfPoolOwner * (
-                (sizeOfASaturatedPool - cappedRelativeStake) / sizeOfASaturatedPool);
+        double relativeStakeOfSaturatedPool = cappedRelativeStakeOfPoolOwner * ((sizeOfASaturatedPool - cappedRelativeStake) / sizeOfASaturatedPool);
 
         // o' - (s' * (z0 - o')/ z0) / z0)
         double saturatedPoolWeight = (cappedRelativeStake - relativeStakeOfSaturatedPool) / sizeOfASaturatedPool;
