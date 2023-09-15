@@ -57,7 +57,7 @@ public class RewardsApplication implements ApplicationRunner {
     }
 
     if (!args.getOptionNames().isEmpty()) {
-      logger.warn("Finished the specified actions. Exiting...");
+      logger.warn("Finished actions. Exiting...");
       int exitCode = SpringApplication.exit(context, (ExitCodeGenerator) () -> 0);
       System.exit(exitCode);
     }

@@ -13,4 +13,6 @@ public class Epoch {
     private Double fees;
     private int blockCount;
     private Double activeStake;
+    private int nonOBFTBlockCount;
+    private int OBFTBlockCount;
 }

@@ -41,10 +41,10 @@ public class TreasuryCalculationTest {
       throw new RuntimeException("Unknown data provider type: " + dataProviderType);
     }
 
-    ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch);
+    ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch - 2);
     final double treasuryGrowthRate = protocolParameters.getTreasuryGrowRate();
     final double monetaryExpandRate = protocolParameters.getMonetaryExpandRate();
-    final double decentralizationParameter = protocolParameters.getDecentralisation();
+    double decentralizationParameter = protocolParameters.getDecentralisation();
 
     AdaPots adaPotsForPreviousEpoch = dataProvider.getAdaPotsForEpoch(epoch - 1);
     AdaPots adaPotsForCurrentEpoch = dataProvider.getAdaPotsForEpoch(epoch);
@@ -62,8 +62,13 @@ public class TreasuryCalculationTest {
     double treasuryInPreviousEpoch = adaPotsForPreviousEpoch.getTreasury();
     double expectedTreasuryForCurrentEpoch = adaPotsForCurrentEpoch.getTreasury();
 
-    // TODO: It seems that the blocks we need to use for the eta calculation are the blocks produced by pools (NON-OBFT blocks).
     int totalBlocksInEpoch = epochInfo.getBlockCount();
+
+    if (epoch > 214 && epoch < 257) {
+        Epoch currentEpochInfo = dataProvider.getEpochInfo(epoch - 2);
+        totalBlocksInEpoch = currentEpochInfo.getNonOBFTBlockCount();
+    }
+
     double rewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(
             monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserveInPreviousEpoch, totalFeesForCurrentEpoch);
 
@@ -96,19 +101,23 @@ public class TreasuryCalculationTest {
     }
   }
 
-  static Stream<Integer> range() {
-    return IntStream.range(209, 215).boxed();
+  static Stream<Integer> koiosDataProviderRange() {
+    return IntStream.range(210, 213).boxed();
   }
 
   @ParameterizedTest
-  @MethodSource("range")
+  @MethodSource("koiosDataProviderRange")
   void Test_calculateTreasuryWithKoiosDataProvider(int epoch) {
     Test_calculateTreasury(epoch, DataProviderType.KOIOS);
   }
 
+  static Stream<Integer> jsonDataProviderRange() {
+    return IntStream.range(210, 433).boxed();
+  }
+
   @ParameterizedTest
-  @MethodSource("range")
-  void Test_calculateTreasuryWithJsonDataProviderForEpoch209(int epoch) {
+  @MethodSource("jsonDataProviderRange")
+  void Test_calculateTreasuryWithJsonDataProvider(int epoch) {
     Test_calculateTreasury(epoch, DataProviderType.JSON);
   }
 }
