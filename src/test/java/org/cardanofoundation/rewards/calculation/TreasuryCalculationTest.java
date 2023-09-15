@@ -27,7 +27,7 @@ public class TreasuryCalculationTest {
   KoiosDataProvider koiosDataProvider;
 
   static Stream<Integer> range() {
-    return IntStream.range(214, 220).boxed();
+    return IntStream.range(214, 230).boxed();
   }
 
   @ParameterizedTest
