@@ -88,7 +88,21 @@ window.onload = () => {
     }
 
     const layoutAda = {
-        title: 'Treasury Calculation & Actual Values - Difference in ADA',
+        title: 'Treasury Calculation & Actual Values',
+        showlegend: false,
+        xaxis: {
+            title: 'Epoch',
+            showgrid: false,
+            zeroline: false
+        },
+        yaxis: {
+            title: '₳',
+            showline: false
+        }
+    };
+    
+    const layoutAdaDifference = {
+        title: 'Treasury Calculation - Difference in ADA',
         showlegend: false,
         xaxis: {
             title: 'Epoch',
@@ -102,7 +116,7 @@ window.onload = () => {
     };
 
     const layoutPercentage = {
-        title: 'Treasury Calculation & Actual Values - Difference in ADA',
+        title: 'Treasury Calculation - Difference in %',
         showlegend: false,
         xaxis: {
             title: 'Epoch',
@@ -116,7 +130,7 @@ window.onload = () => {
     };
 
     Plotly.newPlot('calculated-vs-actual-plot', [actualTreasury, calculatedTreasury], layoutAda);
-    Plotly.newPlot('difference-plot', [difference], layoutAda);
+    Plotly.newPlot('difference-plot', [difference], layoutAdaDifference);
     Plotly.newPlot('difference-percentage-plot', [relativeDifference], layoutPercentage);
 
     const epochInfo = document.getElementById('epoch-info');
