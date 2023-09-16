@@ -1,0 +1,40 @@
+name: Run Plot Action and Upload Results
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  upload-core-bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup JDK 18
+        uses: actions/setup-java@v3
+        with:
+          java-version: '18'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build
+        run: |
+          mvn --batch-mode --update-snapshots clean package -DskipTests && mv target/rewards-*.jar target/rewards-calculation.jar
+
+      - name: 📊 Generate plots
+        run: java -jar target/rewards-calculation.jar --action=plot
+
+      - name: JSON result to js file
+        run: |
+          echo -e "const treasuryCalculationResult = $(cat ./report/treasury_calculation_result.json)" > ./report/treasury_calculation_result.js
+        
+      - name: 📅 Publish report to gh-pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          BRANCH: gh-pages
+          folder: report
+          target-folder: report/

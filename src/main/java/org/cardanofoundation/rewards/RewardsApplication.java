@@ -2,6 +2,7 @@ package org.cardanofoundation.rewards;
 
 import org.cardanofoundation.rewards.data.fetcher.DataFetcher;
 import org.cardanofoundation.rewards.data.fetcher.KoiosDataFetcher;
+import org.cardanofoundation.rewards.data.plotter.JsonDataPlotter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class RewardsApplication implements ApplicationRunner {
     for (String name : args.getOptionNames()) {
       if (name.equals("action")) {
         List<String> action = args.getOptionValues("action");
-        if (action == null) {
+        if (action == null || action.isEmpty()) {
           logger.warn("No action specified. Example usage: --action=fetch --override");
           int exitCode = SpringApplication.exit(context, (ExitCodeGenerator) () -> 0);
           System.exit(exitCode);
@@ -48,6 +49,11 @@ public class RewardsApplication implements ApplicationRunner {
             logger.info("Fetching data for epoch " + epoch);
             dataFetcher.fetch(epoch, override);
           }
+        } else if (action.get(0).equals("plot")) {
+          int epochStart = 210;
+          int epochEnd = 433;
+          JsonDataPlotter dataPlotter = new JsonDataPlotter();
+            dataPlotter.plot(epochStart, epochEnd);
         } else {
           logger.warn("Unknown action: " + action.get(0));
         }
