@@ -43,6 +43,7 @@ jobs:
         run: |
           echo "VERSION=$(xq -r .project.version pom.xml)" >> $GITHUB_ENV
           echo "LATEST_COMMIT_HASH=$(git rev-parse --short \"$GITHUB_SHA\")" >> $GITHUB_ENV
+          echo "LATEST_COMMIT_HASH_SHORT=$(git rev-parse --short \"$GITHUB_SHA\")" >> $GITHUB_ENV
           echo "UTC_DATE=$(date -uR|sed 's/.....$//')" >> $GITHUB_ENV
 
       - name: 📂 Create report directory
@@ -55,7 +56,7 @@ jobs:
 
       - name: 📝 Add metadata to the report
         run: |
-          sed -i 's,<footer></footer>,<footer><p>Created on ${{ env.UTC_DATE }} UTC as a result of modifications triggered by <a href="https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/${{ GITHUB_SHA }}">${{ env.LATEST_COMMIT_HASH }}</a></p></footer>,' report-${{ env.VERSION }}/treasury_calculation.html
+          sed -i 's,<footer></footer>,<footer><p>Created on ${{ env.UTC_DATE }} UTC as a result of modifications triggered by <a href="https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/${{ env.LATEST_COMMIT_HASH }}">${{ env.LATEST_COMMIT_HASH_SHORT }}</a></p></footer>,' report-${{ env.VERSION }}/treasury_calculation.html
 
       - name: 📅 Publish report to gh-pages
         uses: JamesIves/github-pages-deploy-action@v4
