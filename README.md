@@ -10,7 +10,7 @@
 
 This java project is used to calculate the rewards of the Cardano network. It aims to be both an edge case documentation and formula implementation.
 
-📈 [Treasury Calculation Report](https://cardano-foundation.github.io/cf-java-rewards-calculation/report/treasury_calculation.html)
+📈 [Treasury Calculation Report](https://cardano-foundation.github.io/cf-java-rewards-calculation/report-latest/treasury_calculation.html)
 
 ```mermaid
 flowchart
