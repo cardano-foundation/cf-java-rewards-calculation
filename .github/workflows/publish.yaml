@@ -48,11 +48,11 @@ jobs:
 
       - name: 📂 Create report directory
         run: |
-          mkdir -p report-${{ env.VERSION }}
+          mkdir -p report-v${{ env.VERSION }}
 
       - name: 📄 Copy report files
         run: |
-          cp -r report/* report-${{ env.VERSION }}
+          cp -r report/* report-v${{ env.VERSION }}
 
       - name: 📝 Add metadata to the report
         run: |
