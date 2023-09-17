@@ -10,6 +10,9 @@ on:
 jobs:
   plot-and-publish:
     runs-on: ubuntu-latest
+    if: |
+      "contains(github.event.head_commit.message, 'release-please--branches--main')" ||
+      ${{ github.event_name == 'pull_request' }}
     steps:
       - name: ⬇️ Checkout repository
         uses: actions/checkout@v3
@@ -20,6 +23,10 @@ jobs:
           java-version: '18'
           distribution: 'temurin'
           cache: maven
+
+      - name: Setup dependencies
+        run: |
+          pip install yq
 
       - name: Build
         run: |
@@ -32,9 +39,34 @@ jobs:
         run: |
           echo -e "const treasuryCalculationResult = $(cat ./report/treasury_calculation_result.json)" > ./report/treasury_calculation_result.js
         
+      - name: 👀 Lookup metadata for report
+        run: |
+          echo "VERSION=$(xq -r .project.version pom.xml)" >> $GITHUB_ENV
+          echo "LATEST_COMMIT_HASH=$(git rev-parse --short \"$GITHUB_SHA\")" >> $GITHUB_ENV
+          echo "UTC_DATE=$(date -uR|sed 's/.....$//')" >> $GITHUB_ENV
+
+      - name: 📂 Create report directory
+        run: |
+          mkdir -p report-${{ env.VERSION }}
+
+      - name: 📄 Copy report files
+        run: |
+          cp -r report/* report-${{ env.VERSION }}
+
+      - name: 📝 Add metadata to the report
+        run: |
+          sed -i 's,<footer></footer>,<footer><p>Created on ${{ env.UTC_DATE }} UTC as a result of modifications triggered by <a href="https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/${{ GITHUB_SHA }}">${{ env.LATEST_COMMIT_HASH }}</a></p></footer>,' report-${{ env.VERSION }}/treasury_calculation.html
+
       - name: 📅 Publish report to gh-pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           BRANCH: gh-pages
-          folder: report
-          target-folder: report/
+          folder: report-${{ env.VERSION }}
+          target-folder: report-latest/
+
+      - name: 📅 Publish report to gh-pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          BRANCH: gh-pages
+          folder: report-${{ env.VERSION }}
+          target-folder: report-${{ env.VERSION }}/
