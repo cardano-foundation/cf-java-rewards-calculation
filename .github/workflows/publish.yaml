@@ -56,18 +56,18 @@ jobs:
 
       - name: 📝 Add metadata to the report
         run: |
-          sed -i 's,<footer></footer>,<footer><p>Created on ${{ env.UTC_DATE }} UTC as a result of modifications triggered by <a href="https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/${{ env.LATEST_COMMIT_HASH }}">${{ env.LATEST_COMMIT_HASH_SHORT }}</a></p></footer>,' report-${{ env.VERSION }}/treasury_calculation.html
+          sed -i 's|<footer></footer>|<footer><p>Created on ${{ env.UTC_DATE }} UTC as a result of modifications triggered by <a href="https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/${{ env.LATEST_COMMIT_HASH }}">${{ env.LATEST_COMMIT_HASH_SHORT }}</a></p></footer>|' report-v${{ env.VERSION }}/treasury_calculation.html
 
       - name: 📅 Publish report to gh-pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           BRANCH: gh-pages
-          folder: report-${{ env.VERSION }}
+          folder: report-v${{ env.VERSION }}
           target-folder: report-latest/
 
       - name: 📅 Publish report to gh-pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           BRANCH: gh-pages
-          folder: report-${{ env.VERSION }}
-          target-folder: report-${{ env.VERSION }}/
+          folder: report-v${{ env.VERSION }}
+          target-folder: report-v${{ env.VERSION }}/
