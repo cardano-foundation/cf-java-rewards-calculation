@@ -1,9 +1,6 @@
 package org.cardanofoundation.rewards.data.provider;
 
-import org.cardanofoundation.rewards.entity.AdaPots;
-import org.cardanofoundation.rewards.entity.Epoch;
-import org.cardanofoundation.rewards.entity.PoolHistory;
-import org.cardanofoundation.rewards.entity.ProtocolParameters;
+import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.enums.DataType;
 import org.springframework.stereotype.Service;
 
@@ -57,6 +54,16 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public Double getActiveStakesOfAddressesInEpoch(List<String> stakeAddresses, int epoch) {
+        return null;
+    }
+
+    @Override
+    public List<PoolUpdate> getPoolUpdatesInEpoch(int epoch) {
+        return null;
+    }
+
+    @Override
+    public List<AccountUpdate> getAccountUpdatesUntilEpoch(List<String> stakeAddresses, int epoch) {
         return null;
     }
 }

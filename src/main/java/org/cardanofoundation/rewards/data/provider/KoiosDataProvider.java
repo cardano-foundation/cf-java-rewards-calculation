@@ -5,13 +5,11 @@ import org.cardanofoundation.rewards.entity.AdaPots;
 import org.cardanofoundation.rewards.entity.Epoch;
 import org.cardanofoundation.rewards.entity.PoolHistory;
 import org.cardanofoundation.rewards.entity.ProtocolParameters;
-import org.cardanofoundation.rewards.mapper.AdaPotsMapper;
-import org.cardanofoundation.rewards.mapper.EpochMapper;
-import org.cardanofoundation.rewards.mapper.PoolHistoryMapper;
-import org.cardanofoundation.rewards.mapper.ProtocolParametersMapper;
+import org.cardanofoundation.rewards.mapper.*;
 import org.springframework.stereotype.Service;
 import rest.koios.client.backend.api.account.model.AccountUpdate;
 import rest.koios.client.backend.api.account.model.AccountUpdates;
+import rest.koios.client.backend.api.base.Result;
 import rest.koios.client.backend.api.base.exception.ApiException;
 import rest.koios.client.backend.api.block.model.Block;
 import rest.koios.client.backend.api.epoch.model.EpochInfo;
@@ -97,43 +95,6 @@ public class KoiosDataProvider implements DataProvider {
         return ProtocolParametersMapper.fromKoiosEpochParams(epochParams);
     }
 
-    /*
-       The deposit for pool registration is 500 ADA. The deposit is returned 2 epochs later when the pool is retired.
-       If the stake address associated with the pool has been deregistered, the deposit is returned to the treasury.
-     */
-    public int countRetiredPoolsWithDeregisteredRewardAddress(int epoch) throws ApiException {
-        List<PoolUpdate> poolUpdates = koiosBackendService.getPoolService()
-                .getPoolUpdates(Options.builder()
-                        .option(Filter.of("retiring_epoch", FilterType.LTE, String.valueOf(epoch)))
-                        .option(Filter.of("retiring_epoch", FilterType.GTE, String.valueOf(epoch - 2)))
-                        .build()).getValue();
-
-        if (poolUpdates.isEmpty()) {
-            return 0;
-        }
-
-        List<String> rewardAddresses = poolUpdates.stream()
-                .map(PoolUpdate::getRewardAddr)
-                .toList();
-
-        List<AccountUpdates> accountUpdates = koiosBackendService.getAccountService()
-                .getAccountUpdates(rewardAddresses, Options.EMPTY).getValue();
-
-        int poolCount = 0;
-        for (AccountUpdates accountUpdate : accountUpdates) {
-            List<AccountUpdate> updates = accountUpdate.getUpdates();
-            for (AccountUpdate update : updates) {
-                if (update.getActionType().equals("deregistration") && update.getEpochNo() <= epoch) {
-                    System.out.println("Epoch: " + epoch);
-                    System.out.println(accountUpdate.getStakeAddress());
-                    poolCount = poolCount + 1;
-                    break;
-                }
-            }
-        }
-        return poolCount;
-    }
-
     public PoolHistory getPoolHistory(String poolId, int epoch) {
         rest.koios.client.backend.api.pool.model.PoolHistory poolHistory = null;
 
@@ -201,5 +162,44 @@ public class KoiosDataProvider implements DataProvider {
         }
 
         return activeStake;
+    }
+
+    @Override
+    public List<org.cardanofoundation.rewards.entity.PoolUpdate> getPoolUpdatesInEpoch(int epoch) {
+        List<org.cardanofoundation.rewards.entity.PoolUpdate> poolUpdates = new ArrayList<>();
+
+        try {
+            List<PoolUpdate> poolUpdateList = koiosBackendService.getPoolService().getPoolUpdates(Options.builder()
+                .option(Filter.of("active_epoch_no", FilterType.EQ, String.valueOf(epoch)))
+                .build()).getValue();
+
+            poolUpdates.addAll(poolUpdateList.stream()
+                .map(PoolUpdateMapper::fromKoiosPoolUpdate)
+                .toList());
+        } catch (ApiException e) {
+            e.printStackTrace();
+        }
+
+        return poolUpdates;
+    }
+
+    @Override
+    public List<org.cardanofoundation.rewards.entity.AccountUpdate> getAccountUpdatesUntilEpoch(List<String> stakeAddresses, int epoch) {
+        List<org.cardanofoundation.rewards.entity.AccountUpdate> accountUpdates = new ArrayList<>();
+
+        try {
+            Result<List<AccountUpdates>> updates = koiosBackendService.getAccountService().getAccountUpdates(stakeAddresses, Options.EMPTY);
+            List<AccountUpdates> accountUpdatesList = updates.getValue();
+            if (accountUpdatesList != null) {
+                accountUpdates.addAll(AccountUpdateMapper.fromKoiosAccountUpdates(accountUpdatesList));
+                accountUpdates = accountUpdates.stream().filter(
+                        accountUpdate -> accountUpdate.getEpoch() <= epoch)
+                        .toList();
+            }
+        } catch (ApiException e) {
+            e.printStackTrace();
+        }
+
+        return accountUpdates;
     }
 }
