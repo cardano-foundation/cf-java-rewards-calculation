@@ -20,7 +20,7 @@ public interface DataProvider {
 
     public Double getActiveStakesOfAddressesInEpoch(List<String> stakeAddresses, int epoch);
 
-    public List<PoolUpdate> getPoolUpdatesInEpoch(int epoch);
+    public List<PoolDeregistration> getRetiredPoolsInEpoch(int epoch);
 
     public List<AccountUpdate> getAccountUpdatesUntilEpoch(List<String> stakeAddresses, int epoch);
 }
