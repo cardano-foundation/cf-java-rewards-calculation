@@ -1,10 +1,7 @@
 package org.cardanofoundation.rewards.data.provider;
 
 import lombok.RequiredArgsConstructor;
-import org.cardanofoundation.rewards.entity.AdaPots;
-import org.cardanofoundation.rewards.entity.Epoch;
-import org.cardanofoundation.rewards.entity.PoolHistory;
-import org.cardanofoundation.rewards.entity.ProtocolParameters;
+import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.mapper.*;
 import org.springframework.stereotype.Service;
 import rest.koios.client.backend.api.account.model.AccountUpdate;
@@ -165,22 +162,27 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
-    public List<org.cardanofoundation.rewards.entity.PoolUpdate> getPoolUpdatesInEpoch(int epoch) {
-        List<org.cardanofoundation.rewards.entity.PoolUpdate> poolUpdates = new ArrayList<>();
+    public List<PoolDeregistration> getRetiredPoolsInEpoch(int epoch) {
+        List<PoolDeregistration> retiredPools = new ArrayList<>();
 
+        // TODO: It seems as this is not a sufficient method to get the retired pools
         try {
             List<PoolUpdate> poolUpdateList = koiosBackendService.getPoolService().getPoolUpdates(Options.builder()
                 .option(Filter.of("active_epoch_no", FilterType.EQ, String.valueOf(epoch)))
+                .option(Filter.of("retiring_epoch", FilterType.GT, String.valueOf(epoch - 1)))
+                .option(Filter.of("retiring_epoch", FilterType.LTE, String.valueOf(epoch)))
                 .build()).getValue();
 
-            poolUpdates.addAll(poolUpdateList.stream()
-                .map(PoolUpdateMapper::fromKoiosPoolUpdate)
-                .toList());
+            if (poolUpdateList == null) return List.of();
+
+            retiredPools.addAll(poolUpdateList.stream()
+                    .map(PoolDeregistrationMapper::fromKoiosPoolUpdate).toList());
+
         } catch (ApiException e) {
             e.printStackTrace();
         }
 
-        return poolUpdates;
+        return retiredPools;
     }
 
     @Override

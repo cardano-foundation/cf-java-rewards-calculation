@@ -1,6 +1,8 @@
 package org.cardanofoundation.rewards.calculation;
 
 import org.cardanofoundation.rewards.data.provider.DataProvider;
+import org.cardanofoundation.rewards.data.provider.JsonDataProvider;
+import org.cardanofoundation.rewards.data.provider.KoiosDataProvider;
 import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.enums.AccountUpdateAction;
 
@@ -100,6 +102,10 @@ public class TreasuryCalculation {
     double treasuryForCurrentEpoch = TreasuryCalculation.calculateTreasury(
             treasuryGrowthRate, rewardPot, treasuryInPreviousEpoch);
 
+    // The sum of all the refunds attached to unregistered reward accounts are added to the
+    // treasury (see: Pool Reap Transition, p.53, figure 40, shely-ledger.pdf)
+    treasuryForCurrentEpoch += TreasuryCalculation.calculateUnclaimedRefundsForRetiredPools(epoch, dataProvider);
+
     return TreasuryCalculationResult.builder()
             .calculatedTreasury(treasuryForCurrentEpoch)
             .actualTreasury(expectedTreasuryForCurrentEpoch)
@@ -114,23 +120,14 @@ public class TreasuryCalculation {
     https://github.com/input-output-hk/cardano-ledger/blob/9e2f8151e3b9a0dde9faeb29a7dd2456e854427c/eras/shelley/formal-spec/epoch.tex#L546C9-L547C87
    */
   public static Double calculateUnclaimedRefundsForRetiredPools(int epoch, DataProvider dataProvider) {
-    List<PoolUpdate> poolUpdatesInEpoch = dataProvider.getPoolUpdatesInEpoch(epoch - 1);
-    List<String> rewardAddresses = new ArrayList<>();
-
-    // TODO: It seems as this is not a sufficient method to get the retired pools
-
-    for (PoolUpdate poolUpdate : poolUpdatesInEpoch) {
-      Integer retiringEpoch = poolUpdate.getRetiringEpoch();
-      if (retiringEpoch != null && retiringEpoch > epoch - 1 && retiringEpoch <= epoch) {
-        rewardAddresses.add(poolUpdate.getRewardAddress());
-      }
-    }
+    List<PoolDeregistration> retiredPools = dataProvider.getRetiredPoolsInEpoch(epoch);
 
     double refunds = 0.0;
 
-    if (rewardAddresses.size() > 0) {
+    if (retiredPools.size() > 0) {
       // The deposit will pay back one epoch later
-      List<AccountUpdate> accountUpdates = dataProvider.getAccountUpdatesUntilEpoch(rewardAddresses, epoch);
+      List<AccountUpdate> accountUpdates = dataProvider.getAccountUpdatesUntilEpoch(
+              retiredPools.stream().map(PoolDeregistration::getRewardAddress).toList(), epoch - 1);
 
       // Order list by unix block time
       accountUpdates = accountUpdates.stream().filter(update ->
