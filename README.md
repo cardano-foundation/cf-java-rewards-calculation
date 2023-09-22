@@ -68,6 +68,14 @@ cd cf-java-rewards-calculation
 ./mvnw clean test
 ```
 
+## 🫡 Todo
+ - [ ] Include MIR certificates
+ - [ ] Add a `/docs` folder containing parsable Markdown files to explain MIR certificates and edge cases
+ - [ ] Implement "The difference between the maximal amount and the actual amount received is added to the amount moved to the treasury" (shelley-ledger.pdf p.65)
+ - [ ] Enhance reporting and add values for the other pots as well. Include information from the `/docs` folder
+ - [ ] Add member and operator reward calculation as well as the deposits pot
+ - [ ] Calculate unclaimed rewards that need to go back to the reserves
+
 ## 📖 Sources
  - [Shelley Cardano Delegation Specification](https://github.com/input-output-hk/cardano-ledger/releases/download/cardano-ledger-spec-2023-04-03/shelley-ledger.pdf)
  - [Shelley Cardano Ledger Specification](https://github.com/input-output-hk/cardano-ledger/releases/download/cardano-ledger-spec-2023-04-03/shelley-ledger.pdf)
