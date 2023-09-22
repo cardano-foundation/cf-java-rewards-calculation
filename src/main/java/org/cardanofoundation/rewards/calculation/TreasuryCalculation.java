@@ -34,7 +34,7 @@ public class TreasuryCalculation {
   public static double calculateTotalRewardPotWithEta(double monetaryExpandRate, int totalBlocksInEpochByPools,
                                                          double decentralizationParameter, double reserve, double fee) {
     double eta = calculateEta(totalBlocksInEpochByPools, decentralizationParameter);
-    return Math.floor(reserve * monetaryExpandRate * eta + fee);
+    return Math.floor(reserve * monetaryExpandRate * eta) + fee;
   }
 
   /*

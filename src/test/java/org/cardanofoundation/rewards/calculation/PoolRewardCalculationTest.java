@@ -32,27 +32,43 @@ public class PoolRewardCalculationTest {
         // Step 1: Get Pool information of current epoch
         // Example: https://api.koios.rest/api/v0/pool_history?_pool_bech32=pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt&_epoch_no=210
         PoolHistory poolHistoryCurrentEpoch = koiosDataProvider.getPoolHistory(poolId, epoch);
-        double poolStake = lovelaceToAda(poolHistoryCurrentEpoch.getActiveStake());
-        double expectedPoolReward = lovelaceToAda(poolHistoryCurrentEpoch.getDelegatorRewards());
-        double poolFees = lovelaceToAda(poolHistoryCurrentEpoch.getPoolFees());
+        double poolStake = poolHistoryCurrentEpoch.getActiveStake();
+        double expectedPoolReward = poolHistoryCurrentEpoch.getDelegatorRewards();
+        double poolFees = poolHistoryCurrentEpoch.getPoolFees();
         int blocksPoolHasMinted = poolHistoryCurrentEpoch.getBlockCount();
 
         // Step 2: Get Epoch information of current epoch
         // Source: https://api.koios.rest/api/v0/epoch_info?_epoch_no=211
         Epoch epochInfo = koiosDataProvider.getEpochInfo(epoch);
-        int totalBlocksInEpoch = epochInfo.getBlockCount();
-        double activeStakeInEpoch = lovelaceToAda(epochInfo.getActiveStake());
-        double totalFeesInEpoch = epochInfo.getFees();
 
+        double activeStakeInEpoch = 0;
+        if (epochInfo.getActiveStake() != null) {
+            activeStakeInEpoch = epochInfo.getActiveStake();
+        }
+
+        // The Shelley era and the ada pot system started on mainnet in epoch 208.
+        // Fee and treasury values are 0 for epoch 208.
+        double totalFeesForCurrentEpoch = 0.0;
+        if (epoch > 209) {
+            totalFeesForCurrentEpoch = epochInfo.getFees();
+        }
+
+        int totalBlocksInEpoch = epochInfo.getBlockCount();
+
+        if (epoch > 212 && epoch < 255) {
+            totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();
+        }
+
+        // Get the ada reserves for the next epoch because it was already updated yet
         AdaPots adaPotsForNextEpoch = koiosDataProvider.getAdaPotsForEpoch(epoch + 1);
         double reserves = adaPotsForNextEpoch.getReserves();
 
         // Step 3: Get total ada in circulation
-        double adaInCirculation = lovelaceToAda(TOTAL_LOVELACE - reserves);
+        double adaInCirculation = adaPotsForNextEpoch.getAdaInCirculation();
 
         // Step 4: Get protocol parameters for current epoch
         ProtocolParameters protocolParameters = koiosDataProvider.getProtocolParametersForEpoch(epoch);
-        double decentralizationParam = protocolParameters.getDecentralisation();
+        double decentralizationParameter = protocolParameters.getDecentralisation();
         int optimalPoolCount = protocolParameters.getOptimalPoolCount();
         double influenceParam = protocolParameters.getPoolOwnerInfluence();
         double monetaryExpandRate = protocolParameters.getMonetaryExpandRate();
@@ -61,25 +77,25 @@ public class PoolRewardCalculationTest {
         // Step 5: Calculate apparent pool performance
         var apparentPoolPerformance =
                 PoolRewardCalculation.calculateApparentPoolPerformance(poolStake, activeStakeInEpoch,
-                        blocksPoolHasMinted, totalBlocksInEpoch, decentralizationParam);
+                        blocksPoolHasMinted, totalBlocksInEpoch, decentralizationParameter);
 
         // Step 6: Calculate total available reward for pools (total reward pot after treasury cut)
-        int totalBlocksTwoEpochsBefore = koiosDataProvider.getEpochInfo(epoch - 2).getBlockCount();
-        double totalRewardPot = lovelaceToAda(TreasuryCalculation.calculateTotalRewardPotWithEta(monetaryExpandRate,
-                totalBlocksTwoEpochsBefore, decentralizationParam, reserves, totalFeesInEpoch));
+        // -----
+        double totalRewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(
+                monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserves, totalFeesForCurrentEpoch);
 
         if (totalRewardPotOverride != null) {
             totalRewardPot = totalRewardPotOverride;
         }
 
-        double stakePoolRewardsPot = totalRewardPot * (1 - treasuryGrowRate);
+        double stakePoolRewardsPot = totalRewardPot - Math.floor(totalRewardPot * treasuryGrowRate);
 
         // shelley-delegation.pdf 5.5.3
         //      "[...]the relative stake of the pool owner(s) (the amount of ada
         //      pledged during pool registration)"
 
         // Step 7: Get the latest pool update before this epoch and extract the pledge
-        double poolOwnerActiveStake = lovelaceToAda(koiosDataProvider.getPoolPledgeInEpoch(poolId, epoch - 1));
+        double poolOwnerActiveStake = koiosDataProvider.getPoolPledgeInEpoch(poolId, epoch);
 
         double relativeStakeOfPoolOwner = poolOwnerActiveStake / adaInCirculation;
         double relativePoolStake = poolStake / adaInCirculation;
@@ -126,73 +142,23 @@ public class PoolRewardCalculationTest {
         Test_calculatePoolReward(poolId, epoch, false, totalRewardPotOverride);
     }
 
-    @Test
-    void calculatePoolRewardInEpoch211() throws ApiException {
-        String poolId1 = "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx";
-        String poolId2 = "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9";
-        String poolId3 = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
+    static Stream<String> testPoolIds() {
+        return Stream.of(
+                "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9",
+                "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt",
+                "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx"
+        );
+    }
 
+    @ParameterizedTest
+    @MethodSource("testPoolIds")
+    void calculatePoolRewardInEpoch211(String poolId) throws ApiException {
         int epoch = 211;
-
-        Test_calculatePoolReward(poolId1, epoch);
-        Test_calculatePoolReward(poolId2, epoch);
-        Test_calculatePoolReward(poolId3, epoch);
-    }
-
-    @Test
-    void calculatePoolRewardInEpoch212() throws ApiException {
-        String poolId1 = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
-        String poolId2 = "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9";
-        String poolId3 = "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx";
-
-        int epoch = 212;
-
-        Test_calculatePoolReward(poolId1, epoch);
-        Test_calculatePoolReward(poolId2, epoch);
-        Test_calculatePoolReward(poolId3, epoch);
-    }
-
-    @Test
-    void calculatePoolRewardInEpoch213() throws ApiException {
-        String poolId1 = "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx";
-        String poolId2 = "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9";
-        String poolId3 = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
-
-        int epoch = 213;
-
-        Test_calculatePoolReward(poolId1, epoch);
-        Test_calculatePoolReward(poolId2, epoch);
-        Test_calculatePoolReward(poolId3, epoch);
-    }
-
-    @Test
-    void calculatePoolRewardInEpoch214() throws ApiException {
-        String poolId1 = "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx";
-        String poolId2 = "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9";
-        String poolId3 = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
-
-        int epoch = 214;
-
-        Test_calculatePoolReward(poolId1, epoch);
-        Test_calculatePoolReward(poolId2, epoch);
-        Test_calculatePoolReward(poolId3, epoch);
-    }
-
-    @Test
-    void calculatePoolRewardInEpoch215() throws ApiException {
-        String poolId1 = "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx";
-        String poolId2 = "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9";
-        String poolId3 = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
-
-        int epoch = 215;
-
-        Test_calculatePoolReward(poolId1, epoch);
-        Test_calculatePoolReward(poolId2, epoch);
-        Test_calculatePoolReward(poolId3, epoch);
+        Test_calculatePoolReward(poolId, epoch);
     }
 
     static Stream<Integer> testPoolRewardRange() {
-        return IntStream.range(213, 250).boxed();
+        return IntStream.range(212, 216).boxed();
     }
 
     @ParameterizedTest

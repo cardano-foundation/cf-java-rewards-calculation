@@ -12,6 +12,7 @@ public class AdaPotsMapper {
                 .treasury(Double.parseDouble(totals.getTreasury()))
                 .reserves(Double.parseDouble(totals.getReserves()))
                 .rewards(Double.parseDouble(totals.getReward()))
+                .adaInCirculation(Double.parseDouble(totals.getSupply()))
                 .epoch(totals.getEpochNo())
                 .build();
     }
