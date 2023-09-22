@@ -44,6 +44,8 @@ public class PoolRewardCalculation {
      *          (( sizeOfASaturatedPool - cappedRelativeStake ) / sizeOfASaturatedPool))
      *          / sizeOfASaturatedPool)
      *      )
+     *
+     * See the Haskell implementation: https://github.com/input-output-hk/cardano-ledger/blob/e722881568155fc39550a8dfabda3efeb263a1e5/shelley/chain-and-ledger/executable-spec/src/Shelley/Spec/Ledger/EpochBoundary.hs#L111
      */
     public static double calculateOptimalPoolReward(double totalAvailableRewards, int optimalPoolCount, double influence, double relativeStakeOfPool, double relativeStakeOfPoolOwner) {
 
@@ -53,20 +55,17 @@ public class PoolRewardCalculation {
 
         // R / (1 + a0)
         // "R are the total available rewards for the epoch (in ada)." (shelley-delegation.pdf 5.5.3)
-        double totalAvailableRewardsInAda = Math.round(totalAvailableRewards);
-        double rewardsDividedByOnePlusInfluence = totalAvailableRewardsInAda / (1 + influence);
+        double rewardsDividedByOnePlusInfluence = totalAvailableRewards / (1 + influence);
 
-        // s' * a0
-        double influenceOfOwner = cappedRelativeStakeOfPoolOwner * influence;
+        // (z0 - sigma') / z0
+        double relativeStakeOfSaturatedPool = (sizeOfASaturatedPool - cappedRelativeStake) / sizeOfASaturatedPool;
 
-        // s'((z0 - o')/ z0)
-        double relativeStakeOfSaturatedPool = cappedRelativeStakeOfPoolOwner * ((sizeOfASaturatedPool - cappedRelativeStake) / sizeOfASaturatedPool);
+        // (sigma' - s' * relativeStakeOfSaturatedPool) / z0
+        double saturatedPoolWeight = (cappedRelativeStake - cappedRelativeStakeOfPoolOwner * relativeStakeOfSaturatedPool) / sizeOfASaturatedPool;
 
-        // o' - ((s' * (z0 - o')/ z0) / z0)
-        double saturatedPoolWeight = cappedRelativeStake - (relativeStakeOfSaturatedPool / sizeOfASaturatedPool);
-
-        // R/(1+a0) (s'a0(o' - (s'(z0 - o') / z0)) / z0)
-        return rewardsDividedByOnePlusInfluence * (cappedRelativeStake + influenceOfOwner * saturatedPoolWeight);
+        // R / (1+a0) * (sigma' + s' * a0 * saturatedPoolWeight)
+        return Math.floor(rewardsDividedByOnePlusInfluence *
+                (cappedRelativeStake + cappedRelativeStakeOfPoolOwner * influence * saturatedPoolWeight));
     }
 
     /*

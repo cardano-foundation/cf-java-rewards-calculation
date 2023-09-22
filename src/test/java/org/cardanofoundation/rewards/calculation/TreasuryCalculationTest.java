@@ -1,6 +1,5 @@
 package org.cardanofoundation.rewards.calculation;
 
-import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -9,7 +8,6 @@ import org.cardanofoundation.rewards.data.provider.JsonDataProvider;
 import org.cardanofoundation.rewards.data.provider.KoiosDataProvider;
 import org.cardanofoundation.rewards.entity.AdaPots;
 import org.cardanofoundation.rewards.entity.Epoch;
-import org.cardanofoundation.rewards.entity.PoolUpdate;
 import org.cardanofoundation.rewards.entity.ProtocolParameters;
 import org.cardanofoundation.rewards.enums.DataProviderType;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,7 +16,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.ComponentScan;
 import static org.cardanofoundation.rewards.constants.RewardConstants.*;
 import static org.cardanofoundation.rewards.util.CurrencyConverter.lovelaceToAda;
@@ -68,8 +65,7 @@ public class TreasuryCalculationTest {
     int totalBlocksInEpoch = epochInfo.getBlockCount();
 
     if (epoch > 214 && epoch < 257) {
-        Epoch currentEpochInfo = dataProvider.getEpochInfo(epoch - 2);
-        totalBlocksInEpoch = currentEpochInfo.getNonOBFTBlockCount();
+        totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();
     }
 
     double rewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(
@@ -87,14 +83,7 @@ public class TreasuryCalculationTest {
 
     System.out.println("Difference in ADA: " + differenceInADA);
 
-    if (differenceInADA > 0 && differenceInADA % DEPOSIT_POOL_REGISTRATION_IN_ADA == 0) {
-      long numberOfPools = differenceInADA / DEPOSIT_POOL_REGISTRATION_IN_ADA;
-      System.out.println("Probably there was/were " + numberOfPools + " retired pool(s) with deregistered reward address in epoch " + epoch +
-              ". That's why " + differenceInADA + " ADA was added to the treasury.");
-      Assertions.assertEquals(0, differenceInADA % DEPOSIT_POOL_REGISTRATION_IN_ADA);
-    } else {
-      Assertions.assertEquals(Math.floor(expectedTreasuryForCurrentEpoch), Math.floor(treasuryForCurrentEpoch));
-    }
+    Assertions.assertEquals(Math.floor(expectedTreasuryForCurrentEpoch), Math.floor(treasuryForCurrentEpoch));
   }
 
   static Stream<Integer> koiosDataProviderRange() {

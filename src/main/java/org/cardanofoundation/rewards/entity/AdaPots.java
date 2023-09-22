@@ -12,4 +12,5 @@ public class AdaPots {
     private Double treasury;
     private Double reserves;
     private Double rewards;
+    private Double adaInCirculation;
 }
