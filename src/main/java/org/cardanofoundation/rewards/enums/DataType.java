@@ -5,7 +5,10 @@ public enum DataType {
     EPOCH_INFO ("epochInfo"),
     PROTOCOL_PARAMETERS ("protocolParameters"),
     POOL_DEREGISTRATIONS ("poolDeregistrations"),
-    ACCOUNT_UPDATES ("accountUpdates");
+    POOL_PARAMETERS ("poolParameters"),
+    POOL_HISTORY ("poolHistory"),
+    ACCOUNT_UPDATES ("accountUpdates"),
+    POOL_OWNER_HISTORY("accountHistory");
 
     public final String resourceFolderName;
 

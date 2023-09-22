@@ -16,9 +16,7 @@ public interface DataProvider {
 
     public Double getPoolPledgeInEpoch(String poolId, int epoch);
 
-    public List<String> getPoolOwners(String poolId, int epoch);
-
-    public Double getActiveStakesOfAddressesInEpoch(List<String> stakeAddresses, int epoch);
+    public PoolOwnerHistory getHistoryOfPoolOwnersInEpoch(String poolId, int epoch);
 
     public List<PoolDeregistration> getRetiredPoolsInEpoch(int epoch);
 

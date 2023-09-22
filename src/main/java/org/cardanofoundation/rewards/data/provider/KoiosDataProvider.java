@@ -4,7 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.mapper.*;
 import org.springframework.stereotype.Service;
-import rest.koios.client.backend.api.account.model.AccountUpdate;
+import rest.koios.client.backend.api.account.model.AccountHistory;
+import rest.koios.client.backend.api.account.model.AccountHistoryInner;
 import rest.koios.client.backend.api.account.model.AccountUpdates;
 import rest.koios.client.backend.api.base.Result;
 import rest.koios.client.backend.api.base.exception.ApiException;
@@ -125,40 +126,52 @@ public class KoiosDataProvider implements DataProvider {
         }
     }
 
-    public List<String> getPoolOwners(String poolId, int epoch) {
-        List<PoolUpdate> poolUpdates = new ArrayList<>();
+    @Override
+    public PoolOwnerHistory getHistoryOfPoolOwnersInEpoch(String poolId, int epoch) {
+        List<String> poolOwnerAddresses = new ArrayList<>();
 
         try {
-            poolUpdates = koiosBackendService.getPoolService().getPoolUpdatesByPoolBech32(poolId, Options.builder()
-                    .option(Filter.of("active_epoch_no", FilterType.LTE, String.valueOf(epoch)))
-                    .option(Order.by("block_time", SortType.DESC))
-                    .option(Limit.of(1))
-                    .build()).getValue();
+            List<PoolUpdate> poolUpdates = koiosBackendService.getPoolService()
+                    .getPoolUpdatesByPoolBech32(poolId, Options.builder()
+                            .option(Filter.of("active_epoch_no", FilterType.LTE, String.valueOf(epoch)))
+                            .option(Order.by("block_time", SortType.DESC))
+                            .option(Limit.of(1))
+                            .build()).getValue();
+
+            if (poolUpdates == null || poolUpdates.isEmpty()) return null;
+            poolOwnerAddresses = poolUpdates.get(0).getOwners();
         } catch (ApiException e) {
             e.printStackTrace();
         }
 
-        if(poolUpdates.isEmpty()) {
-            return List.of();
-        } else {
-            return poolUpdates.get(0).getOwners();
-        }
-    }
-
-    public Double getActiveStakesOfAddressesInEpoch(List<String> stakeAddresses, int epoch) {
-        Double activeStake = null;
+        if (poolOwnerAddresses.isEmpty()) return null;
+        PoolOwnerHistory poolOwnerHistory = null;
 
         try {
-            activeStake = koiosBackendService.getAccountService()
-                .getAccountHistory(stakeAddresses, epoch, Options.EMPTY)
-                .getValue().stream().map(accountHistory ->
-                       Double.parseDouble(accountHistory.getHistory().get(0).getActiveStake()))
-                .reduce((double) 0, Double::sum);
+            List<AccountHistory> accountHistories = koiosBackendService.getAccountService()
+                    .getAccountHistory(poolOwnerAddresses, epoch, Options.EMPTY)
+                    .getValue();
+
+            if (accountHistories == null || accountHistories.isEmpty()) return null;
+
+            Double totalActiveStake = accountHistories.stream()
+                    .map(AccountHistory::getHistory)
+                    .flatMap(List::stream)
+                    .map(AccountHistoryInner::getActiveStake)
+                    .map(Double::valueOf)
+                    .reduce(0.0, Double::sum);
+
+            poolOwnerHistory = PoolOwnerHistory.builder()
+                    .activeStake(totalActiveStake)
+                    .epoch(epoch)
+                    .stakeAddresses(poolOwnerAddresses)
+                    .build();
+
         } catch (ApiException e) {
             e.printStackTrace();
         }
 
-        return activeStake;
+        return poolOwnerHistory;
     }
 
     @Override
