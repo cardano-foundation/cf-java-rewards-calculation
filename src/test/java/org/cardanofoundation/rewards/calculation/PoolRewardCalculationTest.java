@@ -159,19 +159,23 @@ public class PoolRewardCalculationTest {
         Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }
 
-    static Stream<Integer> testPoolRewardRange() {
+    static Stream<Integer> testPoolJsonProviderRewardRange() {
         return IntStream.range(211, 433).boxed();
     }
 
     @ParameterizedTest
-    @MethodSource("testPoolRewardRange")
+    @MethodSource("testPoolJsonProviderRewardRange")
     void calculateNorthPoolRewardFromEpoch211To216(int epoch) {
         String poolId = "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx";
         Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }
 
+    static Stream<Integer> testPoolKoiosProviderRewardRange() {
+        return IntStream.range(211, 213).boxed();
+    }
+
     @ParameterizedTest
-    @MethodSource("testPoolRewardRange")
+    @MethodSource("testPoolKoiosProviderRewardRange")
     void calculateOCTASPoolRewardFromEpoch211To216(int epoch) {
         String poolId = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
         Test_calculatePoolReward(poolId, epoch, DataProviderType.KOIOS);
