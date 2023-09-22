@@ -12,16 +12,23 @@ import static org.cardanofoundation.rewards.util.JsonConverter.readJsonFile;
 @Service
 public class JsonDataProvider implements DataProvider {
 
-    private String getResourceFolder(DataType dataType, Integer epoch) {
+    private String getResourceFolder(DataType dataType, Integer epoch, String poolId) {
         if (dataType.equals(POOL_DEREGISTRATIONS)) {
             return "./src/test/resources/poolDeregistrations/deregistrations.json";
-        } else {
+        } else if (dataType.equals(POOL_PARAMETERS)) {
+            return String.format("./src/test/resources/pools/%s/parameters_epoch_%d.json", poolId, epoch);
+        } else if (dataType.equals(POOL_HISTORY)) {
+            return String.format("./src/test/resources/pools/%s/history_epoch_%d.json", poolId, epoch);
+        } else if (dataType.equals(POOL_OWNER_HISTORY)) {
+            return String.format("./src/test/resources/pools/%s/owner_account_history_epoch_%d.json", poolId, epoch);
+        }
+        else {
             return String.format("./src/test/resources/%s/epoch%d.json", dataType.resourceFolderName, epoch);
         }
     }
 
-    private <T> T getDataFromJson(DataType dataType, int epoch, Class<T> objectClass) {
-        String filePath = getResourceFolder(dataType, epoch);
+    private <T> T getDataFromJson(DataType dataType, int epoch, Class<T> objectClass, String poolId) {
+        String filePath = getResourceFolder(dataType, epoch, poolId);
 
         try {
             return readJsonFile(filePath, objectClass);
@@ -31,8 +38,12 @@ public class JsonDataProvider implements DataProvider {
         return null;
     }
 
-    private <T> List<T> getListFromJson(DataType dataType, Integer epoch, Class<T> objectClass) {
-        String filePath = getResourceFolder(dataType, epoch);
+    private <T> T getDataFromJson(DataType dataType, int epoch, Class<T> objectClass) {
+        return getDataFromJson(dataType, epoch, objectClass, null);
+    }
+
+    private <T> List<T> getListFromJson(DataType dataType, Integer epoch, Class<T> objectClass, String poolId) {
+        String filePath = getResourceFolder(dataType, epoch, poolId);
 
         try {
             return convertFileJsonToArrayList(filePath, objectClass);
@@ -40,6 +51,10 @@ public class JsonDataProvider implements DataProvider {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private <T> List<T> getListFromJson(DataType dataType, Integer epoch, Class<T> objectClass) {
+        return getListFromJson(dataType, epoch, objectClass, null);
     }
 
     @Override
@@ -59,22 +74,21 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public PoolHistory getPoolHistory(String poolId, int epoch) {
-        return null;
+        return getDataFromJson(POOL_HISTORY, epoch, PoolHistory.class, poolId);
     }
 
     @Override
     public Double getPoolPledgeInEpoch(String poolId, int epoch) {
-        return null;
+        PoolParameters poolParameters = getDataFromJson(POOL_PARAMETERS, epoch, PoolParameters.class, poolId);
+
+        if (poolParameters == null) return null;
+
+        return poolParameters.getPledge();
     }
 
     @Override
-    public List<String> getPoolOwners(String poolId, int epoch) {
-        return null;
-    }
-
-    @Override
-    public Double getActiveStakesOfAddressesInEpoch(List<String> stakeAddresses, int epoch) {
-        return null;
+    public PoolOwnerHistory getHistoryOfPoolOwnersInEpoch(String poolId, int epoch) {
+        return getDataFromJson(POOL_OWNER_HISTORY, epoch, PoolOwnerHistory.class, poolId);
     }
 
     public List<String> getStakeAddressesOfAllPoolsEverRetired() {
