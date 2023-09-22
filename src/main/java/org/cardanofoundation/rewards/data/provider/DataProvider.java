@@ -1,9 +1,7 @@
 package org.cardanofoundation.rewards.data.provider;
 
-import org.cardanofoundation.rewards.entity.AdaPots;
-import org.cardanofoundation.rewards.entity.Epoch;
-import org.cardanofoundation.rewards.entity.ProtocolParameters;
-import org.cardanofoundation.rewards.entity.PoolHistory;
+import org.cardanofoundation.rewards.entity.*;
+
 import java.util.List;
 
 public interface DataProvider {
@@ -18,7 +16,9 @@ public interface DataProvider {
 
     public Double getPoolPledgeInEpoch(String poolId, int epoch);
 
-    public List<String> getPoolOwners(String poolId, int epoch);
+    public PoolOwnerHistory getHistoryOfPoolOwnersInEpoch(String poolId, int epoch);
 
-    public Double getActiveStakesOfAddressesInEpoch(List<String> stakeAddresses, int epoch);
+    public List<PoolDeregistration> getRetiredPoolsInEpoch(int epoch);
+
+    public List<AccountUpdate> getAccountUpdatesUntilEpoch(List<String> stakeAddresses, int epoch);
 }

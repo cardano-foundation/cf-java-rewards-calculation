@@ -1,12 +1,16 @@
 package org.cardanofoundation.rewards.calculation;
 
 import org.cardanofoundation.rewards.data.provider.DataProvider;
-import org.cardanofoundation.rewards.entity.AdaPots;
-import org.cardanofoundation.rewards.entity.Epoch;
-import org.cardanofoundation.rewards.entity.ProtocolParameters;
-import org.cardanofoundation.rewards.entity.TreasuryCalculationResult;
+import org.cardanofoundation.rewards.data.provider.JsonDataProvider;
+import org.cardanofoundation.rewards.data.provider.KoiosDataProvider;
+import org.cardanofoundation.rewards.entity.*;
+import org.cardanofoundation.rewards.enums.AccountUpdateAction;
 
-import static org.cardanofoundation.rewards.constants.RewardConstants.EXPECTED_SLOT_PER_EPOCH;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+import static org.cardanofoundation.rewards.constants.RewardConstants.*;
 import static org.cardanofoundation.rewards.util.CurrencyConverter.lovelaceToAda;
 
 public class TreasuryCalculation {
@@ -30,7 +34,7 @@ public class TreasuryCalculation {
   public static double calculateTotalRewardPotWithEta(double monetaryExpandRate, int totalBlocksInEpochByPools,
                                                          double decentralizationParameter, double reserve, double fee) {
     double eta = calculateEta(totalBlocksInEpochByPools, decentralizationParameter);
-    return Math.floor(reserve * monetaryExpandRate * eta + fee);
+    return Math.floor(reserve * monetaryExpandRate * eta) + fee;
   }
 
   /*
@@ -98,17 +102,9 @@ public class TreasuryCalculation {
     double treasuryForCurrentEpoch = TreasuryCalculation.calculateTreasury(
             treasuryGrowthRate, rewardPot, treasuryInPreviousEpoch);
 
-    /*
-      TODO: "For each retiring pool, the refund for the pool registration deposit is added to the
-       pool's registered reward account, provided the reward account is still registered." -
-       https://github.com/input-output-hk/cardano-ledger/blob/9e2f8151e3b9a0dde9faeb29a7dd2456e854427c/eras/shelley/formal-spec/epoch.tex#L546C9-L547C87
-
-
-       int retiredPoolsWithDeregisteredRewardAddress = koiosDataProvider.countRetiredPoolsWithDeregisteredRewardAddress(epoch - 1);
-
-       BigDecimal deposit = new BigDecimal(DEPOSIT_POOL_REGISTRATION_IN_ADA);
-       treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(deposit.multiply(new BigDecimal(retiredPoolsWithDeregisteredRewardAddress)));
-    */
+    // The sum of all the refunds attached to unregistered reward accounts are added to the
+    // treasury (see: Pool Reap Transition, p.53, figure 40, shely-ledger.pdf)
+    treasuryForCurrentEpoch += TreasuryCalculation.calculateUnclaimedRefundsForRetiredPools(epoch, dataProvider);
 
     return TreasuryCalculationResult.builder()
             .calculatedTreasury(treasuryForCurrentEpoch)
@@ -116,5 +112,45 @@ public class TreasuryCalculation {
             .epoch(epoch)
             .totalRewardPot(rewardPot)
             .build();
+  }
+
+  /*
+    "For each retiring pool, the refund for the pool registration deposit is added to the
+    pool's registered reward account, provided the reward account is still registered." -
+    https://github.com/input-output-hk/cardano-ledger/blob/9e2f8151e3b9a0dde9faeb29a7dd2456e854427c/eras/shelley/formal-spec/epoch.tex#L546C9-L547C87
+   */
+  public static Double calculateUnclaimedRefundsForRetiredPools(int epoch, DataProvider dataProvider) {
+    List<PoolDeregistration> retiredPools = dataProvider.getRetiredPoolsInEpoch(epoch);
+
+    double refunds = 0.0;
+
+    if (retiredPools.size() > 0) {
+      // The deposit will pay back one epoch later
+      List<AccountUpdate> accountUpdates = dataProvider.getAccountUpdatesUntilEpoch(
+              retiredPools.stream().map(PoolDeregistration::getRewardAddress).toList(), epoch - 1);
+
+      // Order list by unix block time
+      accountUpdates = accountUpdates.stream().filter(update ->
+              update.getAction().equals(AccountUpdateAction.DEREGISTRATION)
+              || update.getAction().equals(AccountUpdateAction.REGISTRATION)).sorted(
+              Comparator.comparing(AccountUpdate::getUnixBlockTime).reversed()).toList();
+
+      // only hold the latest account update for each reward address
+      // preventing the case of an unregistered reward address becoming registered again
+      List<AccountUpdate> latestAccountUpdates = new ArrayList<>();
+      for (AccountUpdate accountUpdate : accountUpdates) {
+        if (latestAccountUpdates.stream().map(AccountUpdate::getStakeAddress).noneMatch(stakeAddress -> stakeAddress.equals(accountUpdate.getStakeAddress()))) {
+          latestAccountUpdates.add(accountUpdate);
+        }
+      }
+
+      for (AccountUpdate lastAccountUpdate : latestAccountUpdates) {
+        if (lastAccountUpdate.getAction() == AccountUpdateAction.DEREGISTRATION) {
+          refunds += DEPOSIT_POOL_REGISTRATION_IN_LOVELACE;
+        }
+      }
+    }
+
+    return refunds;
   }
 }
