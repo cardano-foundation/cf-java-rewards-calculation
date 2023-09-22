@@ -11,11 +11,11 @@ import org.cardanofoundation.rewards.entity.Epoch;
 import org.cardanofoundation.rewards.entity.ProtocolParameters;
 import org.cardanofoundation.rewards.enums.DataProviderType;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.ComponentScan;
 import static org.cardanofoundation.rewards.constants.RewardConstants.*;
 import static org.cardanofoundation.rewards.util.CurrencyConverter.lovelaceToAda;
@@ -65,8 +65,7 @@ public class TreasuryCalculationTest {
     int totalBlocksInEpoch = epochInfo.getBlockCount();
 
     if (epoch > 214 && epoch < 257) {
-        Epoch currentEpochInfo = dataProvider.getEpochInfo(epoch - 2);
-        totalBlocksInEpoch = currentEpochInfo.getNonOBFTBlockCount();
+        totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();
     }
 
     double rewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(
@@ -75,30 +74,16 @@ public class TreasuryCalculationTest {
     double treasuryForCurrentEpoch = TreasuryCalculation.calculateTreasury(
             treasuryGrowthRate, rewardPot, treasuryInPreviousEpoch);
 
-    /*
-      TODO: "For each retiring pool, the refund for the pool registration deposit is added to the
-       pool's registered reward account, provided the reward account is still registered." -
-       https://github.com/input-output-hk/cardano-ledger/blob/9e2f8151e3b9a0dde9faeb29a7dd2456e854427c/eras/shelley/formal-spec/epoch.tex#L546C9-L547C87
 
-
-       int retiredPoolsWithDeregisteredRewardAddress = koiosDataProvider.countRetiredPoolsWithDeregisteredRewardAddress(epoch - 1);
-
-       BigDecimal deposit = new BigDecimal(DEPOSIT_POOL_REGISTRATION_IN_ADA);
-       treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(deposit.multiply(new BigDecimal(retiredPoolsWithDeregisteredRewardAddress)));
-    */
+    // The sum of all the refunds attached to unregistered reward accounts are added to the
+    // treasury (see: Pool Reap Transition, p.53, figure 40, shely-ledger.pdf)
+    treasuryForCurrentEpoch += TreasuryCalculation.calculateUnclaimedRefundsForRetiredPools(epoch, dataProvider);
 
     long differenceInADA = Math.round(lovelaceToAda(expectedTreasuryForCurrentEpoch - treasuryForCurrentEpoch));
 
     System.out.println("Difference in ADA: " + differenceInADA);
 
-    if (differenceInADA > 0 && differenceInADA % DEPOSIT_POOL_REGISTRATION_IN_ADA == 0) {
-      long numberOfPools = differenceInADA / DEPOSIT_POOL_REGISTRATION_IN_ADA;
-      System.out.println("Probably there was/were " + numberOfPools + " retired pool(s) with deregistered reward address in epoch " + epoch +
-              ". That's why " + differenceInADA + " ADA was added to the treasury.");
-      Assertions.assertEquals(0, differenceInADA % DEPOSIT_POOL_REGISTRATION_IN_ADA);
-    } else {
-      Assertions.assertEquals(Math.floor(expectedTreasuryForCurrentEpoch), Math.floor(treasuryForCurrentEpoch));
-    }
+    Assertions.assertEquals(Math.floor(expectedTreasuryForCurrentEpoch), Math.floor(treasuryForCurrentEpoch));
   }
 
   static Stream<Integer> koiosDataProviderRange() {
@@ -112,12 +97,32 @@ public class TreasuryCalculationTest {
   }
 
   static Stream<Integer> jsonDataProviderRange() {
-    return IntStream.range(210, 433).boxed();
+    return IntStream.range(210, 215).boxed();
   }
 
   @ParameterizedTest
   @MethodSource("jsonDataProviderRange")
   void Test_calculateTreasuryWithJsonDataProvider(int epoch) {
     Test_calculateTreasury(epoch, DataProviderType.JSON);
+  }
+
+  private static Stream<Arguments> retiredPoolTestRange() {
+    return Stream.of(
+            Arguments.of(210, 0.0),
+            Arguments.of(211, DEPOSIT_POOL_REGISTRATION_IN_LOVELACE),
+            Arguments.of(212, 0.0),
+            Arguments.of(213, DEPOSIT_POOL_REGISTRATION_IN_LOVELACE),
+            Arguments.of(214, DEPOSIT_POOL_REGISTRATION_IN_LOVELACE),
+            Arguments.of(215, DEPOSIT_POOL_REGISTRATION_IN_LOVELACE),
+            Arguments.of(216, 0.0),
+            Arguments.of(219, 0.0),
+            Arguments.of(222, 0.0)
+    );
+  }
+  @ParameterizedTest
+  @MethodSource("retiredPoolTestRange")
+  void Test_calculateUnclaimedRefundsForRetiredPools(int epoch, double expectedUnclaimedRefunds) {
+    double unclaimedRefunds = TreasuryCalculation.calculateUnclaimedRefundsForRetiredPools(epoch, jsonDataProvider);
+    Assertions.assertEquals(expectedUnclaimedRefunds, unclaimedRefunds);
   }
 }

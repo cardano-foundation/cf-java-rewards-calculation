@@ -7,10 +7,8 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdaPots {
+public class PoolDeregistration {
     private int epoch;
-    private Double treasury;
-    private Double reserves;
-    private Double rewards;
-    private Double adaInCirculation;
+    private String poolId;
+    private String rewardAddress;
 }
