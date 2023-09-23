@@ -5,9 +5,13 @@ import org.cardanofoundation.rewards.data.provider.KoiosDataProvider;
 import org.cardanofoundation.rewards.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rest.koios.client.backend.api.base.exception.ApiException;
+import rest.koios.client.backend.api.pool.model.PoolDelegatorHistory;
+import rest.koios.client.backend.factory.options.Options;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.enums.DataType.*;
@@ -206,10 +210,10 @@ public class KoiosDataFetcher implements DataFetcher{
 
     @Override
     public void fetch(int epoch, boolean override) {
-        fetchAdaPots(epoch, override);
+        /*fetchAdaPots(epoch, override);
         fetchEpochInfo(epoch, override);
         fetchProtocolParameters(epoch, override);
-        fetchAccountUpdates(epoch, override);
+        fetchAccountUpdates(epoch, override);*/
 
         List<String> poolIds = List.of(
             "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9",
@@ -223,9 +227,9 @@ public class KoiosDataFetcher implements DataFetcher{
         );
 
         for (String poolId : poolIds) {
-            fetchPoolPledgeInEpoch(poolId, epoch, override);
+            //fetchPoolPledgeInEpoch(poolId, epoch, override);
             fetchPoolHistoryByEpoch(poolId, epoch, override);
-            fetchPoolOwnersStakeInEpoch(poolId, epoch, override);
+            //fetchPoolOwnersStakeInEpoch(poolId, epoch, override);
         }
     }
 }

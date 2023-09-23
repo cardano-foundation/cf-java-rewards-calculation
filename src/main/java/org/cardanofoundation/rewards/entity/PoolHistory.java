@@ -2,6 +2,8 @@ package org.cardanofoundation.rewards.entity;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Builder
@@ -13,6 +15,7 @@ public class PoolHistory {
     private Double poolFees;
     private Double margin;
     private Double fixedCost;
+    private List<Delegator> delegators;
     private int blockCount;
     private int epoch;
 }

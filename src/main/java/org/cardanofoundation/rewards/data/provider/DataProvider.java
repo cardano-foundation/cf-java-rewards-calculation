@@ -21,4 +21,5 @@ public interface DataProvider {
     public List<PoolDeregistration> getRetiredPoolsInEpoch(int epoch);
 
     public List<AccountUpdate> getAccountUpdatesUntilEpoch(List<String> stakeAddresses, int epoch);
+
 }
