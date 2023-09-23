@@ -13,6 +13,7 @@ import rest.koios.client.backend.api.block.model.Block;
 import rest.koios.client.backend.api.epoch.model.EpochInfo;
 import rest.koios.client.backend.api.epoch.model.EpochParams;
 import rest.koios.client.backend.api.network.model.Totals;
+import rest.koios.client.backend.api.pool.model.PoolDelegatorHistory;
 import rest.koios.client.backend.api.pool.model.PoolUpdate;
 import rest.koios.client.backend.factory.BackendFactory;
 import rest.koios.client.backend.factory.BackendService;
@@ -103,7 +104,13 @@ public class KoiosDataProvider implements DataProvider {
             e.printStackTrace();
         }
 
-        return PoolHistoryMapper.fromKoiosPoolHistory(poolHistory);
+        PoolHistory history = PoolHistoryMapper.fromKoiosPoolHistory(poolHistory);
+
+        if (history == null) return null;
+
+        List<Delegator> poolMemberInEpoch = getPoolMemberInEpoch(poolId, epoch);
+        history.setDelegators(poolMemberInEpoch);
+        return history;
     }
 
     @Override
@@ -216,5 +223,22 @@ public class KoiosDataProvider implements DataProvider {
         }
 
         return accountUpdates;
+    }
+
+    private List<Delegator> getPoolMemberInEpoch(String poolId, int epoch) {
+        List<Delegator> delegators = new ArrayList<>();
+        try {
+            List<PoolDelegatorHistory> poolDelegatorsHistory = koiosBackendService
+                    .getPoolService().getPoolDelegatorsHistory(poolId, epoch, Options.EMPTY).getValue();
+            for (PoolDelegatorHistory poolDelegator : poolDelegatorsHistory) {
+                delegators.add(Delegator.builder()
+                        .activeStake(Double.valueOf(poolDelegator.getAmount()))
+                        .stakeAddress(poolDelegator.getStakeAddress())
+                        .build());
+            }
+        } catch (ApiException e) {
+            e.printStackTrace();
+        }
+        return delegators;
     }
 }

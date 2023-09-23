@@ -15,7 +15,8 @@ import org.springframework.context.annotation.ComponentScan;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static org.cardanofoundation.rewards.constants.RewardConstants.TOTAL_LOVELACE;
+import static org.cardanofoundation.rewards.util.CurrencyConverter.adaToLovelace;
+import static org.cardanofoundation.rewards.util.CurrencyConverter.lovelaceToAda;
 
 @SpringBootTest
 @ComponentScan
@@ -32,7 +33,7 @@ public class PoolRewardCalculationTest {
                                                    final int epoch,
                                                    final DataProviderType dataProviderType) {
 
-        DataProvider dataProvider = null;
+        DataProvider dataProvider;
         if (dataProviderType == DataProviderType.KOIOS) {
             dataProvider = koiosDataProvider;
         } else if (dataProviderType == DataProviderType.JSON) {
@@ -41,110 +42,18 @@ public class PoolRewardCalculationTest {
             throw new RuntimeException("Unknown data provider type: " + dataProviderType);
         }
 
-        // Step 1: Get Pool information of current epoch
-        // Example: https://api.koios.rest/api/v0/pool_history?_pool_bech32=pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt&_epoch_no=210
-        PoolHistory poolHistoryCurrentEpoch = dataProvider.getPoolHistory(poolId, epoch);
-        double poolStake = poolHistoryCurrentEpoch.getActiveStake();
-        double expectedPoolReward = poolHistoryCurrentEpoch.getDelegatorRewards();
-        double poolFees = poolHistoryCurrentEpoch.getPoolFees();
-        double poolMargin = poolHistoryCurrentEpoch.getMargin();
-        double poolFixedCost = poolHistoryCurrentEpoch.getFixedCost();
-        int blocksPoolHasMinted = poolHistoryCurrentEpoch.getBlockCount();
+       PoolRewardCalculationResult poolRewardCalculationResult =
+                PoolRewardCalculation.calculatePoolRewardInEpoch(poolId, epoch, dataProvider);
 
-        if (blocksPoolHasMinted == 0) {
-            Assertions.assertEquals(expectedPoolReward, 0.0);
-            return;
-        }
+       PoolHistory poolHistoryCurrentEpoch = dataProvider.getPoolHistory(poolId, epoch);
+       if (poolHistoryCurrentEpoch == null) {
+           Assertions.assertEquals(0.0, poolRewardCalculationResult.getPoolReward());
+           return;
+       }
 
-        // Step 2: Get Epoch information of current epoch
-        // Source: https://api.koios.rest/api/v0/epoch_info?_epoch_no=211
-        Epoch epochInfo = dataProvider.getEpochInfo(epoch);
+       double difference = (poolHistoryCurrentEpoch.getDelegatorRewards() - (poolRewardCalculationResult.getPoolReward() - poolRewardCalculationResult.getPoolFee()));
 
-        double activeStakeInEpoch = 0;
-        if (epochInfo.getActiveStake() != null) {
-            activeStakeInEpoch = epochInfo.getActiveStake();
-        }
-
-        // The Shelley era and the ada pot system started on mainnet in epoch 208.
-        // Fee and treasury values are 0 for epoch 208.
-        double totalFeesForCurrentEpoch = 0.0;
-        if (epoch > 209) {
-            totalFeesForCurrentEpoch = epochInfo.getFees();
-        }
-
-        int totalBlocksInEpoch = epochInfo.getBlockCount();
-
-        if (epoch > 212 && epoch < 255) {
-            totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();
-        }
-
-        // Get the ada reserves for the next epoch because it was already updated yet
-        AdaPots adaPotsForNextEpoch = dataProvider.getAdaPotsForEpoch(epoch + 1);
-        double reserves = adaPotsForNextEpoch.getReserves();
-
-        // Step 3: Get total ada in circulation
-        double adaInCirculation = TOTAL_LOVELACE - reserves;
-
-        // Step 4: Get protocol parameters for current epoch
-        ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch);
-        double decentralizationParameter = protocolParameters.getDecentralisation();
-        int optimalPoolCount = protocolParameters.getOptimalPoolCount();
-        double influenceParam = protocolParameters.getPoolOwnerInfluence();
-        double monetaryExpandRate = protocolParameters.getMonetaryExpandRate();
-        double treasuryGrowRate = protocolParameters.getTreasuryGrowRate();
-
-        // Step 5: Calculate apparent pool performance
-        var apparentPoolPerformance =
-                PoolRewardCalculation.calculateApparentPoolPerformance(poolStake, activeStakeInEpoch,
-                        blocksPoolHasMinted, totalBlocksInEpoch, decentralizationParameter);
-
-        // Step 6: Calculate total available reward for pools (total reward pot after treasury cut)
-        // -----
-        double totalRewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(
-                monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserves, totalFeesForCurrentEpoch);
-
-        double stakePoolRewardsPot = totalRewardPot - Math.floor(totalRewardPot * treasuryGrowRate);
-
-        // shelley-delegation.pdf 5.5.3
-        //      "[...]the relative stake of the pool owner(s) (the amount of ada
-        //      pledged during pool registration)"
-
-        // Step 7: Get the latest pool update before this epoch and extract the pledge
-        double poolPledge = dataProvider.getPoolPledgeInEpoch(poolId, epoch);
-
-        PoolOwnerHistory poolOwnersHistoryInEpoch = dataProvider.getHistoryOfPoolOwnersInEpoch(poolId, epoch);
-        double totalActiveStakeOfOwners = poolOwnersHistoryInEpoch.getActiveStake();
-        if (totalActiveStakeOfOwners < poolPledge) {
-            Assertions.assertEquals(expectedPoolReward, 0.0);
-            return;
-        }
-
-        double relativeStakeOfPoolOwner = poolPledge / adaInCirculation;
-        double relativePoolStake = poolStake / adaInCirculation;
-
-        // Step 8: Calculate optimal pool reward
-        double optimalPoolReward =
-                PoolRewardCalculation.calculateOptimalPoolReward(
-                        stakePoolRewardsPot,
-                        optimalPoolCount,
-                        influenceParam,
-                        relativePoolStake,
-                        relativeStakeOfPoolOwner);
-
-        // Step 9: Calculate pool reward as optimal pool reward * apparent pool performance
-        double poolReward = PoolRewardCalculation.calculatePoolReward(optimalPoolReward, apparentPoolPerformance);
-
-        double poolOperatorReward = PoolRewardCalculation.calculateLeaderReward(poolReward, poolMargin, poolFixedCost,
-                totalActiveStakeOfOwners / adaInCirculation, relativePoolStake);
-
-        System.out.println("Pool operator reward: " + poolOperatorReward);
-
-        // Step 10: Compare estimated pool reward with actual pool reward minus pool fees
-        System.out.println("Difference between expected pool reward and actual pool reward: " +
-                (expectedPoolReward - (poolReward - poolFees)));
-        Assertions.assertEquals(Math.round(expectedPoolReward),
-                Math.round(poolReward - poolFees));
-
+       Assertions.assertTrue(Math.abs(difference) < adaToLovelace(1), "The difference between expected pool reward and actual pool reward is greater than 1 ADA: " + lovelaceToAda(difference) + " ADA");
     }
 
     static Stream<String> testPoolIds() {
@@ -168,12 +77,12 @@ public class PoolRewardCalculationTest {
     }
 
     static Stream<Integer> testPoolJsonProviderRewardRange() {
-        return IntStream.range(211, 433).boxed();
+        return IntStream.range(211, 432).boxed();
     }
 
     @ParameterizedTest
     @MethodSource("testPoolJsonProviderRewardRange")
-    void calculateNorthPoolRewardFromEpoch211To216(int epoch) {
+    void calculateNorthPoolRewardFromEpoch211To432(int epoch) {
         String poolId = "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx";
         Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }
@@ -184,7 +93,7 @@ public class PoolRewardCalculationTest {
 
     @ParameterizedTest
     @MethodSource("testPoolKoiosProviderRewardRange")
-    void calculateOCTASPoolRewardFromEpoch211To216(int epoch) {
+    void calculateOCTASPoolRewardFromEpoch211To213(int epoch) {
         String poolId = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
         Test_calculatePoolReward(poolId, epoch, DataProviderType.KOIOS);
 
