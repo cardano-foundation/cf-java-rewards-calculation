@@ -31,8 +31,8 @@ flowchart
     D --> | <a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87'>Rewards Equation<br /> for Pool 2</a> | H[Stake Pool 2]
     D --> I[...]
     D --> | <a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87'>Rewards Equation<br /> for Pool n</a> | J[Stake Pool n]
-    J --> | <b><i>margin & minPoolCost</i></b> | K[Operators]
-    J --> | <b><i>rewards</b></i> | L[Delegators]
+    J --> | <a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a3151888e3133937b6098efdec72b587d88ba4cd/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L85'><b><i>margin & minPoolCost</i></b></a> | K[Operators]
+    J --> | <a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a3151888e3133937b6098efdec72b587d88ba4cd/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L102'><b><i>rewards</b></i></a> | L[Delegators]
     D --> | Capped Pool Rewards | C
     L <--> | Stake Key Registration & <br /> Deregistration | M[Deposits]
     K <--> | Stake Pool Registration & <br /> Deregistration | M
