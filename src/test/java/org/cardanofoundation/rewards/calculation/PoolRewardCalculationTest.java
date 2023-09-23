@@ -47,6 +47,8 @@ public class PoolRewardCalculationTest {
         double poolStake = poolHistoryCurrentEpoch.getActiveStake();
         double expectedPoolReward = poolHistoryCurrentEpoch.getDelegatorRewards();
         double poolFees = poolHistoryCurrentEpoch.getPoolFees();
+        double poolMargin = poolHistoryCurrentEpoch.getMargin();
+        double poolFixedCost = poolHistoryCurrentEpoch.getFixedCost();
         int blocksPoolHasMinted = poolHistoryCurrentEpoch.getBlockCount();
 
         if (blocksPoolHasMinted == 0) {
@@ -108,15 +110,16 @@ public class PoolRewardCalculationTest {
         //      pledged during pool registration)"
 
         // Step 7: Get the latest pool update before this epoch and extract the pledge
-        double poolOwnerActiveStake = dataProvider.getPoolPledgeInEpoch(poolId, epoch);
+        double poolPledge = dataProvider.getPoolPledgeInEpoch(poolId, epoch);
 
         PoolOwnerHistory poolOwnersHistoryInEpoch = dataProvider.getHistoryOfPoolOwnersInEpoch(poolId, epoch);
-        if (poolOwnersHistoryInEpoch.getActiveStake() < poolOwnerActiveStake) {
+        double totalActiveStakeOfOwners = poolOwnersHistoryInEpoch.getActiveStake();
+        if (totalActiveStakeOfOwners < poolPledge) {
             Assertions.assertEquals(expectedPoolReward, 0.0);
             return;
         }
 
-        double relativeStakeOfPoolOwner = poolOwnerActiveStake / adaInCirculation;
+        double relativeStakeOfPoolOwner = poolPledge / adaInCirculation;
         double relativePoolStake = poolStake / adaInCirculation;
 
         // Step 8: Calculate optimal pool reward
@@ -130,6 +133,11 @@ public class PoolRewardCalculationTest {
 
         // Step 9: Calculate pool reward as optimal pool reward * apparent pool performance
         double poolReward = PoolRewardCalculation.calculatePoolReward(optimalPoolReward, apparentPoolPerformance);
+
+        double poolOperatorReward = PoolRewardCalculation.calculateLeaderReward(poolReward, poolMargin, poolFixedCost,
+                totalActiveStakeOfOwners / adaInCirculation, relativePoolStake);
+
+        System.out.println("Pool operator reward: " + poolOperatorReward);
 
         // Step 10: Compare estimated pool reward with actual pool reward minus pool fees
         System.out.println("Difference between expected pool reward and actual pool reward: " +
@@ -154,7 +162,7 @@ public class PoolRewardCalculationTest {
 
     @ParameterizedTest
     @MethodSource("testPoolIds")
-    void calculatePoolRewardInEpoch211(String poolId) {
+    void calculatePoolRewardInEpoch213(String poolId) {
         int epoch = 213;
         Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }

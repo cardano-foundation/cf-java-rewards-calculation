@@ -77,4 +77,30 @@ public class PoolRewardCalculation {
     public static double calculatePoolReward(double optimalPoolReward, double poolPerformance) {
         return optimalPoolReward * poolPerformance;
     }
+
+    /*
+     * This method calculates the pool operator reward regarding the formula described
+     * in the shelly-ledger.pdf p. 61, figure 47
+     */
+    public static double calculateLeaderReward(double poolReward, double margin, double poolCost,
+                                               double relativeOwnerStake, double relativeStakeOfPool) {
+        if (poolReward <= poolCost) {
+            return poolCost;
+        }
+
+        return poolCost +
+                Math.floor((poolReward - poolCost) *
+                        (margin + (1 - margin) * (relativeOwnerStake / relativeStakeOfPool)));
+    }
+
+    /*
+     * This method calculates the pool member reward regarding the formula described
+     * in the shelly-ledger.pdf p. 61, figure 47
+     *
+     * See Haskell implementation: https://github.com/input-output-hk/cardano-ledger/blob/aed5dde9cd1096cfc2e255879cd617c0d64f8d9d/eras/shelley/impl/src/Cardano/Ledger/Shelley/Rewards.hs#L117
+     */
+    public static double calculateMemberReward(double poolReward, double margin, double poolCost,
+                                               double relativeMemberStake, double relativeStakeOfPool) {
+        return Math.floor((poolReward - poolCost) * (1 - margin) * relativeMemberStake / relativeStakeOfPool);
+    }
 }
