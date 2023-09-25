@@ -8,7 +8,8 @@ public enum DataType {
     POOL_PARAMETERS ("poolParameters"),
     POOL_HISTORY ("poolHistory"),
     ACCOUNT_UPDATES ("accountUpdates"),
-    POOL_OWNER_HISTORY("accountHistory");
+    POOL_OWNER_HISTORY("accountHistory"),
+    MIR_CERTIFICATE("mirCertificates");
 
     public final String resourceFolderName;
 

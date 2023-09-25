@@ -22,6 +22,7 @@ import rest.koios.client.backend.factory.options.filters.Filter;
 import rest.koios.client.backend.factory.options.filters.FilterType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +56,14 @@ public class KoiosDataProvider implements DataProvider {
                     .getEpochInformationByEpoch(epoch).getValue();
 
             epochEntity = EpochMapper.fromKoiosEpochInfo(epochInfo);
+            List<Block> blocks = new ArrayList<>();
+            for (int offset = 0; offset < epochEntity.getBlockCount(); offset += 1000) {
+                blocks.addAll(koiosBackendService.getBlockService().getBlockList(Options.builder()
+                        .option(Filter.of("epoch_no", FilterType.EQ, String.valueOf(epoch)))
+                        .option(Offset.of(offset))
+                        .build()).getValue());
+            }
+            epochEntity.setPoolsMadeBlocks(blocks.stream().map(Block::getPool).filter(Objects::nonNull).distinct().toList());
             if (epoch < 211) {
                 epochEntity.setOBFTBlockCount(epochEntity.getBlockCount());
                 epochEntity.setNonOBFTBlockCount(0);
@@ -62,14 +71,6 @@ public class KoiosDataProvider implements DataProvider {
                 epochEntity.setOBFTBlockCount(0);
                 epochEntity.setNonOBFTBlockCount(epochEntity.getBlockCount());
             } else {
-                List<Block> blocks = new ArrayList<>();
-                for (int offset = 0; offset < epochEntity.getBlockCount(); offset += 1000) {
-                    blocks.addAll(koiosBackendService.getBlockService().getBlockList(Options.builder()
-                            .option(Filter.of("epoch_no", FilterType.EQ, String.valueOf(epoch)))
-                            .option(Offset.of(offset))
-                            .build()).getValue());
-                }
-
                 epochEntity.setOBFTBlockCount((int) blocks.stream().filter(block -> block.getPool() == null).count());
                 epochEntity.setNonOBFTBlockCount((int) blocks.stream().filter(block -> block.getPool() != null).count());
             }
@@ -223,6 +224,11 @@ public class KoiosDataProvider implements DataProvider {
         }
 
         return accountUpdates;
+    }
+
+    @Override
+    public List<MirCertificate> getMirCertificatesInEpoch(int epoch) {
+        return null;
     }
 
     private List<Delegator> getPoolMemberInEpoch(String poolId, int epoch) {
