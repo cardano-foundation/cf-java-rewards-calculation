@@ -1,1 +1,1 @@
-{"activeStake":9.21745179434E11,"delegatorRewards":0.0,"poolFees":0.0,"blockCount":0,"epoch":210}
+{"activeStake":9.21745179434E11,"delegatorRewards":0.0,"poolFees":0.0,"margin":0.01,"fixedCost":3.4E8,"delegators":[{"stakeAddress":"stake1uygzlhxmu0u7ausxnpvzfv6smdlxkw0l4a36gz3frq6kk2su4x75y","activeStake":8.21638519661E11},{"stakeAddress":"stake1u9snzc3kmfr9kdauycyuwemke5daf6h6dytdmuht5sqn6rqxjnklw","activeStake":1.00106659773E11}],"blockCount":0,"epoch":210}

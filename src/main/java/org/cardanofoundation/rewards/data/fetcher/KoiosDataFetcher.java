@@ -5,9 +5,13 @@ import org.cardanofoundation.rewards.data.provider.KoiosDataProvider;
 import org.cardanofoundation.rewards.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rest.koios.client.backend.api.base.exception.ApiException;
+import rest.koios.client.backend.api.pool.model.PoolDelegatorHistory;
+import rest.koios.client.backend.factory.options.Options;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.enums.DataType.*;
