@@ -11,7 +11,7 @@
 
   <groupId>org.cardanofoundation</groupId>
   <artifactId>rewards</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>0.1.0</version>
   <name>cardano-reward-calculation</name>
   <packaging>jar</packaging>
   <description>This project aims to be a cardano reward calculation, java formula implementation and edge case documentation</description>
