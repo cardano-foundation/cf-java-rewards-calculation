@@ -89,9 +89,8 @@ public class TreasuryCalculation {
 
     int totalBlocksInEpoch = epochInfo.getBlockCount();
 
-    if (epoch > 214 && epoch < 257) {
-      Epoch currentEpochInfo = dataProvider.getEpochInfo(epoch - 2);
-      totalBlocksInEpoch = currentEpochInfo.getNonOBFTBlockCount();
+    if (decentralizationParameter < 0.8 && decentralizationParameter > 0.0) {
+      totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();
     }
 
     double rewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(

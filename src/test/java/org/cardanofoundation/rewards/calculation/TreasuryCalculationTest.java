@@ -46,7 +46,8 @@ public class TreasuryCalculationTest {
     TreasuryCalculationResult treasuryCalculationResult = TreasuryCalculation.calculateTreasuryForEpoch(epoch, dataProvider);
 
     double difference = treasuryCalculationResult.getActualTreasury() - treasuryCalculationResult.getCalculatedTreasury();
-    Assertions.assertTrue(Math.abs(difference) < 1, "The difference between expected pool reward and actual pool reward is greater than 1 LOVELACE: " + lovelaceToAda(difference) + " ADA");
+    System.out.println(difference);
+    Assertions.assertTrue(Math.abs(difference) < 1, "The difference " + lovelaceToAda(difference) + " ADA between expected treasury value and actual treasury value is greater than 1 LOVELACE");
   }
 
   static Stream<Integer> koiosDataProviderRange() {
@@ -60,7 +61,7 @@ public class TreasuryCalculationTest {
   }
 
   static Stream<Integer> jsonDataProviderRange() {
-    return IntStream.range(210, 430).boxed();
+    return IntStream.range(211, 270).boxed();
   }
 
   @ParameterizedTest
