@@ -36,7 +36,7 @@ flowchart
     D --> | Capped Pool Rewards | C
     L <--> | Stake Key Registration & <br /> Deregistration | M[Deposits]
     K <--> | Stake Pool Registration & <br /> Deregistration | M
-    M --> | Unclaimed Refunds for Retired Pools | C
+    M --> | <a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/1ed16503d7ed592410d55489cc2144762ce718d5/src/main/java/org/cardanofoundation/rewards/calculation/TreasuryCalculation.java#L122'>Unclaimed Refunds for Retired Pools</a> | C
     end
 
     style A fill:#5C8DFF,stroke:#5C8DFF
