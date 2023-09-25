@@ -19,6 +19,8 @@ public class EpochMapper {
                 .fees(Double.valueOf(epochInfo.getFees()))
                 .blockCount(epochInfo.getBlkCount())
                 .activeStake(activeStake)
+                .unixTimeFirstBlock(epochInfo.getFirstBlockTime())
+                .unixTimeLastBlock(epochInfo.getLastBlockTime())
                 .build();
     }
 }

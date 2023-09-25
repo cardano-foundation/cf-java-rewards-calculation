@@ -22,4 +22,5 @@ public interface DataProvider {
 
     public List<AccountUpdate> getAccountUpdatesUntilEpoch(List<String> stakeAddresses, int epoch);
 
+    public List<MirCertificate> getMirCertificatesInEpoch(int epoch);
 }
