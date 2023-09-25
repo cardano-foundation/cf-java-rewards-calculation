@@ -21,8 +21,9 @@ public class JsonDataProvider implements DataProvider {
             return String.format("./src/test/resources/pools/%s/history_epoch_%d.json", poolId, epoch);
         } else if (dataType.equals(POOL_OWNER_HISTORY)) {
             return String.format("./src/test/resources/pools/%s/owner_account_history_epoch_%d.json", poolId, epoch);
-        }
-        else {
+        } else if (dataType.equals(MIR_CERTIFICATE)) {
+            return "./src/test/resources/mirCertificates/mirCertificates.json";
+        } else {
             return String.format("./src/test/resources/%s/epoch%d.json", dataType.resourceFolderName, epoch);
         }
     }
@@ -116,5 +117,17 @@ public class JsonDataProvider implements DataProvider {
         List<AccountUpdate> accountUpdates = getListFromJson(ACCOUNT_UPDATES, epoch, AccountUpdate.class);
         if (accountUpdates == null) return List.of();
         return accountUpdates.stream().filter(accountUpdate -> stakeAddresses.contains(accountUpdate.getStakeAddress())).toList();
+    }
+
+    @Override
+    public List<MirCertificate> getMirCertificatesInEpoch(int epoch) {
+        List<MirCertificate> mirCertificates = getListFromJson(MIR_CERTIFICATE, epoch, MirCertificate.class);
+        Epoch epochInfo = getDataFromJson(EPOCH_INFO, epoch, Epoch.class);
+        if (mirCertificates == null || epochInfo == null) return List.of();
+
+        return mirCertificates.stream()
+                .filter(mirCertificate -> mirCertificate.getBlockTime() <= epochInfo.getUnixTimeLastBlock())
+                .filter(mirCertificate -> mirCertificate.getBlockTime() >= epochInfo.getUnixTimeFirstBlock())
+                .toList();
     }
 }

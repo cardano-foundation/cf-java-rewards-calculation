@@ -11,6 +11,8 @@ public class PoolHistoryMapper {
             .activeStake(Double.parseDouble(poolHistory.getActiveStake()))
             .delegatorRewards(Double.parseDouble(poolHistory.getDelegRewards()))
             .poolFees(Double.parseDouble(poolHistory.getPoolFees()))
+            .margin(Double.parseDouble(String.valueOf(poolHistory.getMargin())))
+            .fixedCost(Double.parseDouble(String.valueOf(poolHistory.getFixedCost())))
             .blockCount(poolHistory.getBlockCnt())
             .epoch(poolHistory.getEpochNo())
             .build();

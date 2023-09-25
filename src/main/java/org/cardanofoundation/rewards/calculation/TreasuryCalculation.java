@@ -1,17 +1,15 @@
 package org.cardanofoundation.rewards.calculation;
 
 import org.cardanofoundation.rewards.data.provider.DataProvider;
-import org.cardanofoundation.rewards.data.provider.JsonDataProvider;
-import org.cardanofoundation.rewards.data.provider.KoiosDataProvider;
 import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.enums.AccountUpdateAction;
+import org.cardanofoundation.rewards.enums.MirPot;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.constants.RewardConstants.*;
-import static org.cardanofoundation.rewards.util.CurrencyConverter.lovelaceToAda;
 
 public class TreasuryCalculation {
 
@@ -105,6 +103,14 @@ public class TreasuryCalculation {
     // The sum of all the refunds attached to unregistered reward accounts are added to the
     // treasury (see: Pool Reap Transition, p.53, figure 40, shely-ledger.pdf)
     treasuryForCurrentEpoch += TreasuryCalculation.calculateUnclaimedRefundsForRetiredPools(epoch, dataProvider);
+
+    // Check if there was a MIR Certificate in the previous epoch
+    List<MirCertificate> mirCertificates = dataProvider.getMirCertificatesInEpoch(epoch - 1);
+    for (MirCertificate mirCertificate : mirCertificates) {
+      if (mirCertificate.getPot() == MirPot.TREASURY) {
+        treasuryForCurrentEpoch -= mirCertificate.getTotalRewards();
+      }
+    }
 
     return TreasuryCalculationResult.builder()
             .calculatedTreasury(treasuryForCurrentEpoch)
