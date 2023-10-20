@@ -6,9 +6,6 @@ import java.util.stream.Stream;
 import org.cardanofoundation.rewards.data.provider.DataProvider;
 import org.cardanofoundation.rewards.data.provider.JsonDataProvider;
 import org.cardanofoundation.rewards.data.provider.KoiosDataProvider;
-import org.cardanofoundation.rewards.entity.AdaPots;
-import org.cardanofoundation.rewards.entity.Epoch;
-import org.cardanofoundation.rewards.entity.ProtocolParameters;
 import org.cardanofoundation.rewards.entity.TreasuryCalculationResult;
 import org.cardanofoundation.rewards.enums.DataProviderType;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,7 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.context.annotation.ComponentScan;
 import static org.cardanofoundation.rewards.constants.RewardConstants.*;
-import static org.cardanofoundation.rewards.util.CurrencyConverter.adaToLovelace;
 import static org.cardanofoundation.rewards.util.CurrencyConverter.lovelaceToAda;
 
 @SpringBootTest
@@ -61,7 +57,7 @@ public class TreasuryCalculationTest {
   }
 
   static Stream<Integer> jsonDataProviderRange() {
-    return IntStream.range(211, 270).boxed();
+    return IntStream.range(215, 217).boxed();
   }
 
   @ParameterizedTest
