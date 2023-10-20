@@ -1,51 +1,36 @@
+
+---
 spring:
+  config:
+    activate:
+      on-profile: db-sync
+
+  flyway:
+    enabled: false
+
   datasource:
-    url: ${DB_URL:jdbc:h2:mem:rewards}
-    username: ${DB_USERNAME:sa}
-    password: ${DB_PASSWORD:password}
-    driver-class-name: org.h2.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      read-only: true
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:54321}/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
 
   jpa:
-    generate-ddl: true
     open-in-view: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
     properties:
+      javax:
+        persistence:
+          readOnly: true
       hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
-        ddl-auto: update
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        ddl-auto: none
         show_sql: false
         format_sql: true
         jdbc:
           batch_size: 100
-
-  task:
-    execution:
-      pool:
-        max-size: 2
-        core-size: 2
-        queue-capacity: 50
-      thread-name-prefix: Executorxx-
-
-  flyway:
-    locations:
-      - classpath:db/migration
-    out-of-order: true
-
-application:
-  network-magic: ${NETWORK_MAGIC:764824073} #mainnet
-
-logging:
-  level:
-    org.org.cardanofoundation: ${LOG:DEBUG}
-
-blocks:
-  batch-size: ${BLOCKS_BATCH_SIZE:1000}
-  commitThreshold: ${COMMIT_THRESHOLD:3000}
-
-jobs:
-  fetch-pool-offline-data:
-    delay: 172800000
-  insert-pool-offline-data:
-    delay: 180000
-    innit: 5000
-  install-batch: 100
+        temp:
+          use_jdbc_metadata_defaults: false
