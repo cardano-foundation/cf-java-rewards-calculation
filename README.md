@@ -69,11 +69,12 @@ cd cf-java-rewards-calculation
 ```
 
 ## 🫡 Todo
- - [ ] Include MIR certificates
+ - [X] Include MIR certificates
  - [ ] Add a `/docs` folder containing parsable Markdown files to explain MIR certificates and edge cases
  - [ ] Implement "The difference between the maximal amount and the actual amount received is added to the amount moved to the treasury" (shelley-ledger.pdf p.65)
  - [ ] Enhance reporting and add values for the other pots as well. Include information from the `/docs` folder
- - [ ] Add member and operator reward calculation as well as the deposits pot
+ - [X] Calculate member and operator rewards
+ - [ ] Add deposits and utxo pot
  - [ ] Calculate unclaimed rewards that need to go back to the reserves
 
 ## 📖 Sources
