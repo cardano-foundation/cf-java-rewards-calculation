@@ -1,8 +1,11 @@
 package org.cardanofoundation.rewards.data.provider;
 
 import org.cardanofoundation.rewards.entity.*;
+import org.cardanofoundation.rewards.entity.jpa.DbSyncAdaPots;
 import org.cardanofoundation.rewards.entity.jpa.DbSyncEpoch;
+import org.cardanofoundation.rewards.mapper.AdaPotsMapper;
 import org.cardanofoundation.rewards.mapper.EpochMapper;
+import org.cardanofoundation.rewards.repository.DbSyncAdaPotsRepository;
 import org.cardanofoundation.rewards.repository.DbSyncEpochRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -17,9 +20,13 @@ public class DbSyncDataProvider implements DataProvider {
     @Autowired
     DbSyncEpochRepository dbSyncEpochRepository;
 
+    @Autowired
+    DbSyncAdaPotsRepository dbSyncAdaPotsRepository;
+
     @Override
     public AdaPots getAdaPotsForEpoch(int epoch) {
-        return null;
+        DbSyncAdaPots dbSyncAdaPots = dbSyncAdaPotsRepository.findByEpoch(epoch);
+        return AdaPotsMapper.fromDbSyncAdaPots(dbSyncAdaPots);
     }
 
     @Override
