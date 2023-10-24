@@ -1,6 +1,7 @@
 package org.cardanofoundation.rewards.mapper;
 
 import org.cardanofoundation.rewards.entity.ProtocolParameters;
+import org.cardanofoundation.rewards.entity.jpa.DbSyncProtocolParameters;
 import rest.koios.client.backend.api.epoch.model.EpochParams;
 
 public class ProtocolParametersMapper {
@@ -14,6 +15,18 @@ public class ProtocolParametersMapper {
             .treasuryGrowRate(epochParams.getTreasuryGrowthRate().doubleValue())
             .optimalPoolCount(epochParams.getOptimalPoolCount())
             .poolOwnerInfluence(epochParams.getInfluence().doubleValue())
+            .build();
+    }
+
+    public static ProtocolParameters fromDbSyncProtocolParameters(DbSyncProtocolParameters dbSyncProtocolParameters) {
+        if (dbSyncProtocolParameters == null) return null;
+
+        return ProtocolParameters.builder()
+            .decentralisation(dbSyncProtocolParameters.getDecentralisation())
+            .monetaryExpandRate(dbSyncProtocolParameters.getMonetaryExpandRate())
+            .treasuryGrowRate(dbSyncProtocolParameters.getTreasuryGrowRate())
+            .optimalPoolCount(dbSyncProtocolParameters.getOptimalPoolCount())
+            .poolOwnerInfluence(dbSyncProtocolParameters.getPoolOwnerInfluence())
             .build();
     }
 }
