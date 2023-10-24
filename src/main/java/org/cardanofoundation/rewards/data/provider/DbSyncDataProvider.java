@@ -3,14 +3,21 @@ package org.cardanofoundation.rewards.data.provider;
 import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.entity.jpa.DbSyncAdaPots;
 import org.cardanofoundation.rewards.entity.jpa.DbSyncEpoch;
+import org.cardanofoundation.rewards.entity.jpa.EpochStake;
+import org.cardanofoundation.rewards.entity.jpa.DbSyncProtocolParameters;
+import org.cardanofoundation.rewards.entity.jpa.projection.PoolEpochStake;
 import org.cardanofoundation.rewards.mapper.AdaPotsMapper;
 import org.cardanofoundation.rewards.mapper.EpochMapper;
+import org.cardanofoundation.rewards.mapper.ProtocolParametersMapper;
 import org.cardanofoundation.rewards.repository.DbSyncAdaPotsRepository;
 import org.cardanofoundation.rewards.repository.DbSyncEpochRepository;
+import org.cardanofoundation.rewards.repository.DbSyncEpochStakeRepository;
+import org.cardanofoundation.rewards.repository.DbSyncProtocolParametersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,9 +26,13 @@ public class DbSyncDataProvider implements DataProvider {
 
     @Autowired
     DbSyncEpochRepository dbSyncEpochRepository;
-
     @Autowired
     DbSyncAdaPotsRepository dbSyncAdaPotsRepository;
+    @Autowired
+    DbSyncProtocolParametersRepository dbSyncProtocolParametersRepository;
+
+    @Autowired
+    DbSyncEpochStakeRepository dbSyncPoolHistoryRepository;
 
     @Override
     public AdaPots getAdaPotsForEpoch(int epoch) {
@@ -37,12 +48,28 @@ public class DbSyncDataProvider implements DataProvider {
 
     @Override
     public ProtocolParameters getProtocolParametersForEpoch(int epoch) {
-        return null;
+        DbSyncProtocolParameters dbSyncProtocolParameters = dbSyncProtocolParametersRepository.findByEpoch(epoch);
+        return ProtocolParametersMapper.fromDbSyncProtocolParameters(dbSyncProtocolParameters);
     }
 
     @Override
     public PoolHistory getPoolHistory(String poolId, int epoch) {
-        return null;
+        PoolHistory poolHistory = new PoolHistory();
+        List<PoolEpochStake> poolEpochStakes = dbSyncPoolHistoryRepository.getPoolActiveStakeInEpoch(poolId, epoch);
+        double activeStake = 0;
+        List<Delegator> delegators = new ArrayList<>();
+        for (PoolEpochStake poolEpochStake : poolEpochStakes) {
+            activeStake += poolEpochStake.getAmount();
+            Delegator delegator = Delegator.builder()
+                    .stakeAddress(poolEpochStake.getStakeAddress())
+                    .activeStake(poolEpochStake.getAmount())
+                    .build();
+            delegators.add(delegator);
+        }
+
+        poolHistory.setActiveStake(activeStake);
+        poolHistory.setDelegators(delegators);
+        return poolHistory;
     }
 
     @Override
