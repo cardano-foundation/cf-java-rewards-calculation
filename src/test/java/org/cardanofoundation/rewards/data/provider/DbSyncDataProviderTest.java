@@ -54,5 +54,6 @@ public class DbSyncDataProviderTest {
         int epoch = 220;
         PoolHistory poolHistory = dbSyncDataProvider.getPoolHistory(poolId, epoch);
         Assertions.assertEquals(poolHistory.getActiveStake(), 27523186299296.0);
+        Assertions.assertEquals(poolHistory.getBlockCount(), 10);
     }
 }

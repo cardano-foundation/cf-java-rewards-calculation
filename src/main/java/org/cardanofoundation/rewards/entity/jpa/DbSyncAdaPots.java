@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Profile;
 @Table(name = "ada_pots")
 public class DbSyncAdaPots {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "slot_no")

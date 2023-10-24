@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 @Table(name = "epoch")
 public class DbSyncEpoch {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "out_sum")

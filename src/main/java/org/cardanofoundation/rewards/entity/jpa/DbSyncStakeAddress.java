@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Profile;
 @Table(name = "stake_address")
 public class DbSyncStakeAddress {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String view;
 }

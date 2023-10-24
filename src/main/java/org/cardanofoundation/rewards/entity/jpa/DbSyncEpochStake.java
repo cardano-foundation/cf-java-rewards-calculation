@@ -11,9 +11,8 @@ import org.springframework.context.annotation.Profile;
 @Getter
 @Profile("db-sync")
 @Table(name = "epoch_stake")
-public class EpochStake {
+public class DbSyncEpochStake {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "amount")
@@ -29,7 +28,7 @@ public class EpochStake {
     @JoinColumn(name = "pool_id", nullable = false,
             foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "none"))
     @EqualsAndHashCode.Exclude
-    private PoolHash pool;
+    private DbSyncPoolHash pool;
 
     @Column(name = "epoch_no")
     private Integer epoch;
