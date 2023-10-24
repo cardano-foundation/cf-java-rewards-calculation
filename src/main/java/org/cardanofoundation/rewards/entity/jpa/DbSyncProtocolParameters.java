@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Profile;
 @Table(name = "epoch_param")
 public class DbSyncProtocolParameters {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "epoch_no")

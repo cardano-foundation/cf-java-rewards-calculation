@@ -3,16 +3,12 @@ package org.cardanofoundation.rewards.data.provider;
 import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.entity.jpa.DbSyncAdaPots;
 import org.cardanofoundation.rewards.entity.jpa.DbSyncEpoch;
-import org.cardanofoundation.rewards.entity.jpa.EpochStake;
 import org.cardanofoundation.rewards.entity.jpa.DbSyncProtocolParameters;
 import org.cardanofoundation.rewards.entity.jpa.projection.PoolEpochStake;
 import org.cardanofoundation.rewards.mapper.AdaPotsMapper;
 import org.cardanofoundation.rewards.mapper.EpochMapper;
 import org.cardanofoundation.rewards.mapper.ProtocolParametersMapper;
-import org.cardanofoundation.rewards.repository.DbSyncAdaPotsRepository;
-import org.cardanofoundation.rewards.repository.DbSyncEpochRepository;
-import org.cardanofoundation.rewards.repository.DbSyncEpochStakeRepository;
-import org.cardanofoundation.rewards.repository.DbSyncProtocolParametersRepository;
+import org.cardanofoundation.rewards.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -30,7 +26,8 @@ public class DbSyncDataProvider implements DataProvider {
     DbSyncAdaPotsRepository dbSyncAdaPotsRepository;
     @Autowired
     DbSyncProtocolParametersRepository dbSyncProtocolParametersRepository;
-
+    @Autowired
+    DbSyncBlockRepository dbSyncBlockRepository;
     @Autowired
     DbSyncEpochStakeRepository dbSyncPoolHistoryRepository;
 
@@ -66,9 +63,11 @@ public class DbSyncDataProvider implements DataProvider {
                     .build();
             delegators.add(delegator);
         }
-
         poolHistory.setActiveStake(activeStake);
         poolHistory.setDelegators(delegators);
+
+        Integer blockCount = dbSyncBlockRepository.getBlocksMadeByPoolInEpoch(poolId, epoch);
+        poolHistory.setBlockCount(blockCount);
         return poolHistory;
     }
 

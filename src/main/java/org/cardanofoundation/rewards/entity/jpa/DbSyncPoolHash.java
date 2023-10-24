@@ -10,9 +10,8 @@ import org.springframework.context.annotation.Profile;
 @Getter
 @Profile("db-sync")
 @Table(name = "pool_hash")
-public class PoolHash {
+public class DbSyncPoolHash {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "view")
