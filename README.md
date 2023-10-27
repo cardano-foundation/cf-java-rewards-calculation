@@ -68,14 +68,24 @@ cd cf-java-rewards-calculation
 ./mvnw clean test
 ```
 
-## 🫡 Todo
+#### Data Provider
+The pool rewards calculation and also the treasury calculation requires a data provider to perform the calculation.
+This repository offers different data providers and also an interface if you want to add your own provider. The following data providers are available:
+
+ - [Koios Data Provider](./src/main/java/org/cardanofoundation/rewards/calculation/data/provider/KoiosDataProvider.java)
+ - [JSON Data Provider](./src/main/java/org/cardanofoundation/rewards/calculation/data/provider/JsonDataProvider.java)
+ - [DbSync Data Provider (WIP 🦾)](./src/main/java/org/cardanofoundation/rewards/calculation/data/provider/DbSyncDataProvider.java)
+
+## 🫡 Roadmap
+ - [ ] Add a data provider for [Yaci Store](https://github.com/bloxbean/yaci-store) (scoped indexer 👀)
+ - [ ] Create REST endpoints to get the rewards as a service
  - [X] Include MIR certificates
  - [ ] Add a `/docs` folder containing parsable Markdown files to explain MIR certificates and edge cases
- - [ ] Implement "The difference between the maximal amount and the actual amount received is added to the amount moved to the treasury" (shelley-ledger.pdf p.65)
  - [ ] Enhance reporting and add values for the other pots as well. Include information from the `/docs` folder
  - [X] Calculate member and operator rewards
  - [ ] Add deposits and utxo pot
  - [ ] Calculate unclaimed rewards that need to go back to the reserves
+ - [ ] A nice web ui to visualize the rewards calculation
 
 ## 📖 Sources
  - [Shelley Cardano Delegation Specification](https://github.com/input-output-hk/cardano-ledger/releases/download/cardano-ledger-spec-2023-04-03/shelley-ledger.pdf)
