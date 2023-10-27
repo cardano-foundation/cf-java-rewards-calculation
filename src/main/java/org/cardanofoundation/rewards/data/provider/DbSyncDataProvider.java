@@ -1,9 +1,8 @@
 package org.cardanofoundation.rewards.data.provider;
 
+import org.cardanofoundation.rewards.calculation.PoolRewardCalculation;
 import org.cardanofoundation.rewards.entity.*;
-import org.cardanofoundation.rewards.entity.jpa.DbSyncAdaPots;
-import org.cardanofoundation.rewards.entity.jpa.DbSyncEpoch;
-import org.cardanofoundation.rewards.entity.jpa.DbSyncProtocolParameters;
+import org.cardanofoundation.rewards.entity.jpa.*;
 import org.cardanofoundation.rewards.entity.jpa.projection.PoolEpochStake;
 import org.cardanofoundation.rewards.mapper.AdaPotsMapper;
 import org.cardanofoundation.rewards.mapper.EpochMapper;
@@ -15,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.cardanofoundation.rewards.constants.RewardConstants.TOTAL_LOVELACE;
 
 @Service
 @Profile("db-sync")
@@ -30,6 +31,15 @@ public class DbSyncDataProvider implements DataProvider {
     DbSyncBlockRepository dbSyncBlockRepository;
     @Autowired
     DbSyncEpochStakeRepository dbSyncPoolHistoryRepository;
+
+    @Autowired
+    DbSyncPoolUpdateRepository dbSyncPoolUpdateRepository;
+
+    @Autowired
+    DbSyncPoolOwnerRepository dbSyncPoolOwnerRepository;
+
+    @Autowired
+    DbSyncRewardRepository dbSyncRewardRepository;
 
     @Override
     public AdaPots getAdaPotsForEpoch(int epoch) {
@@ -68,6 +78,44 @@ public class DbSyncDataProvider implements DataProvider {
 
         Integer blockCount = dbSyncBlockRepository.getBlocksMadeByPoolInEpoch(poolId, epoch);
         poolHistory.setBlockCount(blockCount);
+
+        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestUpdateForEpoch(poolId, epoch);
+        poolHistory.setFixedCost(dbSyncPoolUpdate.getFixedCost());
+        poolHistory.setMargin(dbSyncPoolUpdate.getMargin());
+        poolHistory.setEpoch(epoch);
+
+        List<DbSyncReward> rewards = dbSyncRewardRepository.getRewardsForPoolInEpoch(poolId, epoch);
+        double totalPoolRewards = 0;
+        for (DbSyncReward reward : rewards) {
+            totalPoolRewards += reward.getAmount();
+        }
+
+        DbSyncAdaPots dbSyncAdaPots = dbSyncAdaPotsRepository.findByEpoch(epoch + 1);
+        double reserves = dbSyncAdaPots.getReserves();
+        double adaInCirculation = TOTAL_LOVELACE - reserves;
+        double relativePoolStake = activeStake / adaInCirculation;
+
+        List<DbSyncPoolOwner> owners = dbSyncPoolOwnerRepository.getByPoolUpdateId(dbSyncPoolUpdate.getId());
+
+        double totalActiveStakeOfOwners = 0.0;
+        double totalMemberRewardsOfOwners = 0.0;
+        for (DbSyncPoolOwner owner : owners) {
+            Delegator delegator = poolHistory.getDelegator(owner.getStakeAddress().getView());
+            totalActiveStakeOfOwners += delegator.getActiveStake();
+            totalMemberRewardsOfOwners += PoolRewardCalculation.calculateMemberReward(totalPoolRewards,
+                    poolHistory.getMargin(), poolHistory.getFixedCost(),
+                    delegator.getActiveStake() / adaInCirculation, relativePoolStake);
+
+        }
+
+
+        double poolOperatorReward = PoolRewardCalculation.calculateLeaderReward(totalPoolRewards,
+                poolHistory.getMargin(), poolHistory.getFixedCost(),
+                totalActiveStakeOfOwners / adaInCirculation, relativePoolStake);
+
+        poolHistory.setPoolFees(poolOperatorReward - totalMemberRewardsOfOwners);
+        poolHistory.setDelegatorRewards(totalPoolRewards - poolOperatorReward + totalMemberRewardsOfOwners);
+
         return poolHistory;
     }
 
