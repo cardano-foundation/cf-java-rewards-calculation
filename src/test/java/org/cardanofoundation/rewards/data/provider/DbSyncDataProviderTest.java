@@ -55,5 +55,9 @@ public class DbSyncDataProviderTest {
         PoolHistory poolHistory = dbSyncDataProvider.getPoolHistory(poolId, epoch);
         Assertions.assertEquals(poolHistory.getActiveStake(), 27523186299296.0);
         Assertions.assertEquals(poolHistory.getBlockCount(), 10);
+        Assertions.assertEquals(poolHistory.getFixedCost(), 340000000.0);
+        Assertions.assertEquals(poolHistory.getMargin(), 0.009);
+        Assertions.assertEquals(poolHistory.getDelegatorRewards(), 14877804008.0);
+        Assertions.assertEquals(poolHistory.getPoolFees(), 475116283.0);
     }
 }

@@ -18,4 +18,13 @@ public class PoolHistory {
     private List<Delegator> delegators;
     private int blockCount;
     private int epoch;
+
+    public Delegator getDelegator(String stakeAddress) {
+        for (Delegator delegator : delegators) {
+            if (delegator.getStakeAddress().equals(stakeAddress)) {
+                return delegator;
+            }
+        }
+        return null;
+    }
 }
