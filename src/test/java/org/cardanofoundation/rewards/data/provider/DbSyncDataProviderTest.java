@@ -1,12 +1,15 @@
 package org.cardanofoundation.rewards.data.provider;
 
 import org.cardanofoundation.rewards.entity.*;
+import org.cardanofoundation.rewards.enums.MirPot;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.util.List;
 
 @SpringBootTest
 @ComponentScan
@@ -61,5 +64,20 @@ public class DbSyncDataProviderTest {
         int epoch = 220;
         PoolOwnerHistory poolOwnerHistory = dbSyncDataProvider.getHistoryOfPoolOwnersInEpoch(poolId, epoch);
         Assertions.assertEquals(poolOwnerHistory.getActiveStake(), 4.76793511093E11);
+    }
+
+    @Test
+    public void testGetMirCertificatesInEpoch() {
+        int epoch = 374;
+        List<MirCertificate> mirCertificates = dbSyncDataProvider.getMirCertificatesInEpoch(epoch);
+
+        double totalRewards = 0;
+        for (MirCertificate mirCertificate : mirCertificates) {
+            if (mirCertificate.getPot() == MirPot.TREASURY) {
+                totalRewards += mirCertificate.getTotalRewards();
+            }
+        }
+
+        Assertions.assertEquals(totalRewards, 3.9432064006444E13);
     }
 }

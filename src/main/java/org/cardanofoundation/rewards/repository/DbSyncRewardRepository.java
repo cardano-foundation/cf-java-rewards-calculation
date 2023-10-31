@@ -17,4 +17,11 @@ public interface DbSyncRewardRepository extends ReadOnlyRepository<DbSyncReward,
              	AND reward.earnedEpoch = :epoch
             """)
     List<DbSyncReward> getRewardsForPoolInEpoch(String poolId, Integer epoch);
+
+    @Query("""
+           SELECT reward from DbSyncReward AS reward
+             	WHERE (reward.type = 'reserves' OR reward.type = 'treasury')
+             	AND reward.earnedEpoch = :epoch
+            """)
+    List<DbSyncReward> getMIRCertificatesInEpoch(Integer epoch);
 }

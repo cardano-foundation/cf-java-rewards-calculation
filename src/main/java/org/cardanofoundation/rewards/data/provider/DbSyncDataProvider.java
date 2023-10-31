@@ -4,6 +4,7 @@ import org.cardanofoundation.rewards.calculation.PoolRewardCalculation;
 import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.entity.jpa.*;
 import org.cardanofoundation.rewards.entity.jpa.projection.PoolEpochStake;
+import org.cardanofoundation.rewards.enums.MirPot;
 import org.cardanofoundation.rewards.mapper.AdaPotsMapper;
 import org.cardanofoundation.rewards.mapper.EpochMapper;
 import org.cardanofoundation.rewards.mapper.ProtocolParametersMapper;
@@ -163,6 +164,16 @@ public class DbSyncDataProvider implements DataProvider {
 
     @Override
     public List<MirCertificate> getMirCertificatesInEpoch(int epoch) {
-        return null;
+        List<DbSyncReward> mirCertificatesInEpoch = dbSyncRewardRepository.getMIRCertificatesInEpoch(epoch);
+        List<MirCertificate> mirCertificates = new ArrayList<>();
+
+        for (DbSyncReward dbSyncReward : mirCertificatesInEpoch) {
+            MirCertificate mirCertificate = new MirCertificate();
+            mirCertificate.setPot(MirPot.valueOf(dbSyncReward.getType().toUpperCase()));
+            mirCertificate.setTotalRewards(dbSyncReward.getAmount());
+            mirCertificates.add(mirCertificate);
+        }
+
+        return mirCertificates;
     }
 }
