@@ -99,6 +99,7 @@ public class DbSyncDataProvider implements DataProvider {
 
         double totalActiveStakeOfOwners = 0.0;
         double totalMemberRewardsOfOwners = 0.0;
+
         for (DbSyncPoolOwner owner : owners) {
             Delegator delegator = poolHistory.getDelegator(owner.getStakeAddress().getView());
             totalActiveStakeOfOwners += delegator.getActiveStake();
@@ -107,7 +108,6 @@ public class DbSyncDataProvider implements DataProvider {
                     delegator.getActiveStake() / adaInCirculation, relativePoolStake);
 
         }
-
 
         double poolOperatorReward = PoolRewardCalculation.calculateLeaderReward(totalPoolRewards,
                 poolHistory.getMargin(), poolHistory.getFixedCost(),
@@ -121,12 +121,34 @@ public class DbSyncDataProvider implements DataProvider {
 
     @Override
     public Double getPoolPledgeInEpoch(String poolId, int epoch) {
-        return null;
+        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestUpdateForEpoch(poolId, epoch);
+        return dbSyncPoolUpdate.getPledge();
     }
 
     @Override
     public PoolOwnerHistory getHistoryOfPoolOwnersInEpoch(String poolId, int epoch) {
-        return null;
+        PoolOwnerHistory poolOwnerHistory = new PoolOwnerHistory();
+        poolOwnerHistory.setEpoch(epoch);
+
+        List<PoolEpochStake> poolEpochStakes = dbSyncPoolHistoryRepository.getPoolActiveStakeInEpoch(poolId, epoch);
+        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestUpdateForEpoch(poolId, epoch);
+        List<DbSyncPoolOwner> owners = dbSyncPoolOwnerRepository.getByPoolUpdateId(dbSyncPoolUpdate.getId());
+
+        List<String> stakeAddresses = owners.stream()
+                .map(DbSyncPoolOwner::getStakeAddress)
+                .map(DbSyncStakeAddress::getView)
+                .toList();
+
+        double activeStakes = 0.0;
+
+        for (PoolEpochStake poolEpochStake : poolEpochStakes) {
+            if (stakeAddresses.contains(poolEpochStake.getStakeAddress())) {
+                activeStakes += poolEpochStake.getAmount();
+            }
+        }
+        poolOwnerHistory.setStakeAddresses(stakeAddresses);
+        poolOwnerHistory.setActiveStake(activeStakes);
+        return poolOwnerHistory;
     }
 
     @Override
