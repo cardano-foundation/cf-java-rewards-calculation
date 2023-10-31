@@ -1,17 +1,11 @@
 package org.cardanofoundation.rewards.data.provider;
 
-import org.cardanofoundation.rewards.entity.AdaPots;
-import org.cardanofoundation.rewards.entity.Epoch;
-import org.cardanofoundation.rewards.entity.PoolHistory;
-import org.cardanofoundation.rewards.entity.ProtocolParameters;
+import org.cardanofoundation.rewards.entity.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
@@ -59,5 +53,13 @@ public class DbSyncDataProviderTest {
         Assertions.assertEquals(poolHistory.getMargin(), 0.009);
         Assertions.assertEquals(poolHistory.getDelegatorRewards(), 14877804008.0);
         Assertions.assertEquals(poolHistory.getPoolFees(), 475116283.0);
+    }
+
+    @Test
+    public void testGetHistoryOfPoolOwnersInEpoch() {
+        String poolId = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
+        int epoch = 220;
+        PoolOwnerHistory poolOwnerHistory = dbSyncDataProvider.getHistoryOfPoolOwnersInEpoch(poolId, epoch);
+        Assertions.assertEquals(poolOwnerHistory.getActiveStake(), 4.76793511093E11);
     }
 }
