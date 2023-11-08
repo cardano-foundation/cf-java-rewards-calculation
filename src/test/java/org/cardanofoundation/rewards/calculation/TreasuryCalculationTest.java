@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.context.annotation.ComponentScan;
+
 import static org.cardanofoundation.rewards.constants.RewardConstants.*;
 import static org.cardanofoundation.rewards.util.CurrencyConverter.lovelaceToAda;
 
@@ -46,18 +47,18 @@ public class TreasuryCalculationTest {
     Assertions.assertTrue(Math.abs(difference) < 1, "The difference " + lovelaceToAda(difference) + " ADA between expected treasury value and actual treasury value is greater than 1 LOVELACE");
   }
 
-  static Stream<Integer> koiosDataProviderRange() {
+  static Stream<Integer> dataProviderRangeUntilEpoch213() {
     return IntStream.range(210, 213).boxed();
   }
 
   @ParameterizedTest
-  @MethodSource("koiosDataProviderRange")
+  @MethodSource("dataProviderRangeUntilEpoch213")
   void Test_calculateTreasuryWithKoiosDataProvider(int epoch) {
     Test_calculateTreasury(epoch, DataProviderType.KOIOS);
   }
 
   static Stream<Integer> jsonDataProviderRange() {
-    return IntStream.range(215, 217).boxed();
+    return IntStream.range(210, 217).boxed();
   }
 
   @ParameterizedTest

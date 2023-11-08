@@ -10,17 +10,21 @@ import org.springframework.context.annotation.Profile;
 @Immutable
 @Getter
 @Profile("db-sync")
-@Table(name = "pool_owner")
-public class DbSyncPoolOwner {
+@Table(name = "stake_registration")
+public class DbSyncAccountRegistration {
     @Id
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "addr_id", nullable = false,
+    @JoinColumn(name = "addr_id")
+    private DbSyncStakeAddress address;
+
+    @Column(name = "epoch_no")
+    private Integer epoch;
+
+    @ManyToOne
+    @JoinColumn(name = "tx_id", nullable = false,
             foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "none"))
     @EqualsAndHashCode.Exclude
-    private DbSyncStakeAddress stakeAddress;
-
-    @Column(name = "pool_update_id")
-    private Long poolUpdateId;
+    private DbSyncTransaction transaction;
 }
