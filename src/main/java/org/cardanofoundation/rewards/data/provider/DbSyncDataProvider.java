@@ -4,6 +4,7 @@ import org.cardanofoundation.rewards.calculation.PoolRewardCalculation;
 import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.entity.jpa.*;
 import org.cardanofoundation.rewards.entity.jpa.projection.PoolEpochStake;
+import org.cardanofoundation.rewards.enums.AccountUpdateAction;
 import org.cardanofoundation.rewards.enums.MirPot;
 import org.cardanofoundation.rewards.mapper.AdaPotsMapper;
 import org.cardanofoundation.rewards.mapper.EpochMapper;
@@ -41,6 +42,15 @@ public class DbSyncDataProvider implements DataProvider {
 
     @Autowired
     DbSyncRewardRepository dbSyncRewardRepository;
+
+    @Autowired
+    DbSyncPoolRetirementRepository dbSyncPoolRetirementRepository;
+
+    @Autowired
+    DbSyncStakeDeregistrationRepository dbSyncStakeDeregistrationRepository;
+
+    @Autowired
+    DbSyncStakeRegistrationRepository dbSyncStakeRegistrationRepository;
 
     @Override
     public AdaPots getAdaPotsForEpoch(int epoch) {
@@ -154,12 +164,54 @@ public class DbSyncDataProvider implements DataProvider {
 
     @Override
     public List<PoolDeregistration> getRetiredPoolsInEpoch(int epoch) {
-        return null;
+        List<PoolDeregistration> poolDeregistrations = new ArrayList<>();
+        List<DbSyncPoolRetirement> dbSyncPoolRetirements = dbSyncPoolRetirementRepository.getPoolRetirementsByEpoch(epoch);
+
+        for (DbSyncPoolRetirement dbSyncPoolRetirement : dbSyncPoolRetirements) {
+            PoolDeregistration poolDeregistration = new PoolDeregistration();
+            poolDeregistration.setPoolId(dbSyncPoolRetirement.getPool().getBech32PoolId());
+            if (poolDeregistrations.stream().anyMatch(deregistration -> deregistration.getPoolId().equals(poolDeregistration.getPoolId()))) {
+                continue;
+            }
+
+            DbSyncPoolUpdate lastestUpdateForEpoch =
+                    dbSyncPoolUpdateRepository.findLastestUpdateForEpoch(
+                            dbSyncPoolRetirement.getPool().getBech32PoolId(), epoch);
+            if (lastestUpdateForEpoch != null) {
+                poolDeregistration.setRewardAddress(lastestUpdateForEpoch.getStakeAddress().getView());
+                poolDeregistrations.add(poolDeregistration);
+            }
+        }
+        return poolDeregistrations;
     }
 
     @Override
     public List<AccountUpdate> getAccountUpdatesUntilEpoch(List<String> stakeAddresses, int epoch) {
-        return null;
+        List<AccountUpdate> accountUpdates = new ArrayList<>();
+
+        List<DbSyncAccountDeregistration> stakeDeregistrationsInEpoch =
+                dbSyncStakeDeregistrationRepository.getLatestAccountDeregistrationsUntilEpochForAddresses(stakeAddresses, epoch);
+        List<DbSyncAccountRegistration> stakeRegistrationsInEpoch =
+                dbSyncStakeRegistrationRepository.getLatestAccountRegistrationsUntilEpochForAddresses(stakeAddresses, epoch);
+
+        for (DbSyncAccountDeregistration deregistration : stakeDeregistrationsInEpoch) {
+            accountUpdates.add(AccountUpdate.builder()
+                    .epoch(deregistration.getEpoch())
+                    .action(AccountUpdateAction.DEREGISTRATION)
+                    .stakeAddress(deregistration.getAddress().getView())
+                    .build());
+        }
+
+        for (DbSyncAccountRegistration registration : stakeRegistrationsInEpoch) {
+            accountUpdates.add(AccountUpdate.builder()
+                    .epoch(registration.getEpoch())
+                    .action(AccountUpdateAction.DEREGISTRATION)
+                    .stakeAddress(registration.getAddress().getView())
+                    .unixBlockTime(registration.getTransaction().getBlock().getTime().getTime())
+                    .build());
+        }
+
+        return  accountUpdates;
     }
 
     @Override

@@ -12,7 +12,7 @@ public interface DbSyncPoolUpdateRepository extends ReadOnlyRepository<DbSyncPoo
     @Query("""
             SELECT update FROM DbSyncPoolUpdate AS update
                 WHERE update.pool.bech32PoolId = :poolId
-                AND update.activeEpochNumber <= :epoch
+                AND update.activeEpochNumber <= :epoch+1
             ORDER BY update.registeredTxId DESC LIMIT 1""")
     DbSyncPoolUpdate findLastestUpdateForEpoch(String poolId, Integer epoch);
 }

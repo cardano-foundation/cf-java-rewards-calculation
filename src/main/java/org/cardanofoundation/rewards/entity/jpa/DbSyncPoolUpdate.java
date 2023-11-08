@@ -34,7 +34,7 @@ public class DbSyncPoolUpdate {
     @Column(name = "registered_tx_id")
     private Long registeredTxId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne
     @JoinColumn(name = "reward_addr_id", nullable = false,
             foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "none"))
     @EqualsAndHashCode.Exclude
