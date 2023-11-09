@@ -61,7 +61,22 @@ public class DbSyncDataProvider implements DataProvider {
     @Override
     public Epoch getEpochInfo(int epoch) {
         DbSyncEpoch dbSyncEpoch = dbSyncEpochRepository.findByNumber(epoch);
-        return EpochMapper.fromDbSyncEpoch(dbSyncEpoch);
+        Epoch epochInfo = EpochMapper.fromDbSyncEpoch(dbSyncEpoch);
+
+        if (epoch < 211) {
+            epochInfo.setOBFTBlockCount(epochInfo.getBlockCount());
+            epochInfo.setNonOBFTBlockCount(0);
+        } else if (epoch > 256) {
+            epochInfo.setOBFTBlockCount(0);
+            epochInfo.setNonOBFTBlockCount(epochInfo.getBlockCount());
+        } else {
+            Integer nonObftBlocks = dbSyncBlockRepository.getNonOBFTBlocksInEpoch(epoch);
+            Integer obftBlocks = dbSyncBlockRepository.getOBFTBlocksInEpoch(epoch);
+            epochInfo.setOBFTBlockCount(obftBlocks);
+            epochInfo.setNonOBFTBlockCount(nonObftBlocks);
+        }
+
+        return epochInfo;
     }
 
     @Override
@@ -199,13 +214,14 @@ public class DbSyncDataProvider implements DataProvider {
                     .epoch(deregistration.getEpoch())
                     .action(AccountUpdateAction.DEREGISTRATION)
                     .stakeAddress(deregistration.getAddress().getView())
+                    .unixBlockTime(deregistration.getTransaction().getBlock().getTime().getTime())
                     .build());
         }
 
         for (DbSyncAccountRegistration registration : stakeRegistrationsInEpoch) {
             accountUpdates.add(AccountUpdate.builder()
                     .epoch(registration.getEpoch())
-                    .action(AccountUpdateAction.DEREGISTRATION)
+                    .action(AccountUpdateAction.REGISTRATION)
                     .stakeAddress(registration.getAddress().getView())
                     .unixBlockTime(registration.getTransaction().getBlock().getTime().getTime())
                     .build());

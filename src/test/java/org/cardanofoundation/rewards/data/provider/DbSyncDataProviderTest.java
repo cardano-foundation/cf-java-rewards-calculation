@@ -37,6 +37,18 @@ public class DbSyncDataProviderTest {
     }
 
     @Test
+    public void testGetEpochInfoOf215() {
+        Epoch epoch = dbSyncDataProvider.getEpochInfo(215);
+        Assertions.assertEquals(epoch.getNumber(), 215);
+        Assertions.assertEquals(epoch.getFees(), 8.110049274E9);
+        Assertions.assertEquals(epoch.getBlockCount(), 21572);
+        Assertions.assertEquals(epoch.getNonOBFTBlockCount(), 5710);
+        Assertions.assertEquals(epoch.getUnixTimeFirstBlock(), 1599083091);
+        Assertions.assertEquals(epoch.getUnixTimeLastBlock(), 1599515063);
+        Assertions.assertEquals(epoch.getOBFTBlockCount(), 15862);
+    }
+
+    @Test
     public void testGetAdaPots() {
         AdaPots adaPots = dbSyncDataProvider.getAdaPotsForEpoch(220);
         Assertions.assertEquals(adaPots.getTreasury(), 9.4812346026398E13);
@@ -137,12 +149,12 @@ public class DbSyncDataProviderTest {
         Assertions.assertEquals(accountUpdates.size(), 1);
     }
 
-    static Stream<Integer> dataProviderRangeUntilEpoch213() {
-        return IntStream.range(210, 213).boxed();
+    static Stream<Integer> dataProviderRangeUntilEpoch216() {
+        return IntStream.range(210, 216).boxed();
     }
 
     @ParameterizedTest
-    @MethodSource("dataProviderRangeUntilEpoch213")
+    @MethodSource("dataProviderRangeUntilEpoch216")
     void Test_calculateTreasuryWithDbSyncDataProvider(final int epoch) {
         TreasuryCalculationResult treasuryCalculationResult = TreasuryCalculation.calculateTreasuryForEpoch(epoch, dbSyncDataProvider);
 
