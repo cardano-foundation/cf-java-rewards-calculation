@@ -4,6 +4,7 @@ import org.cardanofoundation.rewards.calculation.PoolRewardCalculation;
 import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.entity.jpa.*;
 import org.cardanofoundation.rewards.entity.jpa.projection.PoolEpochStake;
+import org.cardanofoundation.rewards.entity.jpa.projection.StakeAccountUpdate;
 import org.cardanofoundation.rewards.enums.AccountUpdateAction;
 import org.cardanofoundation.rewards.enums.MirPot;
 import org.cardanofoundation.rewards.mapper.AdaPotsMapper;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.constants.RewardConstants.TOTAL_LOVELACE;
@@ -231,7 +233,7 @@ public class DbSyncDataProvider implements DataProvider {
     }
 
     @Override
-    public List<MirCertificate> getMirCertificatesInEpoch(int epoch) {
+    public List<MirCertificate> getMirCertificatesInEpoch(final int epoch) {
         List<DbSyncReward> mirCertificatesInEpoch = dbSyncRewardRepository.getMIRCertificatesInEpoch(epoch);
         List<MirCertificate> mirCertificates = new ArrayList<>();
 
@@ -243,5 +245,9 @@ public class DbSyncDataProvider implements DataProvider {
         }
 
         return mirCertificates;
+    }
+
+    public List<String> getPoolsThatProducedBlocksInEpoch(int epoch) {
+        return dbSyncBlockRepository.getPoolsThatProducedBlocksInEpoch(epoch);
     }
 }

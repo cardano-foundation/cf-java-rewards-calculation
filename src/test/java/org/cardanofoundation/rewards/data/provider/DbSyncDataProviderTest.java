@@ -149,12 +149,12 @@ public class DbSyncDataProviderTest {
         Assertions.assertEquals(accountUpdates.size(), 1);
     }
 
-    static Stream<Integer> dataProviderRangeUntilEpoch216() {
-        return IntStream.range(210, 216).boxed();
+    static Stream<Integer> dataProviderRangeUntilEpoch225() {
+        return IntStream.range(210, 225).boxed();
     }
 
     @ParameterizedTest
-    @MethodSource("dataProviderRangeUntilEpoch216")
+    @MethodSource("dataProviderRangeUntilEpoch225")
     void Test_calculateTreasuryWithDbSyncDataProvider(final int epoch) {
         TreasuryCalculationResult treasuryCalculationResult = TreasuryCalculation.calculateTreasuryForEpoch(epoch, dbSyncDataProvider);
 

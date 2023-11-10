@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 @Profile("db-sync")
 public interface DbSyncBlockRepository extends ReadOnlyRepository<DbSyncBlock, Long> {
@@ -28,4 +30,11 @@ public interface DbSyncBlockRepository extends ReadOnlyRepository<DbSyncBlock, L
                     and block.slotLeader.pool is NULL
            """)
     Integer getOBFTBlocksInEpoch(Integer epoch);
+
+    @Query("""
+            select block.slotLeader.pool.bech32PoolId from DbSyncBlock AS block
+                where block.epochNo = :epoch
+                and block.slotLeader.pool is not NULL
+           """)
+    List<String> getPoolsThatProducedBlocksInEpoch(Integer epoch);
 }
