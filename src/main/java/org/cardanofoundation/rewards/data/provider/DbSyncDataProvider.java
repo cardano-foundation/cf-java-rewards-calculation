@@ -118,11 +118,7 @@ public class DbSyncDataProvider implements DataProvider {
         poolHistory.setMargin(dbSyncPoolUpdate.getMargin());
         poolHistory.setEpoch(epoch);
 
-        List<DbSyncReward> rewards = dbSyncRewardRepository.getRewardsForPoolInEpoch(poolId, epoch);
-        double totalPoolRewards = 0;
-        for (DbSyncReward reward : rewards) {
-            totalPoolRewards += reward.getAmount();
-        }
+        double totalPoolRewards = dbSyncRewardRepository.getRewardsForPoolInEpoch(poolId, epoch);
 
         DbSyncAdaPots dbSyncAdaPots = dbSyncAdaPotsRepository.findByEpoch(epoch + 1);
         double reserves = dbSyncAdaPots.getReserves();
