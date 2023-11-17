@@ -30,9 +30,10 @@ public class EpochCalculationTest {
         TreasuryCalculationResult treasuryCalculationResult = TreasuryCalculation.calculateTreasuryForEpoch(epoch, dataProvider);
         List<String> poolIds = dataProvider.getPoolsThatProducedBlocksInEpoch(epoch);
 
-        for (String poolId : poolIds) {
+        for (int i = 0; i < poolIds.size(); i++) {
+            String poolId = poolIds.get(i);
             PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardCalculation.calculatePoolRewardInEpoch(poolId, epoch, dataProvider);
-            System.out.println("Pool " + poolId + " reward: " + poolRewardCalculationResult.getPoolReward());
+            System.out.println("Pool (" + i +  "/" + poolIds.size() + ") " + poolId + " reward: " + poolRewardCalculationResult.getPoolReward());
         }
     }
 

@@ -12,11 +12,11 @@ import java.util.List;
 public interface DbSyncRewardRepository extends ReadOnlyRepository<DbSyncReward, Long>{
 
     @Query("""
-           SELECT reward from DbSyncReward AS reward
+           SELECT SUM(reward.amount) from DbSyncReward AS reward
              	WHERE reward.pool.bech32PoolId = :poolId
              	AND reward.earnedEpoch = :epoch
             """)
-    List<DbSyncReward> getRewardsForPoolInEpoch(String poolId, Integer epoch);
+    Double getRewardsForPoolInEpoch(String poolId, Integer epoch);
 
     @Query("""
            SELECT reward from DbSyncReward AS reward
