@@ -1,5 +1,6 @@
 package org.cardanofoundation.rewards.data.provider;
 
+import org.cardanofoundation.rewards.calculation.PoolRewardCalculation;
 import org.cardanofoundation.rewards.calculation.TreasuryCalculation;
 import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.enums.DataProviderType;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static org.cardanofoundation.rewards.util.CurrencyConverter.adaToLovelace;
 import static org.cardanofoundation.rewards.util.CurrencyConverter.lovelaceToAda;
 
 @SpringBootTest
@@ -161,5 +163,40 @@ public class DbSyncDataProviderTest {
         double difference = treasuryCalculationResult.getActualTreasury() - treasuryCalculationResult.getCalculatedTreasury();
         System.out.println(difference);
         Assertions.assertTrue(Math.abs(difference) < 1, "The difference " + lovelaceToAda(difference) + " ADA between expected treasury value and actual treasury value is greater than 1 LOVELACE");
+    }
+
+    private void Test_calculatePoolRewardWithDbSyncDataProvider(final String poolId,
+                                          final int epoch) {
+        PoolRewardCalculationResult poolRewardCalculationResult =
+                PoolRewardCalculation.calculatePoolRewardInEpoch(poolId, epoch, dbSyncDataProvider);
+
+        PoolHistory poolHistoryCurrentEpoch = dbSyncDataProvider.getPoolHistory(poolId, epoch);
+        if (poolHistoryCurrentEpoch == null) {
+            Assertions.assertEquals(0.0, poolRewardCalculationResult.getPoolReward());
+            return;
+        }
+
+        double difference = (poolHistoryCurrentEpoch.getDelegatorRewards() - (poolRewardCalculationResult.getPoolReward() - poolRewardCalculationResult.getPoolFee()));
+        Assertions.assertTrue(Math.abs(difference) < adaToLovelace(1), "The difference between expected pool reward and actual pool reward is greater than 1 ADA: " + lovelaceToAda(difference) + " ADA");
+    }
+
+    static Stream<String> testPoolIds() {
+        return Stream.of(
+                "pool1qqqqx69ztfvd83rtafs3mk4lwanehrglmp2vwkjpaguecs2t4c2",
+                "pool19ctjr5ft75sz396hn0tf6ns4hy5w9l9jp2jh3m8mx6acvm2cn7j",
+                "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9",
+                "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt",
+                "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx",
+                "pool1spus7k8cy5qcs82xhw60dwwk2d4vrfs0m5vr2zst04gtq700gjn",
+                "pool13n4jzw847sspllczxgnza7vkq80m8px7mpvwnsqthyy2790vmyc",
+                "pool1ljlmfg7p37ysmea9ra5xqwccue203dpj40w6zlzn5r2cvjrf6tw"
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("testPoolIds")
+    void calculatePoolRewardInEpoch213(String poolId) {
+        int epoch = 213;
+        Test_calculatePoolRewardWithDbSyncDataProvider(poolId, epoch);
     }
 }
