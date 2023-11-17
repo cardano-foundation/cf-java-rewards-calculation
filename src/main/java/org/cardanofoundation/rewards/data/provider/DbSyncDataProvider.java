@@ -4,7 +4,6 @@ import org.cardanofoundation.rewards.calculation.PoolRewardCalculation;
 import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.entity.jpa.*;
 import org.cardanofoundation.rewards.entity.jpa.projection.PoolEpochStake;
-import org.cardanofoundation.rewards.entity.jpa.projection.StakeAccountUpdate;
 import org.cardanofoundation.rewards.enums.AccountUpdateAction;
 import org.cardanofoundation.rewards.enums.MirPot;
 import org.cardanofoundation.rewards.mapper.AdaPotsMapper;
@@ -16,7 +15,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.constants.RewardConstants.TOTAL_LOVELACE;
@@ -34,7 +32,7 @@ public class DbSyncDataProvider implements DataProvider {
     @Autowired
     DbSyncBlockRepository dbSyncBlockRepository;
     @Autowired
-    DbSyncEpochStakeRepository dbSyncPoolHistoryRepository;
+    DbSyncEpochStakeRepository dbSyncEpochStakeRepository;
 
     @Autowired
     DbSyncPoolUpdateRepository dbSyncPoolUpdateRepository;
@@ -78,6 +76,9 @@ public class DbSyncDataProvider implements DataProvider {
             epochInfo.setNonOBFTBlockCount(nonObftBlocks);
         }
 
+        Long epochStake = dbSyncEpochStakeRepository.getEpochStakeByEpoch(epoch);
+        epochInfo.setActiveStake(epochStake.doubleValue());
+
         return epochInfo;
     }
 
@@ -90,7 +91,7 @@ public class DbSyncDataProvider implements DataProvider {
     @Override
     public PoolHistory getPoolHistory(String poolId, int epoch) {
         PoolHistory poolHistory = new PoolHistory();
-        List<PoolEpochStake> poolEpochStakes = dbSyncPoolHistoryRepository.getPoolActiveStakeInEpoch(poolId, epoch);
+        List<PoolEpochStake> poolEpochStakes = dbSyncEpochStakeRepository.getPoolActiveStakeInEpoch(poolId, epoch);
         double activeStake = 0;
         List<Delegator> delegators = new ArrayList<>();
         for (PoolEpochStake poolEpochStake : poolEpochStakes) {
@@ -101,6 +102,11 @@ public class DbSyncDataProvider implements DataProvider {
                     .build();
             delegators.add(delegator);
         }
+
+        if (delegators.isEmpty()) {
+            return null;
+        }
+
         poolHistory.setActiveStake(activeStake);
         poolHistory.setDelegators(delegators);
 
@@ -158,7 +164,7 @@ public class DbSyncDataProvider implements DataProvider {
         PoolOwnerHistory poolOwnerHistory = new PoolOwnerHistory();
         poolOwnerHistory.setEpoch(epoch);
 
-        List<PoolEpochStake> poolEpochStakes = dbSyncPoolHistoryRepository.getPoolActiveStakeInEpoch(poolId, epoch);
+        List<PoolEpochStake> poolEpochStakes = dbSyncEpochStakeRepository.getPoolActiveStakeInEpoch(poolId, epoch);
         DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestUpdateForEpoch(poolId, epoch);
         List<DbSyncPoolOwner> owners = dbSyncPoolOwnerRepository.getByPoolUpdateId(dbSyncPoolUpdate.getId());
 
