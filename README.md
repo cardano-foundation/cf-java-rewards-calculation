@@ -74,8 +74,9 @@ This repository offers different data providers and also an interface if you wan
 
  - [Koios Data Provider](./src/main/java/org/cardanofoundation/rewards/calculation/data/provider/KoiosDataProvider.java)
  - [JSON Data Provider](./src/main/java/org/cardanofoundation/rewards/calculation/data/provider/JsonDataProvider.java)
- - [DbSync Data Provider (WIP 🦾)](./src/main/java/org/cardanofoundation/rewards/calculation/data/provider/DbSyncDataProvider.java)
-
+ - [DbSync Data Provider](./src/main/java/org/cardanofoundation/rewards/calculation/data/provider/DbSyncDataProvider.java)
+ - Yaci Store Data Provider (Coming Next 👀)
+  
 ## 🫡 Roadmap
  - [ ] Add a data provider for [Yaci Store](https://github.com/bloxbean/yaci-store) (scoped indexer 👀)
  - [ ] Create REST endpoints to get the rewards as a service
