@@ -31,8 +31,12 @@ public class DbSyncPoolUpdate {
 
     @Column(name = "fixed_cost")
     private Double fixedCost;
-    @Column(name = "registered_tx_id")
-    private Long registeredTxId;
+
+    @ManyToOne
+    @JoinColumn(name = "registered_tx_id", nullable = false,
+            foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "none"))
+    @EqualsAndHashCode.Exclude
+    private DbSyncTransaction registeredTransaction;
 
     @ManyToOne
     @JoinColumn(name = "reward_addr_id", nullable = false,

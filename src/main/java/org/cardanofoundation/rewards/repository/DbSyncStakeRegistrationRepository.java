@@ -1,8 +1,6 @@
 package org.cardanofoundation.rewards.repository;
 
-import org.cardanofoundation.rewards.entity.jpa.DbSyncAccountDeregistration;
 import org.cardanofoundation.rewards.entity.jpa.DbSyncAccountRegistration;
-import org.cardanofoundation.rewards.entity.jpa.DbSyncStakeAddress;
 import org.cardanofoundation.rewards.entity.jpa.projection.StakeAccountUpdate;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.Query;
@@ -24,4 +22,7 @@ public interface DbSyncStakeRegistrationRepository extends ReadOnlyRepository<Db
             "FROM DbSyncAccountRegistration registration WHERE " +
             "registration.epoch <= :epoch AND registration.epoch > :epoch-2")
     List<StakeAccountUpdate> getRecentAccountRegistrationsBeforeEpoch(Integer epoch);
+
+    @Query("SELECT COUNT(*) FROM DbSyncAccountRegistration WHERE epoch = :epoch")
+    Integer countRegistrationsInEpoch(Integer epoch);
 }
