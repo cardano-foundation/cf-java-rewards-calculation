@@ -21,5 +21,7 @@ public class DbSyncTransaction {
     @EqualsAndHashCode.Exclude
     private DbSyncBlock block;
 
+    private Double deposit;
+
     private Double fee;
 }

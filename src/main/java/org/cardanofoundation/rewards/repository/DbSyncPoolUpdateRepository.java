@@ -13,6 +13,13 @@ public interface DbSyncPoolUpdateRepository extends ReadOnlyRepository<DbSyncPoo
             SELECT update FROM DbSyncPoolUpdate AS update
                 WHERE update.pool.bech32PoolId = :poolId
                 AND update.activeEpochNumber <= :epoch+1
-            ORDER BY update.registeredTxId DESC LIMIT 1""")
+            ORDER BY update.registeredTransaction.id DESC LIMIT 1""")
     DbSyncPoolUpdate findLastestUpdateForEpoch(String poolId, Integer epoch);
+
+    @Query("""
+            SELECT COUNT(update) FROM DbSyncPoolUpdate AS update
+            WHERE update.registeredTransaction.block.epochNo = :epoch
+            AND update.registeredTransaction.deposit = 500000000
+            """)
+    Integer countPoolRegistrationsInEpoch(Integer epoch);
 }

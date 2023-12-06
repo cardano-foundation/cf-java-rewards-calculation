@@ -22,4 +22,7 @@ public interface DbSyncStakeDeregistrationRepository extends ReadOnlyRepository<
             "FROM DbSyncAccountDeregistration deregistration WHERE " +
             "deregistration.epoch <= :epoch AND deregistration.epoch > :epoch-2")
     List<StakeAccountUpdate> getRecentAccountDeregistrationsBeforeEpoch(Integer epoch);
+
+    @Query("SELECT COUNT(*) FROM DbSyncAccountDeregistration WHERE epoch = :epoch")
+    Integer countDeregistrationsInEpoch(Integer epoch);
 }

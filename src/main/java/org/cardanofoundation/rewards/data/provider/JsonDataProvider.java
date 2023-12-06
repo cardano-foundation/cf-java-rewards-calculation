@@ -130,4 +130,29 @@ public class JsonDataProvider implements DataProvider {
                 .filter(mirCertificate -> mirCertificate.getBlockTime() >= epochInfo.getUnixTimeFirstBlock())
                 .toList();
     }
+
+    @Override
+    public int getAccountRegistrationsInEpoch(int epoch) {
+        return 0;
+    }
+
+    @Override
+    public int getAccountDeregistrationsInEpoch(int epoch) {
+        return 0;
+    }
+
+    @Override
+    public int getPoolRegistrationsInEpoch(int epoch) {
+        return 0;
+    }
+
+    @Override
+    public int getPoolDeregistrationsInEpoch(int epoch) {
+        return 0;
+    }
+
+    @Override
+    public Double getTransactionDepositsInEpoch(int epoch) {
+        return null;
+    }
 }

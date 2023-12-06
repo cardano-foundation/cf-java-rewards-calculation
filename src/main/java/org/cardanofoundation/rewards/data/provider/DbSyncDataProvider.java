@@ -52,6 +52,9 @@ public class DbSyncDataProvider implements DataProvider {
     @Autowired
     DbSyncStakeRegistrationRepository dbSyncStakeRegistrationRepository;
 
+    @Autowired
+    DbSyncTransactionRepository dbSyncTransactionRepository;
+
     @Override
     public AdaPots getAdaPotsForEpoch(int epoch) {
         DbSyncAdaPots dbSyncAdaPots = dbSyncAdaPotsRepository.findByEpoch(epoch);
@@ -247,6 +250,31 @@ public class DbSyncDataProvider implements DataProvider {
         }
 
         return mirCertificates;
+    }
+
+    @Override
+    public int getAccountRegistrationsInEpoch(int epoch) {
+        return dbSyncStakeRegistrationRepository.countRegistrationsInEpoch(epoch);
+    }
+
+    @Override
+    public int getAccountDeregistrationsInEpoch(int epoch) {
+        return dbSyncStakeDeregistrationRepository.countDeregistrationsInEpoch(epoch);
+    }
+
+    @Override
+    public int getPoolRegistrationsInEpoch(int epoch) {
+        return dbSyncPoolUpdateRepository.countPoolRegistrationsInEpoch(epoch);
+    }
+
+    @Override
+    public int getPoolDeregistrationsInEpoch(int epoch) {
+        return 0;
+    }
+
+    @Override
+    public Double getTransactionDepositsInEpoch(int epoch) {
+        return dbSyncTransactionRepository.getSumOfDepositsInEpoch(epoch);
     }
 
     public List<String> getPoolsThatProducedBlocksInEpoch(int epoch) {
