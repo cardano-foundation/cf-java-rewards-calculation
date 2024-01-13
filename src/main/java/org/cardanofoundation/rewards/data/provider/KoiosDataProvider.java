@@ -247,6 +247,11 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
+    public List<org.cardanofoundation.rewards.entity.PoolUpdate> getPoolUpdateAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch) {
+        return null;
+    }
+
+    @Override
     public int getPoolDeregistrationsInEpoch(int epoch) {
         return 0;
     }

@@ -8,7 +8,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PoolDeregistration {
-    private int epoch;
+    private int retiringEpoch;
     private String poolId;
     private String rewardAddress;
+    private String announcedTransactionHash;
+    private long announcedTransactionId;
 }

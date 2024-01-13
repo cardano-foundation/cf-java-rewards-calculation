@@ -14,7 +14,7 @@ public interface DbSyncPoolRetirementRepository extends ReadOnlyRepository<DbSyn
 
     @Query("""
             SELECT retirement FROM DbSyncPoolRetirement AS retirement
-                WHERE retirement.retiringEpoch = :epoch""")
+                WHERE retirement.retiringEpoch = :epoch AND retirement.announcedTransaction.block.epochNo <= :epoch""")
     List<DbSyncPoolRetirement> getPoolRetirementsByEpoch(Integer epoch);
 
 }

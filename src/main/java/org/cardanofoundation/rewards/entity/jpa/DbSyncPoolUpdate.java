@@ -18,7 +18,7 @@ public class DbSyncPoolUpdate {
     @Id
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne
     @JoinColumn(name = "hash_id", nullable = false,
             foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "none"))
     @EqualsAndHashCode.Exclude

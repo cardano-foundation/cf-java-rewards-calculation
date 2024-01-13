@@ -30,6 +30,8 @@ public interface DataProvider {
 
     public int getPoolRegistrationsInEpoch(int epoch);
 
+    public List<PoolUpdate> getPoolUpdateAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch);
+
     public int getPoolDeregistrationsInEpoch(int epoch);
 
     public Double getTransactionDepositsInEpoch(int epoch);

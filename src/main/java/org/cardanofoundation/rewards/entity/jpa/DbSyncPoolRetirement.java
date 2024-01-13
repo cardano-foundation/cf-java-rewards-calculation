@@ -23,4 +23,10 @@ public class DbSyncPoolRetirement {
 
     @Column(name = "retiring_epoch")
     private Integer retiringEpoch;
+
+    @ManyToOne
+    @JoinColumn(name = "announced_tx_id", nullable = false,
+            foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "none"))
+    @EqualsAndHashCode.Exclude
+    private DbSyncTransaction announcedTransaction;
 }

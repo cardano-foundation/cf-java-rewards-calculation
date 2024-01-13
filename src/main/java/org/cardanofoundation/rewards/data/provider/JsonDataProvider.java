@@ -108,7 +108,7 @@ public class JsonDataProvider implements DataProvider {
         if (poolDeregistrations == null) return List.of();
 
         return poolDeregistrations.stream()
-                .filter(poolDeregistration -> poolDeregistration.getEpoch() == epoch)
+                .filter(poolDeregistration -> poolDeregistration.getRetiringEpoch() == epoch)
                 .toList();
     }
 
@@ -144,6 +144,11 @@ public class JsonDataProvider implements DataProvider {
     @Override
     public int getPoolRegistrationsInEpoch(int epoch) {
         return 0;
+    }
+
+    @Override
+    public List<PoolUpdate> getPoolUpdateAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch) {
+        return null;
     }
 
     @Override

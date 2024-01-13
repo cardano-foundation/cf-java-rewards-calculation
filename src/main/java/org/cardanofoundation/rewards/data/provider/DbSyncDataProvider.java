@@ -6,9 +6,7 @@ import org.cardanofoundation.rewards.entity.jpa.*;
 import org.cardanofoundation.rewards.entity.jpa.projection.PoolEpochStake;
 import org.cardanofoundation.rewards.enums.AccountUpdateAction;
 import org.cardanofoundation.rewards.enums.MirPot;
-import org.cardanofoundation.rewards.mapper.AdaPotsMapper;
-import org.cardanofoundation.rewards.mapper.EpochMapper;
-import org.cardanofoundation.rewards.mapper.ProtocolParametersMapper;
+import org.cardanofoundation.rewards.mapper.*;
 import org.cardanofoundation.rewards.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -186,25 +184,8 @@ public class DbSyncDataProvider implements DataProvider {
 
     @Override
     public List<PoolDeregistration> getRetiredPoolsInEpoch(int epoch) {
-        List<PoolDeregistration> poolDeregistrations = new ArrayList<>();
         List<DbSyncPoolRetirement> dbSyncPoolRetirements = dbSyncPoolRetirementRepository.getPoolRetirementsByEpoch(epoch);
-
-        for (DbSyncPoolRetirement dbSyncPoolRetirement : dbSyncPoolRetirements) {
-            PoolDeregistration poolDeregistration = new PoolDeregistration();
-            poolDeregistration.setPoolId(dbSyncPoolRetirement.getPool().getBech32PoolId());
-            if (poolDeregistrations.stream().anyMatch(deregistration -> deregistration.getPoolId().equals(poolDeregistration.getPoolId()))) {
-                continue;
-            }
-
-            DbSyncPoolUpdate lastestUpdateForEpoch =
-                    dbSyncPoolUpdateRepository.findLastestUpdateForEpoch(
-                            dbSyncPoolRetirement.getPool().getBech32PoolId(), epoch);
-            if (lastestUpdateForEpoch != null) {
-                poolDeregistration.setRewardAddress(lastestUpdateForEpoch.getStakeAddress().getView());
-                poolDeregistrations.add(poolDeregistration);
-            }
-        }
-        return poolDeregistrations;
+        return dbSyncPoolRetirements.stream().map(PoolDeregistrationMapper::fromDbSyncPoolRetirement).toList();
     }
 
     @Override
@@ -265,6 +246,12 @@ public class DbSyncDataProvider implements DataProvider {
     @Override
     public int getPoolRegistrationsInEpoch(int epoch) {
         return dbSyncPoolUpdateRepository.countPoolRegistrationsInEpoch(epoch);
+    }
+
+    @Override
+    public List<PoolUpdate> getPoolUpdateAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch) {
+        return dbSyncPoolUpdateRepository.findByBech32PoolIdAfterTransactionIdInEpoch(poolId, transactionId, epoch).stream()
+                .map(PoolUpdateMapper::fromDbSyncPoolUpdate).toList();
     }
 
     @Override

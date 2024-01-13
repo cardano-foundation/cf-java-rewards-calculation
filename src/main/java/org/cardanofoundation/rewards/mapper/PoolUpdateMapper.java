@@ -21,4 +21,17 @@ public class PoolUpdateMapper {
             .retiringEpoch(poolUpdate.getRetiringEpoch())
             .build();
     }
+
+    public static PoolUpdate fromDbSyncPoolUpdate(org.cardanofoundation.rewards.entity.jpa.DbSyncPoolUpdate poolUpdate) {
+        if (poolUpdate == null) return null;
+
+        return PoolUpdate.builder()
+                .poolId(poolUpdate.getPool().getBech32PoolId())
+                .fixedCost(poolUpdate.getFixedCost())
+                .margin(poolUpdate.getMargin())
+                .pledge(poolUpdate.getPledge())
+                .rewardAddress(poolUpdate.getStakeAddress().getView())
+                .activeEpoch(poolUpdate.getActiveEpochNumber().intValue())
+                .build();
+    }
 }
