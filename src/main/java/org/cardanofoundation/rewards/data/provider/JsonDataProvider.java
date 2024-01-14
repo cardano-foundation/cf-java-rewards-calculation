@@ -152,8 +152,8 @@ public class JsonDataProvider implements DataProvider {
     }
 
     @Override
-    public int getPoolDeregistrationsInEpoch(int epoch) {
-        return 0;
+    public PoolDeregistration latestPoolRetirementUntilEpoch(String poolId, int epoch) {
+        return null;
     }
 
     @Override

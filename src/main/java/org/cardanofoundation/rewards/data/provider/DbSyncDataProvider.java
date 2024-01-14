@@ -255,8 +255,9 @@ public class DbSyncDataProvider implements DataProvider {
     }
 
     @Override
-    public int getPoolDeregistrationsInEpoch(int epoch) {
-        return 0;
+    public PoolDeregistration latestPoolRetirementUntilEpoch(String poolId, int epoch) {
+        DbSyncPoolRetirement dbSyncPoolRetirement = dbSyncPoolRetirementRepository.latestPoolRetirementUntilEpoch(poolId, epoch);
+        return PoolDeregistrationMapper.fromDbSyncPoolRetirement(dbSyncPoolRetirement);
     }
 
     @Override

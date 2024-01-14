@@ -32,7 +32,7 @@ public interface DataProvider {
 
     public List<PoolUpdate> getPoolUpdateAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch);
 
-    public int getPoolDeregistrationsInEpoch(int epoch);
+    public PoolDeregistration latestPoolRetirementUntilEpoch(String poolId,int epoch);
 
     public Double getTransactionDepositsInEpoch(int epoch);
 }

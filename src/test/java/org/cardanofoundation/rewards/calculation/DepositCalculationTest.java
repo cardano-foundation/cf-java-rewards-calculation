@@ -76,6 +76,13 @@ public class DepositCalculationTest {
 
                 // There is an update after the deregistration, so the pool was not retired
                 if (poolUpdates.size() == 0) {
+                    PoolDeregistration latestPoolRetirementUntilEpoch = dataProvider.latestPoolRetirementUntilEpoch(poolDeregistration.getPoolId(), epoch);
+                    if (latestPoolRetirementUntilEpoch != null && latestPoolRetirementUntilEpoch.getRetiringEpoch() != epoch + 1) {
+                        // The pool was retired in a previous epoch for the next epoch, but another deregistration was announced and changed the
+                        // retirement epoch to something else. This means the pool was not retired in this epoch.
+                        continue;
+                    }
+
                     actualPoolDeregistrationsInEpoch += 1;
                 }
             }
@@ -92,7 +99,7 @@ public class DepositCalculationTest {
     }
 
     static Stream<Integer> dataProviderRangeUntilEpoch213() {
-        return IntStream.range(443, 460).boxed();
+        return IntStream.range(208, 460).boxed();
     }
 
     @ParameterizedTest
