@@ -261,6 +261,11 @@ public class KoiosDataProvider implements DataProvider {
         return null;
     }
 
+    @Override
+    public Double getSumOfFeesInEpoch(int epoch) {
+        return null;
+    }
+
     private List<Delegator> getPoolMemberInEpoch(String poolId, int epoch) {
         List<Delegator> delegators = new ArrayList<>();
         try {

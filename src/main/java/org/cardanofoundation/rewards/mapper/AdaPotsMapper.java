@@ -26,6 +26,7 @@ public class AdaPotsMapper {
                 .reserves(dbSyncAdaPots.getReserves())
                 .rewards(dbSyncAdaPots.getRewards())
                 .deposits(dbSyncAdaPots.getDeposits())
+                .fees(dbSyncAdaPots.getFees())
                 .adaInCirculation(dbSyncAdaPots.getUtxo())
                 .epoch(dbSyncAdaPots.getEpoch())
                 .build();

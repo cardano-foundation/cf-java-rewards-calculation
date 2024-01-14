@@ -14,4 +14,5 @@ public class AdaPots {
     private Double rewards;
     private Double deposits;
     private Double adaInCirculation;
+    private Double fees;
 }

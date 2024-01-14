@@ -265,6 +265,11 @@ public class DbSyncDataProvider implements DataProvider {
         return dbSyncTransactionRepository.getSumOfDepositsInEpoch(epoch);
     }
 
+    @Override
+    public Double getSumOfFeesInEpoch(int epoch) {
+        return dbSyncTransactionRepository.getSumOfFeesInEpoch(epoch);
+    }
+
     public List<String> getPoolsThatProducedBlocksInEpoch(int epoch) {
         return dbSyncBlockRepository.getPoolsThatProducedBlocksInEpoch(epoch);
     }

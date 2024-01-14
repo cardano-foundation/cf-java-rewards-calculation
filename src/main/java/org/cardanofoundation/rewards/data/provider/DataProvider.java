@@ -35,4 +35,6 @@ public interface DataProvider {
     public PoolDeregistration latestPoolRetirementUntilEpoch(String poolId,int epoch);
 
     public Double getTransactionDepositsInEpoch(int epoch);
+
+    public Double getSumOfFeesInEpoch(int epoch);
 }

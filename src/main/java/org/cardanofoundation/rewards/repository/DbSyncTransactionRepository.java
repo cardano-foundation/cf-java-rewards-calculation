@@ -10,4 +10,7 @@ import org.springframework.stereotype.Repository;
 public interface DbSyncTransactionRepository extends ReadOnlyRepository<DbSyncTransaction, Long> {
     @Query("SELECT SUM(deposit) FROM DbSyncTransaction WHERE block.epochNo = :epoch")
     Double getSumOfDepositsInEpoch(Integer epoch);
+
+    @Query("SELECT SUM(fee) FROM DbSyncTransaction WHERE block.epochNo = :epoch")
+    Double getSumOfFeesInEpoch(Integer epoch);
 }
