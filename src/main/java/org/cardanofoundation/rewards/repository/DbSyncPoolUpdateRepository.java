@@ -31,7 +31,7 @@ public interface DbSyncPoolUpdateRepository extends ReadOnlyRepository<DbSyncPoo
            SELECT update FROM DbSyncPoolUpdate AS update
                WHERE update.pool.bech32PoolId = :poolId
                AND update.registeredTransaction.id > :transactionId
-               AND update.registeredTransaction.block.epochNo = :epoch
+               AND update.registeredTransaction.block.epochNo <= :epoch
            ORDER BY update.registeredTransaction.id DESC""")
     List<DbSyncPoolUpdate> findByBech32PoolIdAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch);
 

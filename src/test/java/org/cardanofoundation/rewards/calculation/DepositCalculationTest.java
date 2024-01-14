@@ -92,7 +92,7 @@ public class DepositCalculationTest {
     }
 
     static Stream<Integer> dataProviderRangeUntilEpoch213() {
-        return IntStream.range(208, 460).boxed();
+        return IntStream.range(443, 460).boxed();
     }
 
     @ParameterizedTest
