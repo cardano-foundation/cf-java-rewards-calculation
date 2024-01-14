@@ -165,4 +165,9 @@ public class JsonDataProvider implements DataProvider {
     public Double getSumOfFeesInEpoch(int epoch) {
         return null;
     }
+
+    @Override
+    public Double getSumOfWithdrawalsInEpoch(int epoch) {
+        return null;
+    }
 }

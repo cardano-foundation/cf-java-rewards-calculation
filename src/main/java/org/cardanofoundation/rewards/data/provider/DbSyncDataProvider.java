@@ -53,6 +53,9 @@ public class DbSyncDataProvider implements DataProvider {
     @Autowired
     DbSyncTransactionRepository dbSyncTransactionRepository;
 
+    @Autowired
+    DbSyncWithdrawalRepository dbSyncWithdrawalRepository;
+
     @Override
     public AdaPots getAdaPotsForEpoch(int epoch) {
         DbSyncAdaPots dbSyncAdaPots = dbSyncAdaPotsRepository.findByEpoch(epoch);
@@ -268,6 +271,11 @@ public class DbSyncDataProvider implements DataProvider {
     @Override
     public Double getSumOfFeesInEpoch(int epoch) {
         return dbSyncTransactionRepository.getSumOfFeesInEpoch(epoch);
+    }
+
+    @Override
+    public Double getSumOfWithdrawalsInEpoch(int epoch) {
+        return dbSyncWithdrawalRepository.getSumOfWithdrawalsInEpoch(epoch);
     }
 
     public List<String> getPoolsThatProducedBlocksInEpoch(int epoch) {

@@ -37,4 +37,6 @@ public interface DataProvider {
     public Double getTransactionDepositsInEpoch(int epoch);
 
     public Double getSumOfFeesInEpoch(int epoch);
+
+    public Double getSumOfWithdrawalsInEpoch(int epoch);
 }
