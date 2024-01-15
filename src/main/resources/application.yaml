@@ -1,3 +1,9 @@
+server:
+  port: ${SERVER_PORT:8888}
+
+spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:ci, json}
 
 ---
 spring:

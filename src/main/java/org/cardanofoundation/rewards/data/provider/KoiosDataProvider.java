@@ -232,16 +232,6 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
-    public int getAccountRegistrationsInEpoch(int epoch) {
-        return 0;
-    }
-
-    @Override
-    public int getAccountDeregistrationsInEpoch(int epoch) {
-        return 0;
-    }
-
-    @Override
     public int getPoolRegistrationsInEpoch(int epoch) {
         return 0;
     }

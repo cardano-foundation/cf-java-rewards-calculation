@@ -7,6 +7,7 @@ import org.cardanofoundation.rewards.data.provider.KoiosDataProvider;
 import org.cardanofoundation.rewards.entity.AdaPots;
 import org.cardanofoundation.rewards.enums.DataProviderType;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,5 +72,10 @@ public class UtxoCalculation {
     @MethodSource("dataProviderRangeUntilEpoch213")
     void Test_calculateUtxoPotWithDbSyncDataProvider(int epoch) {
         Test_calculateUtxoPot(epoch, DataProviderType.DB_SYNC);
+    }
+
+    @Test
+    void Test_calculateUtxoPotWithDbSyncDataProviderForEpoch236() {
+        Test_calculateUtxoPot(236, DataProviderType.DB_SYNC);
     }
 }

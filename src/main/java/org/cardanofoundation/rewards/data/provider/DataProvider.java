@@ -24,10 +24,6 @@ public interface DataProvider {
 
     public List<MirCertificate> getMirCertificatesInEpoch(int epoch);
 
-    public int getAccountRegistrationsInEpoch(int epoch);
-
-    public int getAccountDeregistrationsInEpoch(int epoch);
-
     public int getPoolRegistrationsInEpoch(int epoch);
 
     public List<PoolUpdate> getPoolUpdateAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch);

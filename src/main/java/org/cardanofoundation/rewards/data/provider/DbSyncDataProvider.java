@@ -237,16 +237,6 @@ public class DbSyncDataProvider implements DataProvider {
     }
 
     @Override
-    public int getAccountRegistrationsInEpoch(int epoch) {
-        return dbSyncStakeRegistrationRepository.countRegistrationsInEpoch(epoch);
-    }
-
-    @Override
-    public int getAccountDeregistrationsInEpoch(int epoch) {
-        return dbSyncStakeDeregistrationRepository.countDeregistrationsInEpoch(epoch);
-    }
-
-    @Override
     public int getPoolRegistrationsInEpoch(int epoch) {
         return dbSyncPoolUpdateRepository.countPoolRegistrationsInEpoch(epoch);
     }
