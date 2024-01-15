@@ -1,6 +1,7 @@
 package org.cardanofoundation.rewards;
 
 import org.cardanofoundation.rewards.data.fetcher.DataFetcher;
+import org.cardanofoundation.rewards.data.fetcher.DbSyncDataFetcher;
 import org.cardanofoundation.rewards.data.fetcher.KoiosDataFetcher;
 import org.cardanofoundation.rewards.data.plotter.JsonDataPlotter;
 import org.slf4j.Logger;
@@ -45,13 +46,15 @@ public class RewardsApplication implements ApplicationRunner {
         if (action.get(0).equals("fetch")) {
           boolean override = args.containsOption("override");
           KoiosDataFetcher dataFetcher = new KoiosDataFetcher();
-          for (int epoch = 208; epoch < 433; epoch++) {
+          DbSyncDataFetcher dbSyncDataFetcher = new DbSyncDataFetcher();
+          for (int epoch = 208; epoch < 460; epoch++) {
             logger.info("Fetching data for epoch " + epoch);
             dataFetcher.fetch(epoch, override);
+            dbSyncDataFetcher.fetch(epoch, override);
           }
         } else if (action.get(0).equals("plot")) {
           int epochStart = 210;
-          int epochEnd = 433;
+          int epochEnd = 460;
           JsonDataPlotter dataPlotter = new JsonDataPlotter();
             dataPlotter.plot(epochStart, epochEnd);
         } else {
