@@ -1,6 +1,7 @@
 name: 🐞 Bug
 description: Report a bug encountered while using this project
-labels: ["Bug", "Needs Triage"]
+title: "[🐞 Bug]: <Brief Description of the Issue>"
+labels: ["bug"]
 
 body:
   - type: checkboxes
