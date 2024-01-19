@@ -86,6 +86,7 @@ This repository offers different data providers and also an interface if you wan
  - [X] Calculate member and operator rewards
  - [ ] Add deposits and utxo pot
  - [ ] Calculate unclaimed rewards that need to go back to the reserves
+ - [ ] Put rewards to unregistered stake addresses into the treasury
  - [ ] A nice web ui to visualize the rewards calculation
 
 ## 📖 Sources
