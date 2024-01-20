@@ -5,6 +5,10 @@ spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:ci, json}
 
+json:
+  data-provider:
+    source: ${JSON_DATA_SOURCE_FOLDER}
+
 ---
 spring:
   config:

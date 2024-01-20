@@ -2,8 +2,10 @@ package org.cardanofoundation.rewards.data.provider;
 
 import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.enums.DataType;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.enums.DataType.*;
@@ -12,19 +14,24 @@ import static org.cardanofoundation.rewards.util.JsonConverter.readJsonFile;
 @Service
 public class JsonDataProvider implements DataProvider {
 
+    @Value("${json.data-provider.source}")
+    private String sourceFolder;
+
     private String getResourceFolder(DataType dataType, Integer epoch, String poolId) {
+        if (sourceFolder == null) throw new RuntimeException("Invalid source folder for JSON data provider. Please check the JSON_DATA_SOURCE_FOLDER environment variable that you have provided.");
+
         if (dataType.equals(POOL_DEREGISTRATIONS)) {
-            return "./src/test/resources/poolDeregistrations/deregistrations.json";
+            return String.join(File.separator, sourceFolder, "poolDeregistrations", "deregistrations.json");
         } else if (dataType.equals(POOL_PARAMETERS)) {
-            return String.format("./src/test/resources/pools/%s/parameters_epoch_%d.json", poolId, epoch);
+            return String.join(File.separator, sourceFolder, "pools", poolId, "parameters_epoch_" + epoch + ".json");
         } else if (dataType.equals(POOL_HISTORY)) {
-            return String.format("./src/test/resources/pools/%s/history_epoch_%d.json", poolId, epoch);
+            return String.join(File.separator, sourceFolder, "pools", poolId, "history_epoch_" + epoch + ".json");
         } else if (dataType.equals(POOL_OWNER_HISTORY)) {
-            return String.format("./src/test/resources/pools/%s/owner_account_history_epoch_%d.json", poolId, epoch);
+            return String.join(File.separator, sourceFolder, "pools", poolId, "owner_account_history_epoch_" + epoch + ".json");
         } else if (dataType.equals(MIR_CERTIFICATE)) {
-            return "./src/test/resources/mirCertificates/mirCertificates.json";
+            return String.join(File.separator, sourceFolder, "mirCertificates", "mirCertificates.json");
         } else {
-            return String.format("./src/test/resources/%s/epoch%d.json", dataType.resourceFolderName, epoch);
+            return String.join(File.separator, sourceFolder, dataType.resourceFolderName, "epoch" + epoch + ".json");
         }
     }
 
