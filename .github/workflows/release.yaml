@@ -19,6 +19,6 @@ jobs:
         with:
           release-type: simple
           extra-files: |
-            src/pom.xml
+            pom.xml
           bump-minor-pre-major: true
           bump-patch-for-minor-pre-major: true
