@@ -17,6 +17,8 @@ jobs:
       - name: 🚀 release-please-action
         uses: google-github-actions/release-please-action@v3
         with:
-          release-type: maven
+          release-type: simple
+          extra-files: |
+            src/pom.xml
           bump-minor-pre-major: true
           bump-patch-for-minor-pre-major: true
