@@ -1,0 +1,6 @@
+{
+  "bootstrap-sha": "692c26c7d058924cd5a17a5990758a4de9845352",
+  "bump-minor-pre-major": true,
+  "bump-patch-for-minor-pre-major": true,
+  "extra-files": ["pom.xml"]
+}
