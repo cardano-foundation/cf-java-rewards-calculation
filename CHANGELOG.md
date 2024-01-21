@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.2.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.1.0...v0.2.0) (2024-01-21)
+
+
+### Features
+
+* add dbsync data fetcher ([51a2972](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/51a297242eecc086074869e801b23a1ab70c8a5f))
+* add fees pot calculation as a sum from the tx fees of a previous epoch ([97323f8](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/97323f801c645115f75b743af3810d20a08bd571))
+* add method to fetch pool blocks per epoch ([13688d2](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/13688d28993093154e5c8b4fc6e61a764e714bef))
+* add utxo pot calculation ([8edc86f](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/8edc86fe32eb696d2938eacda1dedbd6fcf7cfb5))
+* **dbsync_dataprovider:** improve pool calculation speed ([2c463cf](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/2c463cfeedb7f71504474a9ad5916cf27d2a41b9))
+* finish get pool history in dbsync data provider ([6462e43](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/6462e4352b9e3e5bd1934ab9a5a79483c82cd46b))
+* finish the implementation of the dbsync data provider ([e22cc0c](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/e22cc0c1668c25472913566289991cb8eaf85fba))
+* join dbsync tables to get the epoch stake information ([07b33e9](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/07b33e9dd4af4bf89229162a290d811f0d69cf16))
+* start implementation of a dbsync data provider ([8965ba3](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/8965ba31ce1399b585a448ef8cdbdb6b7bc5ad05))
+* start with calculation for all ada pots in an epoch ([225e91e](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/225e91efc84dd8b372562f1359e0da74f149717b))
+* start with deposits calculation ([c9c06a8](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/c9c06a8981605904e6b106559b128ca9575dc1a8))
+* use the env file to configure the json data source path ([58062df](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/58062df6d24e6349268dfdffc668d7d3ea7a3a65))
+
+
+### Bug Fixes
+
+* add a &lt;= to the select query to find updates after the retirement because this could also happen epochs before the actual retiring epoch ([55213eb](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/55213eb6c1a4a31caeff5963521ae099b844d84f))
+* **dbsync_dataprovider:** add epoch stake as active stake to the epoch info ([87cbf80](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/87cbf80534a4850f8738a7d7200d5df918aba46a))
+* deposits calculation is now 100% alinged with the ada_pots table. Fix bug about double deregistrations and epoch switches ([fcbb4b3](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/fcbb4b34ed7645156c2ab0c94a76760dc2263e76))
+* implement deposits calculation including the correct epoch boundary handling ([5b0405a](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/5b0405ac82c6361dc52cda73aacecf951d00a90d))
+* resolve an issue with not finding pool updates for a certain epoch ([10f3355](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/10f3355c30fc7c45a9d40d98e18593d07a002268))
+* use manifest-pr command to fix release pipeline ([9259820](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/925982008719357bdc6d54285a64fda70a762b46))
+* use non obft blocks if d&gt;0 and d&lt;0.8 and do not decide epoch-based ([3165b92](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/3165b92dbbecf2653fa6daa914bdd5f627d5bd6e))
+
+
+### Miscellaneous Chores
+
+* release 0.2.0 ([2195551](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/219555178d73c2fc747b7a154d3ce3ea42bfb746))
+
 ## [0.1.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.0.1...v0.1.0) (2023-09-25)
 
 
