@@ -2,6 +2,7 @@
   "bootstrap-sha": "489cc4c55abd88759ceabb19cd90b095eaddbb4f",
   "bump-minor-pre-major": true,
   "bump-patch-for-minor-pre-major": true,
+  "commit-search-depth": 2,
   "packages": {
     ".": {
       "release-type": "simple",
