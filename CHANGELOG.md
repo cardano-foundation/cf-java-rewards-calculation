@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.3.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.2.0...v0.3.0) (2024-01-21)
+
+
+### Features
+
+* add fee calculation to calculate the fee pot for a certain epoch ([9cfadf7](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/9cfadf7f17d4f02fce037760c67beef26129b53f))
+* add utxo pot calculation to calculation module ([e5ac721](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/e5ac7213d9171fcadd71dda51d918f654eb6aabf))
+
+
+### Bug Fixes
+
+* add pom to pipeline ([3784c3a](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/3784c3a1eaed5200dbc9b5942b469012cb3e10ee))
+
 ## [0.2.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.1.0...v0.2.0) (2024-01-21)
 
 
