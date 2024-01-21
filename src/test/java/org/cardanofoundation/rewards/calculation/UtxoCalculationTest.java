@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 @SpringBootTest
 @ComponentScan
 @ActiveProfiles("db-sync")
-public class UtxoCalculation {
+public class UtxoCalculationTest {
 
     @Autowired
     KoiosDataProvider koiosDataProvider;
@@ -45,20 +45,7 @@ public class UtxoCalculation {
         }
 
         AdaPots adaPots = dataProvider.getAdaPotsForEpoch(epoch);
-        double utxo = 31111977147073356.0;
-
-        if (epoch > 208) {
-            double utxoFromPreviousEpoch = dataProvider.getAdaPotsForEpoch(epoch - 1).getAdaInCirculation();
-            double deposits = dataProvider.getTransactionDepositsInEpoch(epoch - 1);
-            double fees = dataProvider.getSumOfFeesInEpoch(epoch - 1);
-            double withdrawals = 0.0;
-
-            if (epoch > 209) {
-                withdrawals = dataProvider.getSumOfWithdrawalsInEpoch(epoch - 1);
-            }
-
-            utxo = utxoFromPreviousEpoch - deposits - fees + withdrawals;
-        }
+        double utxo = UtxoCalculation.calculateUtxoPotInEpoch(epoch, dataProvider);
 
         double difference = adaPots.getAdaInCirculation() - utxo;
         Assertions.assertEquals(0.0, difference);
@@ -77,5 +64,10 @@ public class UtxoCalculation {
     @Test
     void Test_calculateUtxoPotWithDbSyncDataProviderForEpoch236() {
         Test_calculateUtxoPot(236, DataProviderType.DB_SYNC);
+    }
+
+    @Test
+    void Test_calculateUtxoPotWithDbSyncDataProviderForEpoch355() {
+        Test_calculateUtxoPot(355, DataProviderType.DB_SYNC);
     }
 }
