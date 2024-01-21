@@ -15,6 +15,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 🚀 release-please-action
-        uses: google-github-actions/release-please-action@v4
+        uses: google-github-actions/release-please-action@v3
         with:
-          command: manifest
+          release-type": simple
+          bootstrap-sha": 692c26c7d058924cd5a17a5990758a4de9845352
+          bump-minor-pre-major": true
+          bump-patch-for-minor-pre-major": true
+          extra-files: |
+            pom.xml
