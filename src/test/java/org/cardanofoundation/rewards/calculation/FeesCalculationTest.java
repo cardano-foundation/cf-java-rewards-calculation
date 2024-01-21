@@ -7,6 +7,7 @@ import org.cardanofoundation.rewards.data.provider.KoiosDataProvider;
 import org.cardanofoundation.rewards.entity.AdaPots;
 import org.cardanofoundation.rewards.enums.DataProviderType;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,11 +44,7 @@ public class FeesCalculationTest {
         }
 
         AdaPots adaPots = dataProvider.getAdaPotsForEpoch(epoch);
-        double fees = 0;
-
-        if (epoch > 208) {
-            fees = dataProvider.getSumOfFeesInEpoch(epoch - 1);
-        }
+        double fees = FeeCalculation.calculateFeePotInEpoch(epoch, dataProvider);
 
         double difference = adaPots.getFees() - fees;
         Assertions.assertEquals(0.0, difference);
@@ -61,5 +58,10 @@ public class FeesCalculationTest {
     @MethodSource("dataProviderRangeUntilEpoch213")
     void Test_calculateFeesWithDbSyncDataProvider(int epoch) {
         Test_calculateFees(epoch, DataProviderType.DB_SYNC);
+    }
+
+    @Test
+    void Test_calculateFeesWithDbSyncDataProviderForEpoch214() {
+        Test_calculateFees(214, DataProviderType.DB_SYNC);
     }
 }
