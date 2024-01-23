@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.EnabledIf;
 
 import java.util.List;
 import java.util.stream.IntStream;
@@ -22,7 +22,7 @@ import static org.cardanofoundation.rewards.util.CurrencyConverter.lovelaceToAda
 
 @SpringBootTest
 @ComponentScan
-@ActiveProfiles("db-sync")
+@EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
 public class DbSyncDataProviderTest {
 
     @Autowired

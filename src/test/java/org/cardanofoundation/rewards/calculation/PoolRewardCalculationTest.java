@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
-
+import org.springframework.test.context.junit.jupiter.DisabledIf;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -27,7 +27,6 @@ public class PoolRewardCalculationTest {
 
     @Autowired
     JsonDataProvider jsonDataProvider;
-
 
     private void Test_calculatePoolReward(final String poolId,
                                                    final int epoch,
@@ -82,6 +81,7 @@ public class PoolRewardCalculationTest {
 
     @ParameterizedTest
     @MethodSource("testPoolJsonProviderRewardRange")
+    @DisabledIf(expression = "#{environment.acceptsProfiles('ci')}", loadContext = true, reason = "Range test is too long for CI")
     void calculateNorthPoolRewardFromEpoch211To432(int epoch) {
         String poolId = "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx";
         Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);

@@ -1,15 +1,13 @@
 package org.cardanofoundation.rewards.calculation;
 
-import org.cardanofoundation.rewards.data.provider.DataProvider;
 import org.cardanofoundation.rewards.data.provider.DbSyncDataProvider;
 import org.cardanofoundation.rewards.entity.PoolRewardCalculationResult;
 import org.cardanofoundation.rewards.entity.TreasuryCalculationResult;
-import org.cardanofoundation.rewards.enums.DataProviderType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.EnabledIf;
 
 import java.util.List;
 
@@ -18,7 +16,7 @@ import java.util.List;
  */
 @SpringBootTest
 @ComponentScan
-@ActiveProfiles("db-sync")
+@EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
 public class EpochCalculationTest {
 
     // Only the DbSyncDataProvider is used for this test

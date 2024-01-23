@@ -5,8 +5,6 @@ import org.cardanofoundation.rewards.data.provider.DbSyncDataProvider;
 import org.cardanofoundation.rewards.data.provider.JsonDataProvider;
 import org.cardanofoundation.rewards.data.provider.KoiosDataProvider;
 import org.cardanofoundation.rewards.entity.AdaPots;
-import org.cardanofoundation.rewards.entity.PoolDeregistration;
-import org.cardanofoundation.rewards.entity.PoolUpdate;
 import org.cardanofoundation.rewards.enums.DataProviderType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -15,17 +13,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.context.ActiveProfiles;
-
-import java.util.List;
+import org.springframework.test.context.junit.jupiter.EnabledIf;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static org.cardanofoundation.rewards.constants.RewardConstants.DEPOSIT_POOL_REGISTRATION_IN_LOVELACE;
-
 @SpringBootTest
 @ComponentScan
-@ActiveProfiles("db-sync")
+@EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
 public class DepositCalculationTest {
 
     @Autowired

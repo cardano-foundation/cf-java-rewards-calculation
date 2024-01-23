@@ -1,0 +1,46 @@
+server:
+  port: ${SERVER_PORT:8888}
+
+spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:ci, json}
+
+json:
+  data-provider:
+    source: ${JSON_DATA_SOURCE_FOLDER}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: db-sync
+
+  flyway:
+    enabled: false
+
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      read-only: true
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:54321}/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    properties:
+      javax:
+        persistence:
+          readOnly: true
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        ddl-auto: none
+        show_sql: false
+        format_sql: true
+        jdbc:
+          batch_size: 100
+        temp:
+          use_jdbc_metadata_defaults: false
