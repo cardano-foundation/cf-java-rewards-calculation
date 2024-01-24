@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonDataPlotter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cardano-reward-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.data.plotter</a> &gt; <span class="el_source">JsonDataPlotter.java</span></div><h1>JsonDataPlotter.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.data.plotter;
+
+import org.cardanofoundation.rewards.calculation.TreasuryCalculation;
+import org.cardanofoundation.rewards.data.provider.JsonDataProvider;
+import org.cardanofoundation.rewards.entity.TreasuryCalculationResult;
+import org.cardanofoundation.rewards.util.JsonConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class JsonDataPlotter implements DataPlotter{
+
+<span class="nc" id="L14">    private static final Logger logger = LoggerFactory.getLogger(JsonDataPlotter.class);</span>
+
+
+    private final JsonDataProvider jsonDataProvider;
+
+<span class="nc" id="L19">    public JsonDataPlotter() {</span>
+<span class="nc" id="L20">        this.jsonDataProvider = new JsonDataProvider();</span>
+<span class="nc" id="L21">    }</span>
+
+    @Override
+    public void plot(int epochStart, int epochEnd) {
+<span class="nc bnc" id="L25" title="All 2 branches missed.">        if (epochStart &gt; epochEnd) {</span>
+<span class="nc" id="L26">            throw new IllegalArgumentException(&quot;epochStart must be less than or equal to epochEnd&quot;);</span>
+        }
+
+<span class="nc" id="L29">        Map&lt;Integer, TreasuryCalculationResult&gt; epochTreasuryCalculationResultMap = new LinkedHashMap&lt;&gt;();</span>
+
+<span class="nc bnc" id="L31" title="All 2 branches missed.">        for (int epoch = epochStart; epoch &lt; epochEnd; epoch++) {</span>
+<span class="nc" id="L32">            TreasuryCalculationResult treasuryCalculationResult = TreasuryCalculation</span>
+<span class="nc" id="L33">                    .calculateTreasuryForEpoch(epoch, jsonDataProvider);</span>
+<span class="nc" id="L34">            epochTreasuryCalculationResultMap.put(epoch, treasuryCalculationResult);</span>
+        }
+
+        try {
+<span class="nc" id="L38">            JsonConverter.writeObjectToJsonFile(epochTreasuryCalculationResultMap,</span>
+                    &quot;./report/treasury_calculation_result.json&quot;);
+<span class="nc" id="L40">        } catch (Exception e) {</span>
+<span class="nc" id="L41">            logger.error(e.getMessage());</span>
+<span class="nc" id="L42">            logger.warn(&quot;Failed to write treasury calculation result to json file&quot;);</span>
+<span class="nc" id="L43">        }</span>
+<span class="nc" id="L44">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

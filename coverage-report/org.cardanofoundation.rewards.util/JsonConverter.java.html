@@ -1,38 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonConverter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cardano-reward-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.util</a> &gt; <span class="el_source">JsonConverter.java</span></div><h1>JsonConverter.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.util;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-<span class="nc" id="L10">public class JsonConverter {</span>
-    public static &lt;T&gt; ArrayList&lt;T&gt; convertJsonToArrayList(BufferedReader br, Class&lt;T&gt; clazz) {
+<span class="nc" id="L9">public class JsonConverter {</span>
+    public static &lt;T&gt; ArrayList&lt;T&gt; convertJsonToArrayList(BufferedReader br, Class&lt;T&gt; objectClass) {
         try {
-<span class="nc" id="L13">            ObjectMapper objectMapper = new ObjectMapper();</span>
-<span class="nc" id="L14">            return objectMapper.readValue(</span>
-<span class="nc" id="L15">                    br, objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz));</span>
-<span class="nc" id="L16">        } catch (Exception e) {</span>
-<span class="nc" id="L17">            e.printStackTrace();</span>
-<span class="nc" id="L18">            return null;</span>
+<span class="nc" id="L12">            ObjectMapper objectMapper = new ObjectMapper();</span>
+<span class="nc" id="L13">            return objectMapper.readValue(</span>
+<span class="nc" id="L14">                    br, objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, objectClass));</span>
+<span class="nc" id="L15">        } catch (Exception e) {</span>
+<span class="nc" id="L16">            e.printStackTrace();</span>
+<span class="nc" id="L17">            return null;</span>
         }
     }
 
-    public static &lt;T&gt; ArrayList&lt;T&gt; convertFileJsonToArrayList(String filePath, Class&lt;T&gt; clazz) {
+    public static &lt;T&gt; T readJsonFile(String filePath, Class&lt;T&gt; targetClass) throws IOException {
+<span class="fc" id="L22">        ObjectMapper objectMapper = new ObjectMapper();</span>
+<span class="fc" id="L23">        return objectMapper.readValue(new File(filePath), targetClass);</span>
+    }
+
+    public static &lt;T&gt; void writeObjectToJsonFile(T objectToWrite, String filePath) throws IOException {
+<span class="nc" id="L27">        ObjectMapper objectMapper = new ObjectMapper();</span>
+<span class="nc" id="L28">        File outputFile = new File(filePath);</span>
+<span class="nc" id="L29">        objectMapper.writeValue(outputFile, objectToWrite);</span>
+<span class="nc" id="L30">    }</span>
+
+
+    public static &lt;T&gt; ArrayList&lt;T&gt; convertFileJsonToArrayList(String filePath, Class&lt;T&gt; objectClass) {
         BufferedReader br;
         try {
-<span class="nc" id="L25">            br = new BufferedReader(new FileReader(filePath));</span>
-<span class="nc" id="L26">        } catch (FileNotFoundException e) {</span>
-<span class="nc" id="L27">            throw new RuntimeException(e);</span>
-<span class="nc" id="L28">        }</span>
+<span class="fc" id="L36">            br = new BufferedReader(new FileReader(filePath));</span>
+<span class="nc" id="L37">        } catch (FileNotFoundException e) {</span>
+<span class="nc" id="L38">            throw new RuntimeException(e);</span>
+<span class="fc" id="L39">        }</span>
         try {
-<span class="nc" id="L30">            ObjectMapper objectMapper = new ObjectMapper();</span>
-<span class="nc" id="L31">            return objectMapper.readValue(</span>
-<span class="nc" id="L32">                    br, objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz));</span>
-<span class="nc" id="L33">        } catch (Exception e) {</span>
-<span class="nc" id="L34">            e.printStackTrace();</span>
-<span class="nc" id="L35">            return null;</span>
+<span class="fc" id="L41">            ObjectMapper objectMapper = new ObjectMapper();</span>
+<span class="fc" id="L42">            return objectMapper.readValue(</span>
+<span class="fc" id="L43">                    br, objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, objectClass));</span>
+<span class="nc" id="L44">        } catch (Exception e) {</span>
+<span class="nc" id="L45">            e.printStackTrace();</span>
+<span class="nc" id="L46">            return null;</span>
         }
     }
 }

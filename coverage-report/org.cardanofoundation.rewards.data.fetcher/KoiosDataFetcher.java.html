@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>KoiosDataFetcher.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cardano-reward-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.data.fetcher</a> &gt; <span class="el_source">KoiosDataFetcher.java</span></div><h1>KoiosDataFetcher.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.data.fetcher;
+
+import org.cardanofoundation.rewards.data.provider.JsonDataProvider;
+import org.cardanofoundation.rewards.data.provider.KoiosDataProvider;
+import org.cardanofoundation.rewards.entity.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import static org.cardanofoundation.rewards.enums.DataType.*;
+import static org.cardanofoundation.rewards.util.JsonConverter.writeObjectToJsonFile;
+
+public class KoiosDataFetcher implements DataFetcher{
+
+    private final KoiosDataProvider koiosDataProvider;
+    private final JsonDataProvider jsonDataProvider;
+
+<span class="nc" id="L20">    private static final Logger logger = LoggerFactory.getLogger(KoiosDataFetcher.class);</span>
+
+<span class="nc" id="L22">    public KoiosDataFetcher() {</span>
+<span class="nc" id="L23">        this.koiosDataProvider = new KoiosDataProvider();</span>
+<span class="nc" id="L24">        this.jsonDataProvider = new JsonDataProvider();</span>
+<span class="nc" id="L25">    }</span>
+
+    private void fetchAdaPots(int epoch, boolean override) {
+<span class="nc" id="L28">        String filePath = String.format(&quot;./src/test/resources/%s/epoch%d.json&quot;, ADA_POTS.resourceFolderName, epoch);</span>
+<span class="nc" id="L29">        File outputFile = new File(filePath);</span>
+
+<span class="nc bnc" id="L31" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
+<span class="nc" id="L32">            logger.info(&quot;Skip to fetch AdaPots for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
+<span class="nc" id="L33">            return;</span>
+        }
+
+<span class="nc" id="L36">        AdaPots adaPots = koiosDataProvider.getAdaPotsForEpoch(epoch);</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">        if (adaPots == null) {</span>
+<span class="nc" id="L38">            logger.error(&quot;Failed to fetch AdaPots for epoch &quot; + epoch);</span>
+<span class="nc" id="L39">            return;</span>
+        }
+
+        try {
+<span class="nc" id="L43">            writeObjectToJsonFile(adaPots, filePath);</span>
+<span class="nc" id="L44">        } catch (IOException e) {</span>
+<span class="nc" id="L45">            logger.error(&quot;Failed to write AdaPots to json file for epoch &quot; + epoch);</span>
+<span class="nc" id="L46">        }</span>
+<span class="nc" id="L47">    }</span>
+
+    private void fetchEpochInfo(int epoch, boolean override) {
+<span class="nc" id="L50">        String filePath = String.format(&quot;./src/test/resources/%s/epoch%d.json&quot;, EPOCH_INFO.resourceFolderName, epoch);</span>
+<span class="nc" id="L51">        File outputFile = new File(filePath);</span>
+
+<span class="nc bnc" id="L53" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
+<span class="nc" id="L54">            logger.info(&quot;Skip to fetch EpochInfo for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
+<span class="nc" id="L55">            return;</span>
+        }
+
+<span class="nc" id="L58">        Epoch epochInfo = koiosDataProvider.getEpochInfo(epoch);</span>
+<span class="nc bnc" id="L59" title="All 2 branches missed.">        if (epochInfo == null) {</span>
+<span class="nc" id="L60">            logger.error(&quot;Failed to fetch EpochInfo for epoch &quot; + epoch);</span>
+<span class="nc" id="L61">            return;</span>
+        }
+
+        try {
+<span class="nc" id="L65">            writeObjectToJsonFile(epochInfo, filePath);</span>
+<span class="nc" id="L66">        } catch (IOException e) {</span>
+<span class="nc" id="L67">            logger.error(&quot;Failed to write EpochInfo to json file for epoch &quot; + epoch);</span>
+<span class="nc" id="L68">        }</span>
+<span class="nc" id="L69">    }</span>
+
+    private void fetchProtocolParameters(int epoch, boolean override) {
+<span class="nc" id="L72">        String filePath = String.format(&quot;./src/test/resources/%s/epoch%d.json&quot;, PROTOCOL_PARAMETERS.resourceFolderName, epoch);</span>
+<span class="nc" id="L73">        File outputFile = new File(filePath);</span>
+
+<span class="nc bnc" id="L75" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
+<span class="nc" id="L76">            logger.info(&quot;Skip to fetch ProtocolParameters for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
+<span class="nc" id="L77">            return;</span>
+        }
+
+<span class="nc" id="L80">        ProtocolParameters protocolParameters = koiosDataProvider.getProtocolParametersForEpoch(epoch);</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        if (protocolParameters == null) {</span>
+<span class="nc" id="L82">            logger.error(&quot;Failed to fetch ProtocolParameters for epoch &quot; + epoch);</span>
+<span class="nc" id="L83">            return;</span>
+        }
+
+        try {
+<span class="nc" id="L87">            writeObjectToJsonFile(protocolParameters, filePath);</span>
+<span class="nc" id="L88">        } catch (IOException e) {</span>
+<span class="nc" id="L89">            logger.error(&quot;Failed to write ProtocolParameters to json file for epoch &quot; + epoch);</span>
+<span class="nc" id="L90">        }</span>
+<span class="nc" id="L91">    }</span>
+
+    private void fetchAccountUpdates(int epoch, boolean override) {
+<span class="nc" id="L94">        String filePath = String.format(&quot;./src/test/resources/%s/epoch%d.json&quot;, ACCOUNT_UPDATES.resourceFolderName, epoch);</span>
+<span class="nc" id="L95">        File outputFile = new File(filePath);</span>
+
+<span class="nc bnc" id="L97" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
+<span class="nc" id="L98">            logger.info(&quot;Skip to fetch AccountUpdates for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
+<span class="nc" id="L99">            return;</span>
+        }
+
+<span class="nc" id="L102">        List&lt;String&gt; stakeAddresses = jsonDataProvider.getStakeAddressesOfAllPoolsEverRetired();</span>
+
+<span class="nc" id="L104">        List&lt;AccountUpdate&gt; accountUpdates = koiosDataProvider.getAccountUpdatesUntilEpoch(stakeAddresses, epoch);</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">        if (accountUpdates == null) {</span>
+<span class="nc" id="L106">            logger.error(&quot;Failed to fetch AccountUpdates for epoch &quot; + epoch);</span>
+<span class="nc" id="L107">            return;</span>
+        }
+
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        if (accountUpdates.isEmpty()) {</span>
+<span class="nc" id="L111">            logger.info(&quot;Skip to write AccountUpdates to json file for epoch &quot; + epoch + &quot; because the accountUpdates are empty&quot;);</span>
+<span class="nc" id="L112">            return;</span>
+        }
+
+        try {
+<span class="nc" id="L116">            writeObjectToJsonFile(accountUpdates, filePath);</span>
+<span class="nc" id="L117">        } catch (IOException e) {</span>
+<span class="nc" id="L118">            logger.error(&quot;Failed to write AccountUpdates to json file for epoch &quot; + epoch);</span>
+<span class="nc" id="L119">        }</span>
+<span class="nc" id="L120">    }</span>
+
+    private void fetchPoolPledgeInEpoch (String poolId, int epoch, boolean override) {
+<span class="nc" id="L123">        String filePath = String.format(&quot;./src/test/resources/pools/%s/parameters_epoch_%d.json&quot;, poolId, epoch);</span>
+<span class="nc" id="L124">        File outputFile = new File(filePath);</span>
+
+<span class="nc bnc" id="L126" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
+<span class="nc" id="L127">            logger.info(&quot;Skip to fetch PoolPledge for pool &quot; + poolId + &quot; in epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
+<span class="nc" id="L128">            return;</span>
+        }
+
+<span class="nc" id="L131">        File poolIdFolder = new File(String.format(&quot;./src/test/resources/pools/%s&quot;, poolId));</span>
+<span class="nc bnc" id="L132" title="All 2 branches missed.">        if (!poolIdFolder.exists()) {</span>
+<span class="nc bnc" id="L133" title="All 2 branches missed.">            if(!poolIdFolder.mkdir()) {</span>
+<span class="nc" id="L134">                logger.error(&quot;Failed to create folder for pool &quot; + poolId);</span>
+<span class="nc" id="L135">                return;</span>
+            }
+        }
+
+<span class="nc" id="L139">        Double poolPledge = koiosDataProvider.getPoolPledgeInEpoch(poolId, epoch);</span>
+<span class="nc" id="L140">        PoolParameters poolParameters = PoolParameters.builder().epoch(epoch).pledge(poolPledge).build();</span>
+
+        try {
+<span class="nc" id="L143">            writeObjectToJsonFile(poolParameters, filePath);</span>
+<span class="nc" id="L144">        } catch (IOException e) {</span>
+<span class="nc" id="L145">            logger.error(&quot;Failed to write pool params (pledge) to json file for epoch &quot; + epoch);</span>
+<span class="nc" id="L146">        }</span>
+<span class="nc" id="L147">    }</span>
+
+    private void fetchPoolOwnersStakeInEpoch(String poolId, int epoch, boolean override) {
+<span class="nc" id="L150">        String filePath = String.format(&quot;./src/test/resources/pools/%s/owner_account_history_epoch_%d.json&quot;, poolId, epoch);</span>
+<span class="nc" id="L151">        File outputFile = new File(filePath);</span>
+
+<span class="nc bnc" id="L153" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
+<span class="nc" id="L154">            logger.info(&quot;Skip to fetch PoolOwnerStake for pool &quot; + poolId + &quot; in epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
+<span class="nc" id="L155">            return;</span>
+        }
+
+<span class="nc" id="L158">        File poolIdFolder = new File(String.format(&quot;./src/test/resources/pools/%s&quot;, poolId));</span>
+<span class="nc bnc" id="L159" title="All 2 branches missed.">        if (!poolIdFolder.exists()) {</span>
+<span class="nc bnc" id="L160" title="All 2 branches missed.">            if(!poolIdFolder.mkdir()) {</span>
+<span class="nc" id="L161">                logger.error(&quot;Failed to create folder for pool &quot; + poolId);</span>
+<span class="nc" id="L162">                return;</span>
+            }
+        }
+
+<span class="nc" id="L166">        PoolOwnerHistory poolOwnersHistory = koiosDataProvider.getHistoryOfPoolOwnersInEpoch(poolId, epoch);</span>
+
+<span class="nc bnc" id="L168" title="All 2 branches missed.">        if (poolOwnersHistory == null) {</span>
+<span class="nc" id="L169">            logger.info(&quot;Pool owners history for pool &quot; + poolId + &quot; in epoch &quot; + epoch + &quot; is null&quot;);</span>
+<span class="nc" id="L170">            return;</span>
+        }
+
+        try {
+<span class="nc" id="L174">            writeObjectToJsonFile(poolOwnersHistory, filePath);</span>
+<span class="nc" id="L175">        } catch (IOException e) {</span>
+<span class="nc" id="L176">            logger.error(&quot;Failed to write pool owner stake to json file for epoch &quot; + epoch);</span>
+<span class="nc" id="L177">        }</span>
+<span class="nc" id="L178">    }</span>
+
+    private void fetchPoolHistoryByEpoch(String poolId, int epoch, boolean override) {
+<span class="nc" id="L181">        String filePath = String.format(&quot;./src/test/resources/pools/%s/history_epoch_%d.json&quot;, poolId, epoch);</span>
+<span class="nc" id="L182">        File outputFile = new File(filePath);</span>
+
+<span class="nc" id="L184">        File poolIdFolder = new File(String.format(&quot;./src/test/resources/pools/%s&quot;, poolId));</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">        if (!poolIdFolder.exists()) {</span>
+<span class="nc bnc" id="L186" title="All 2 branches missed.">            if(!poolIdFolder.mkdir()) {</span>
+<span class="nc" id="L187">                logger.error(&quot;Failed to create folder for pool &quot; + poolId);</span>
+<span class="nc" id="L188">                return;</span>
+            }
+        }
+
+<span class="nc bnc" id="L192" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
+<span class="nc" id="L193">            logger.info(&quot;Skip to fetch PoolHistory for pool &quot; + poolId + &quot; in epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
+<span class="nc" id="L194">            return;</span>
+        }
+
+<span class="nc" id="L197">        PoolHistory poolHistory = koiosDataProvider.getPoolHistory(poolId, epoch);</span>
+
+        try {
+<span class="nc" id="L200">            writeObjectToJsonFile(poolHistory, filePath);</span>
+<span class="nc" id="L201">        } catch (IOException e) {</span>
+<span class="nc" id="L202">            logger.error(&quot;Failed to write pool history to json file for epoch &quot; + epoch);</span>
+<span class="nc" id="L203">        }</span>
+<span class="nc" id="L204">    }</span>
+
+    @Override
+    public void fetch(int epoch, boolean override) {
+<span class="nc" id="L208">        fetchAdaPots(epoch, override);</span>
+<span class="nc" id="L209">        fetchEpochInfo(epoch, override);</span>
+<span class="nc" id="L210">        fetchProtocolParameters(epoch, override);</span>
+<span class="nc" id="L211">        fetchAccountUpdates(epoch, override);</span>
+
+<span class="nc" id="L213">        List&lt;String&gt; poolIds = List.of(</span>
+            &quot;pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9&quot;,
+            &quot;pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt&quot;,
+            &quot;pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx&quot;,
+            &quot;pool1spus7k8cy5qcs82xhw60dwwk2d4vrfs0m5vr2zst04gtq700gjn&quot;,
+            &quot;pool1qqqqx69ztfvd83rtafs3mk4lwanehrglmp2vwkjpaguecs2t4c2&quot;,
+            &quot;pool13n4jzw847sspllczxgnza7vkq80m8px7mpvwnsqthyy2790vmyc&quot;,
+            &quot;pool1ljlmfg7p37ysmea9ra5xqwccue203dpj40w6zlzn5r2cvjrf6tw&quot;,
+            &quot;pool19ctjr5ft75sz396hn0tf6ns4hy5w9l9jp2jh3m8mx6acvm2cn7j&quot;
+        );
+
+<span class="nc bnc" id="L224" title="All 2 branches missed.">        for (String poolId : poolIds) {</span>
+<span class="nc" id="L225">            fetchPoolPledgeInEpoch(poolId, epoch, override);</span>
+<span class="nc" id="L226">            fetchPoolHistoryByEpoch(poolId, epoch, override);</span>
+<span class="nc" id="L227">            fetchPoolOwnersStakeInEpoch(poolId, epoch, override);</span>
+<span class="nc" id="L228">        }</span>
+<span class="nc" id="L229">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonDataProvider.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cardano-reward-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.data.provider</a> &gt; <span class="el_source">JsonDataProvider.java</span></div><h1>JsonDataProvider.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.data.provider;
+
+import org.cardanofoundation.rewards.entity.*;
+import org.cardanofoundation.rewards.enums.DataType;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.util.List;
+
+import static org.cardanofoundation.rewards.enums.DataType.*;
+import static org.cardanofoundation.rewards.util.JsonConverter.convertFileJsonToArrayList;
+import static org.cardanofoundation.rewards.util.JsonConverter.readJsonFile;
+@Service
+<span class="fc" id="L15">public class JsonDataProvider implements DataProvider {</span>
+
+    @Value(&quot;${json.data-provider.source}&quot;)
+    private String sourceFolder;
+
+    private String getResourceFolder(DataType dataType, Integer epoch, String poolId) {
+<span class="pc bpc" id="L21" title="1 of 2 branches missed.">        if (sourceFolder == null) throw new RuntimeException(&quot;Invalid source folder for JSON data provider. Please check the JSON_DATA_SOURCE_FOLDER environment variable that you have provided.&quot;);</span>
+
+<span class="fc bfc" id="L23" title="All 2 branches covered.">        if (dataType.equals(POOL_DEREGISTRATIONS)) {</span>
+<span class="fc" id="L24">            return String.join(File.separator, sourceFolder, &quot;poolDeregistrations&quot;, &quot;deregistrations.json&quot;);</span>
+<span class="fc bfc" id="L25" title="All 2 branches covered.">        } else if (dataType.equals(POOL_PARAMETERS)) {</span>
+<span class="fc" id="L26">            return String.join(File.separator, sourceFolder, &quot;pools&quot;, poolId, &quot;parameters_epoch_&quot; + epoch + &quot;.json&quot;);</span>
+<span class="fc bfc" id="L27" title="All 2 branches covered.">        } else if (dataType.equals(POOL_HISTORY)) {</span>
+<span class="fc" id="L28">            return String.join(File.separator, sourceFolder, &quot;pools&quot;, poolId, &quot;history_epoch_&quot; + epoch + &quot;.json&quot;);</span>
+<span class="fc bfc" id="L29" title="All 2 branches covered.">        } else if (dataType.equals(POOL_OWNER_HISTORY)) {</span>
+<span class="fc" id="L30">            return String.join(File.separator, sourceFolder, &quot;pools&quot;, poolId, &quot;owner_account_history_epoch_&quot; + epoch + &quot;.json&quot;);</span>
+<span class="fc bfc" id="L31" title="All 2 branches covered.">        } else if (dataType.equals(MIR_CERTIFICATE)) {</span>
+<span class="fc" id="L32">            return String.join(File.separator, sourceFolder, &quot;mirCertificates&quot;, &quot;mirCertificates.json&quot;);</span>
+        } else {
+<span class="fc" id="L34">            return String.join(File.separator, sourceFolder, dataType.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
+        }
+    }
+
+    private &lt;T&gt; T getDataFromJson(DataType dataType, int epoch, Class&lt;T&gt; objectClass, String poolId) {
+<span class="fc" id="L39">        String filePath = getResourceFolder(dataType, epoch, poolId);</span>
+
+        try {
+<span class="fc" id="L42">            return readJsonFile(filePath, objectClass);</span>
+<span class="nc" id="L43">        } catch (Exception e) {</span>
+<span class="nc" id="L44">            e.printStackTrace();</span>
+        }
+<span class="nc" id="L46">        return null;</span>
+    }
+
+    private &lt;T&gt; T getDataFromJson(DataType dataType, int epoch, Class&lt;T&gt; objectClass) {
+<span class="fc" id="L50">        return getDataFromJson(dataType, epoch, objectClass, null);</span>
+    }
+
+    private &lt;T&gt; List&lt;T&gt; getListFromJson(DataType dataType, Integer epoch, Class&lt;T&gt; objectClass, String poolId) {
+<span class="fc" id="L54">        String filePath = getResourceFolder(dataType, epoch, poolId);</span>
+
+        try {
+<span class="fc" id="L57">            return convertFileJsonToArrayList(filePath, objectClass);</span>
+<span class="nc" id="L58">        } catch (Exception e) {</span>
+<span class="nc" id="L59">            e.printStackTrace();</span>
+        }
+<span class="nc" id="L61">        return null;</span>
+    }
+
+    private &lt;T&gt; List&lt;T&gt; getListFromJson(DataType dataType, Integer epoch, Class&lt;T&gt; objectClass) {
+<span class="fc" id="L65">        return getListFromJson(dataType, epoch, objectClass, null);</span>
+    }
+
+    @Override
+    public AdaPots getAdaPotsForEpoch(int epoch) {
+<span class="fc" id="L70">        return getDataFromJson(ADA_POTS, epoch, AdaPots.class);</span>
+    }
+
+    @Override
+    public Epoch getEpochInfo(int epoch) {
+<span class="fc" id="L75">        return getDataFromJson(EPOCH_INFO, epoch, Epoch.class);</span>
+    }
+
+    @Override
+    public ProtocolParameters getProtocolParametersForEpoch(int epoch) {
+<span class="fc" id="L80">        return getDataFromJson(PROTOCOL_PARAMETERS, epoch, ProtocolParameters.class);</span>
+    }
+
+    @Override
+    public PoolHistory getPoolHistory(String poolId, int epoch) {
+<span class="fc" id="L85">        return getDataFromJson(POOL_HISTORY, epoch, PoolHistory.class, poolId);</span>
+    }
+
+    @Override
+    public Double getPoolPledgeInEpoch(String poolId, int epoch) {
+<span class="fc" id="L90">        PoolParameters poolParameters = getDataFromJson(POOL_PARAMETERS, epoch, PoolParameters.class, poolId);</span>
+
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">        if (poolParameters == null) return null;</span>
+
+<span class="fc" id="L94">        return poolParameters.getPledge();</span>
+    }
+
+    @Override
+    public PoolOwnerHistory getHistoryOfPoolOwnersInEpoch(String poolId, int epoch) {
+<span class="fc" id="L99">        return getDataFromJson(POOL_OWNER_HISTORY, epoch, PoolOwnerHistory.class, poolId);</span>
+    }
+
+    public List&lt;String&gt; getStakeAddressesOfAllPoolsEverRetired() {
+<span class="nc" id="L103">        List&lt;PoolDeregistration&gt; poolDeregistrations = getListFromJson(POOL_DEREGISTRATIONS, null, PoolDeregistration.class);</span>
+
+<span class="nc bnc" id="L105" title="All 2 branches missed.">        if (poolDeregistrations == null) return List.of();</span>
+
+<span class="nc" id="L107">        return poolDeregistrations.stream()</span>
+<span class="nc" id="L108">                .map(PoolDeregistration::getRewardAddress)</span>
+<span class="nc" id="L109">                .toList();</span>
+    }
+
+    @Override
+    public List&lt;PoolDeregistration&gt; getRetiredPoolsInEpoch(int epoch) {
+<span class="fc" id="L114">        List&lt;PoolDeregistration&gt; poolDeregistrations = getListFromJson(POOL_DEREGISTRATIONS, null, PoolDeregistration.class);</span>
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">        if (poolDeregistrations == null) return List.of();</span>
+
+<span class="fc" id="L117">        return poolDeregistrations.stream()</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">                .filter(poolDeregistration -&gt; poolDeregistration.getRetiringEpoch() == epoch)</span>
+<span class="fc" id="L119">                .toList();</span>
+    }
+
+    @Override
+    public List&lt;AccountUpdate&gt; getAccountUpdatesUntilEpoch(List&lt;String&gt; stakeAddresses, int epoch) {
+<span class="fc" id="L124">        List&lt;AccountUpdate&gt; accountUpdates = getListFromJson(ACCOUNT_UPDATES, epoch, AccountUpdate.class);</span>
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">        if (accountUpdates == null) return List.of();</span>
+<span class="fc" id="L126">        return accountUpdates.stream().filter(accountUpdate -&gt; stakeAddresses.contains(accountUpdate.getStakeAddress())).toList();</span>
+    }
+
+    @Override
+    public List&lt;MirCertificate&gt; getMirCertificatesInEpoch(int epoch) {
+<span class="fc" id="L131">        List&lt;MirCertificate&gt; mirCertificates = getListFromJson(MIR_CERTIFICATE, epoch, MirCertificate.class);</span>
+<span class="fc" id="L132">        Epoch epochInfo = getDataFromJson(EPOCH_INFO, epoch, Epoch.class);</span>
+<span class="pc bpc" id="L133" title="2 of 4 branches missed.">        if (mirCertificates == null || epochInfo == null) return List.of();</span>
+
+<span class="fc" id="L135">        return mirCertificates.stream()</span>
+<span class="fc bfc" id="L136" title="All 2 branches covered.">                .filter(mirCertificate -&gt; mirCertificate.getBlockTime() &lt;= epochInfo.getUnixTimeLastBlock())</span>
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">                .filter(mirCertificate -&gt; mirCertificate.getBlockTime() &gt;= epochInfo.getUnixTimeFirstBlock())</span>
+<span class="fc" id="L138">                .toList();</span>
+    }
+
+    @Override
+    public int getPoolRegistrationsInEpoch(int epoch) {
+<span class="nc" id="L143">        return 0;</span>
+    }
+
+    @Override
+    public List&lt;PoolUpdate&gt; getPoolUpdateAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch) {
+<span class="nc" id="L148">        return null;</span>
+    }
+
+    @Override
+    public PoolDeregistration latestPoolRetirementUntilEpoch(String poolId, int epoch) {
+<span class="nc" id="L153">        return null;</span>
+    }
+
+    @Override
+    public Double getTransactionDepositsInEpoch(int epoch) {
+<span class="nc" id="L158">        return null;</span>
+    }
+
+    @Override
+    public Double getSumOfFeesInEpoch(int epoch) {
+<span class="nc" id="L163">        return null;</span>
+    }
+
+    @Override
+    public Double getSumOfWithdrawalsInEpoch(int epoch) {
+<span class="nc" id="L168">        return null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

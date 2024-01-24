@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdaPotsMapper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cardano-reward-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.mapper</a> &gt; <span class="el_source">AdaPotsMapper.java</span></div><h1>AdaPotsMapper.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.mapper;
+
+import org.cardanofoundation.rewards.entity.AdaPots;
+import org.cardanofoundation.rewards.entity.jpa.DbSyncAdaPots;
+import rest.koios.client.backend.api.network.model.Totals;
+
+import static org.cardanofoundation.rewards.constants.RewardConstants.TOTAL_LOVELACE;
+
+<span class="nc" id="L9">public class AdaPotsMapper {</span>
+
+    public static AdaPots fromKoiosTotals (Totals totals) {
+<span class="pc bpc" id="L12" title="1 of 2 branches missed.">        if (totals == null) return null;</span>
+
+<span class="fc" id="L14">        return AdaPots.builder()</span>
+<span class="fc" id="L15">                .treasury(Double.parseDouble(totals.getTreasury()))</span>
+<span class="fc" id="L16">                .reserves(Double.parseDouble(totals.getReserves()))</span>
+<span class="fc" id="L17">                .rewards(Double.parseDouble(totals.getReward()))</span>
+<span class="fc" id="L18">                .adaInCirculation(Double.parseDouble(totals.getSupply()))</span>
+<span class="fc" id="L19">                .epoch(totals.getEpochNo())</span>
+<span class="fc" id="L20">                .build();</span>
+    }
+
+    public static AdaPots fromDbSyncAdaPots (DbSyncAdaPots dbSyncAdaPots) {
+<span class="nc" id="L24">        return AdaPots.builder()</span>
+<span class="nc" id="L25">                .treasury(dbSyncAdaPots.getTreasury())</span>
+<span class="nc" id="L26">                .reserves(dbSyncAdaPots.getReserves())</span>
+<span class="nc" id="L27">                .rewards(dbSyncAdaPots.getRewards())</span>
+<span class="nc" id="L28">                .deposits(dbSyncAdaPots.getDeposits())</span>
+<span class="nc" id="L29">                .fees(dbSyncAdaPots.getFees())</span>
+<span class="nc" id="L30">                .adaInCirculation(dbSyncAdaPots.getUtxo())</span>
+<span class="nc" id="L31">                .epoch(dbSyncAdaPots.getEpoch())</span>
+<span class="nc" id="L32">                .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PoolHistoryMapper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cardano-reward-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.mapper</a> &gt; <span class="el_source">PoolHistoryMapper.java</span></div><h1>PoolHistoryMapper.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.mapper;
+
+import org.cardanofoundation.rewards.entity.PoolHistory;
+
+<span class="nc" id="L5">public class PoolHistoryMapper {</span>
+
+    public static PoolHistory fromKoiosPoolHistory(rest.koios.client.backend.api.pool.model.PoolHistory poolHistory) {
+<span class="pc bpc" id="L8" title="1 of 2 branches missed.">        if (poolHistory == null) return null;</span>
+
+<span class="fc" id="L10">        return PoolHistory.builder()</span>
+<span class="fc" id="L11">            .activeStake(Double.parseDouble(poolHistory.getActiveStake()))</span>
+<span class="fc" id="L12">            .delegatorRewards(Double.parseDouble(poolHistory.getDelegRewards()))</span>
+<span class="fc" id="L13">            .poolFees(Double.parseDouble(poolHistory.getPoolFees()))</span>
+<span class="fc" id="L14">            .margin(Double.parseDouble(String.valueOf(poolHistory.getMargin())))</span>
+<span class="fc" id="L15">            .fixedCost(Double.parseDouble(String.valueOf(poolHistory.getFixedCost())))</span>
+<span class="fc" id="L16">            .blockCount(poolHistory.getBlockCnt())</span>
+<span class="fc" id="L17">            .epoch(poolHistory.getEpochNo())</span>
+<span class="fc" id="L18">            .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

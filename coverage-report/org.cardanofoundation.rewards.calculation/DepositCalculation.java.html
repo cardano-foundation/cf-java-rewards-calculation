@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DepositCalculation.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cardano-reward-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.calculation</a> &gt; <span class="el_source">DepositCalculation.java</span></div><h1>DepositCalculation.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.calculation;
+
+import org.cardanofoundation.rewards.data.provider.DataProvider;
+import org.cardanofoundation.rewards.entity.AdaPots;
+import org.cardanofoundation.rewards.entity.PoolDeregistration;
+import org.cardanofoundation.rewards.entity.PoolUpdate;
+
+import java.util.List;
+
+import static org.cardanofoundation.rewards.constants.RewardConstants.DEPOSIT_POOL_REGISTRATION_IN_LOVELACE;
+
+<span class="nc" id="L12">public class DepositCalculation {</span>
+
+    public static double calculateDepositInEpoch(int epoch, DataProvider dataProvider) {
+<span class="nc" id="L15">        AdaPots adaPots = dataProvider.getAdaPotsForEpoch(epoch);</span>
+<span class="nc" id="L16">        double depositsInPreviousEpoch = adaPots.getDeposits();</span>
+<span class="nc" id="L17">        double deposit = 0;</span>
+
+<span class="nc bnc" id="L19" title="All 2 branches missed.">        if (epoch &gt; 207) {</span>
+<span class="nc" id="L20">            double transactionDepositsInEpoch = dataProvider.getTransactionDepositsInEpoch(epoch);</span>
+<span class="nc" id="L21">            List&lt;PoolDeregistration&gt; retiredPoolsInEpoch = dataProvider.getRetiredPoolsInEpoch(epoch + 1);</span>
+<span class="nc" id="L22">            int actualPoolDeregistrationsInEpoch = 0;</span>
+
+<span class="nc bnc" id="L24" title="All 2 branches missed.">            for (PoolDeregistration poolDeregistration : retiredPoolsInEpoch) {</span>
+<span class="nc" id="L25">                boolean poolDeregistrationLaterInEpoch = retiredPoolsInEpoch.stream().anyMatch(</span>
+<span class="nc bnc" id="L26" title="All 2 branches missed.">                        deregistration -&gt; deregistration.getPoolId().equals(poolDeregistration.getPoolId()) &amp;&amp;</span>
+<span class="nc bnc" id="L27" title="All 2 branches missed.">                                deregistration.getAnnouncedTransactionId() &gt; poolDeregistration.getAnnouncedTransactionId()</span>
+                );
+
+                // To prevent double counting, we only count the pool deregistration if there is no other deregistration
+                // for the same pool later in the epoch
+<span class="nc bnc" id="L32" title="All 2 branches missed.">                if (poolDeregistrationLaterInEpoch) {</span>
+<span class="nc" id="L33">                    continue;</span>
+                }
+
+<span class="nc" id="L36">                List&lt;PoolUpdate&gt; poolUpdates = dataProvider.getPoolUpdateAfterTransactionIdInEpoch(poolDeregistration.getPoolId(),</span>
+<span class="nc" id="L37">                        poolDeregistration.getAnnouncedTransactionId(), epoch);</span>
+
+                // There is an update after the deregistration, so the pool was not retired
+<span class="nc bnc" id="L40" title="All 2 branches missed.">                if (poolUpdates.size() == 0) {</span>
+<span class="nc" id="L41">                    PoolDeregistration latestPoolRetirementUntilEpoch = dataProvider.latestPoolRetirementUntilEpoch(poolDeregistration.getPoolId(), epoch);</span>
+<span class="nc bnc" id="L42" title="All 4 branches missed.">                    if (latestPoolRetirementUntilEpoch != null &amp;&amp; latestPoolRetirementUntilEpoch.getRetiringEpoch() != epoch + 1) {</span>
+                        // The pool was retired in a previous epoch for the next epoch, but another deregistration was announced and changed the
+                        // retirement epoch to something else. This means the pool was not retired in this epoch.
+<span class="nc" id="L45">                        continue;</span>
+                    }
+
+<span class="nc" id="L48">                    actualPoolDeregistrationsInEpoch += 1;</span>
+                }
+<span class="nc" id="L50">            }</span>
+
+<span class="nc" id="L52">            deposit += transactionDepositsInEpoch;</span>
+<span class="nc" id="L53">            deposit -= actualPoolDeregistrationsInEpoch * DEPOSIT_POOL_REGISTRATION_IN_LOVELACE;</span>
+        }
+
+<span class="nc" id="L56">        return depositsInPreviousEpoch + deposit;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

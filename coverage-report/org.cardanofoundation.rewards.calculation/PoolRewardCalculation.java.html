@@ -1,31 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PoolRewardCalculation.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cardano-reward-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.calculation</a> &gt; <span class="el_source">PoolRewardCalculation.java</span></div><h1>PoolRewardCalculation.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.calculation;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
+import org.cardanofoundation.rewards.data.provider.DataProvider;
+import org.cardanofoundation.rewards.entity.*;
 
-<span class="nc" id="L7">public class PoolRewardCalculation {</span>
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.cardanofoundation.rewards.constants.RewardConstants.TOTAL_LOVELACE;
+
+<span class="nc" id="L11">public class PoolRewardCalculation {</span>
 
     /*
-    * https://github.com/input-output-hk/cardano-ledger/releases/latest/download/shelley-delegation.pdf
-    *
-    * Calculate the apparent pool performance with the formula (shelley-delegation.pdf page 36):
-    *
-    * performance = relativeBlocksCreatedInEpoch / relativeActiveStake
-    *
-    * hint: shelley-delegation.pdf 3.8.3
-    *       As long as we have d &gt;= 0.8, we set the apparent performance of any pool to 1
-    */
-    public static BigDecimal calculateApparentPoolPerformance(BigDecimal poolStake, BigDecimal totalEpochStake,
-                                                              int blocksMintedByPool, int totalBlocksInEpoch,
-                                                              double decentralizationParam) {
-<span class="pc bpc" id="L22" title="1 of 2 branches missed.">        if (decentralizationParam &gt;= 0.8) {</span>
-<span class="fc" id="L23">            return BigDecimal.ONE;</span>
-        }
+     * https://github.com/input-output-hk/cardano-ledger/releases/latest/download/shelley-delegation.pdf
+     *
+     * Calculate the apparent pool performance with the formula (shelley-delegation.pdf page 36):
+     *
+     * performance = relativeBlocksCreatedInEpoch / relativeActiveStake
+     *
+     * hint: shelley-delegation.pdf 3.8.3
+     *       As long as we have d &gt;= 0.8, we set the apparent performance of any pool to 1
+     *
+     * See Haskell implementation: https://github.com/input-output-hk/cardano-ledger/blob/64459cc87094331c79d11880e0a4c81b9a721ab0/eras/shelley/impl/src/Cardano/Ledger/Shelley/Rewards.hs#L87C32-L87C44
+     */
+    public static double calculateApparentPoolPerformance(final double activePoolStake, final double totalActiveEpochStake, final int blocksMintedByPool, final int blocksMintedByStakePools, final double decentralizationParam) {
+<span class="fc bfc" id="L26" title="All 2 branches covered.">        if (decentralizationParam &gt;= 0.8) {</span>
+<span class="fc" id="L27">            return 1.0;</span>
+<span class="pc bpc" id="L28" title="2 of 4 branches missed.">        } else if (activePoolStake == 0.0 || totalActiveEpochStake == 0.0) {</span>
+<span class="nc" id="L29">            return 0.0;</span>
+        } else {
 
-<span class="nc" id="L26">        BigDecimal relativeBlocksCreatedInEpoch = new BigDecimal(blocksMintedByPool).divide(new BigDecimal(totalBlocksInEpoch), 30, RoundingMode.DOWN);</span>
-<span class="nc" id="L27">        BigDecimal relativeActiveStake = poolStake.divide(totalEpochStake, 30, RoundingMode.DOWN);</span>
-<span class="nc" id="L28">        return relativeBlocksCreatedInEpoch.divide(relativeActiveStake, 30, RoundingMode.DOWN);</span>
+<span class="fc" id="L32">            final double relativeBlocksCreatedInEpoch = (double) blocksMintedByPool / (double) blocksMintedByStakePools;</span>
+<span class="fc" id="L33">            final double relativeActiveStake = activePoolStake / totalActiveEpochStake;</span>
+<span class="fc" id="L34">            return relativeBlocksCreatedInEpoch / relativeActiveStake;</span>
+        }
     }
 
     /*
@@ -47,45 +54,188 @@ import java.math.RoundingMode;
      *          (( sizeOfASaturatedPool - cappedRelativeStake ) / sizeOfASaturatedPool))
      *          / sizeOfASaturatedPool)
      *      )
+     *
+     * See the Haskell implementation: https://github.com/input-output-hk/cardano-ledger/blob/e722881568155fc39550a8dfabda3efeb263a1e5/shelley/chain-and-ledger/executable-spec/src/Shelley/Spec/Ledger/EpochBoundary.hs#L111
      */
-    public static BigDecimal calculateOptimalPoolReward(
-            BigDecimal totalAvailableRewards,
-            int optimalPoolCount,
-            double influenceParam,
-            BigDecimal relativeStakeOfPool,
-            BigDecimal relativeStakeOfPoolOwner) {
-<span class="fc" id="L57">        var influence = new BigDecimal(influenceParam);</span>
-<span class="fc" id="L58">        var sizeOfASaturatedPool =</span>
-<span class="fc" id="L59">                BigDecimal.ONE.divide(</span>
-                        new BigDecimal(optimalPoolCount), 30, RoundingMode.DOWN);
+    public static double calculateOptimalPoolReward(double totalAvailableRewards, int optimalPoolCount, double influence, double relativeStakeOfPool, double relativeStakeOfPoolOwner) {
 
-<span class="fc" id="L62">        var cappedRelativeStake = sizeOfASaturatedPool.min(relativeStakeOfPool);</span>
-<span class="fc" id="L63">        var cappedRelativeStakeOfPoolOwner = sizeOfASaturatedPool.min(relativeStakeOfPoolOwner);</span>
-<span class="fc" id="L64">        MathContext mathContext = new MathContext(30, RoundingMode.DOWN);</span>
+<span class="fc" id="L62">        double sizeOfASaturatedPool = 1.0 / optimalPoolCount;</span>
+<span class="fc" id="L63">        double cappedRelativeStake = Math.min(relativeStakeOfPool, sizeOfASaturatedPool);</span>
+<span class="fc" id="L64">        double cappedRelativeStakeOfPoolOwner = Math.min(relativeStakeOfPoolOwner, sizeOfASaturatedPool);</span>
 
         // R / (1 + a0)
-<span class="fc" id="L67">        var rewardsDividedByOnePlusInfluence = totalAvailableRewards.divide(BigDecimal.ONE.add(influence), 30, RoundingMode.DOWN);</span>
+        // &quot;R are the total available rewards for the epoch (in ada).&quot; (shelley-delegation.pdf 5.5.3)
+<span class="fc" id="L68">        double rewardsDividedByOnePlusInfluence = totalAvailableRewards / (1 + influence);</span>
 
-        // s' * a0
-<span class="fc" id="L70">        var influenceOfOwner = cappedRelativeStakeOfPoolOwner.multiply(influence, mathContext);</span>
+        // (z0 - sigma') / z0
+<span class="fc" id="L71">        double relativeStakeOfSaturatedPool = (sizeOfASaturatedPool - cappedRelativeStake) / sizeOfASaturatedPool;</span>
 
-        // s'((z0 - o')/ z0)
-<span class="fc" id="L73">        var relativeStakeOfSaturatedPool = cappedRelativeStakeOfPoolOwner.multiply(</span>
-<span class="fc" id="L74">                sizeOfASaturatedPool.subtract(cappedRelativeStake, mathContext).divide(sizeOfASaturatedPool, 30, RoundingMode.DOWN));</span>
+        // (sigma' - s' * relativeStakeOfSaturatedPool) / z0
+<span class="fc" id="L74">        double saturatedPoolWeight = (cappedRelativeStake - cappedRelativeStakeOfPoolOwner * relativeStakeOfSaturatedPool) / sizeOfASaturatedPool;</span>
 
-        // o' - (s' * (z0 - o')/ z0) / z0)
-<span class="fc" id="L77">        var saturatedPoolWeight = cappedRelativeStake.subtract(relativeStakeOfSaturatedPool, mathContext)</span>
-<span class="fc" id="L78">                .divide(sizeOfASaturatedPool, 30, RoundingMode.DOWN);</span>
-
-<span class="fc" id="L80">        return rewardsDividedByOnePlusInfluence.multiply(cappedRelativeStake.add(influenceOfOwner.multiply(saturatedPoolWeight)));</span>
+        // R / (1+a0) * (sigma' + s' * a0 * saturatedPoolWeight)
+<span class="fc" id="L77">        return Math.floor(rewardsDividedByOnePlusInfluence *</span>
+                (cappedRelativeStake + cappedRelativeStakeOfPoolOwner * influence * saturatedPoolWeight));
     }
 
     /*
      *  Calculate the pool reward with the formula (shelley-delegation.pdf 5.5.3 page 37 below):
      *  actualRewards = poolPerformance * optimalPoolReward
      */
-    public static BigDecimal calculatePoolReward(BigDecimal optimalPoolReward, BigDecimal poolPerformance) {
-<span class="fc" id="L88">        return optimalPoolReward.multiply(poolPerformance);</span>
+    public static double calculatePoolReward(double optimalPoolReward, double poolPerformance) {
+<span class="fc" id="L86">        return optimalPoolReward * poolPerformance;</span>
+    }
+
+    /*
+     * This method calculates the pool operator reward regarding the formula described
+     * in the shelly-ledger.pdf p. 61, figure 47
+     */
+    public static double calculateLeaderReward(double poolReward, double margin, double poolCost,
+                                               double relativeOwnerStake, double relativeStakeOfPool) {
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if (poolReward &lt;= poolCost) {</span>
+<span class="nc" id="L96">            return poolCost;</span>
+        }
+
+<span class="fc" id="L99">        return poolCost +</span>
+<span class="fc" id="L100">                Math.floor((poolReward - poolCost) *</span>
+                        (margin + (1 - margin) * (relativeOwnerStake / relativeStakeOfPool)));
+    }
+
+    /*
+     * This method calculates the pool member reward regarding the formula described
+     * in the shelly-ledger.pdf p. 61, figure 47
+     *
+     * See Haskell implementation: https://github.com/input-output-hk/cardano-ledger/blob/aed5dde9cd1096cfc2e255879cd617c0d64f8d9d/eras/shelley/impl/src/Cardano/Ledger/Shelley/Rewards.hs#L117
+     */
+    public static double calculateMemberReward(double poolReward, double margin, double poolCost,
+                                               double relativeMemberStake, double relativeStakeOfPool) {
+<span class="fc" id="L112">        return Math.floor((poolReward - poolCost) * (1 - margin) * relativeMemberStake / relativeStakeOfPool);</span>
+    }
+
+    public static PoolRewardCalculationResult calculatePoolRewardInEpoch(String poolId, int epoch, DataProvider dataProvider) {
+        // Step 1: Get Pool information of current epoch
+        // Example: https://api.koios.rest/api/v0/pool_history?_pool_bech32=pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt&amp;_epoch_no=210
+<span class="fc" id="L118">        PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardCalculationResult.builder()</span>
+<span class="fc" id="L119">                .epoch(epoch)</span>
+<span class="fc" id="L120">                .poolId(poolId)</span>
+<span class="fc" id="L121">                .poolReward(0.0)</span>
+<span class="fc" id="L122">                .build();</span>
+
+<span class="fc" id="L124">        PoolHistory poolHistoryCurrentEpoch = dataProvider.getPoolHistory(poolId, epoch);</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">        if(poolHistoryCurrentEpoch == null) {</span>
+<span class="fc" id="L126">            return poolRewardCalculationResult;</span>
+        }
+
+<span class="fc" id="L129">        double poolStake = poolHistoryCurrentEpoch.getActiveStake();</span>
+<span class="fc" id="L130">        double poolFees = poolHistoryCurrentEpoch.getPoolFees();</span>
+<span class="fc" id="L131">        double poolMargin = poolHistoryCurrentEpoch.getMargin();</span>
+<span class="fc" id="L132">        double poolFixedCost = poolHistoryCurrentEpoch.getFixedCost();</span>
+<span class="fc" id="L133">        int blocksPoolHasMinted = poolHistoryCurrentEpoch.getBlockCount();</span>
+
+<span class="fc" id="L135">        poolRewardCalculationResult.setPoolFee(poolFees);</span>
+<span class="fc" id="L136">        poolRewardCalculationResult.setPoolMargin(poolMargin);</span>
+<span class="fc" id="L137">        poolRewardCalculationResult.setPoolCost(poolFixedCost);</span>
+
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">        if (blocksPoolHasMinted == 0) {</span>
+<span class="nc" id="L140">            return poolRewardCalculationResult;</span>
+        }
+
+        // Step 2: Get Epoch information of current epoch
+        // Source: https://api.koios.rest/api/v0/epoch_info?_epoch_no=211
+<span class="fc" id="L145">        Epoch epochInfo = dataProvider.getEpochInfo(epoch);</span>
+
+<span class="fc" id="L147">        double activeStakeInEpoch = 0;</span>
+<span class="pc bpc" id="L148" title="1 of 2 branches missed.">        if (epochInfo.getActiveStake() != null) {</span>
+<span class="fc" id="L149">            activeStakeInEpoch = epochInfo.getActiveStake();</span>
+        }
+
+        // The Shelley era and the ada pot system started on mainnet in epoch 208.
+        // Fee and treasury values are 0 for epoch 208.
+<span class="fc" id="L154">        double totalFeesForCurrentEpoch = 0.0;</span>
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">        if (epoch &gt; 209) {</span>
+<span class="fc" id="L156">            totalFeesForCurrentEpoch = epochInfo.getFees();</span>
+        }
+
+<span class="fc" id="L159">        int totalBlocksInEpoch = epochInfo.getBlockCount();</span>
+
+<span class="pc bpc" id="L161" title="1 of 4 branches missed.">        if (epoch &gt; 212 &amp;&amp; epoch &lt; 255) {</span>
+<span class="fc" id="L162">            totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();</span>
+        }
+
+        // Get the ada reserves for the next epoch because it was already updated yet
+<span class="fc" id="L166">        AdaPots adaPotsForNextEpoch = dataProvider.getAdaPotsForEpoch(epoch + 1);</span>
+<span class="fc" id="L167">        double reserves = adaPotsForNextEpoch.getReserves();</span>
+
+        // Step 3: Get total ada in circulation
+<span class="fc" id="L170">        double adaInCirculation = TOTAL_LOVELACE - reserves;</span>
+
+        // Step 4: Get protocol parameters for current epoch
+<span class="fc" id="L173">        ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch);</span>
+<span class="fc" id="L174">        double decentralizationParameter = protocolParameters.getDecentralisation();</span>
+<span class="fc" id="L175">        int optimalPoolCount = protocolParameters.getOptimalPoolCount();</span>
+<span class="fc" id="L176">        double influenceParam = protocolParameters.getPoolOwnerInfluence();</span>
+<span class="fc" id="L177">        double monetaryExpandRate = protocolParameters.getMonetaryExpandRate();</span>
+<span class="fc" id="L178">        double treasuryGrowRate = protocolParameters.getTreasuryGrowRate();</span>
+
+        // Step 5: Calculate apparent pool performance
+<span class="fc" id="L181">        double apparentPoolPerformance =</span>
+<span class="fc" id="L182">                PoolRewardCalculation.calculateApparentPoolPerformance(poolStake, activeStakeInEpoch,</span>
+                        blocksPoolHasMinted, totalBlocksInEpoch, decentralizationParameter);
+<span class="fc" id="L184">        poolRewardCalculationResult.setApparentPoolPerformance(apparentPoolPerformance);</span>
+        // Step 6: Calculate total available reward for pools (total reward pot after treasury cut)
+        // -----
+<span class="fc" id="L187">        double totalRewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(</span>
+                monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserves, totalFeesForCurrentEpoch);
+
+<span class="fc" id="L190">        double stakePoolRewardsPot = totalRewardPot - Math.floor(totalRewardPot * treasuryGrowRate);</span>
+<span class="fc" id="L191">        poolRewardCalculationResult.setStakePoolRewardsPot(stakePoolRewardsPot);</span>
+        // shelley-delegation.pdf 5.5.3
+        //      &quot;[...]the relative stake of the pool owner(s) (the amount of ada
+        //      pledged during pool registration)&quot;
+
+        // Step 7: Get the latest pool update before this epoch and extract the pledge
+<span class="fc" id="L197">        double poolPledge = dataProvider.getPoolPledgeInEpoch(poolId, epoch);</span>
+
+<span class="fc" id="L199">        PoolOwnerHistory poolOwnersHistoryInEpoch = dataProvider.getHistoryOfPoolOwnersInEpoch(poolId, epoch);</span>
+<span class="fc" id="L200">        double totalActiveStakeOfOwners = poolOwnersHistoryInEpoch.getActiveStake();</span>
+
+<span class="pc bpc" id="L202" title="1 of 2 branches missed.">        if (totalActiveStakeOfOwners &lt; poolPledge) {</span>
+<span class="nc" id="L203">            return poolRewardCalculationResult;</span>
+        }
+
+<span class="fc" id="L206">        double relativeStakeOfPoolOwner = poolPledge / adaInCirculation;</span>
+<span class="fc" id="L207">        double relativePoolStake = poolStake / adaInCirculation;</span>
+
+        // Step 8: Calculate optimal pool reward
+<span class="fc" id="L210">        double optimalPoolReward =</span>
+<span class="fc" id="L211">                PoolRewardCalculation.calculateOptimalPoolReward(</span>
+                        stakePoolRewardsPot,
+                        optimalPoolCount,
+                        influenceParam,
+                        relativePoolStake,
+                        relativeStakeOfPoolOwner);
+<span class="fc" id="L217">        poolRewardCalculationResult.setOptimalPoolReward(optimalPoolReward);</span>
+
+        // Step 9: Calculate pool reward as optimal pool reward * apparent pool performance
+<span class="fc" id="L220">        double poolReward = PoolRewardCalculation.calculatePoolReward(optimalPoolReward, apparentPoolPerformance);</span>
+<span class="fc" id="L221">        poolRewardCalculationResult.setPoolReward(poolReward);</span>
+
+        // Step 10: Calculate pool operator reward
+<span class="fc" id="L224">        double poolOperatorReward = PoolRewardCalculation.calculateLeaderReward(poolReward, poolMargin, poolFixedCost,</span>
+                totalActiveStakeOfOwners / adaInCirculation, relativePoolStake);
+<span class="fc" id="L226">        poolRewardCalculationResult.setOperatorReward(poolOperatorReward);</span>
+        // Step 11: Calculate pool member reward
+<span class="fc" id="L228">        List&lt;Reward&gt; memberRewards = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L229" title="All 2 branches covered.">        for (Delegator delegator : poolHistoryCurrentEpoch.getDelegators()) {</span>
+<span class="fc" id="L230">            double memberReward = PoolRewardCalculation.calculateMemberReward(poolReward, poolMargin,</span>
+<span class="fc" id="L231">                    poolFixedCost, delegator.getActiveStake() / adaInCirculation, relativePoolStake);</span>
+<span class="fc" id="L232">            memberRewards.add(Reward.builder()</span>
+<span class="fc" id="L233">                    .amount(memberReward)</span>
+<span class="fc" id="L234">                    .stakeAddress(delegator.getStakeAddress())</span>
+<span class="fc" id="L235">                    .build());</span>
+<span class="fc" id="L236">        }</span>
+<span class="fc" id="L237">        poolRewardCalculationResult.setMemberRewards(memberRewards);</span>
+<span class="fc" id="L238">        return poolRewardCalculationResult;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
