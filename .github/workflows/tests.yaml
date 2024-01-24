@@ -37,8 +37,19 @@ jobs:
 
       - name: Debug
         run: |
+          echo "$PWD"
+
+      - name: Debug
+        run: |
+          ls -la ../../data
+
+      - name: Debug
+        run: |
+          ls -la /data
+
+      - name: Debug
+        run: |
           ls -la /data/rewards-calculation-test-data
-          du /data/rewards-calculation-test-data
 
       - name: 🍀 Generate .env file
         run: |
