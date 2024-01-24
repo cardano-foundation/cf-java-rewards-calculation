@@ -37,6 +37,10 @@ jobs:
           aws_region: ${{ secrets.AWS_REGION }}
           flags: --recursive
 
+      - name: Debug
+        run: |
+          ls -la /data/rewards-calculation-test-data
+
       - name: 🍀 Generate .env file
         run: |
           echo "SPRING_PROFILES_ACTIVE=ci" >> src/test/resources/.env
