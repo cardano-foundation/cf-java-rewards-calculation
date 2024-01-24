@@ -24,37 +24,21 @@ jobs:
         run: |
           mvn --batch-mode --update-snapshots clean package -DskipTests
 
-      - name: 👻 Create empty test data folder
-        run: |
-          mkdir -p /data/rewards-calculation-test-data
-
       - name: ⬇️ Download test data
         uses: keithweaver/aws-s3-github-action@v1.0.0
         with:
           command: cp
           source: ${{ secrets.AWS_S3_BUCKET }}
-          destination: /data/rewards-calculation-test-data
+          destination: ./rewards-calculation-test-data
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: ${{ secrets.AWS_REGION }}
           flags: --recursive
 
-      - name: Debug
-        run: |
-          echo "$PWD"
-
-      - name: Debug
-        run: |
-          ls -la /data
-
-      - name: Debug
-        run: |
-          ls -la /data/rewards-calculation-test-data
-
       - name: 🍀 Generate .env file
         run: |
           echo "SPRING_PROFILES_ACTIVE=ci" >> src/test/resources/.env
-          echo "JSON_DATA_SOURCE_FOLDER=/data/rewards-calculation-test-data" >> src/test/resources/.env
+          echo "JSON_DATA_SOURCE_FOLDER=./rewards-calculation-test-data" >> src/test/resources/.env
 
       - name: 🎳 Test
         run: |
