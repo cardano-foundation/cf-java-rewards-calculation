@@ -24,6 +24,10 @@ jobs:
         run: |
           mvn --batch-mode --update-snapshots clean package -DskipTests
 
+      - name: 👻 Create empty test data folder
+        run: |
+          mkdir -p /data/rewards-calculation-test-data
+
       - name: ⬇️ Download test data
         uses: keithweaver/aws-s3-github-action@v1.0.0
         with:
@@ -38,10 +42,6 @@ jobs:
       - name: Debug
         run: |
           echo "$PWD"
-
-      - name: Debug
-        run: |
-          ls -la ../../data
 
       - name: Debug
         run: |
