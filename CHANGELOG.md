@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.4.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.3.0...v0.4.0) (2024-01-27)
+
+
+### Features
+
+* download aggregated data from the s3 bucket during the report generation. closes [#22](https://github.com/cardano-foundation/cf-java-rewards-calculation/issues/22) ([267b035](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/267b035f4eed4444d42f666740e2c62ef8ae3046))
+* fetch test data from the s3 bucket while running the test ([4be8758](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/4be8758282d4d4799bdfe40a69f68be9d4c150fb))
+
+
+### Bug Fixes
+
+* repair publish pipeline ([6409772](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/640977269c402a4ad314465c0edade2f9f1adbb0))
+
 ## [0.3.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.2.0...v0.3.0) (2024-01-21)
 
 
