@@ -40,6 +40,7 @@ jobs:
       - name: 🍀 Generate .env file
         run: |
           echo "SPRING_PROFILES_ACTIVE=ci" >> src/test/resources/.env
+          echo "RUN_MODE=plot" >> src/test/resources/.env
           echo "JSON_DATA_SOURCE_FOLDER=./rewards-calculation-test-data" >> src/test/resources/.env
 
       - name: Build
@@ -47,7 +48,7 @@ jobs:
           mvn --batch-mode --update-snapshots clean package -DskipTests && mv target/rewards-*.jar target/rewards-calculation.jar
 
       - name: 📊 Generate plots
-        run: java -jar target/rewards-calculation.jar --action=plot
+        run: java -jar target/rewards-calculation.jar
 
       - name: JSON result to js file
         run: |

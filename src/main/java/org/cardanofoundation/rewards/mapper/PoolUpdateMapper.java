@@ -10,7 +10,6 @@ public class PoolUpdateMapper {
 
         return PoolUpdate.builder()
             .poolId(poolUpdate.getPoolIdBech32())
-            .poolStatus(PoolStatus.fromString(poolUpdate.getPoolStatus()))
             .activeEpoch(Math.toIntExact(poolUpdate.getActiveEpochNo()))
             .fixedCost(Double.parseDouble(String.valueOf(poolUpdate.getFixedCost())))
             .margin(poolUpdate.getMargin())

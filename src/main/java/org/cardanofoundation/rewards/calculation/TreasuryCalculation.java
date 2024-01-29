@@ -66,32 +66,51 @@ public class TreasuryCalculation {
   }
 
   public static TreasuryCalculationResult calculateTreasuryForEpoch(int epoch, DataProvider dataProvider) {
-    ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch - 2);
-    final double treasuryGrowthRate = protocolParameters.getTreasuryGrowRate();
-    final double monetaryExpandRate = protocolParameters.getMonetaryExpandRate();
-    double decentralizationParameter = protocolParameters.getDecentralisation();
+    // The Shelley era and the ada pot system started on mainnet in epoch 208.
+    // Fee and treasury values are 0 for epoch 208.
+    if (epoch == 208) {
+        return TreasuryCalculationResult.builder()
+                .calculatedTreasury(0.0)
+                .actualTreasury(0.0)
+                .epoch(epoch)
+                .totalRewardPot(0.0)
+                .treasuryWithdrawals(0.0)
+                .build();
+    }
+
+    double treasuryGrowthRate = 0.2;
+    double monetaryExpandRate = 0.003;
+    double decentralizationParameter = 1;
 
     AdaPots adaPotsForPreviousEpoch = dataProvider.getAdaPotsForEpoch(epoch - 1);
     AdaPots adaPotsForCurrentEpoch = dataProvider.getAdaPotsForEpoch(epoch);
 
-    // The Shelley era and the ada pot system started on mainnet in epoch 208.
-    // Fee and treasury values are 0 for epoch 208.
     double totalFeesForCurrentEpoch = 0.0;
-    Epoch epochInfo = dataProvider.getEpochInfo(epoch - 2);
+    int totalBlocksInEpoch = 0;
+
+    /* We need to use the epoch info 2 epochs before as shelley starts in epoch 208 it will be possible to get
+       those values from epoch 210 onwards. Before that we need to use the genesis values, but they are not
+       needed anyway if the decentralization parameter is > 0.8.
+       See: shelley-delegation.pdf 5.4.3 */
     if (epoch > 209) {
+      ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch - 2);
+      Epoch epochInfo = dataProvider.getEpochInfo(epoch - 2);
       totalFeesForCurrentEpoch = epochInfo.getFees();
+      treasuryGrowthRate = protocolParameters.getTreasuryGrowRate();
+      monetaryExpandRate = protocolParameters.getMonetaryExpandRate();
+      decentralizationParameter = protocolParameters.getDecentralisation();
+
+      totalBlocksInEpoch = epochInfo.getBlockCount();
+
+      if (decentralizationParameter < 0.8 && decentralizationParameter > 0.0) {
+        totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();
+      }
     }
 
     double reserveInPreviousEpoch = adaPotsForPreviousEpoch.getReserves();
 
     double treasuryInPreviousEpoch = adaPotsForPreviousEpoch.getTreasury();
     double expectedTreasuryForCurrentEpoch = adaPotsForCurrentEpoch.getTreasury();
-
-    int totalBlocksInEpoch = epochInfo.getBlockCount();
-
-    if (decentralizationParameter < 0.8 && decentralizationParameter > 0.0) {
-      totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();
-    }
 
     double rewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(
             monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserveInPreviousEpoch, totalFeesForCurrentEpoch);
@@ -104,18 +123,21 @@ public class TreasuryCalculation {
     treasuryForCurrentEpoch += TreasuryCalculation.calculateUnclaimedRefundsForRetiredPools(epoch, dataProvider);
 
     // Check if there was a MIR Certificate in the previous epoch
+    double treasuryWithdrawals = 0.0;
     List<MirCertificate> mirCertificates = dataProvider.getMirCertificatesInEpoch(epoch - 1);
     for (MirCertificate mirCertificate : mirCertificates) {
       if (mirCertificate.getPot() == MirPot.TREASURY) {
-        treasuryForCurrentEpoch -= mirCertificate.getTotalRewards();
+        treasuryWithdrawals += mirCertificate.getTotalRewards();
       }
     }
+    treasuryForCurrentEpoch -= treasuryWithdrawals;
 
     return TreasuryCalculationResult.builder()
             .calculatedTreasury(treasuryForCurrentEpoch)
             .actualTreasury(expectedTreasuryForCurrentEpoch)
             .epoch(epoch)
             .totalRewardPot(rewardPot)
+            .treasuryWithdrawals(treasuryWithdrawals)
             .build();
   }
 

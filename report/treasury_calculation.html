@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1" />
@@ -77,6 +78,7 @@
         table {
             border-collapse: collapse;
             width: 100%;
+            overflow: scroll;
             text-align: center;
             vertical-align: middle;
         }
@@ -89,13 +91,13 @@
             background-color: #F6C667 !important;
         }
 
-        td, th {
+        td,
+        th {
             padding: 8px;
         }
 
         .table-container {
             width: 100%;
-            overflow: scroll;
             background-color: #fff;
             padding: 16px;
             border-radius: 12px;
@@ -106,11 +108,12 @@
         }
     </style>
 </head>
+
 <body>
     <div id="content">
         <h2>Treasury Calculation Report</h2>
         <h4 id="epoch-info"></h4>
-        <div class="cards" >
+        <div class="cards">
             <div class="card" id="highest-difference-percentage"></div>
             <div class="card" id="average-difference-percentage"></div>
             <div class="card" id="highest-absolut-difference"></div>
@@ -147,7 +150,32 @@
             </table>
         </div>
 
-        <footer></footer>
-    </div>
+        <h3>Treasury Development</h3>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Epoch</th>
+                        <th>ADA Added to Treasury</th>
+                        <th>Total Rewards Pot Size</th>
+                        <th>% Added to Treasury from Total Rewards Pot</th>
+                        <th>ADA Added on Top of Treasury Cut (PoolReap, etc.)</th>
+                        <th>ADA Removed from Treasury (MIR Cert)</th>
+                    </tr>
+                </thead>
+                <tbody id="treasury-development-table">
+                </tbody>
+            </table>
+
+            <footer></footer>
+        </div>
+
+        <div class="cards">
+            <div class="card" id="ada-added-to-treasury"></div>
+            <div class="card" id="ada-withdrawled-from-treasury"></div>
+            <div class="card" id="total-ada-added-on-top-of-treasury-cut"></div>
+        </div>
 </body>
+
 </html>

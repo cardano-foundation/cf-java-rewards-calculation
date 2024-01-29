@@ -4,12 +4,15 @@ import org.cardanofoundation.rewards.data.provider.DbSyncDataProvider;
 import org.cardanofoundation.rewards.entity.persistence.AggregationsInEpoch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 import java.io.File;
 import java.io.IOException;
 
 import static org.cardanofoundation.rewards.enums.DataType.AGGREGATIONS_IN_EPOCH;
 import static org.cardanofoundation.rewards.util.JsonConverter.writeObjectToJsonFile;
 
+@Service
 public class DbSyncDataFetcher implements DataFetcher {
 
     private static final Logger logger = LoggerFactory.getLogger(DbSyncDataFetcher.class);

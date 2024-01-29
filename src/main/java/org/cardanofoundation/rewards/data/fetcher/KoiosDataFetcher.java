@@ -3,8 +3,13 @@ package org.cardanofoundation.rewards.data.fetcher;
 import org.cardanofoundation.rewards.data.provider.JsonDataProvider;
 import org.cardanofoundation.rewards.data.provider.KoiosDataProvider;
 import org.cardanofoundation.rewards.entity.*;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -12,20 +17,21 @@ import java.util.List;
 import static org.cardanofoundation.rewards.enums.DataType.*;
 import static org.cardanofoundation.rewards.util.JsonConverter.writeObjectToJsonFile;
 
-public class KoiosDataFetcher implements DataFetcher{
+@Service
+public class KoiosDataFetcher implements DataFetcher {
 
-    private final KoiosDataProvider koiosDataProvider;
-    private final JsonDataProvider jsonDataProvider;
+    @Autowired
+    private KoiosDataProvider koiosDataProvider;
+    @Autowired
+    private JsonDataProvider jsonDataProvider;
+
+    @Value("${json.data-provider.source}")
+    private String sourceFolder;
 
     private static final Logger logger = LoggerFactory.getLogger(KoiosDataFetcher.class);
 
-    public KoiosDataFetcher() {
-        this.koiosDataProvider = new KoiosDataProvider();
-        this.jsonDataProvider = new JsonDataProvider();
-    }
-
     private void fetchAdaPots(int epoch, boolean override) {
-        String filePath = String.format("./src/test/resources/%s/epoch%d.json", ADA_POTS.resourceFolderName, epoch);
+        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, ADA_POTS.resourceFolderName, epoch);
         File outputFile = new File(filePath);
 
         if (outputFile.exists() && !override) {
@@ -47,7 +53,7 @@ public class KoiosDataFetcher implements DataFetcher{
     }
 
     private void fetchEpochInfo(int epoch, boolean override) {
-        String filePath = String.format("./src/test/resources/%s/epoch%d.json", EPOCH_INFO.resourceFolderName, epoch);
+        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, EPOCH_INFO.resourceFolderName, epoch);
         File outputFile = new File(filePath);
 
         if (outputFile.exists() && !override) {
@@ -69,7 +75,7 @@ public class KoiosDataFetcher implements DataFetcher{
     }
 
     private void fetchProtocolParameters(int epoch, boolean override) {
-        String filePath = String.format("./src/test/resources/%s/epoch%d.json", PROTOCOL_PARAMETERS.resourceFolderName, epoch);
+        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, PROTOCOL_PARAMETERS.resourceFolderName, epoch);
         File outputFile = new File(filePath);
 
         if (outputFile.exists() && !override) {
@@ -91,7 +97,7 @@ public class KoiosDataFetcher implements DataFetcher{
     }
 
     private void fetchAccountUpdates(int epoch, boolean override) {
-        String filePath = String.format("./src/test/resources/%s/epoch%d.json", ACCOUNT_UPDATES.resourceFolderName, epoch);
+        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, ACCOUNT_UPDATES.resourceFolderName, epoch);
         File outputFile = new File(filePath);
 
         if (outputFile.exists() && !override) {
@@ -120,7 +126,7 @@ public class KoiosDataFetcher implements DataFetcher{
     }
 
     private void fetchPoolPledgeInEpoch (String poolId, int epoch, boolean override) {
-        String filePath = String.format("./src/test/resources/pools/%s/parameters_epoch_%d.json", poolId, epoch);
+        String filePath = String.format("%s/pools/%s/parameters_epoch_%d.json", sourceFolder, poolId, epoch);
         File outputFile = new File(filePath);
 
         if (outputFile.exists() && !override) {
@@ -128,7 +134,7 @@ public class KoiosDataFetcher implements DataFetcher{
             return;
         }
 
-        File poolIdFolder = new File(String.format("./src/test/resources/pools/%s", poolId));
+        File poolIdFolder = new File(String.format("%s/pools/%s", sourceFolder, poolId));
         if (!poolIdFolder.exists()) {
             if(!poolIdFolder.mkdir()) {
                 logger.error("Failed to create folder for pool " + poolId);
@@ -147,7 +153,7 @@ public class KoiosDataFetcher implements DataFetcher{
     }
 
     private void fetchPoolOwnersStakeInEpoch(String poolId, int epoch, boolean override) {
-        String filePath = String.format("./src/test/resources/pools/%s/owner_account_history_epoch_%d.json", poolId, epoch);
+        String filePath = String.format("%s/pools/%s/owner_account_history_epoch_%d.json", sourceFolder, poolId, epoch);
         File outputFile = new File(filePath);
 
         if (outputFile.exists() && !override) {
@@ -155,7 +161,7 @@ public class KoiosDataFetcher implements DataFetcher{
             return;
         }
 
-        File poolIdFolder = new File(String.format("./src/test/resources/pools/%s", poolId));
+        File poolIdFolder = new File(String.format("%s/pools/%s", sourceFolder, poolId));
         if (!poolIdFolder.exists()) {
             if(!poolIdFolder.mkdir()) {
                 logger.error("Failed to create folder for pool " + poolId);
@@ -178,10 +184,10 @@ public class KoiosDataFetcher implements DataFetcher{
     }
 
     private void fetchPoolHistoryByEpoch(String poolId, int epoch, boolean override) {
-        String filePath = String.format("./src/test/resources/pools/%s/history_epoch_%d.json", poolId, epoch);
+        String filePath = String.format("%s/pools/%s/history_epoch_%d.json", sourceFolder, poolId, epoch);
         File outputFile = new File(filePath);
 
-        File poolIdFolder = new File(String.format("./src/test/resources/pools/%s", poolId));
+        File poolIdFolder = new File(String.format("%s/pools/%s", sourceFolder, poolId));
         if (!poolIdFolder.exists()) {
             if(!poolIdFolder.mkdir()) {
                 logger.error("Failed to create folder for pool " + poolId);
@@ -217,8 +223,7 @@ public class KoiosDataFetcher implements DataFetcher{
             "pool1spus7k8cy5qcs82xhw60dwwk2d4vrfs0m5vr2zst04gtq700gjn",
             "pool1qqqqx69ztfvd83rtafs3mk4lwanehrglmp2vwkjpaguecs2t4c2",
             "pool13n4jzw847sspllczxgnza7vkq80m8px7mpvwnsqthyy2790vmyc",
-            "pool1ljlmfg7p37ysmea9ra5xqwccue203dpj40w6zlzn5r2cvjrf6tw",
-            "pool19ctjr5ft75sz396hn0tf6ns4hy5w9l9jp2jh3m8mx6acvm2cn7j"
+            "pool1ljlmfg7p37ysmea9ra5xqwccue203dpj40w6zlzn5r2cvjrf6tw"
         );
 
         for (String poolId : poolIds) {

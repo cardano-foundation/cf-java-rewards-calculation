@@ -20,5 +20,4 @@ public class PoolUpdate {
     private Double pledge;
     private String rewardAddress;
     private List<String> owners;
-    private PoolStatus poolStatus;
 }

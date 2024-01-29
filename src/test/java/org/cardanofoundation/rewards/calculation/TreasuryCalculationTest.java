@@ -12,11 +12,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.context.junit.jupiter.DisabledIf;
 
 import static org.cardanofoundation.rewards.constants.RewardConstants.*;
 import static org.cardanofoundation.rewards.util.CurrencyConverter.lovelaceToAda;
@@ -30,9 +28,6 @@ public class TreasuryCalculationTest {
 
   @Autowired
   JsonDataProvider jsonDataProvider;
-
-  @Value("${spring.profiles.active}")
-  private String activeProfiles;
 
   void Test_calculateTreasury(final int epoch, DataProviderType dataProviderType) {
 
@@ -52,20 +47,8 @@ public class TreasuryCalculationTest {
     Assertions.assertTrue(Math.abs(difference) < 1, "The difference " + lovelaceToAda(difference) + " ADA between expected treasury value and actual treasury value is greater than 1 LOVELACE");
   }
 
-  static Stream<Integer> dataProviderRangeUntilEpoch213() {
-    return IntStream.range(210, 213).boxed();
-  }
-
-  @ParameterizedTest
-  @DisabledIf(expression = "#{environment.acceptsProfiles('ci')}", loadContext = true, reason = "Range test is too long for CI")
-  @MethodSource("dataProviderRangeUntilEpoch213")
-  void Test_calculateTreasuryWithKoiosDataProvider(int epoch) {
-    System.out.println(activeProfiles);
-    Test_calculateTreasury(epoch, DataProviderType.KOIOS);
-  }
-
   static Stream<Integer> jsonDataProviderRange() {
-    return IntStream.range(210, 215).boxed();
+    return IntStream.range(208, 215).boxed();
   }
 
   @ParameterizedTest

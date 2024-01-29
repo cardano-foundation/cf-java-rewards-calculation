@@ -12,4 +12,5 @@ public class TreasuryCalculationResult {
     Double calculatedTreasury;
     Double actualTreasury;
     Double totalRewardPot;
+    Double treasuryWithdrawals;
 }

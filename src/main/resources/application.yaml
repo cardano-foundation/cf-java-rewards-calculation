@@ -9,6 +9,12 @@ json:
   data-provider:
     source: ${JSON_DATA_SOURCE_FOLDER}
 
+application:
+  run:
+    mode: ${RUN_MODE:fetch}
+  fetch:
+    override: ${OVERWRITE_EXISTING_DATA:false}
+
 ---
 spring:
   config:

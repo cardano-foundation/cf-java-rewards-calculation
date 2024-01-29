@@ -1,5 +1,8 @@
 package org.cardanofoundation.rewards.data.fetcher;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public interface DataFetcher {
-    public void fetch(int epoch, boolean override);
+    void fetch(int epoch, boolean override);
 }
