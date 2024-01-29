@@ -18,7 +18,7 @@ window.onload = () => {
         connectgaps: true,
         line: {
             color: '#5C8DFF'
-        } 
+        }
     }
 
     const difference = {
@@ -29,7 +29,7 @@ window.onload = () => {
         connectgaps: true,
         line: {
             color: '#1EC198'
-        } 
+        }
     }
 
     const relativeDifference = {
@@ -40,11 +40,16 @@ window.onload = () => {
         connectgaps: true,
         line: {
             color: '#1EC198'
-        } 
+        }
     }
 
     const lovelaceToAda = (lovelace) => {
         return Math.round(lovelace / 1000000);
+    }
+
+    const formatAda = (ada) => {
+        const amount = ada.toLocaleString();
+        return `${amount === '-0' ? '0' : amount}₳`;
     }
 
     const treasuryCalculationTable = document.getElementById('treasury-calculation-table');
@@ -61,7 +66,7 @@ window.onload = () => {
 
         relativeDifference.x.push(epoch);
         relativeDifference.y.push(
-            Math.round(
+            epoch === "208" ? 0 : Math.round(
                 (Math.abs(treasuryCalculationResult[epoch].actualTreasury - treasuryCalculationResult[epoch].calculatedTreasury) /
                 Math.abs((treasuryCalculationResult[epoch].actualTreasury + treasuryCalculationResult[epoch].calculatedTreasury) / 2) * 100) * 1000) / 1000
         );
@@ -70,10 +75,10 @@ window.onload = () => {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${epoch}</td>
-            <td>${lovelaceToAda(treasuryCalculationResult[epoch].actualTreasury)}₳</td>
-            <td>${lovelaceToAda(treasuryCalculationResult[epoch].calculatedTreasury)}₳</td>
-            <td>${differenceAbsolut}₳</td>
-            <td>${Math.round(
+            <td>${formatAda(lovelaceToAda(treasuryCalculationResult[epoch].actualTreasury))}</td>
+            <td>${formatAda(lovelaceToAda(treasuryCalculationResult[epoch].calculatedTreasury))}</td>
+            <td>${formatAda(differenceAbsolut)}</td>
+            <td>${epoch === "208" ? 0 : Math.round(
                 (Math.abs(treasuryCalculationResult[epoch].actualTreasury - treasuryCalculationResult[epoch].calculatedTreasury) /
                 Math.abs((treasuryCalculationResult[epoch].actualTreasury + treasuryCalculationResult[epoch].calculatedTreasury) / 2) * 100) * 1000) / 1000
             }%</td>
@@ -85,6 +90,45 @@ window.onload = () => {
         }
 
         treasuryCalculationTable.appendChild(row);
+    }
+
+    const treasuryDevelopmentTable = document.getElementById('treasury-development-table');
+
+    let totalAdaAddedToTreasury = 0.0;
+    let totalAdaWithdrawledFromTreasury = 0.0;
+    let totalAdaAddedOnTopOfTreasuryCut = 0.0;
+
+    for (const epoch of Object.keys(treasuryCalculationResult)) {
+        const currentEpochTreasury = treasuryCalculationResult[epoch].actualTreasury;
+        const previousEpochTreasury = treasuryCalculationResult[epoch - 1]?.actualTreasury;
+
+        if (previousEpochTreasury === undefined) {
+            continue;
+        }
+
+        const totalRewardPot = treasuryCalculationResult[epoch].totalRewardPot;
+        const treasuryWithdrawals = treasuryCalculationResult[epoch].treasuryWithdrawals;
+        totalAdaWithdrawledFromTreasury += treasuryWithdrawals;
+        const adaAddedToTreasury = (currentEpochTreasury + treasuryWithdrawals) - previousEpochTreasury;
+        totalAdaAddedToTreasury += adaAddedToTreasury;
+        const percentageAddedToTreasury = Math.round(adaAddedToTreasury / totalRewardPot * 100 * 1000) / 1000;
+        
+        const tauParameter = 0.2;
+        const treasuryCut = tauParameter * totalRewardPot;
+        const adaAddedOnTopOfTreasuryCut = adaAddedToTreasury - treasuryCut;
+        totalAdaAddedOnTopOfTreasuryCut += adaAddedOnTopOfTreasuryCut;
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${epoch}</td>
+            <td>${formatAda(lovelaceToAda(adaAddedToTreasury))}</td>
+            <td>${formatAda(lovelaceToAda(totalRewardPot))}</td>
+            <td>${percentageAddedToTreasury}%</td>
+            <td>${formatAda(lovelaceToAda(adaAddedOnTopOfTreasuryCut))}</td>
+            <td>${formatAda(lovelaceToAda(treasuryWithdrawals))}</td>
+        `;
+
+        treasuryDevelopmentTable.appendChild(row);
     }
 
     const layoutAda = {
@@ -100,7 +144,7 @@ window.onload = () => {
             showline: false
         }
     };
-    
+
     const layoutAdaDifference = {
         title: 'Treasury Calculation - Difference in ADA',
         showlegend: false,
@@ -134,7 +178,7 @@ window.onload = () => {
     Plotly.newPlot('difference-percentage-plot', [relativeDifference], layoutPercentage);
 
     const epochInfo = document.getElementById('epoch-info');
-    const epochs = Object.keys(treasuryCalculationResult).map((epoch) => Number(epoch)); 
+    const epochs = Object.keys(treasuryCalculationResult).map((epoch) => Number(epoch));
     const epochStart = Math.min(...epochs);
     const epochEnd = Math.max(...epochs);
     epochInfo.innerHTML = `Epoch ${epochStart} - ${epochEnd}`;
@@ -156,13 +200,13 @@ window.onload = () => {
 
     const highestAbsolutDifference = Math.max(...difference.y);
     const highestAbsolutDifferenceEpoch = difference.x[difference.y.indexOf(highestAbsolutDifference)];
-    fillCard('highest-absolut-difference', 'Highest absolut difference', `${highestAbsolutDifference}₳`, `Epoch ${highestAbsolutDifferenceEpoch}`);
+    fillCard('highest-absolut-difference', 'Highest absolut difference', `${highestAbsolutDifference.toLocaleString()}₳`, `Epoch ${highestAbsolutDifferenceEpoch}`);
 
     const averageDifferenceMedian = relativeDifference.y.sort((a, b) => a - b)[Math.round(relativeDifference.y.length / 2)];
     fillCard('average-difference-percentage', 'Average relative difference', `${averageDifferenceMedian}%`, 'Median');
 
     const averageAbsolutDifferenceMedian = difference.y.sort((a, b) => a - b)[Math.round(difference.y.length / 2)]
-    fillCard('average-absolut-difference', 'Average absolut difference', `${averageAbsolutDifferenceMedian}₳`, 'Median');
+    fillCard('average-absolut-difference', 'Average absolut difference', `${averageAbsolutDifferenceMedian.toLocaleString()}₳`, 'Median');
 
     const absolutDifferences = difference.y.map((difference) => Math.abs(difference));
 
@@ -175,4 +219,8 @@ window.onload = () => {
     fillCard('difference-5k-10k-ADA', 'Difference between 5k₳ and 10k₳', `${absolutDifferences.filter((difference) => difference >= 5000 && difference < 10000).length}`, '');
     fillCard('difference-10k-50k-ADA', 'Difference between 10k₳ and 50k₳', `${absolutDifferences.filter((difference) => difference >= 10000 && difference < 50000).length}`, '');
     fillCard('difference-above-50k-ADA', 'Difference above 50k₳', `${absolutDifferences.filter((difference) => difference >= 50000).length}`, '');
+
+    fillCard('ada-added-to-treasury', 'Total ADA added to treasury', `${formatAda(lovelaceToAda(totalAdaAddedToTreasury))}`, '');
+    fillCard('ada-withdrawled-from-treasury', 'Total ADA withdrawled from treasury', `${formatAda(lovelaceToAda(totalAdaWithdrawledFromTreasury))}`, '');
+    fillCard('total-ada-added-on-top-of-treasury-cut', 'Total ADA added on top of treasury cut', `${formatAda(lovelaceToAda(totalAdaAddedOnTopOfTreasuryCut))}`, '');
 };
