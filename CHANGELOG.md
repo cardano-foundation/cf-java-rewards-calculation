@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.4.0...v0.5.0) (2024-01-29)
+
+
+### Features
+
+* add more information to the treasury report ([2da66f9](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/2da66f90503b3e0bd0ec069ef85a389adc58481b))
+
 ## [0.4.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.3.0...v0.4.0) (2024-01-27)
 
 
