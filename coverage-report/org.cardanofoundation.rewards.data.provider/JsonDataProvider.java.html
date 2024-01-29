@@ -134,7 +134,7 @@ import static org.cardanofoundation.rewards.util.JsonConverter.readJsonFile;
 
 <span class="fc" id="L135">        return mirCertificates.stream()</span>
 <span class="fc bfc" id="L136" title="All 2 branches covered.">                .filter(mirCertificate -&gt; mirCertificate.getBlockTime() &lt;= epochInfo.getUnixTimeLastBlock())</span>
-<span class="pc bpc" id="L137" title="1 of 2 branches missed.">                .filter(mirCertificate -&gt; mirCertificate.getBlockTime() &gt;= epochInfo.getUnixTimeFirstBlock())</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">                .filter(mirCertificate -&gt; mirCertificate.getBlockTime() &gt;= epochInfo.getUnixTimeFirstBlock())</span>
 <span class="fc" id="L138">                .toList();</span>
     }
 

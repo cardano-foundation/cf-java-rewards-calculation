@@ -4,46 +4,49 @@ import org.cardanofoundation.rewards.data.provider.DbSyncDataProvider;
 import org.cardanofoundation.rewards.entity.persistence.AggregationsInEpoch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 import java.io.File;
 import java.io.IOException;
 
 import static org.cardanofoundation.rewards.enums.DataType.AGGREGATIONS_IN_EPOCH;
 import static org.cardanofoundation.rewards.util.JsonConverter.writeObjectToJsonFile;
 
+@Service
 public class DbSyncDataFetcher implements DataFetcher {
 
-<span class="nc" id="L15">    private static final Logger logger = LoggerFactory.getLogger(DbSyncDataFetcher.class);</span>
+<span class="fc" id="L18">    private static final Logger logger = LoggerFactory.getLogger(DbSyncDataFetcher.class);</span>
     private final DbSyncDataProvider dbSyncDataProvider;
 
-<span class="nc" id="L18">    public DbSyncDataFetcher() {</span>
-<span class="nc" id="L19">        this.dbSyncDataProvider = new DbSyncDataProvider();</span>
-<span class="nc" id="L20">    }</span>
+<span class="fc" id="L21">    public DbSyncDataFetcher() {</span>
+<span class="fc" id="L22">        this.dbSyncDataProvider = new DbSyncDataProvider();</span>
+<span class="fc" id="L23">    }</span>
 
     private void aggregateValuesInEpoch(int epoch, boolean override) {
-<span class="nc" id="L23">        String filePath = String.format(&quot;./src/test/resources/%s/epoch%d.json&quot;, AGGREGATIONS_IN_EPOCH.resourceFolderName, epoch);</span>
-<span class="nc" id="L24">        File outputFile = new File(filePath);</span>
+<span class="nc" id="L26">        String filePath = String.format(&quot;./src/test/resources/%s/epoch%d.json&quot;, AGGREGATIONS_IN_EPOCH.resourceFolderName, epoch);</span>
+<span class="nc" id="L27">        File outputFile = new File(filePath);</span>
 
-<span class="nc bnc" id="L26" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
-<span class="nc" id="L27">            logger.info(&quot;Skip to aggregate additional values for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
-<span class="nc" id="L28">            return;</span>
+<span class="nc bnc" id="L29" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
+<span class="nc" id="L30">            logger.info(&quot;Skip to aggregate additional values for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
+<span class="nc" id="L31">            return;</span>
         }
 
-<span class="nc" id="L31">        double feeSum = dbSyncDataProvider.getSumOfFeesInEpoch(epoch);</span>
-<span class="nc" id="L32">        double withdrawalsSum = dbSyncDataProvider.getSumOfWithdrawalsInEpoch(epoch);</span>
-<span class="nc" id="L33">        double depositsSum = dbSyncDataProvider.getTransactionDepositsInEpoch(epoch);</span>
+<span class="nc" id="L34">        double feeSum = dbSyncDataProvider.getSumOfFeesInEpoch(epoch);</span>
+<span class="nc" id="L35">        double withdrawalsSum = dbSyncDataProvider.getSumOfWithdrawalsInEpoch(epoch);</span>
+<span class="nc" id="L36">        double depositsSum = dbSyncDataProvider.getTransactionDepositsInEpoch(epoch);</span>
 
-<span class="nc" id="L35">        AggregationsInEpoch aggregationsInEpoch = new AggregationsInEpoch(feeSum, withdrawalsSum, depositsSum);</span>
+<span class="nc" id="L38">        AggregationsInEpoch aggregationsInEpoch = new AggregationsInEpoch(feeSum, withdrawalsSum, depositsSum);</span>
 
         try {
-<span class="nc" id="L38">            writeObjectToJsonFile(aggregationsInEpoch, filePath);</span>
-<span class="nc" id="L39">        } catch (IOException e) {</span>
-<span class="nc" id="L40">            logger.error(&quot;Failed to write EpochInfo to json file for epoch &quot; + epoch);</span>
-<span class="nc" id="L41">        }</span>
-<span class="nc" id="L42">    }</span>
+<span class="nc" id="L41">            writeObjectToJsonFile(aggregationsInEpoch, filePath);</span>
+<span class="nc" id="L42">        } catch (IOException e) {</span>
+<span class="nc" id="L43">            logger.error(&quot;Failed to write EpochInfo to json file for epoch &quot; + epoch);</span>
+<span class="nc" id="L44">        }</span>
+<span class="nc" id="L45">    }</span>
 
     @Override
     public void fetch(int epoch, boolean override) {
-<span class="nc" id="L46">        aggregateValuesInEpoch(epoch, override);</span>
-<span class="nc" id="L47">    }</span>
+<span class="nc" id="L49">        aggregateValuesInEpoch(epoch, override);</span>
+<span class="nc" id="L50">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -6,19 +6,19 @@ import org.cardanofoundation.rewards.entity.TreasuryCalculationResult;
 import org.cardanofoundation.rewards.util.JsonConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class JsonDataPlotter implements DataPlotter{
+@Service
+<span class="fc" id="L16">public class JsonDataPlotter implements DataPlotter {</span>
 
-<span class="nc" id="L14">    private static final Logger logger = LoggerFactory.getLogger(JsonDataPlotter.class);</span>
+<span class="fc" id="L18">    private static final Logger logger = LoggerFactory.getLogger(JsonDataPlotter.class);</span>
 
-
-    private final JsonDataProvider jsonDataProvider;
-
-<span class="nc" id="L19">    public JsonDataPlotter() {</span>
-<span class="nc" id="L20">        this.jsonDataProvider = new JsonDataProvider();</span>
-<span class="nc" id="L21">    }</span>
+    @Autowired
+    private JsonDataProvider jsonDataProvider;
 
     @Override
     public void plot(int epochStart, int epochEnd) {

@@ -66,57 +66,79 @@ import static org.cardanofoundation.rewards.constants.RewardConstants.*;
   }
 
   public static TreasuryCalculationResult calculateTreasuryForEpoch(int epoch, DataProvider dataProvider) {
-<span class="fc" id="L69">    ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch - 2);</span>
-<span class="fc" id="L70">    final double treasuryGrowthRate = protocolParameters.getTreasuryGrowRate();</span>
-<span class="fc" id="L71">    final double monetaryExpandRate = protocolParameters.getMonetaryExpandRate();</span>
-<span class="fc" id="L72">    double decentralizationParameter = protocolParameters.getDecentralisation();</span>
-
-<span class="fc" id="L74">    AdaPots adaPotsForPreviousEpoch = dataProvider.getAdaPotsForEpoch(epoch - 1);</span>
-<span class="fc" id="L75">    AdaPots adaPotsForCurrentEpoch = dataProvider.getAdaPotsForEpoch(epoch);</span>
-
     // The Shelley era and the ada pot system started on mainnet in epoch 208.
     // Fee and treasury values are 0 for epoch 208.
-<span class="fc" id="L79">    double totalFeesForCurrentEpoch = 0.0;</span>
-<span class="fc" id="L80">    Epoch epochInfo = dataProvider.getEpochInfo(epoch - 2);</span>
-<span class="pc bpc" id="L81" title="1 of 2 branches missed.">    if (epoch &gt; 209) {</span>
-<span class="fc" id="L82">      totalFeesForCurrentEpoch = epochInfo.getFees();</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">    if (epoch == 208) {</span>
+<span class="fc" id="L72">        return TreasuryCalculationResult.builder()</span>
+<span class="fc" id="L73">                .calculatedTreasury(0.0)</span>
+<span class="fc" id="L74">                .actualTreasury(0.0)</span>
+<span class="fc" id="L75">                .epoch(epoch)</span>
+<span class="fc" id="L76">                .totalRewardPot(0.0)</span>
+<span class="fc" id="L77">                .treasuryWithdrawals(0.0)</span>
+<span class="fc" id="L78">                .build();</span>
     }
 
-<span class="fc" id="L85">    double reserveInPreviousEpoch = adaPotsForPreviousEpoch.getReserves();</span>
+<span class="fc" id="L81">    double treasuryGrowthRate = 0.2;</span>
+<span class="fc" id="L82">    double monetaryExpandRate = 0.003;</span>
+<span class="fc" id="L83">    double decentralizationParameter = 1;</span>
 
-<span class="fc" id="L87">    double treasuryInPreviousEpoch = adaPotsForPreviousEpoch.getTreasury();</span>
-<span class="fc" id="L88">    double expectedTreasuryForCurrentEpoch = adaPotsForCurrentEpoch.getTreasury();</span>
+<span class="fc" id="L85">    AdaPots adaPotsForPreviousEpoch = dataProvider.getAdaPotsForEpoch(epoch - 1);</span>
+<span class="fc" id="L86">    AdaPots adaPotsForCurrentEpoch = dataProvider.getAdaPotsForEpoch(epoch);</span>
 
-<span class="fc" id="L90">    int totalBlocksInEpoch = epochInfo.getBlockCount();</span>
+<span class="fc" id="L88">    double totalFeesForCurrentEpoch = 0.0;</span>
+<span class="fc" id="L89">    int totalBlocksInEpoch = 0;</span>
 
-<span class="pc bpc" id="L92" title="3 of 4 branches missed.">    if (decentralizationParameter &lt; 0.8 &amp;&amp; decentralizationParameter &gt; 0.0) {</span>
-<span class="nc" id="L93">      totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();</span>
+    /* We need to use the epoch info 2 epochs before as shelley starts in epoch 208 it will be possible to get
+       those values from epoch 210 onwards. Before that we need to use the genesis values, but they are not
+       needed anyway if the decentralization parameter is &gt; 0.8.
+       See: shelley-delegation.pdf 5.4.3 */
+<span class="fc bfc" id="L95" title="All 2 branches covered.">    if (epoch &gt; 209) {</span>
+<span class="fc" id="L96">      ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch - 2);</span>
+<span class="fc" id="L97">      Epoch epochInfo = dataProvider.getEpochInfo(epoch - 2);</span>
+<span class="fc" id="L98">      totalFeesForCurrentEpoch = epochInfo.getFees();</span>
+<span class="fc" id="L99">      treasuryGrowthRate = protocolParameters.getTreasuryGrowRate();</span>
+<span class="fc" id="L100">      monetaryExpandRate = protocolParameters.getMonetaryExpandRate();</span>
+<span class="fc" id="L101">      decentralizationParameter = protocolParameters.getDecentralisation();</span>
+
+<span class="fc" id="L103">      totalBlocksInEpoch = epochInfo.getBlockCount();</span>
+
+<span class="pc bpc" id="L105" title="3 of 4 branches missed.">      if (decentralizationParameter &lt; 0.8 &amp;&amp; decentralizationParameter &gt; 0.0) {</span>
+<span class="nc" id="L106">        totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();</span>
+      }
     }
 
-<span class="fc" id="L96">    double rewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(</span>
+<span class="fc" id="L110">    double reserveInPreviousEpoch = adaPotsForPreviousEpoch.getReserves();</span>
+
+<span class="fc" id="L112">    double treasuryInPreviousEpoch = adaPotsForPreviousEpoch.getTreasury();</span>
+<span class="fc" id="L113">    double expectedTreasuryForCurrentEpoch = adaPotsForCurrentEpoch.getTreasury();</span>
+
+<span class="fc" id="L115">    double rewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(</span>
             monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserveInPreviousEpoch, totalFeesForCurrentEpoch);
 
-<span class="fc" id="L99">    double treasuryForCurrentEpoch = TreasuryCalculation.calculateTreasury(</span>
+<span class="fc" id="L118">    double treasuryForCurrentEpoch = TreasuryCalculation.calculateTreasury(</span>
             treasuryGrowthRate, rewardPot, treasuryInPreviousEpoch);
 
     // The sum of all the refunds attached to unregistered reward accounts are added to the
     // treasury (see: Pool Reap Transition, p.53, figure 40, shely-ledger.pdf)
-<span class="fc" id="L104">    treasuryForCurrentEpoch += TreasuryCalculation.calculateUnclaimedRefundsForRetiredPools(epoch, dataProvider);</span>
+<span class="fc" id="L123">    treasuryForCurrentEpoch += TreasuryCalculation.calculateUnclaimedRefundsForRetiredPools(epoch, dataProvider);</span>
 
     // Check if there was a MIR Certificate in the previous epoch
-<span class="fc" id="L107">    List&lt;MirCertificate&gt; mirCertificates = dataProvider.getMirCertificatesInEpoch(epoch - 1);</span>
-<span class="pc bpc" id="L108" title="1 of 2 branches missed.">    for (MirCertificate mirCertificate : mirCertificates) {</span>
-<span class="nc bnc" id="L109" title="All 2 branches missed.">      if (mirCertificate.getPot() == MirPot.TREASURY) {</span>
-<span class="nc" id="L110">        treasuryForCurrentEpoch -= mirCertificate.getTotalRewards();</span>
+<span class="fc" id="L126">    double treasuryWithdrawals = 0.0;</span>
+<span class="fc" id="L127">    List&lt;MirCertificate&gt; mirCertificates = dataProvider.getMirCertificatesInEpoch(epoch - 1);</span>
+<span class="fc bfc" id="L128" title="All 2 branches covered.">    for (MirCertificate mirCertificate : mirCertificates) {</span>
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">      if (mirCertificate.getPot() == MirPot.TREASURY) {</span>
+<span class="nc" id="L130">        treasuryWithdrawals += mirCertificate.getTotalRewards();</span>
       }
-<span class="nc" id="L112">    }</span>
+<span class="fc" id="L132">    }</span>
+<span class="fc" id="L133">    treasuryForCurrentEpoch -= treasuryWithdrawals;</span>
 
-<span class="fc" id="L114">    return TreasuryCalculationResult.builder()</span>
-<span class="fc" id="L115">            .calculatedTreasury(treasuryForCurrentEpoch)</span>
-<span class="fc" id="L116">            .actualTreasury(expectedTreasuryForCurrentEpoch)</span>
-<span class="fc" id="L117">            .epoch(epoch)</span>
-<span class="fc" id="L118">            .totalRewardPot(rewardPot)</span>
-<span class="fc" id="L119">            .build();</span>
+<span class="fc" id="L135">    return TreasuryCalculationResult.builder()</span>
+<span class="fc" id="L136">            .calculatedTreasury(treasuryForCurrentEpoch)</span>
+<span class="fc" id="L137">            .actualTreasury(expectedTreasuryForCurrentEpoch)</span>
+<span class="fc" id="L138">            .epoch(epoch)</span>
+<span class="fc" id="L139">            .totalRewardPot(rewardPot)</span>
+<span class="fc" id="L140">            .treasuryWithdrawals(treasuryWithdrawals)</span>
+<span class="fc" id="L141">            .build();</span>
   }
 
   /*
@@ -125,38 +147,38 @@ import static org.cardanofoundation.rewards.constants.RewardConstants.*;
     https://github.com/input-output-hk/cardano-ledger/blob/9e2f8151e3b9a0dde9faeb29a7dd2456e854427c/eras/shelley/formal-spec/epoch.tex#L546C9-L547C87
    */
   public static Double calculateUnclaimedRefundsForRetiredPools(int epoch, DataProvider dataProvider) {
-<span class="fc" id="L128">    List&lt;PoolDeregistration&gt; retiredPools = dataProvider.getRetiredPoolsInEpoch(epoch);</span>
+<span class="fc" id="L150">    List&lt;PoolDeregistration&gt; retiredPools = dataProvider.getRetiredPoolsInEpoch(epoch);</span>
 
-<span class="fc" id="L130">    double refunds = 0.0;</span>
+<span class="fc" id="L152">    double refunds = 0.0;</span>
 
-<span class="pc bpc" id="L132" title="1 of 2 branches missed.">    if (retiredPools.size() &gt; 0) {</span>
+<span class="pc bpc" id="L154" title="1 of 2 branches missed.">    if (retiredPools.size() &gt; 0) {</span>
       // The deposit will pay back one epoch later
-<span class="fc" id="L134">      List&lt;AccountUpdate&gt; accountUpdates = dataProvider.getAccountUpdatesUntilEpoch(</span>
-<span class="fc" id="L135">              retiredPools.stream().map(PoolDeregistration::getRewardAddress).toList(), epoch - 1);</span>
+<span class="fc" id="L156">      List&lt;AccountUpdate&gt; accountUpdates = dataProvider.getAccountUpdatesUntilEpoch(</span>
+<span class="fc" id="L157">              retiredPools.stream().map(PoolDeregistration::getRewardAddress).toList(), epoch - 1);</span>
 
       // Order list by unix block time
-<span class="fc" id="L138">      accountUpdates = accountUpdates.stream().filter(update -&gt;</span>
-<span class="fc bfc" id="L139" title="All 2 branches covered.">              update.getAction().equals(AccountUpdateAction.DEREGISTRATION)</span>
-<span class="fc bfc" id="L140" title="All 2 branches covered.">              || update.getAction().equals(AccountUpdateAction.REGISTRATION)).sorted(</span>
-<span class="fc" id="L141">              Comparator.comparing(AccountUpdate::getUnixBlockTime).reversed()).toList();</span>
+<span class="fc" id="L160">      accountUpdates = accountUpdates.stream().filter(update -&gt;</span>
+<span class="fc bfc" id="L161" title="All 2 branches covered.">              update.getAction().equals(AccountUpdateAction.DEREGISTRATION)</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">              || update.getAction().equals(AccountUpdateAction.REGISTRATION)).sorted(</span>
+<span class="fc" id="L163">              Comparator.comparing(AccountUpdate::getUnixBlockTime).reversed()).toList();</span>
 
       // only hold the latest account update for each reward address
       // preventing the case of an unregistered reward address becoming registered again
-<span class="fc" id="L145">      List&lt;AccountUpdate&gt; latestAccountUpdates = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L146" title="All 2 branches covered.">      for (AccountUpdate accountUpdate : accountUpdates) {</span>
-<span class="fc bfc" id="L147" title="All 2 branches covered.">        if (latestAccountUpdates.stream().map(AccountUpdate::getStakeAddress).noneMatch(stakeAddress -&gt; stakeAddress.equals(accountUpdate.getStakeAddress()))) {</span>
-<span class="fc" id="L148">          latestAccountUpdates.add(accountUpdate);</span>
+<span class="fc" id="L167">      List&lt;AccountUpdate&gt; latestAccountUpdates = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">      for (AccountUpdate accountUpdate : accountUpdates) {</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">        if (latestAccountUpdates.stream().map(AccountUpdate::getStakeAddress).noneMatch(stakeAddress -&gt; stakeAddress.equals(accountUpdate.getStakeAddress()))) {</span>
+<span class="fc" id="L170">          latestAccountUpdates.add(accountUpdate);</span>
         }
-<span class="fc" id="L150">      }</span>
+<span class="fc" id="L172">      }</span>
 
-<span class="fc bfc" id="L152" title="All 2 branches covered.">      for (AccountUpdate lastAccountUpdate : latestAccountUpdates) {</span>
-<span class="fc bfc" id="L153" title="All 2 branches covered.">        if (lastAccountUpdate.getAction() == AccountUpdateAction.DEREGISTRATION) {</span>
-<span class="fc" id="L154">          refunds += DEPOSIT_POOL_REGISTRATION_IN_LOVELACE;</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">      for (AccountUpdate lastAccountUpdate : latestAccountUpdates) {</span>
+<span class="fc bfc" id="L175" title="All 2 branches covered.">        if (lastAccountUpdate.getAction() == AccountUpdateAction.DEREGISTRATION) {</span>
+<span class="fc" id="L176">          refunds += DEPOSIT_POOL_REGISTRATION_IN_LOVELACE;</span>
         }
-<span class="fc" id="L156">      }</span>
+<span class="fc" id="L178">      }</span>
     }
 
-<span class="fc" id="L159">    return refunds;</span>
+<span class="fc" id="L181">    return refunds;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

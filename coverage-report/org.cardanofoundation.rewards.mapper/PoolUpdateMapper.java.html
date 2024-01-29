@@ -10,29 +10,28 @@ import org.cardanofoundation.rewards.enums.PoolStatus;
 
 <span class="nc" id="L11">        return PoolUpdate.builder()</span>
 <span class="nc" id="L12">            .poolId(poolUpdate.getPoolIdBech32())</span>
-<span class="nc" id="L13">            .poolStatus(PoolStatus.fromString(poolUpdate.getPoolStatus()))</span>
-<span class="nc" id="L14">            .activeEpoch(Math.toIntExact(poolUpdate.getActiveEpochNo()))</span>
-<span class="nc" id="L15">            .fixedCost(Double.parseDouble(String.valueOf(poolUpdate.getFixedCost())))</span>
-<span class="nc" id="L16">            .margin(poolUpdate.getMargin())</span>
-<span class="nc" id="L17">            .pledge(Double.parseDouble(String.valueOf(poolUpdate.getPledge())))</span>
-<span class="nc" id="L18">            .transactionHash(poolUpdate.getTxHash())</span>
-<span class="nc" id="L19">            .rewardAddress(poolUpdate.getRewardAddr())</span>
-<span class="nc" id="L20">            .owners(poolUpdate.getOwners())</span>
-<span class="nc" id="L21">            .retiringEpoch(poolUpdate.getRetiringEpoch())</span>
-<span class="nc" id="L22">            .build();</span>
+<span class="nc" id="L13">            .activeEpoch(Math.toIntExact(poolUpdate.getActiveEpochNo()))</span>
+<span class="nc" id="L14">            .fixedCost(Double.parseDouble(String.valueOf(poolUpdate.getFixedCost())))</span>
+<span class="nc" id="L15">            .margin(poolUpdate.getMargin())</span>
+<span class="nc" id="L16">            .pledge(Double.parseDouble(String.valueOf(poolUpdate.getPledge())))</span>
+<span class="nc" id="L17">            .transactionHash(poolUpdate.getTxHash())</span>
+<span class="nc" id="L18">            .rewardAddress(poolUpdate.getRewardAddr())</span>
+<span class="nc" id="L19">            .owners(poolUpdate.getOwners())</span>
+<span class="nc" id="L20">            .retiringEpoch(poolUpdate.getRetiringEpoch())</span>
+<span class="nc" id="L21">            .build();</span>
     }
 
     public static PoolUpdate fromDbSyncPoolUpdate(org.cardanofoundation.rewards.entity.jpa.DbSyncPoolUpdate poolUpdate) {
-<span class="nc bnc" id="L26" title="All 2 branches missed.">        if (poolUpdate == null) return null;</span>
+<span class="nc bnc" id="L25" title="All 2 branches missed.">        if (poolUpdate == null) return null;</span>
 
-<span class="nc" id="L28">        return PoolUpdate.builder()</span>
-<span class="nc" id="L29">                .poolId(poolUpdate.getPool().getBech32PoolId())</span>
-<span class="nc" id="L30">                .fixedCost(poolUpdate.getFixedCost())</span>
-<span class="nc" id="L31">                .margin(poolUpdate.getMargin())</span>
-<span class="nc" id="L32">                .pledge(poolUpdate.getPledge())</span>
-<span class="nc" id="L33">                .rewardAddress(poolUpdate.getStakeAddress().getView())</span>
-<span class="nc" id="L34">                .activeEpoch(poolUpdate.getActiveEpochNumber().intValue())</span>
-<span class="nc" id="L35">                .build();</span>
+<span class="nc" id="L27">        return PoolUpdate.builder()</span>
+<span class="nc" id="L28">                .poolId(poolUpdate.getPool().getBech32PoolId())</span>
+<span class="nc" id="L29">                .fixedCost(poolUpdate.getFixedCost())</span>
+<span class="nc" id="L30">                .margin(poolUpdate.getMargin())</span>
+<span class="nc" id="L31">                .pledge(poolUpdate.getPledge())</span>
+<span class="nc" id="L32">                .rewardAddress(poolUpdate.getStakeAddress().getView())</span>
+<span class="nc" id="L33">                .activeEpoch(poolUpdate.getActiveEpochNumber().intValue())</span>
+<span class="nc" id="L34">                .build();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
