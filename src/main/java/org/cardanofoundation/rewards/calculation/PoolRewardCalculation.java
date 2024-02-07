@@ -239,4 +239,130 @@ public class PoolRewardCalculation {
         poolRewardCalculationResult.setMemberRewards(memberRewards);
         return poolRewardCalculationResult;
     }
+
+    public static PoolRewardCalculationResult calculatePoolRewardInEpoch(String poolId, Epoch epochInfo,
+                                                                         AdaPots adaPotsForNextEpoch,
+                                                                         ProtocolParameters protocolParameters,
+                                                                         DataProvider dataProvider) {
+        // Step 1: Get Pool information of current epoch
+        // Example: https://api.koios.rest/api/v0/pool_history?_pool_bech32=pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt&_epoch_no=210
+        int epoch = epochInfo.getNumber();
+        PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardCalculationResult.builder()
+                .epoch(epoch)
+                .poolId(poolId)
+                .poolReward(0.0)
+                .build();
+
+        PoolHistory poolHistoryCurrentEpoch = dataProvider.getPoolHistory(poolId, epoch);
+        if(poolHistoryCurrentEpoch == null) {
+            return poolRewardCalculationResult;
+        }
+
+        double poolStake = poolHistoryCurrentEpoch.getActiveStake();
+        double poolFees = poolHistoryCurrentEpoch.getPoolFees();
+        double poolMargin = poolHistoryCurrentEpoch.getMargin();
+        double poolFixedCost = poolHistoryCurrentEpoch.getFixedCost();
+        int blocksPoolHasMinted = poolHistoryCurrentEpoch.getBlockCount();
+
+        poolRewardCalculationResult.setPoolFee(poolFees);
+        poolRewardCalculationResult.setPoolMargin(poolMargin);
+        poolRewardCalculationResult.setPoolCost(poolFixedCost);
+        poolRewardCalculationResult.setRewardAddress(poolHistoryCurrentEpoch.getRewardAddress());
+
+        if (blocksPoolHasMinted == 0) {
+            return poolRewardCalculationResult;
+        }
+
+        double activeStakeInEpoch = 0;
+        if (epochInfo.getActiveStake() != null) {
+            activeStakeInEpoch = epochInfo.getActiveStake();
+        }
+
+        // The Shelley era and the ada pot system started on mainnet in epoch 208.
+        // Fee and treasury values are 0 for epoch 208.
+        double totalFeesForCurrentEpoch = 0.0;
+        if (epoch > 209) {
+            totalFeesForCurrentEpoch = epochInfo.getFees();
+        }
+
+        int totalBlocksInEpoch = epochInfo.getBlockCount();
+
+        if (epoch > 212 && epoch < 255) {
+            totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();
+        }
+
+        // Get the ada reserves for the next epoch because it was already updated (int the previous step)
+        double reserves = adaPotsForNextEpoch.getReserves();
+
+        // Step 3: Get total ada in circulation
+        double adaInCirculation = TOTAL_LOVELACE - reserves;
+
+        // Step 4: Get protocol parameters for current epoch
+        double decentralizationParameter = protocolParameters.getDecentralisation();
+        int optimalPoolCount = protocolParameters.getOptimalPoolCount();
+        double influenceParam = protocolParameters.getPoolOwnerInfluence();
+        double monetaryExpandRate = protocolParameters.getMonetaryExpandRate();
+        double treasuryGrowRate = protocolParameters.getTreasuryGrowRate();
+
+        // Step 5: Calculate apparent pool performance
+        double apparentPoolPerformance =
+                PoolRewardCalculation.calculateApparentPoolPerformance(poolStake, activeStakeInEpoch,
+                        blocksPoolHasMinted, totalBlocksInEpoch, decentralizationParameter);
+        poolRewardCalculationResult.setApparentPoolPerformance(apparentPoolPerformance);
+        // Step 6: Calculate total available reward for pools (total reward pot after treasury cut)
+        // -----
+        double totalRewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(
+                monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserves, totalFeesForCurrentEpoch);
+
+        double stakePoolRewardsPot = (totalRewardPot - Math.floor(totalRewardPot * treasuryGrowRate));
+        poolRewardCalculationResult.setStakePoolRewardsPot(stakePoolRewardsPot);
+        // shelley-delegation.pdf 5.5.3
+        //      "[...]the relative stake of the pool owner(s) (the amount of ada
+        //      pledged during pool registration)"
+
+        // Step 7: Get the latest pool update before this epoch and extract the pledge
+        double poolPledge = dataProvider.getPoolPledgeInEpoch(poolId, epoch);
+
+        PoolOwnerHistory poolOwnersHistoryInEpoch = dataProvider.getHistoryOfPoolOwnersInEpoch(poolId, epoch);
+        double totalActiveStakeOfOwners = poolOwnersHistoryInEpoch.getActiveStake();
+        poolRewardCalculationResult.setPoolOwnerStakeAddresses(poolOwnersHistoryInEpoch.getStakeAddresses());
+
+        if (totalActiveStakeOfOwners < poolPledge) {
+            return poolRewardCalculationResult;
+        }
+
+        double relativeStakeOfPoolOwner = poolPledge / adaInCirculation;
+        double relativePoolStake = poolStake / adaInCirculation;
+
+        // Step 8: Calculate optimal pool reward
+        double optimalPoolReward =
+                PoolRewardCalculation.calculateOptimalPoolReward(
+                        stakePoolRewardsPot,
+                        optimalPoolCount,
+                        influenceParam,
+                        relativePoolStake,
+                        relativeStakeOfPoolOwner);
+        poolRewardCalculationResult.setOptimalPoolReward(optimalPoolReward);
+
+        // Step 9: Calculate pool reward as optimal pool reward * apparent pool performance
+        double poolReward = PoolRewardCalculation.calculatePoolReward(optimalPoolReward, apparentPoolPerformance);
+        poolRewardCalculationResult.setPoolReward(poolReward);
+
+        // Step 10: Calculate pool operator reward
+        double poolOperatorReward = PoolRewardCalculation.calculateLeaderReward(poolReward, poolMargin, poolFixedCost,
+                totalActiveStakeOfOwners / adaInCirculation, relativePoolStake);
+        poolRewardCalculationResult.setOperatorReward(poolOperatorReward);
+        // Step 11: Calculate pool member reward
+        List<Reward> memberRewards = new ArrayList<>();
+        for (Delegator delegator : poolHistoryCurrentEpoch.getDelegators()) {
+            double memberReward = PoolRewardCalculation.calculateMemberReward(poolReward, poolMargin,
+                    poolFixedCost, delegator.getActiveStake() / adaInCirculation, relativePoolStake);
+            memberRewards.add(Reward.builder()
+                    .amount(memberReward)
+                    .stakeAddress(delegator.getStakeAddress())
+                    .build());
+        }
+        poolRewardCalculationResult.setMemberRewards(memberRewards);
+        return poolRewardCalculationResult;
+    }
 }

@@ -1,10 +1,7 @@
 package org.cardanofoundation.rewards.calculation;
 
 import org.cardanofoundation.rewards.data.provider.DbSyncDataProvider;
-import org.cardanofoundation.rewards.entity.PoolHistory;
-import org.cardanofoundation.rewards.entity.PoolRewardCalculationResult;
-import org.cardanofoundation.rewards.entity.Reward;
-import org.cardanofoundation.rewards.entity.TreasuryCalculationResult;
+import org.cardanofoundation.rewards.entity.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +11,6 @@ import org.springframework.test.context.junit.jupiter.EnabledIf;
 
 import java.util.List;
 
-import static org.cardanofoundation.rewards.util.CurrencyConverter.adaToLovelace;
 import static org.cardanofoundation.rewards.util.CurrencyConverter.lovelaceToAda;
 
 /*
@@ -35,6 +31,10 @@ public class EpochCalculationTest {
         double totalDifference = 0.0;
         double totalDistributedRewards = 0.0;
 
+        AdaPots adaPotsForNextEpoch = dataProvider.getAdaPotsForEpoch(epoch + 1);
+        ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch);
+        Epoch epochInfo = dataProvider.getEpochInfo(epoch);
+
         for (int i = 0; i < poolIds.size(); i++) {
             String poolId = poolIds.get(i);
 
@@ -43,7 +43,7 @@ public class EpochCalculationTest {
             System.out.println("Pool rewards for pool " + poolId + " in epoch " + epoch + " fetched in " + (System.currentTimeMillis() - start) + " ms");
 
             start = System.currentTimeMillis();
-            PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardCalculation.calculatePoolRewardInEpoch(poolId, epoch, dataProvider);
+            PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardCalculation.calculatePoolRewardInEpoch(poolId, epochInfo, adaPotsForNextEpoch, protocolParameters, dataProvider);
             System.out.println("Pool reward for pool " + poolId + " in epoch " + epoch + " calculated in " + (System.currentTimeMillis() - start) + " ms");
 
             System.out.println("Pool (" + i +  "/" + poolIds.size() + ") " + poolId + " reward: " + poolRewardCalculationResult.getPoolReward());
@@ -71,6 +71,7 @@ public class EpochCalculationTest {
                 if (poolRewardCalculationResult.getPoolOwnerStakeAddresses().contains(reward.getStakeAddress())) {
                     double poolOwnerReward = poolRewardCalculationResult.getOperatorReward();
                     difference = Math.abs(reward.getAmount() - poolOwnerReward);
+                    totalDistributedRewards += poolOwnerReward;
                 }
 
                 if (difference > 0.0) {
@@ -78,12 +79,15 @@ public class EpochCalculationTest {
                 }
 
                 totalDifference += difference;
+                totalDistributedRewards += reward.getAmount();
             }
 
             System.out.println("Total difference: " + lovelaceToAda(totalDifference) + " ADA");
         }
 
         System.out.println("Total difference for epoch " + epoch + ": " + lovelaceToAda(totalDifference) + " ADA");
+        System.out.println("Total distributed rewards for epoch " + epoch + ": " + lovelaceToAda(totalDistributedRewards) + " ADA");
+        System.out.println("Total available rewards for epoch " + epoch + ": " + lovelaceToAda(adaPotsForNextEpoch.getRewards()));
     }
 
     @Test

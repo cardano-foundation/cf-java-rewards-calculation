@@ -117,7 +117,7 @@ public class DbSyncDataProvider implements DataProvider {
         Integer blockCount = dbSyncBlockRepository.getBlocksMadeByPoolInEpoch(poolId, epoch);
         poolHistory.setBlockCount(blockCount);
 
-        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestUpdateForEpoch(poolId, epoch - 1);
+        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestUpdateForEpoch(poolId, epoch);
         poolHistory.setFixedCost(dbSyncPoolUpdate.getFixedCost());
         poolHistory.setMargin(dbSyncPoolUpdate.getMargin());
         poolHistory.setEpoch(epoch);
