@@ -135,6 +135,7 @@ public class PoolRewardCalculation {
         poolRewardCalculationResult.setPoolFee(poolFees);
         poolRewardCalculationResult.setPoolMargin(poolMargin);
         poolRewardCalculationResult.setPoolCost(poolFixedCost);
+        poolRewardCalculationResult.setRewardAddress(poolHistoryCurrentEpoch.getRewardAddress());
 
         if (blocksPoolHasMinted == 0) {
             return poolRewardCalculationResult;
@@ -162,7 +163,7 @@ public class PoolRewardCalculation {
             totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();
         }
 
-        // Get the ada reserves for the next epoch because it was already updated yet
+        // Get the ada reserves for the next epoch because it was already updated (int the previous step)
         AdaPots adaPotsForNextEpoch = dataProvider.getAdaPotsForEpoch(epoch + 1);
         double reserves = adaPotsForNextEpoch.getReserves();
 
@@ -187,17 +188,18 @@ public class PoolRewardCalculation {
         double totalRewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(
                 monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserves, totalFeesForCurrentEpoch);
 
-        double stakePoolRewardsPot = totalRewardPot - Math.floor(totalRewardPot * treasuryGrowRate);
+        double stakePoolRewardsPot = (totalRewardPot - Math.floor(totalRewardPot * treasuryGrowRate));
         poolRewardCalculationResult.setStakePoolRewardsPot(stakePoolRewardsPot);
         // shelley-delegation.pdf 5.5.3
         //      "[...]the relative stake of the pool owner(s) (the amount of ada
         //      pledged during pool registration)"
 
         // Step 7: Get the latest pool update before this epoch and extract the pledge
-        double poolPledge = dataProvider.getPoolPledgeInEpoch(poolId, epoch);
+        double poolPledge = dataProvider.getPoolPledgeInEpoch(poolId, epoch - 1);
 
         PoolOwnerHistory poolOwnersHistoryInEpoch = dataProvider.getHistoryOfPoolOwnersInEpoch(poolId, epoch);
         double totalActiveStakeOfOwners = poolOwnersHistoryInEpoch.getActiveStake();
+        poolRewardCalculationResult.setPoolOwnerStakeAddresses(poolOwnersHistoryInEpoch.getStakeAddresses());
 
         if (totalActiveStakeOfOwners < poolPledge) {
             return poolRewardCalculationResult;

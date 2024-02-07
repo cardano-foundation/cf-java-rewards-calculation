@@ -12,6 +12,7 @@ import java.util.List;
 public class PoolRewardCalculationResult {
     int epoch;
     String poolId;
+    String rewardAddress;
     Double stakePoolRewardsPot;
     List<Reward> memberRewards;
     Double operatorReward;
@@ -21,4 +22,5 @@ public class PoolRewardCalculationResult {
     Double poolFee;
     Double poolMargin;
     Double poolCost;
+    List<String> poolOwnerStakeAddresses;
 }

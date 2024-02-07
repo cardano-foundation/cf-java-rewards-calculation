@@ -35,4 +35,8 @@ public interface DataProvider {
     public Double getSumOfFeesInEpoch(int epoch);
 
     public Double getSumOfWithdrawalsInEpoch(int epoch);
+
+    public List<Reward> getRewardListForPoolInEpoch(int epoch, String poolId);
+
+    public Double getTotalPoolRewardsInEpoch(String poolId, int epoch);
 }

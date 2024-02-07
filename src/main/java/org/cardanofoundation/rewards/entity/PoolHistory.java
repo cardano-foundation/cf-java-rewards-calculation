@@ -12,6 +12,7 @@ import java.util.List;
 public class PoolHistory {
     private Double activeStake;
     private Double delegatorRewards;
+    private String rewardAddress;
     private Double poolFees;
     private Double margin;
     private Double fixedCost;

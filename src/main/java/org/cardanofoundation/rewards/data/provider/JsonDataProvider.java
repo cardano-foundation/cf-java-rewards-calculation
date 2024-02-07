@@ -167,4 +167,14 @@ public class JsonDataProvider implements DataProvider {
     public Double getSumOfWithdrawalsInEpoch(int epoch) {
         return null;
     }
+
+    @Override
+    public List<Reward> getRewardListForPoolInEpoch(int epoch, String poolId) {
+        return null;
+    }
+
+    @Override
+    public Double getTotalPoolRewardsInEpoch(String poolId, int epoch) {
+        return null;
+    }
 }

@@ -11,10 +11,12 @@ import java.util.List;
 @Profile("db-sync")
 public interface DbSyncBlockRepository extends ReadOnlyRepository<DbSyncBlock, Long> {
 
-    @Query("""
-            select count(*) from DbSyncBlock AS block
-                where block.epochNo = :epoch
-                and block.slotLeader.pool.bech32PoolId = :poolId""")
+    @Query(nativeQuery = true, value = """
+            SELECT count(*) from block
+            LEFT JOIN slot_leader ON block.slot_leader_id=slot_leader.id
+            LEFT JOIN pool_hash ON pool_hash.id=slot_leader.pool_hash_id
+            WHERE block.epoch_no = :epoch and pool_hash.view = :poolId
+            """)
     Integer getBlocksMadeByPoolInEpoch(String poolId, Integer epoch);
 
    @Query("""
@@ -32,7 +34,7 @@ public interface DbSyncBlockRepository extends ReadOnlyRepository<DbSyncBlock, L
     Integer getOBFTBlocksInEpoch(Integer epoch);
 
     @Query("""
-            select block.slotLeader.pool.bech32PoolId from DbSyncBlock AS block
+            select distinct block.slotLeader.pool.bech32PoolId from DbSyncBlock AS block
                 where block.epochNo = :epoch
                 and block.slotLeader.pool is not NULL
            """)

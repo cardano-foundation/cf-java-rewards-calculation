@@ -52,12 +52,12 @@ public class DepositCalculationTest {
         Assertions.assertEquals(0.0, difference);
     }
 
-    static Stream<Integer> dataProviderRangeUntilEpoch213() {
+    static Stream<Integer> dataProviderRangeUntilEpoch460() {
         return IntStream.range(208, 460).boxed();
     }
 
     @ParameterizedTest
-    @MethodSource("dataProviderRangeUntilEpoch213")
+    @MethodSource("dataProviderRangeUntilEpoch460")
     void Test_calculateDepositsWithDbSyncDataProvider(int epoch) {
         Test_calculateDeposit(epoch, DataProviderType.DB_SYNC);
     }

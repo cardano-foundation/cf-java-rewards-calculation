@@ -117,12 +117,13 @@ public class DbSyncDataProvider implements DataProvider {
         Integer blockCount = dbSyncBlockRepository.getBlocksMadeByPoolInEpoch(poolId, epoch);
         poolHistory.setBlockCount(blockCount);
 
-        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestUpdateForEpoch(poolId, epoch);
+        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestUpdateForEpoch(poolId, epoch - 1);
         poolHistory.setFixedCost(dbSyncPoolUpdate.getFixedCost());
         poolHistory.setMargin(dbSyncPoolUpdate.getMargin());
         poolHistory.setEpoch(epoch);
+        poolHistory.setRewardAddress(dbSyncPoolUpdate.getStakeAddress().getView());
 
-        double totalPoolRewards = dbSyncRewardRepository.getRewardsForPoolInEpoch(poolId, epoch);
+        double totalPoolRewards = dbSyncRewardRepository.getTotalPoolRewardsInEpoch(poolId, epoch);
 
         DbSyncAdaPots dbSyncAdaPots = dbSyncAdaPotsRepository.findByEpoch(epoch + 1);
         double reserves = dbSyncAdaPots.getReserves();
@@ -136,11 +137,12 @@ public class DbSyncDataProvider implements DataProvider {
 
         for (DbSyncPoolOwner owner : owners) {
             Delegator delegator = poolHistory.getDelegator(owner.getStakeAddress().getView());
-            totalActiveStakeOfOwners += delegator.getActiveStake();
-            totalMemberRewardsOfOwners += PoolRewardCalculation.calculateMemberReward(totalPoolRewards,
-                    poolHistory.getMargin(), poolHistory.getFixedCost(),
-                    delegator.getActiveStake() / adaInCirculation, relativePoolStake);
-
+            if (delegator != null) {
+                totalActiveStakeOfOwners += delegator.getActiveStake();
+                totalMemberRewardsOfOwners += PoolRewardCalculation.calculateMemberReward(totalPoolRewards,
+                        poolHistory.getMargin(), poolHistory.getFixedCost(),
+                        delegator.getActiveStake() / adaInCirculation, relativePoolStake);
+            }
         }
 
         double poolOperatorReward = PoolRewardCalculation.calculateLeaderReward(totalPoolRewards,
@@ -266,6 +268,17 @@ public class DbSyncDataProvider implements DataProvider {
     @Override
     public Double getSumOfWithdrawalsInEpoch(int epoch) {
         return dbSyncWithdrawalRepository.getSumOfWithdrawalsInEpoch(epoch);
+    }
+
+    @Override
+    public List<Reward> getRewardListForPoolInEpoch(int epoch, String poolId) {
+        List <DbSyncReward> poolRewards = dbSyncRewardRepository.getMemberRewardListForPoolInEpoch(poolId, epoch);
+        return poolRewards.stream().map(RewardMapper::fromDbSyncReward).toList();
+    }
+
+    @Override
+    public Double getTotalPoolRewardsInEpoch(String poolId, int epoch) {
+        return dbSyncRewardRepository.getTotalPoolRewardsInEpoch(poolId, epoch);
     }
 
     public List<String> getPoolsThatProducedBlocksInEpoch(int epoch) {
