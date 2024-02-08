@@ -164,6 +164,14 @@ public class PoolRewardCalculationTest {
         Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
     }
 
+    @Test
+    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
+    void calculateXYZPoolRewardInEpoch211() {
+        String poolId = "pool18hkq2t8ss45h4fkr92f52flhc4mpzedx5mcz4xhnpj0dzp76028";
+        int epoch = 213;
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+    }
+
     static Stream<Integer> testPoolKoiosProviderRewardRange() {
         return IntStream.range(211, 213).boxed();
     }
@@ -173,6 +181,5 @@ public class PoolRewardCalculationTest {
     void calculateOCTASPoolRewardFromEpoch211To213(int epoch) {
         String poolId = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
         Test_calculatePoolReward(poolId, epoch, DataProviderType.KOIOS);
-
     }
 }

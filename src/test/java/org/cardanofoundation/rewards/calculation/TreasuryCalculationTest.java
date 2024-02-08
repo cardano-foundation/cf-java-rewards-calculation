@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.test.context.junit.jupiter.EnabledIf;
 
 import static org.cardanofoundation.rewards.constants.RewardConstants.*;
 import static org.cardanofoundation.rewards.util.CurrencyConverter.lovelaceToAda;
@@ -28,6 +29,9 @@ public class TreasuryCalculationTest {
 
   @Autowired
   JsonDataProvider jsonDataProvider;
+
+  @Autowired(required = false)
+  DataProvider dbSyncDataProvider;
 
   void Test_calculateTreasury(final int epoch, DataProviderType dataProviderType) {
 
@@ -74,6 +78,14 @@ public class TreasuryCalculationTest {
   @MethodSource("retiredPoolTestRange")
   void Test_calculateUnclaimedRefundsForRetiredPools(int epoch, double expectedUnclaimedRefunds) {
     double unclaimedRefunds = TreasuryCalculation.calculateUnclaimedRefundsForRetiredPools(epoch, jsonDataProvider);
+    Assertions.assertEquals(expectedUnclaimedRefunds, unclaimedRefunds);
+  }
+
+  @ParameterizedTest
+  @MethodSource("retiredPoolTestRange")
+  @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
+  void Test_calculateUnclaimedRefundsForRetiredPoolsWithDbSync(int epoch, double expectedUnclaimedRefunds) {
+    double unclaimedRefunds = TreasuryCalculation.calculateUnclaimedRefundsForRetiredPools(epoch, dbSyncDataProvider);
     Assertions.assertEquals(expectedUnclaimedRefunds, unclaimedRefunds);
   }
 }

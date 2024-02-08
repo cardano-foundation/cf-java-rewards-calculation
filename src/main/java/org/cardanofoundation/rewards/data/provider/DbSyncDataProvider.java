@@ -117,7 +117,7 @@ public class DbSyncDataProvider implements DataProvider {
         Integer blockCount = dbSyncBlockRepository.getBlocksMadeByPoolInEpoch(poolId, epoch);
         poolHistory.setBlockCount(blockCount);
 
-        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestUpdateForEpoch(poolId, epoch);
+        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestActiveUpdateInEpoch(poolId, epoch);
         poolHistory.setFixedCost(dbSyncPoolUpdate.getFixedCost());
         poolHistory.setMargin(dbSyncPoolUpdate.getMargin());
         poolHistory.setEpoch(epoch);
@@ -157,7 +157,7 @@ public class DbSyncDataProvider implements DataProvider {
 
     @Override
     public Double getPoolPledgeInEpoch(String poolId, int epoch) {
-        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestUpdateForEpoch(poolId, epoch);
+        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestActiveUpdateInEpoch(poolId, epoch);
         return dbSyncPoolUpdate.getPledge();
     }
 
@@ -167,7 +167,7 @@ public class DbSyncDataProvider implements DataProvider {
         poolOwnerHistory.setEpoch(epoch);
 
         List<PoolEpochStake> poolEpochStakes = dbSyncEpochStakeRepository.getPoolActiveStakeInEpoch(poolId, epoch);
-        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestUpdateForEpoch(poolId, epoch);
+        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestActiveUpdateInEpoch(poolId, epoch);
         List<DbSyncPoolOwner> owners = dbSyncPoolOwnerRepository.getByPoolUpdateId(dbSyncPoolUpdate.getId());
 
         List<String> stakeAddresses = owners.stream()
@@ -190,7 +190,40 @@ public class DbSyncDataProvider implements DataProvider {
     @Override
     public List<PoolDeregistration> getRetiredPoolsInEpoch(int epoch) {
         List<DbSyncPoolRetirement> dbSyncPoolRetirements = dbSyncPoolRetirementRepository.getPoolRetirementsByEpoch(epoch);
-        return dbSyncPoolRetirements.stream().map(PoolDeregistrationMapper::fromDbSyncPoolRetirement).toList();
+        List<PoolDeregistration> poolDeregistrations = dbSyncPoolRetirements.stream().map(PoolDeregistrationMapper::fromDbSyncPoolRetirement).toList();
+        List<PoolDeregistration> retiredPools = new ArrayList<>();
+
+        for (PoolDeregistration poolDeregistration : poolDeregistrations) {
+            boolean poolDeregistrationLaterInEpoch = poolDeregistrations.stream().anyMatch(
+                    deregistration -> deregistration.getPoolId().equals(poolDeregistration.getPoolId()) &&
+                            deregistration.getAnnouncedTransactionId() > poolDeregistration.getAnnouncedTransactionId()
+            );
+
+            // To prevent double counting, we only count the pool deregistration if there is no other deregistration
+            // for the same pool later in the epoch
+            if (poolDeregistrationLaterInEpoch) {
+                continue;
+            }
+
+            List<PoolUpdate> poolUpdates = this.getPoolUpdateAfterTransactionIdInEpoch(poolDeregistration.getPoolId(),
+                    poolDeregistration.getAnnouncedTransactionId(), epoch - 1);
+
+            // There is an update after the deregistration, so the pool has not been retired
+            if (poolUpdates.size() == 0) {
+                PoolDeregistration latestPoolRetirementUntilEpoch = this.latestPoolRetirementUntilEpoch(poolDeregistration.getPoolId(), epoch - 1);
+                if (latestPoolRetirementUntilEpoch != null && latestPoolRetirementUntilEpoch.getRetiringEpoch() != epoch) {
+                    // The pool was retired in a previous epoch for the next epoch, but another deregistration was announced and changed the
+                    // retirement epoch to something else. This means the pool was not retired in this epoch.
+                    continue;
+                }
+
+                DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLatestUpdateInEpoch(poolDeregistration.getPoolId(), epoch);
+                poolDeregistration.setRewardAddress(dbSyncPoolUpdate.getStakeAddress().getView());
+                retiredPools.add(poolDeregistration);
+            }
+        }
+
+        return retiredPools;
     }
 
     @Override

@@ -19,38 +19,9 @@ public class DepositCalculation {
         if (epoch > 207) {
             double transactionDepositsInEpoch = dataProvider.getTransactionDepositsInEpoch(epoch);
             List<PoolDeregistration> retiredPoolsInEpoch = dataProvider.getRetiredPoolsInEpoch(epoch + 1);
-            int actualPoolDeregistrationsInEpoch = 0;
-
-            for (PoolDeregistration poolDeregistration : retiredPoolsInEpoch) {
-                boolean poolDeregistrationLaterInEpoch = retiredPoolsInEpoch.stream().anyMatch(
-                        deregistration -> deregistration.getPoolId().equals(poolDeregistration.getPoolId()) &&
-                                deregistration.getAnnouncedTransactionId() > poolDeregistration.getAnnouncedTransactionId()
-                );
-
-                // To prevent double counting, we only count the pool deregistration if there is no other deregistration
-                // for the same pool later in the epoch
-                if (poolDeregistrationLaterInEpoch) {
-                    continue;
-                }
-
-                List<PoolUpdate> poolUpdates = dataProvider.getPoolUpdateAfterTransactionIdInEpoch(poolDeregistration.getPoolId(),
-                        poolDeregistration.getAnnouncedTransactionId(), epoch);
-
-                // There is an update after the deregistration, so the pool was not retired
-                if (poolUpdates.size() == 0) {
-                    PoolDeregistration latestPoolRetirementUntilEpoch = dataProvider.latestPoolRetirementUntilEpoch(poolDeregistration.getPoolId(), epoch);
-                    if (latestPoolRetirementUntilEpoch != null && latestPoolRetirementUntilEpoch.getRetiringEpoch() != epoch + 1) {
-                        // The pool was retired in a previous epoch for the next epoch, but another deregistration was announced and changed the
-                        // retirement epoch to something else. This means the pool was not retired in this epoch.
-                        continue;
-                    }
-
-                    actualPoolDeregistrationsInEpoch += 1;
-                }
-            }
 
             deposit += transactionDepositsInEpoch;
-            deposit -= actualPoolDeregistrationsInEpoch * DEPOSIT_POOL_REGISTRATION_IN_LOVELACE;
+            deposit -= retiredPoolsInEpoch.size() * DEPOSIT_POOL_REGISTRATION_IN_LOVELACE;
         }
 
         return depositsInPreviousEpoch + deposit;

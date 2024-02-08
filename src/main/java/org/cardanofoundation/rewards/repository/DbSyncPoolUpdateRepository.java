@@ -16,7 +16,7 @@ public interface DbSyncPoolUpdateRepository extends ReadOnlyRepository<DbSyncPoo
                 WHERE update.pool.bech32PoolId = :poolId
                 AND update.activeEpochNumber <= :epoch
             ORDER BY update.registeredTransaction.id DESC LIMIT 1""")
-    DbSyncPoolUpdate findLastestUpdateForEpoch(String poolId, Integer epoch);
+    DbSyncPoolUpdate findLastestActiveUpdateInEpoch(String poolId, Integer epoch);
 
     @Query(nativeQuery = true, value = """
             SELECT COUNT(*) FROM (
@@ -35,4 +35,10 @@ public interface DbSyncPoolUpdateRepository extends ReadOnlyRepository<DbSyncPoo
            ORDER BY update.registeredTransaction.id DESC""")
     List<DbSyncPoolUpdate> findByBech32PoolIdAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch);
 
+    @Query("""
+           SELECT update FROM DbSyncPoolUpdate AS update
+               WHERE update.pool.bech32PoolId = :poolId
+               AND update.registeredTransaction.block.epochNo <= :epoch
+           ORDER BY update.registeredTransaction.id DESC LIMIT 1""")
+    DbSyncPoolUpdate findLatestUpdateInEpoch(String poolId, int epoch);
 }
