@@ -201,7 +201,7 @@ public class PoolRewardCalculation {
         //      pledged during pool registration)"
 
         // Step 7: Get the latest pool update before this epoch and extract the pledge
-        double poolPledge = dataProvider.getPoolPledgeInEpoch(poolId, epoch - 1);
+        double poolPledge = dataProvider.getPoolPledgeInEpoch(poolId, epoch);
 
         PoolOwnerHistory poolOwnersHistoryInEpoch = dataProvider.getHistoryOfPoolOwnersInEpoch(poolId, epoch);
         double totalActiveStakeOfOwners = poolOwnersHistoryInEpoch.getActiveStake();
