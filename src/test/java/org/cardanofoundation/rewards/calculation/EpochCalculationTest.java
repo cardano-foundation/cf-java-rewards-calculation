@@ -2,6 +2,7 @@ package org.cardanofoundation.rewards.calculation;
 
 import org.cardanofoundation.rewards.data.provider.DbSyncDataProvider;
 import org.cardanofoundation.rewards.entity.*;
+import org.cardanofoundation.rewards.enums.AccountUpdateAction;
 import org.cardanofoundation.rewards.enums.MirPot;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -10,8 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.cardanofoundation.rewards.constants.RewardConstants.TOTAL_LOVELACE;
 import static org.cardanofoundation.rewards.util.CurrencyConverter.lovelaceToAda;
@@ -163,12 +163,48 @@ public class EpochCalculationTest {
                         // Step 10: Calculate pool operator reward
                         double poolOperatorReward = PoolRewardCalculation.calculateLeaderReward(poolReward, poolMargin, poolFixedCost,
                                 totalActiveStakeOfOwners / adaInCirculation, relativePoolStake);
+
+                        // Step 10 a: Check if pool reward address has been unregistered before
+                        List<String> stakeAddresses = new ArrayList<>();
+                        stakeAddresses.add(poolRewardCalculationResult.getRewardAddress());
+                        stakeAddresses.addAll(poolHistoryCurrentEpoch.getDelegators().stream().map(Delegator::getStakeAddress).toList());
+
+                        List<AccountUpdate> accountUpdates = dataProvider.getAccountUpdatesUntilEpoch(stakeAddresses, epoch);
+                        accountUpdates = accountUpdates.stream().filter(update ->
+                                update.getAction().equals(AccountUpdateAction.DEREGISTRATION)
+                                        || update.getAction().equals(AccountUpdateAction.REGISTRATION)).sorted(
+                                Comparator.comparing(AccountUpdate::getUnixBlockTime).reversed()).toList();
+
+                        Map<String, AccountUpdate> latestAccountUpdates = new HashMap<>();
+                        for (AccountUpdate accountUpdate : accountUpdates) {
+                            if (latestAccountUpdates.keySet().stream().noneMatch(stakeAddress -> stakeAddress.equals(accountUpdate.getStakeAddress()))) {
+                                latestAccountUpdates.put(accountUpdate.getStakeAddress(), accountUpdate);
+                            }
+                        }
+
+                        if (accountUpdates.size() > 0 &&
+                                (latestAccountUpdates.get(poolRewardCalculationResult.getRewardAddress()) == null ||
+                                latestAccountUpdates.get(poolRewardCalculationResult.getRewardAddress()).getAction().equals(AccountUpdateAction.DEREGISTRATION))) {
+                            poolOperatorReward = 0.0;
+                        }
+
                         poolRewardCalculationResult.setOperatorReward(poolOperatorReward);
                         totalDistributedRewards += poolOperatorReward;
 
                         // Step 11: Calculate pool member reward
                         List<Reward> memberRewards = new ArrayList<>();
                         for (Delegator delegator : poolHistoryCurrentEpoch.getDelegators()) {
+                            if (accountUpdates.size() > 0 &&
+                                    (latestAccountUpdates.get(delegator.getStakeAddress()) == null ||
+                                    latestAccountUpdates.get(delegator.getStakeAddress()).getAction().equals(AccountUpdateAction.DEREGISTRATION))) {
+                                continue;
+                            }
+
+                            if (delegator.getStakeAddress().equals(poolHistoryCurrentEpoch.getRewardAddress()) ||
+                                poolOwnersHistoryInEpoch.getStakeAddresses().contains(delegator.getStakeAddress())) {
+                                continue;
+                            }
+
                             double memberReward = PoolRewardCalculation.calculateMemberReward(poolReward, poolMargin,
                                     poolFixedCost, delegator.getActiveStake() / adaInCirculation, relativePoolStake);
                             memberRewards.add(Reward.builder()
@@ -218,6 +254,18 @@ public class EpochCalculationTest {
                 totalDistributedRewards += reward.getAmount();
             }
 
+            double actualTotalPoolRewardsInEpoch = dataProvider.getTotalPoolRewardsInEpoch(poolId, epoch - 2);
+            double calculatedTotalPoolRewardsInEpoch = 0.0;
+
+            if (poolRewardCalculationResult.getMemberRewards() != null) {
+                calculatedTotalPoolRewardsInEpoch = poolRewardCalculationResult.getMemberRewards().stream()
+                        .map(Reward::getAmount)
+                        .mapToDouble(Double::doubleValue).sum() + poolRewardCalculationResult.getOperatorReward();
+            }
+
+            Assertions.assertEquals(actualTotalPoolRewardsInEpoch, calculatedTotalPoolRewardsInEpoch,
+                    "The difference between expected pool reward and actual pool reward is : " + lovelaceToAda(actualTotalPoolRewardsInEpoch - calculatedTotalPoolRewardsInEpoch) + " ADA");
+
             System.out.println("Total difference: " + lovelaceToAda(totalDifference) + " ADA");
         }
 
@@ -226,7 +274,8 @@ public class EpochCalculationTest {
         System.out.println("Expected total rewards for epoch " + epoch + ": " + lovelaceToAda(adaPotsForCurrentEpoch.getRewards()) + " ADA");
         System.out.println("Total fees for epoch " + epoch + ": " + lovelaceToAda(totalFeesForCurrentEpoch) + " ADA");
         System.out.println("Calculated total reward pot for epoch " + epoch + ": " + lovelaceToAda(rewardPot) + " ADA");
-        double calculatedReserveForCurrentEpoch = reserveInPreviousEpoch - rewardPot - totalFeesForCurrentEpoch;
+        System.out.println("Calculated stake pool rewards pot for epoch " + epoch + ": " + lovelaceToAda(stakePoolRewardsPot) + " ADA");
+        double calculatedReserveForCurrentEpoch = reserveInPreviousEpoch - (rewardPot - totalFeesForCurrentEpoch);
         double undistributedRewards = stakePoolRewardsPot - totalDistributedRewards;
         calculatedReserveForCurrentEpoch += undistributedRewards;
         System.out.println("Undistributed rewards for epoch " + epoch + ": " + lovelaceToAda(undistributedRewards) + " ADA");
@@ -239,5 +288,10 @@ public class EpochCalculationTest {
     @Test
     public void testCalculateEpochRewardsForEpoch213() {
         testCalculateEpochPots(213);
+    }
+
+    @Test
+    public void testCalculateEpochRewardsForEpoch214() {
+        testCalculateEpochPots(214);
     }
 }

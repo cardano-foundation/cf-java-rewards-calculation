@@ -2,8 +2,10 @@ package org.cardanofoundation.rewards.calculation;
 
 import org.cardanofoundation.rewards.data.provider.DataProvider;
 import org.cardanofoundation.rewards.entity.*;
+import org.cardanofoundation.rewards.enums.AccountUpdateAction;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.constants.RewardConstants.TOTAL_LOVELACE;
@@ -93,7 +95,7 @@ public class PoolRewardCalculation {
     public static double calculateLeaderReward(double poolReward, double margin, double poolCost,
                                                double relativeOwnerStake, double relativeStakeOfPool) {
         if (poolReward <= poolCost) {
-            return poolCost;
+            return poolReward;
         }
 
         return poolCost +
@@ -109,6 +111,10 @@ public class PoolRewardCalculation {
      */
     public static double calculateMemberReward(double poolReward, double margin, double poolCost,
                                                double relativeMemberStake, double relativeStakeOfPool) {
+        if (poolReward <= poolCost) {
+            return 0.0;
+        }
+
         return Math.floor((poolReward - poolCost) * (1 - margin) * relativeMemberStake / relativeStakeOfPool);
     }
 
@@ -225,10 +231,27 @@ public class PoolRewardCalculation {
         // Step 10: Calculate pool operator reward
         double poolOperatorReward = PoolRewardCalculation.calculateLeaderReward(poolReward, poolMargin, poolFixedCost,
                 totalActiveStakeOfOwners / adaInCirculation, relativePoolStake);
+
+        // Step 10 a: Check if pool reward address has been unregistered before
+        List<AccountUpdate> accountUpdates = dataProvider.getAccountUpdatesUntilEpoch(List.of(poolRewardCalculationResult.getRewardAddress()), epoch);
+        accountUpdates = accountUpdates.stream().filter(update ->
+                update.getAction().equals(AccountUpdateAction.DEREGISTRATION)
+                        || update.getAction().equals(AccountUpdateAction.REGISTRATION)).sorted(
+                Comparator.comparing(AccountUpdate::getUnixBlockTime).reversed()).toList();
+
+        if (accountUpdates.size() > 0 && accountUpdates.get(0).getAction().equals(AccountUpdateAction.DEREGISTRATION)) {
+            poolOperatorReward = 0.0;
+        }
+
         poolRewardCalculationResult.setOperatorReward(poolOperatorReward);
         // Step 11: Calculate pool member reward
         List<Reward> memberRewards = new ArrayList<>();
         for (Delegator delegator : poolHistoryCurrentEpoch.getDelegators()) {
+            accountUpdates = dataProvider.getAccountUpdatesUntilEpoch(List.of(delegator.getStakeAddress()), epoch);
+            if (accountUpdates.size() > 0 && accountUpdates.get(0).getAction().equals(AccountUpdateAction.DEREGISTRATION)) {
+                continue;
+            }
+
             double memberReward = PoolRewardCalculation.calculateMemberReward(poolReward, poolMargin,
                     poolFixedCost, delegator.getActiveStake() / adaInCirculation, relativePoolStake);
             memberRewards.add(Reward.builder()
@@ -351,10 +374,27 @@ public class PoolRewardCalculation {
         // Step 10: Calculate pool operator reward
         double poolOperatorReward = PoolRewardCalculation.calculateLeaderReward(poolReward, poolMargin, poolFixedCost,
                 totalActiveStakeOfOwners / adaInCirculation, relativePoolStake);
+
+        // Step 10 a: Check if pool reward address has been unregistered before
+        List<AccountUpdate> accountUpdates = dataProvider.getAccountUpdatesUntilEpoch(List.of(poolRewardCalculationResult.getRewardAddress()), epoch);
+        accountUpdates = accountUpdates.stream().filter(update ->
+                update.getAction().equals(AccountUpdateAction.DEREGISTRATION)
+                        || update.getAction().equals(AccountUpdateAction.REGISTRATION)).sorted(
+                Comparator.comparing(AccountUpdate::getUnixBlockTime).reversed()).toList();
+
+        if (accountUpdates.size() > 0 && accountUpdates.get(0).getAction().equals(AccountUpdateAction.DEREGISTRATION)) {
+            poolOperatorReward = 0.0;
+        }
+
         poolRewardCalculationResult.setOperatorReward(poolOperatorReward);
         // Step 11: Calculate pool member reward
         List<Reward> memberRewards = new ArrayList<>();
         for (Delegator delegator : poolHistoryCurrentEpoch.getDelegators()) {
+            accountUpdates = dataProvider.getAccountUpdatesUntilEpoch(List.of(delegator.getStakeAddress()), epoch);
+            if (accountUpdates.size() > 0 && accountUpdates.get(0).getAction().equals(AccountUpdateAction.DEREGISTRATION)) {
+                continue;
+            }
+
             double memberReward = PoolRewardCalculation.calculateMemberReward(poolReward, poolMargin,
                     poolFixedCost, delegator.getActiveStake() / adaInCirculation, relativePoolStake);
             memberRewards.add(Reward.builder()
