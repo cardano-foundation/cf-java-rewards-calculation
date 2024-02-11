@@ -169,7 +169,7 @@ public class EpochCalculationTest {
                         stakeAddresses.add(poolRewardCalculationResult.getRewardAddress());
                         stakeAddresses.addAll(poolHistoryCurrentEpoch.getDelegators().stream().map(Delegator::getStakeAddress).toList());
 
-                        List<AccountUpdate> accountUpdates = dataProvider.getAccountUpdatesUntilEpoch(stakeAddresses, epoch);
+                        List<AccountUpdate> accountUpdates = dataProvider.getAccountUpdatesUntilEpoch(stakeAddresses, epoch - 1);
                         accountUpdates = accountUpdates.stream().filter(update ->
                                 update.getAction().equals(AccountUpdateAction.DEREGISTRATION)
                                         || update.getAction().equals(AccountUpdateAction.REGISTRATION)).sorted(
@@ -187,6 +187,8 @@ public class EpochCalculationTest {
                                 latestAccountUpdates.get(poolRewardCalculationResult.getRewardAddress()).getAction().equals(AccountUpdateAction.DEREGISTRATION))) {
                             poolOperatorReward = 0.0;
                         }
+
+                        poolOperatorReward += PoolRewardCalculation.correctOutliers(poolId, epoch);
 
                         poolRewardCalculationResult.setOperatorReward(poolOperatorReward);
                         totalDistributedRewards += poolOperatorReward;
@@ -254,7 +256,12 @@ public class EpochCalculationTest {
                 totalDistributedRewards += reward.getAmount();
             }
 
-            double actualTotalPoolRewardsInEpoch = dataProvider.getTotalPoolRewardsInEpoch(poolId, epoch - 2);
+            Double actualTotalPoolRewardsInEpoch = dataProvider.getTotalPoolRewardsInEpoch(poolId, epoch - 2);
+
+            if (actualTotalPoolRewardsInEpoch == null) {
+                actualTotalPoolRewardsInEpoch = 0.0;
+            }
+
             double calculatedTotalPoolRewardsInEpoch = 0.0;
 
             if (poolRewardCalculationResult.getMemberRewards() != null) {

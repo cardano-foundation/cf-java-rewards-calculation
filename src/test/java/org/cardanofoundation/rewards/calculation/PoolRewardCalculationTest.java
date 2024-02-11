@@ -212,6 +212,14 @@ public class PoolRewardCalculationTest {
         Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
     }
 
+    @Test
+    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
+    void calculateDUCKPoolRewardInEpoch212() {
+        String poolId = "pool13l0j202yexqh6l0awtee9g354244gmfze09utxz0sn7p7r3ev3m";
+        int epoch = 212;
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+    }
+
     static Stream<Integer> testPoolKoiosProviderRewardRange() {
         return IntStream.range(211, 213).boxed();
     }

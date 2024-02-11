@@ -123,7 +123,11 @@ public class DbSyncDataProvider implements DataProvider {
         poolHistory.setEpoch(epoch);
         poolHistory.setRewardAddress(dbSyncPoolUpdate.getStakeAddress().getView());
 
-        double totalPoolRewards = dbSyncRewardRepository.getTotalPoolRewardsInEpoch(poolId, epoch);
+        Double totalPoolRewards = dbSyncRewardRepository.getTotalPoolRewardsInEpoch(poolId, epoch);
+
+        if (totalPoolRewards == null) {
+            totalPoolRewards = 0.0;
+        }
 
         DbSyncAdaPots dbSyncAdaPots = dbSyncAdaPotsRepository.findByEpoch(epoch + 1);
         double reserves = dbSyncAdaPots.getReserves();
@@ -306,6 +310,11 @@ public class DbSyncDataProvider implements DataProvider {
     @Override
     public List<Reward> getRewardListForPoolInEpoch(int epoch, String poolId) {
         List <DbSyncReward> poolRewards = dbSyncRewardRepository.getMemberRewardListForPoolInEpoch(poolId, epoch);
+
+        if (poolRewards.isEmpty()) {
+            return List.of();
+        }
+
         return poolRewards.stream().map(RewardMapper::fromDbSyncReward).toList();
     }
 

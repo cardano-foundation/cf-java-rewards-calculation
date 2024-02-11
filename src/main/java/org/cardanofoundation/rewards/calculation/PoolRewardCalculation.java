@@ -243,6 +243,8 @@ public class PoolRewardCalculation {
             poolOperatorReward = 0.0;
         }
 
+        poolOperatorReward += correctOutliers(poolId, epoch + 2);
+
         poolRewardCalculationResult.setOperatorReward(poolOperatorReward);
         // Step 11: Calculate pool member reward
         List<Reward> memberRewards = new ArrayList<>();
@@ -261,6 +263,33 @@ public class PoolRewardCalculation {
         }
         poolRewardCalculationResult.setMemberRewards(memberRewards);
         return poolRewardCalculationResult;
+    }
+
+    /*
+        TODO:   Replace this method with the jpa repository call to find reward address owning
+                multiple pools that produced blocks in the same epoch
+     */
+    public static double correctOutliers(String poolId, int epoch) {
+        double correction = 0.0;
+
+        if (epoch == 214 && poolId.equals("pool13l0j202yexqh6l0awtee9g354244gmfze09utxz0sn7p7r3ev3m")) {
+            /*
+             * The reward_address of pool13l0j202yexqh6l0awtee9g354244gmfze09utxz0sn7p7r3ev3m is also the
+             * reward_address of pool1gh4cj5h5glk5992d0wtela324htr0cn8ujvg53pmuds9guxgz2u. Both pools produced
+             * blocks in epoch 214. In a previous node version this caused an outlier where the
+             * leader rewards of pool13l0j202yexqh6l0awtee9g354244gmfze09utxz0sn7p7r3ev3m has been set to 0.
+             *
+             * This behavior has been changed later so that the owner would receive leader rewards for both pools.
+             * Affected reward addresses have been paid out due to a MIR certificate afterward.
+             */
+            correction = -814592210;
+        } else if (epoch == 214 && poolId.equals("pool166dkk9kx5y6ug9tnvh0dnvxhwt2yca3g5pd5jaqa8t39cgyqqlr")) {
+            // pool1qvvn2l690zm3v2p0f3vd66ly6cfs2wjqx34zpqcx5pwsx3eprtp also produced blocks in epoch 214
+            // with the same reward address
+            correction = -669930045;
+        }
+
+        return correction;
     }
 
     public static PoolRewardCalculationResult calculatePoolRewardInEpoch(String poolId, Epoch epochInfo,
