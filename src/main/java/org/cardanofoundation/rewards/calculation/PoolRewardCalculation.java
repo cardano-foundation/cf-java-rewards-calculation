@@ -4,11 +4,13 @@ import org.cardanofoundation.rewards.data.provider.DataProvider;
 import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.enums.AccountUpdateAction;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.constants.RewardConstants.TOTAL_LOVELACE;
+import static org.cardanofoundation.rewards.util.BigDecimalUtils.*;
 
 public class PoolRewardCalculation {
 
@@ -30,10 +32,21 @@ public class PoolRewardCalculation {
         } else if (activePoolStake == 0.0 || totalActiveEpochStake == 0.0) {
             return 0.0;
         } else {
-
             final double relativeBlocksCreatedInEpoch = (double) blocksMintedByPool / (double) blocksMintedByStakePools;
             final double relativeActiveStake = activePoolStake / totalActiveEpochStake;
             return relativeBlocksCreatedInEpoch / relativeActiveStake;
+        }
+    }
+
+    public static BigDecimal calculateApparentPoolPerformance(final BigDecimal activePoolStake, final BigDecimal totalActiveEpochStake, final int blocksMintedByPool, final int blocksMintedByStakePools, final double decentralizationParam) {
+        if (decentralizationParam >= 0.8) {
+            return BigDecimal.ONE;
+        } else if (isZero(activePoolStake) || isZero(totalActiveEpochStake)) {
+            return BigDecimal.ZERO;
+        } else {
+            final BigDecimal relativeBlocksCreatedInEpoch = divide(blocksMintedByPool, blocksMintedByStakePools);
+            final BigDecimal relativeActiveStake = divide(activePoolStake, totalActiveEpochStake);
+            return divide(relativeBlocksCreatedInEpoch, relativeActiveStake);
         }
     }
 
@@ -80,12 +93,37 @@ public class PoolRewardCalculation {
                 (cappedRelativeStake + cappedRelativeStakeOfPoolOwner * influence * saturatedPoolWeight));
     }
 
+    public static BigDecimal calculateOptimalPoolReward(double totalAvailableRewards, int optimalPoolCount, double influence, BigDecimal relativeStakeOfPool, BigDecimal relativeStakeOfPoolOwner) {
+
+        BigDecimal sizeOfASaturatedPool = divide(BigDecimal.ONE, optimalPoolCount);
+        BigDecimal cappedRelativeStake = min(relativeStakeOfPool, sizeOfASaturatedPool);
+        BigDecimal cappedRelativeStakeOfPoolOwner = min(relativeStakeOfPoolOwner, sizeOfASaturatedPool);
+
+        // R / (1 + a0)
+        // "R are the total available rewards for the epoch (in ada)." (shelley-delegation.pdf 5.5.3)
+        double rewardsDividedByOnePlusInfluence = totalAvailableRewards / (1 + influence);
+
+        // (z0 - sigma') / z0
+        BigDecimal relativeStakeOfSaturatedPool = divide(subtract(sizeOfASaturatedPool, cappedRelativeStake), sizeOfASaturatedPool);
+
+        // (sigma' - s' * relativeStakeOfSaturatedPool) / z0
+        BigDecimal saturatedPoolWeight = divide(subtract(cappedRelativeStake, multiply(cappedRelativeStakeOfPoolOwner, relativeStakeOfSaturatedPool)), sizeOfASaturatedPool);
+
+        // R / (1+a0) * (sigma' + s' * a0 * saturatedPoolWeight)
+        return floor(multiply(rewardsDividedByOnePlusInfluence,
+                add(cappedRelativeStake, multiply(cappedRelativeStakeOfPoolOwner, influence, saturatedPoolWeight))));
+    }
+
     /*
      *  Calculate the pool reward with the formula (shelley-delegation.pdf 5.5.3 page 37 below):
      *  actualRewards = poolPerformance * optimalPoolReward
      */
     public static double calculatePoolReward(double optimalPoolReward, double poolPerformance) {
-        return optimalPoolReward * poolPerformance;
+        return Math.floor(optimalPoolReward * poolPerformance);
+    }
+
+    public static BigDecimal calculatePoolReward(BigDecimal optimalPoolReward, BigDecimal poolPerformance) {
+        return floor(multiply(optimalPoolReward, poolPerformance));
     }
 
     /*
@@ -103,6 +141,16 @@ public class PoolRewardCalculation {
                         (margin + (1 - margin) * (relativeOwnerStake / relativeStakeOfPool)));
     }
 
+    public static BigDecimal calculateLeaderReward(BigDecimal poolReward, double margin, double poolCost,
+                                                   BigDecimal relativeOwnerStake, BigDecimal relativeStakeOfPool) {
+        if (isLowerOrEquals(poolReward, poolCost)) {
+            return poolReward;
+        }
+
+        return add(poolCost, floor(multiply(subtract(poolReward, poolCost),
+                        add(margin, multiply((1 - margin), divide(relativeOwnerStake, relativeStakeOfPool))))));
+    }
+
     /*
      * This method calculates the pool member reward regarding the formula described
      * in the shelly-ledger.pdf p. 61, figure 47
@@ -116,6 +164,18 @@ public class PoolRewardCalculation {
         }
 
         return Math.floor((poolReward - poolCost) * (1 - margin) * relativeMemberStake / relativeStakeOfPool);
+    }
+
+    public static BigDecimal calculateMemberReward(BigDecimal poolReward, double margin, double poolCost,
+                                               BigDecimal relativeMemberStake, BigDecimal relativeStakeOfPool) {
+        if (isLowerOrEquals(poolReward, poolCost)) {
+            return BigDecimal.ZERO;
+        }
+
+        return floor(divide(multiply(
+                subtract(poolReward, poolCost),
+                subtract(BigDecimal.ONE, margin),
+                relativeMemberStake), relativeStakeOfPool));
     }
 
     public static PoolRewardCalculationResult calculatePoolRewardInEpoch(String poolId, int epoch, DataProvider dataProvider) {
