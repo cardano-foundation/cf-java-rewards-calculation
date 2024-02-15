@@ -20,6 +20,8 @@ import rest.koios.client.backend.factory.BackendService;
 import rest.koios.client.backend.factory.options.*;
 import rest.koios.client.backend.factory.options.filters.Filter;
 import rest.koios.client.backend.factory.options.filters.FilterType;
+
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -162,12 +164,12 @@ public class KoiosDataProvider implements DataProvider {
 
             if (accountHistories == null || accountHistories.isEmpty()) return null;
 
-            Double totalActiveStake = accountHistories.stream()
+            BigInteger totalActiveStake = accountHistories.stream()
                     .map(AccountHistory::getHistory)
                     .flatMap(List::stream)
                     .map(AccountHistoryInner::getActiveStake)
-                    .map(Double::valueOf)
-                    .reduce(0.0, Double::sum);
+                    .map(BigInteger::new)
+                    .reduce(BigInteger.ZERO, BigInteger::add);
 
             poolOwnerHistory = PoolOwnerHistory.builder()
                     .activeStake(totalActiveStake)
@@ -247,17 +249,17 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
-    public Double getTransactionDepositsInEpoch(int epoch) {
+    public BigInteger getTransactionDepositsInEpoch(int epoch) {
         return null;
     }
 
     @Override
-    public Double getSumOfFeesInEpoch(int epoch) {
+    public BigInteger getSumOfFeesInEpoch(int epoch) {
         return null;
     }
 
     @Override
-    public Double getSumOfWithdrawalsInEpoch(int epoch) {
+    public BigInteger getSumOfWithdrawalsInEpoch(int epoch) {
         return null;
     }
 
@@ -267,7 +269,12 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
-    public Double getTotalPoolRewardsInEpoch(String poolId, int epoch) {
+    public BigInteger getTotalPoolRewardsInEpoch(String poolId, int epoch) {
+        return null;
+    }
+
+    @Override
+    public List<String> getPoolsThatProducedBlocksInEpoch(int epoch) {
         return null;
     }
 
@@ -278,7 +285,7 @@ public class KoiosDataProvider implements DataProvider {
                     .getPoolService().getPoolDelegatorsHistory(poolId, epoch, Options.EMPTY).getValue();
             for (PoolDelegatorHistory poolDelegator : poolDelegatorsHistory) {
                 delegators.add(Delegator.builder()
-                        .activeStake(Double.valueOf(poolDelegator.getAmount()))
+                        .activeStake(new BigInteger(poolDelegator.getAmount()))
                         .stakeAddress(poolDelegator.getStakeAddress())
                         .build());
             }

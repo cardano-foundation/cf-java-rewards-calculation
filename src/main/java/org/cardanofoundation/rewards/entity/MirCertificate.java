@@ -3,6 +3,8 @@ package org.cardanofoundation.rewards.entity;
 import lombok.*;
 import org.cardanofoundation.rewards.enums.MirPot;
 
+import java.math.BigInteger;
+
 @Getter
 @Setter
 @Builder
@@ -12,5 +14,5 @@ public class MirCertificate {
     private long blockTime;
     private MirPot pot;
     private int totalStakeKeys;
-    private double totalRewards;
+    private BigInteger totalRewards;
 }

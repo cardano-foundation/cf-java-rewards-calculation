@@ -6,6 +6,8 @@ import lombok.Getter;
 import org.hibernate.annotations.Immutable;
 import org.springframework.context.annotation.Profile;
 
+import java.math.BigInteger;
+
 @Entity
 @Immutable
 @Getter
@@ -21,7 +23,7 @@ public class DbSyncTransaction {
     @EqualsAndHashCode.Exclude
     private DbSyncBlock block;
 
-    private Double deposit;
+    private BigInteger deposit;
 
-    private Double fee;
+    private BigInteger fee;
 }

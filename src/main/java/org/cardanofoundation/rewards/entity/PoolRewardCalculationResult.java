@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 @Builder
@@ -13,13 +15,13 @@ public class PoolRewardCalculationResult {
     int epoch;
     String poolId;
     String rewardAddress;
-    Double stakePoolRewardsPot;
+    BigInteger stakePoolRewardsPot;
     List<Reward> memberRewards;
-    Double operatorReward;
-    Double optimalPoolReward;
-    Double poolReward;
-    Double apparentPoolPerformance;
-    Double poolFee;
+    BigInteger operatorReward;
+    BigInteger optimalPoolReward;
+    BigInteger poolReward;
+    BigDecimal apparentPoolPerformance;
+    BigInteger poolFee;
     Double poolMargin;
     Double poolCost;
     List<String> poolOwnerStakeAddresses;

@@ -2,6 +2,7 @@ package org.cardanofoundation.rewards.entity;
 
 import lombok.*;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Getter
@@ -11,10 +12,10 @@ import java.util.List;
 @AllArgsConstructor
 public class Epoch {
     private int number;
-    private Double output;
-    private Double fees;
+    private BigInteger output;
+    private BigInteger fees;
     private int blockCount;
-    private Double activeStake;
+    private BigInteger activeStake;
     private List<String> poolsMadeBlocks;
     private int nonOBFTBlockCount;
     private int OBFTBlockCount;

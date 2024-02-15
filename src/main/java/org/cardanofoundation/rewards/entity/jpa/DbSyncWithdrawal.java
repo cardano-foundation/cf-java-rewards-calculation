@@ -6,6 +6,8 @@ import lombok.Getter;
 import org.hibernate.annotations.Immutable;
 import org.springframework.context.annotation.Profile;
 
+import java.math.BigInteger;
+
 @Entity
 @Immutable
 @Getter
@@ -14,7 +16,7 @@ import org.springframework.context.annotation.Profile;
 public class DbSyncWithdrawal {
     @Id
     private Long id;
-    private Double amount;
+    private BigInteger amount;
 
     @ManyToOne
     @JoinColumn(name = "tx_id", nullable = false,

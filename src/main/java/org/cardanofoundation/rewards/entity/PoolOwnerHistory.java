@@ -2,6 +2,7 @@ package org.cardanofoundation.rewards.entity;
 
 import lombok.*;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Getter
@@ -12,5 +13,5 @@ import java.util.List;
 public class PoolOwnerHistory {
     int epoch;
     List<String> stakeAddresses;
-    Double activeStake;
+    BigInteger activeStake;
 }

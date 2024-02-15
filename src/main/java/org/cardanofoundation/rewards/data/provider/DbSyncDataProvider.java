@@ -13,11 +13,12 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.constants.RewardConstants.TOTAL_LOVELACE;
-import static org.cardanofoundation.rewards.util.BigDecimalUtils.add;
+import static org.cardanofoundation.rewards.util.BigNumberUtils.divide;
 
 @Service
 @Profile("db-sync")
@@ -82,8 +83,8 @@ public class DbSyncDataProvider implements DataProvider {
             epochInfo.setNonOBFTBlockCount(nonObftBlocks);
         }
 
-        Long epochStake = dbSyncEpochStakeRepository.getEpochStakeByEpoch(epoch);
-        epochInfo.setActiveStake(epochStake.doubleValue());
+        BigInteger epochStake = dbSyncEpochStakeRepository.getEpochStakeByEpoch(epoch);
+        epochInfo.setActiveStake(epochStake);
 
         return epochInfo;
     }
@@ -98,10 +99,10 @@ public class DbSyncDataProvider implements DataProvider {
     public PoolHistory getPoolHistory(String poolId, int epoch) {
         PoolHistory poolHistory = new PoolHistory();
         List<PoolEpochStake> poolEpochStakes = dbSyncEpochStakeRepository.getPoolActiveStakeInEpoch(poolId, epoch);
-        double activeStake = 0;
+        BigInteger activeStake = BigInteger.ZERO;
         List<Delegator> delegators = new ArrayList<>();
         for (PoolEpochStake poolEpochStake : poolEpochStakes) {
-            activeStake += poolEpochStake.getAmount();
+            activeStake = activeStake.add(poolEpochStake.getAmount());
             Delegator delegator = Delegator.builder()
                     .stakeAddress(poolEpochStake.getStakeAddress())
                     .activeStake(poolEpochStake.getAmount())
@@ -125,38 +126,38 @@ public class DbSyncDataProvider implements DataProvider {
         poolHistory.setEpoch(epoch);
         poolHistory.setRewardAddress(dbSyncPoolUpdate.getStakeAddress().getView());
 
-        Double totalPoolRewards = dbSyncRewardRepository.getTotalPoolRewardsInEpoch(poolId, epoch);
+        BigInteger totalPoolRewards = dbSyncRewardRepository.getTotalPoolRewardsInEpoch(poolId, epoch);
 
         if (totalPoolRewards == null) {
-            totalPoolRewards = 0.0;
+            totalPoolRewards = BigInteger.ZERO;
         }
 
         DbSyncAdaPots dbSyncAdaPots = dbSyncAdaPotsRepository.findByEpoch(epoch + 1);
-        double reserves = dbSyncAdaPots.getReserves();
-        double adaInCirculation = TOTAL_LOVELACE - reserves;
-        double relativePoolStake = activeStake / adaInCirculation;
+        BigInteger reserves = dbSyncAdaPots.getReserves();
+        BigInteger adaInCirculation = TOTAL_LOVELACE.subtract(reserves);
+        BigDecimal relativePoolStake = divide(activeStake, adaInCirculation);
 
         List<DbSyncPoolOwner> owners = dbSyncPoolOwnerRepository.getByPoolUpdateId(dbSyncPoolUpdate.getId());
 
-        double totalActiveStakeOfOwners = 0.0;
-        double totalMemberRewardsOfOwners = 0.0;
+        BigInteger totalActiveStakeOfOwners = BigInteger.ZERO;
+        BigInteger totalMemberRewardsOfOwners = BigInteger.ZERO;
 
         for (DbSyncPoolOwner owner : owners) {
             Delegator delegator = poolHistory.getDelegator(owner.getStakeAddress().getView());
             if (delegator != null) {
-                totalActiveStakeOfOwners += delegator.getActiveStake();
-                totalMemberRewardsOfOwners += PoolRewardCalculation.calculateMemberReward(totalPoolRewards,
+                totalActiveStakeOfOwners = totalActiveStakeOfOwners.add(delegator.getActiveStake());
+                totalMemberRewardsOfOwners = totalMemberRewardsOfOwners.add(PoolRewardCalculation.calculateMemberReward(totalPoolRewards,
                         poolHistory.getMargin(), poolHistory.getFixedCost(),
-                        delegator.getActiveStake() / adaInCirculation, relativePoolStake);
+                        divide(delegator.getActiveStake(), adaInCirculation), relativePoolStake));
             }
         }
 
-        double poolOperatorReward = PoolRewardCalculation.calculateLeaderReward(totalPoolRewards,
+        BigInteger poolOperatorReward = PoolRewardCalculation.calculateLeaderReward(totalPoolRewards,
                 poolHistory.getMargin(), poolHistory.getFixedCost(),
-                totalActiveStakeOfOwners / adaInCirculation, relativePoolStake);
+                divide(totalActiveStakeOfOwners, adaInCirculation), relativePoolStake);
 
-        poolHistory.setPoolFees(poolOperatorReward - totalMemberRewardsOfOwners);
-        poolHistory.setDelegatorRewards(totalPoolRewards - poolOperatorReward + totalMemberRewardsOfOwners);
+        poolHistory.setPoolFees(poolOperatorReward.subtract(totalMemberRewardsOfOwners));
+        poolHistory.setDelegatorRewards(totalPoolRewards.subtract(poolOperatorReward).add(totalMemberRewardsOfOwners));
 
         return poolHistory;
     }
@@ -164,6 +165,11 @@ public class DbSyncDataProvider implements DataProvider {
     @Override
     public Double getPoolPledgeInEpoch(String poolId, int epoch) {
         DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestActiveUpdateInEpoch(poolId, epoch);
+
+        if (dbSyncPoolUpdate == null) {
+            return null;
+        }
+
         return dbSyncPoolUpdate.getPledge();
     }
 
@@ -174,6 +180,11 @@ public class DbSyncDataProvider implements DataProvider {
 
         List<PoolEpochStake> poolEpochStakes = dbSyncEpochStakeRepository.getPoolActiveStakeInEpoch(poolId, epoch);
         DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestActiveUpdateInEpoch(poolId, epoch);
+
+        if (dbSyncPoolUpdate == null) {
+            return null;
+        }
+
         List<DbSyncPoolOwner> owners = dbSyncPoolOwnerRepository.getByPoolUpdateId(dbSyncPoolUpdate.getId());
 
         List<String> stakeAddresses = owners.stream()
@@ -181,11 +192,11 @@ public class DbSyncDataProvider implements DataProvider {
                 .map(DbSyncStakeAddress::getView)
                 .toList();
 
-        double activeStakes = 0.0;
+        BigInteger activeStakes = BigInteger.ZERO;
 
         for (PoolEpochStake poolEpochStake : poolEpochStakes) {
             if (stakeAddresses.contains(poolEpochStake.getStakeAddress())) {
-                activeStakes += poolEpochStake.getAmount();
+                activeStakes = activeStakes.add(poolEpochStake.getAmount());
             }
         }
         poolOwnerHistory.setStakeAddresses(stakeAddresses);
@@ -295,17 +306,17 @@ public class DbSyncDataProvider implements DataProvider {
     }
 
     @Override
-    public Double getTransactionDepositsInEpoch(int epoch) {
+    public BigInteger getTransactionDepositsInEpoch(int epoch) {
         return dbSyncTransactionRepository.getSumOfDepositsInEpoch(epoch);
     }
 
     @Override
-    public Double getSumOfFeesInEpoch(int epoch) {
+    public BigInteger getSumOfFeesInEpoch(int epoch) {
         return dbSyncTransactionRepository.getSumOfFeesInEpoch(epoch);
     }
 
     @Override
-    public Double getSumOfWithdrawalsInEpoch(int epoch) {
+    public BigInteger getSumOfWithdrawalsInEpoch(int epoch) {
         return dbSyncWithdrawalRepository.getSumOfWithdrawalsInEpoch(epoch);
     }
 
@@ -321,7 +332,7 @@ public class DbSyncDataProvider implements DataProvider {
     }
 
     @Override
-    public Double getTotalPoolRewardsInEpoch(String poolId, int epoch) {
+    public BigInteger getTotalPoolRewardsInEpoch(String poolId, int epoch) {
         return dbSyncRewardRepository.getTotalPoolRewardsInEpoch(poolId, epoch);
     }
 

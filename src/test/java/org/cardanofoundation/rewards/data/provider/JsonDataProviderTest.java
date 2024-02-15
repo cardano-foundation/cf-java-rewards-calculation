@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 
+import java.math.BigInteger;
+
 @SpringBootTest
 @ComponentScan
 public class JsonDataProviderTest {
@@ -19,9 +21,9 @@ public class JsonDataProviderTest {
     void test_getAdaPotsForEpoch220() {
         AdaPots adaPots = jsonDataProvider.getAdaPotsForEpoch(220);
         Assertions.assertEquals(adaPots.getEpoch(), 220);
-        Assertions.assertEquals(adaPots.getTreasury(), 94812346026398.0);
-        Assertions.assertEquals(adaPots.getReserves(), 13120582265809833.0);
-        Assertions.assertEquals(adaPots.getRewards(), 151012138061367.0);
+        Assertions.assertEquals(adaPots.getTreasury(), new BigInteger("94812346026398"));
+        Assertions.assertEquals(adaPots.getReserves(), new BigInteger("13120582265809833.0"));
+        Assertions.assertEquals(adaPots.getRewards(), new BigInteger("151012138061367.0"));
     }
 
     @Test

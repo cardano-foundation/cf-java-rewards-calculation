@@ -2,6 +2,8 @@ package org.cardanofoundation.rewards.entity;
 
 import lombok.*;
 
+import java.math.BigInteger;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -9,8 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 public class TreasuryCalculationResult {
     int epoch;
-    Double calculatedTreasury;
-    Double actualTreasury;
-    Double totalRewardPot;
-    Double treasuryWithdrawals;
+    BigInteger treasury;
+    BigInteger totalRewardPot;
+    BigInteger treasuryWithdrawals;
 }

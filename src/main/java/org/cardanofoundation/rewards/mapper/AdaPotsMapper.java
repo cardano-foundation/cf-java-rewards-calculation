@@ -4,6 +4,8 @@ import org.cardanofoundation.rewards.entity.AdaPots;
 import org.cardanofoundation.rewards.entity.jpa.DbSyncAdaPots;
 import rest.koios.client.backend.api.network.model.Totals;
 
+import java.math.BigInteger;
+
 import static org.cardanofoundation.rewards.constants.RewardConstants.TOTAL_LOVELACE;
 
 public class AdaPotsMapper {
@@ -12,10 +14,10 @@ public class AdaPotsMapper {
         if (totals == null) return null;
 
         return AdaPots.builder()
-                .treasury(Double.parseDouble(totals.getTreasury()))
-                .reserves(Double.parseDouble(totals.getReserves()))
-                .rewards(Double.parseDouble(totals.getReward()))
-                .adaInCirculation(Double.parseDouble(totals.getSupply()))
+                .treasury(new BigInteger(totals.getTreasury()))
+                .reserves(new BigInteger(totals.getReserves()))
+                .rewards(new BigInteger(totals.getReward()))
+                .adaInCirculation(new BigInteger(totals.getSupply()))
                 .epoch(totals.getEpochNo())
                 .build();
     }

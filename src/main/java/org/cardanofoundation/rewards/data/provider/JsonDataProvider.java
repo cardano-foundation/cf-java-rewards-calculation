@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.enums.DataType.*;
@@ -154,17 +155,17 @@ public class JsonDataProvider implements DataProvider {
     }
 
     @Override
-    public Double getTransactionDepositsInEpoch(int epoch) {
+    public BigInteger getTransactionDepositsInEpoch(int epoch) {
         return null;
     }
 
     @Override
-    public Double getSumOfFeesInEpoch(int epoch) {
+    public BigInteger getSumOfFeesInEpoch(int epoch) {
         return null;
     }
 
     @Override
-    public Double getSumOfWithdrawalsInEpoch(int epoch) {
+    public BigInteger getSumOfWithdrawalsInEpoch(int epoch) {
         return null;
     }
 
@@ -174,7 +175,12 @@ public class JsonDataProvider implements DataProvider {
     }
 
     @Override
-    public Double getTotalPoolRewardsInEpoch(String poolId, int epoch) {
+    public BigInteger getTotalPoolRewardsInEpoch(String poolId, int epoch) {
+        return null;
+    }
+
+    @Override
+    public List<String> getPoolsThatProducedBlocksInEpoch(int epoch) {
         return null;
     }
 }

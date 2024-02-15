@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
 
+import java.math.BigInteger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -46,10 +47,10 @@ public class UtxoCalculationTest {
         }
 
         AdaPots adaPots = dataProvider.getAdaPotsForEpoch(epoch);
-        double utxo = UtxoCalculation.calculateUtxoPotInEpoch(epoch, dataProvider);
+        BigInteger utxo = UtxoCalculation.calculateUtxoPotInEpoch(epoch, dataProvider);
 
-        double difference = adaPots.getAdaInCirculation() - utxo;
-        Assertions.assertEquals(0.0, difference);
+        BigInteger difference = adaPots.getAdaInCirculation().subtract(utxo);
+        Assertions.assertEquals(BigInteger.ZERO, difference);
     }
 
     static Stream<Integer> dataProviderRangeUntilEpoch213() {

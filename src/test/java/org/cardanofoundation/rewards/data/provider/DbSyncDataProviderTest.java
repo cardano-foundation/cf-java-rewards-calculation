@@ -13,11 +13,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static org.cardanofoundation.rewards.util.CurrencyConverter.adaToLovelace;
 import static org.cardanofoundation.rewards.util.CurrencyConverter.lovelaceToAda;
 
 @SpringBootTest
@@ -32,7 +32,7 @@ public class DbSyncDataProviderTest {
     public void testGetEpochs() {
         Epoch epoch = dbSyncDataProvider.getEpochInfo(220);
         Assertions.assertEquals(epoch.getNumber(), 220);
-        Assertions.assertEquals(epoch.getFees(), 5135934788.0);
+        Assertions.assertEquals(epoch.getFees(), new BigInteger("5135934788"));
         Assertions.assertEquals(epoch.getBlockCount(), 21627);
     }
 
@@ -40,7 +40,7 @@ public class DbSyncDataProviderTest {
     public void testGetEpochInfoOf215() {
         Epoch epoch = dbSyncDataProvider.getEpochInfo(215);
         Assertions.assertEquals(epoch.getNumber(), 215);
-        Assertions.assertEquals(epoch.getFees(), 8.110049274E9);
+        Assertions.assertEquals(epoch.getFees(), new BigInteger("8110049274"));
         Assertions.assertEquals(epoch.getBlockCount(), 21572);
         Assertions.assertEquals(epoch.getNonOBFTBlockCount(), 5710);
         Assertions.assertEquals(epoch.getUnixTimeFirstBlock(), 1599083091);
@@ -51,9 +51,9 @@ public class DbSyncDataProviderTest {
     @Test
     public void testGetAdaPots() {
         AdaPots adaPots = dbSyncDataProvider.getAdaPotsForEpoch(220);
-        Assertions.assertEquals(adaPots.getTreasury(), 9.4812346026398E13);
-        Assertions.assertEquals(adaPots.getReserves(), 1.3120582265809832E16);
-        Assertions.assertEquals(adaPots.getRewards(), 1.51012138061367E14);
+        Assertions.assertEquals(adaPots.getTreasury(), new BigInteger("94812346026398"));
+        Assertions.assertEquals(adaPots.getReserves(), new BigInteger("13120582265809833"));
+        Assertions.assertEquals(adaPots.getRewards(), new BigInteger("151012138061367"));
     }
 
     @Test
@@ -71,12 +71,12 @@ public class DbSyncDataProviderTest {
         String poolId = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
         int epoch = 220;
         PoolHistory poolHistory = dbSyncDataProvider.getPoolHistory(poolId, epoch);
-        Assertions.assertEquals(poolHistory.getActiveStake(), 27523186299296.0);
+        Assertions.assertEquals(poolHistory.getActiveStake(), new BigInteger("27523186299296"));
         Assertions.assertEquals(poolHistory.getBlockCount(), 10);
         Assertions.assertEquals(poolHistory.getFixedCost(), 340000000.0);
         Assertions.assertEquals(poolHistory.getMargin(), 0.009);
-        Assertions.assertEquals(poolHistory.getDelegatorRewards(), 14877804008.0);
-        Assertions.assertEquals(poolHistory.getPoolFees(), 475116283.0);
+        Assertions.assertEquals(poolHistory.getDelegatorRewards(), new BigInteger("14877804008"));
+        Assertions.assertEquals(poolHistory.getPoolFees(), new BigInteger("475116283"));
     }
 
     @Test
@@ -84,7 +84,7 @@ public class DbSyncDataProviderTest {
         String poolId = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
         int epoch = 220;
         PoolOwnerHistory poolOwnerHistory = dbSyncDataProvider.getHistoryOfPoolOwnersInEpoch(poolId, epoch);
-        Assertions.assertEquals(poolOwnerHistory.getActiveStake(), 4.76793511093E11);
+        Assertions.assertEquals(poolOwnerHistory.getActiveStake(), new BigInteger("476793511093"));
     }
 
     @Test
@@ -92,14 +92,14 @@ public class DbSyncDataProviderTest {
         int epoch = 374;
         List<MirCertificate> mirCertificates = dbSyncDataProvider.getMirCertificatesInEpoch(epoch);
 
-        double totalRewards = 0;
+        BigInteger totalRewards = BigInteger.ZERO;
         for (MirCertificate mirCertificate : mirCertificates) {
             if (mirCertificate.getPot() == MirPot.TREASURY) {
-                totalRewards += mirCertificate.getTotalRewards();
+                totalRewards = totalRewards.add(mirCertificate.getTotalRewards());
             }
         }
 
-        Assertions.assertEquals(totalRewards, 3.9432064006444E13);
+        Assertions.assertEquals(totalRewards, new BigInteger("39432064006444"));
     }
 
     @Test
@@ -157,10 +157,11 @@ public class DbSyncDataProviderTest {
     @MethodSource("dataProviderRangeUntilEpoch225")
     void Test_calculateTreasuryWithDbSyncDataProvider(final int epoch) {
         TreasuryCalculationResult treasuryCalculationResult = TreasuryCalculation.calculateTreasuryForEpoch(epoch, dbSyncDataProvider);
+        AdaPots adaPots = dbSyncDataProvider.getAdaPotsForEpoch(epoch);
 
-        double difference = treasuryCalculationResult.getActualTreasury() - treasuryCalculationResult.getCalculatedTreasury();
+        BigInteger difference = adaPots.getTreasury().subtract(treasuryCalculationResult.getTreasury());
         System.out.println(difference);
-        Assertions.assertTrue(Math.abs(difference) < 1, "The difference " + lovelaceToAda(difference) + " ADA between expected treasury value and actual treasury value is greater than 1 LOVELACE");
+        Assertions.assertEquals(BigInteger.ZERO, difference, "The difference " + lovelaceToAda(difference.intValue()) + " ADA between expected treasury value and actual treasury value is greater than 1 LOVELACE");
     }
 
     private void Test_calculatePoolRewardWithDbSyncDataProvider(final String poolId,
@@ -170,12 +171,12 @@ public class DbSyncDataProviderTest {
 
         PoolHistory poolHistoryCurrentEpoch = dbSyncDataProvider.getPoolHistory(poolId, epoch);
         if (poolHistoryCurrentEpoch == null) {
-            Assertions.assertEquals(0.0, poolRewardCalculationResult.getPoolReward());
+            Assertions.assertEquals(BigInteger.ZERO, poolRewardCalculationResult.getPoolReward());
             return;
         }
 
-        double difference = (poolHistoryCurrentEpoch.getDelegatorRewards() - (poolRewardCalculationResult.getPoolReward() - poolRewardCalculationResult.getPoolFee()));
-        Assertions.assertTrue(Math.abs(difference) < adaToLovelace(1), "The difference between expected pool reward and actual pool reward is greater than 1 ADA: " + lovelaceToAda(difference) + " ADA");
+        BigInteger difference = (poolHistoryCurrentEpoch.getDelegatorRewards().subtract(poolRewardCalculationResult.getPoolReward().subtract(poolRewardCalculationResult.getPoolFee())));
+        Assertions.assertEquals(BigInteger.ZERO, difference, "The difference between expected pool reward and actual pool reward is greater than 1 ADA: " + lovelaceToAda(difference.intValue()) + " ADA");
     }
 
     static Stream<String> testPoolIds() {

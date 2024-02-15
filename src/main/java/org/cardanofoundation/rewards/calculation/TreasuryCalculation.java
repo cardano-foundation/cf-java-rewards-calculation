@@ -5,23 +5,15 @@ import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.enums.AccountUpdateAction;
 import org.cardanofoundation.rewards.enums.MirPot;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.constants.RewardConstants.*;
+import static org.cardanofoundation.rewards.util.BigNumberUtils.*;
 
 public class TreasuryCalculation {
-
-  /*
-   * Calculate the treasury for epoch e with the formula:
-   *
-   * treasury(e) = treasury_growth_rate * reward_pot + treasury(e - 1)
-   * treasury(e) = 0, if e < 209
-   */
-  public static double calculateTreasury(double treasuryGrowRate, double rewardPot, double lastTreasury) {
-    return rewardPot * treasuryGrowRate + lastTreasury;
-  }
 
   /*
    * Calculate the reward pot for epoch e with the formula:
@@ -29,10 +21,10 @@ public class TreasuryCalculation {
    * rewards(e) = floor(monetary_expand_rate * eta * reserve(e - 1) + fee(e - 1))
    * rewards(e) = 0, if e < 209
    */
-  public static double calculateTotalRewardPotWithEta(double monetaryExpandRate, int totalBlocksInEpochByPools,
-                                                         double decentralizationParameter, double reserve, double fee) {
+  public static BigInteger calculateTotalRewardPotWithEta(double monetaryExpandRate, int totalBlocksInEpochByPools,
+                                                          double decentralizationParameter, BigInteger reserve, BigInteger fee) {
     double eta = calculateEta(totalBlocksInEpochByPools, decentralizationParameter);
-    return Math.floor(reserve * monetaryExpandRate * eta) + fee;
+    return multiplyAndFloor(reserve, monetaryExpandRate, eta).add(fee);
   }
 
   /*
@@ -70,11 +62,10 @@ public class TreasuryCalculation {
     // Fee and treasury values are 0 for epoch 208.
     if (epoch == 208) {
         return TreasuryCalculationResult.builder()
-                .calculatedTreasury(0.0)
-                .actualTreasury(0.0)
+                .treasury(BigInteger.ZERO)
                 .epoch(epoch)
-                .totalRewardPot(0.0)
-                .treasuryWithdrawals(0.0)
+                .totalRewardPot(BigInteger.ZERO)
+                .treasuryWithdrawals(BigInteger.ZERO)
                 .build();
     }
 
@@ -83,9 +74,7 @@ public class TreasuryCalculation {
     double decentralizationParameter = 1;
 
     AdaPots adaPotsForPreviousEpoch = dataProvider.getAdaPotsForEpoch(epoch - 1);
-    AdaPots adaPotsForCurrentEpoch = dataProvider.getAdaPotsForEpoch(epoch);
-
-    double totalFeesForCurrentEpoch = 0.0;
+    BigInteger totalFeesForCurrentEpoch = BigInteger.ZERO;
     int totalBlocksInEpoch = 0;
 
     /* We need to use the epoch info 2 epochs before as shelley starts in epoch 208 it will be possible to get
@@ -107,34 +96,35 @@ public class TreasuryCalculation {
       }
     }
 
-    double reserveInPreviousEpoch = adaPotsForPreviousEpoch.getReserves();
+    BigInteger reserveInPreviousEpoch = adaPotsForPreviousEpoch.getReserves();
 
-    double treasuryInPreviousEpoch = adaPotsForPreviousEpoch.getTreasury();
-    double expectedTreasuryForCurrentEpoch = adaPotsForCurrentEpoch.getTreasury();
-
-    double rewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(
+    BigInteger treasuryInPreviousEpoch = adaPotsForPreviousEpoch.getTreasury();
+    BigInteger rewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(
             monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserveInPreviousEpoch, totalFeesForCurrentEpoch);
 
-    double treasuryForCurrentEpoch = TreasuryCalculation.calculateTreasury(
-            treasuryGrowthRate, rewardPot, treasuryInPreviousEpoch);
+    BigInteger treasuryCut = multiplyAndFloor(rewardPot, treasuryGrowthRate);
+    BigInteger treasuryForCurrentEpoch = treasuryInPreviousEpoch.add(treasuryCut);
 
     // The sum of all the refunds attached to unregistered reward accounts are added to the
     // treasury (see: Pool Reap Transition, p.53, figure 40, shely-ledger.pdf)
-    treasuryForCurrentEpoch += TreasuryCalculation.calculateUnclaimedRefundsForRetiredPools(epoch, dataProvider);
+
+    List<PoolDeregistration> retiredPools = dataProvider.getRetiredPoolsInEpoch(epoch);
+    List<AccountUpdate> accountUpdates = dataProvider.getAccountUpdatesUntilEpoch(
+            retiredPools.stream().map(PoolDeregistration::getRewardAddress).toList(), epoch - 1);
+    treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(TreasuryCalculation.calculateUnclaimedRefundsForRetiredPools(retiredPools, accountUpdates));
 
     // Check if there was a MIR Certificate in the previous epoch
-    double treasuryWithdrawals = 0.0;
+    BigInteger treasuryWithdrawals = BigInteger.ZERO;
     List<MirCertificate> mirCertificates = dataProvider.getMirCertificatesInEpoch(epoch - 1);
     for (MirCertificate mirCertificate : mirCertificates) {
       if (mirCertificate.getPot() == MirPot.TREASURY) {
-        treasuryWithdrawals += mirCertificate.getTotalRewards();
+        treasuryWithdrawals = treasuryWithdrawals.add(mirCertificate.getTotalRewards());
       }
     }
-    treasuryForCurrentEpoch -= treasuryWithdrawals;
+    treasuryForCurrentEpoch = treasuryForCurrentEpoch.subtract(treasuryWithdrawals);
 
     return TreasuryCalculationResult.builder()
-            .calculatedTreasury(treasuryForCurrentEpoch)
-            .actualTreasury(expectedTreasuryForCurrentEpoch)
+            .treasury(treasuryForCurrentEpoch)
             .epoch(epoch)
             .totalRewardPot(rewardPot)
             .treasuryWithdrawals(treasuryWithdrawals)
@@ -146,20 +136,15 @@ public class TreasuryCalculation {
     pool's registered reward account, provided the reward account is still registered." -
     https://github.com/input-output-hk/cardano-ledger/blob/9e2f8151e3b9a0dde9faeb29a7dd2456e854427c/eras/shelley/formal-spec/epoch.tex#L546C9-L547C87
    */
-  public static Double calculateUnclaimedRefundsForRetiredPools(int epoch, DataProvider dataProvider) {
-    List<PoolDeregistration> retiredPools = dataProvider.getRetiredPoolsInEpoch(epoch);
-
-    double refunds = 0.0;
+  public static BigInteger calculateUnclaimedRefundsForRetiredPools(List<PoolDeregistration> retiredPools,
+                                                                    List<AccountUpdate> accountUpdates) {
+    BigInteger refunds = BigInteger.ZERO;
 
     if (retiredPools.size() > 0) {
-      // The deposit will pay back one epoch later
-      List<AccountUpdate> accountUpdates = dataProvider.getAccountUpdatesUntilEpoch(
-              retiredPools.stream().map(PoolDeregistration::getRewardAddress).toList(), epoch - 1);
-
       // Order list by unix block time
       accountUpdates = accountUpdates.stream().filter(update ->
               update.getAction().equals(AccountUpdateAction.DEREGISTRATION)
-              || update.getAction().equals(AccountUpdateAction.REGISTRATION)).sorted(
+                      || update.getAction().equals(AccountUpdateAction.REGISTRATION)).sorted(
               Comparator.comparing(AccountUpdate::getUnixBlockTime).reversed()).toList();
 
       // only hold the latest account update for each reward address
@@ -173,7 +158,7 @@ public class TreasuryCalculation {
 
       for (AccountUpdate lastAccountUpdate : latestAccountUpdates) {
         if (lastAccountUpdate.getAction() == AccountUpdateAction.DEREGISTRATION) {
-          refunds += DEPOSIT_POOL_REGISTRATION_IN_LOVELACE;
+          refunds = refunds.add(POOL_DEPOSIT_IN_LOVELACE);
         }
       }
     }

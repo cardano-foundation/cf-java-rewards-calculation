@@ -3,7 +3,6 @@ package org.cardanofoundation.rewards.data.fetcher;
 import org.cardanofoundation.rewards.data.provider.JsonDataProvider;
 import org.cardanofoundation.rewards.data.provider.KoiosDataProvider;
 import org.cardanofoundation.rewards.entity.*;
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -223,7 +222,8 @@ public class KoiosDataFetcher implements DataFetcher {
             "pool1spus7k8cy5qcs82xhw60dwwk2d4vrfs0m5vr2zst04gtq700gjn",
             "pool1qqqqx69ztfvd83rtafs3mk4lwanehrglmp2vwkjpaguecs2t4c2",
             "pool13n4jzw847sspllczxgnza7vkq80m8px7mpvwnsqthyy2790vmyc",
-            "pool1ljlmfg7p37ysmea9ra5xqwccue203dpj40w6zlzn5r2cvjrf6tw"
+            "pool1ljlmfg7p37ysmea9ra5xqwccue203dpj40w6zlzn5r2cvjrf6tw",
+            "pool19ctjr5ft75sz396hn0tf6ns4hy5w9l9jp2jh3m8mx6acvm2cn7j"
         );
 
         for (String poolId : poolIds) {

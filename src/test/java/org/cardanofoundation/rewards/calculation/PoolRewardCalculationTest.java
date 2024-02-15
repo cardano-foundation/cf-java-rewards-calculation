@@ -16,15 +16,17 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.DisabledIf;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static org.cardanofoundation.rewards.util.CurrencyConverter.adaToLovelace;
+import static org.cardanofoundation.rewards.util.BigNumberUtils.isHigher;
 import static org.cardanofoundation.rewards.util.CurrencyConverter.lovelaceToAda;
 
 @SpringBootTest
 @ComponentScan
+@EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
 public class PoolRewardCalculationTest {
 
     @Autowired
@@ -55,11 +57,11 @@ public class PoolRewardCalculationTest {
 
        List<Reward> actualPoolRewardsInEpoch = dataProvider.getRewardListForPoolInEpoch(epoch, poolId);
        if (actualPoolRewardsInEpoch == null) {
-           Assertions.assertEquals(0.0, poolRewardCalculationResult.getPoolReward());
+           Assertions.assertEquals(BigInteger.ZERO, poolRewardCalculationResult.getPoolReward());
            return;
        }
 
-       double totalDifference = 0.0;
+       BigInteger totalDifference = BigInteger.ZERO;
        int rewardIndex = 0;
        for (Reward reward : actualPoolRewardsInEpoch) {
            Reward memberReward = poolRewardCalculationResult.getMemberRewards().stream()
@@ -67,45 +69,45 @@ public class PoolRewardCalculationTest {
                    .findFirst()
                    .orElse(null);
            Assertions.assertNotNull(memberReward, "Member reward not found for stake address: " + reward.getStakeAddress());
-           double difference = Math.abs(reward.getAmount() - memberReward.getAmount());
+           BigInteger difference = reward.getAmount().subtract(memberReward.getAmount()).abs();
 
            if (poolRewardCalculationResult.getPoolOwnerStakeAddresses().contains(reward.getStakeAddress())) {
-               double poolOwnerReward = poolRewardCalculationResult.getOperatorReward();
-               difference = Math.abs(reward.getAmount() - poolOwnerReward);
+               BigInteger poolOwnerReward = poolRewardCalculationResult.getOperatorReward();
+               difference = reward.getAmount().subtract(poolOwnerReward).abs();
            }
-           totalDifference += difference;
+           totalDifference = totalDifference.add(difference);
 
-           System.out.println("[" + rewardIndex + "] The difference between expected member " + reward.getStakeAddress() + " reward and actual member reward is : " + lovelaceToAda(difference) + " ADA");
+           System.out.println("[" + rewardIndex + "] The difference between expected member " + reward.getStakeAddress() + " reward and actual member reward is : " + lovelaceToAda(difference.intValue()) + " ADA");
            rewardIndex++;
            //Assertions.assertEquals(0.0, difference, "The difference between expected member reward and actual member reward is : " + lovelaceToAda(difference) + " ADA");
        }
 
-       System.out.println("Total difference: " + lovelaceToAda(totalDifference) + " ADA");
+       System.out.println("Total difference: " + lovelaceToAda(totalDifference.intValue()) + " ADA");
 
-       double totalNoReward = 0.0;
-       double coOwnerReward = 0.0;
+       BigInteger totalNoReward = BigInteger.ZERO;
+       BigInteger coOwnerReward = BigInteger.ZERO;
        for (Reward memberReward : poolRewardCalculationResult.getMemberRewards()) {
            Reward actualReward = actualPoolRewardsInEpoch.stream()
                    .filter(reward -> reward.getStakeAddress().equals(memberReward.getStakeAddress()))
                    .findFirst()
                    .orElse(null);
-           if (actualReward == null && memberReward.getAmount() != 0.0 && !poolRewardCalculationResult.getPoolOwnerStakeAddresses().contains(memberReward.getStakeAddress())) {
-               totalNoReward += memberReward.getAmount();
-               System.out.println("No reward! The difference between expected member " + memberReward.getStakeAddress() + " reward and actual member reward is : " + lovelaceToAda(memberReward.getAmount()) + " ADA");
+           if (actualReward == null && isHigher(memberReward.getAmount(), BigInteger.ZERO) && !poolRewardCalculationResult.getPoolOwnerStakeAddresses().contains(memberReward.getStakeAddress())) {
+               totalNoReward = totalNoReward.add(memberReward.getAmount());
+               System.out.println("No reward! The difference between expected member " + memberReward.getStakeAddress() + " reward and actual member reward is : " + lovelaceToAda(memberReward.getAmount().intValue()) + " ADA");
            }
 
            // Co-owner reward is not included in the member rewards and would be added to the reward address of the pool
            if(poolRewardCalculationResult.getPoolOwnerStakeAddresses().contains(memberReward.getStakeAddress())) {
-               coOwnerReward += memberReward.getAmount();
+               coOwnerReward = coOwnerReward.add(memberReward.getAmount());
            }
        }
-       System.out.println("Total no reward: " + lovelaceToAda(totalNoReward) + " ADA");
+       System.out.println("Total no reward: " + lovelaceToAda(totalNoReward.intValue()) + " ADA");
 
-       double totalActualPoolRewards = dataProvider.getTotalPoolRewardsInEpoch(poolId, epoch);
-       double calculatedMemberRewards = poolRewardCalculationResult.getMemberRewards().stream().mapToDouble(Reward::getAmount).sum();
-       double difference = totalActualPoolRewards - (calculatedMemberRewards - coOwnerReward + poolRewardCalculationResult.getOperatorReward());
+       BigInteger totalActualPoolRewards = dataProvider.getTotalPoolRewardsInEpoch(poolId, epoch);
+       BigInteger calculatedMemberRewards = poolRewardCalculationResult.getMemberRewards().stream().map(Reward::getAmount).reduce(BigInteger.ZERO, BigInteger::add);
+       BigInteger difference = totalActualPoolRewards.subtract(calculatedMemberRewards.subtract(coOwnerReward).add(poolRewardCalculationResult.getOperatorReward()));
 
-       Assertions.assertEquals(0, difference, "The difference between expected pool reward and actual pool reward is : " + lovelaceToAda(difference) + " ADA");
+       Assertions.assertEquals(BigInteger.ZERO, difference, "The difference between expected pool reward and actual pool reward is : " + lovelaceToAda(difference.intValue()) + " ADA");
     }
 
     static Stream<String> testPoolIds() {
@@ -123,6 +125,7 @@ public class PoolRewardCalculationTest {
 
     @ParameterizedTest
     @MethodSource("testPoolIds")
+    @DisabledIf(expression = "#{environment.acceptsProfiles('ci')}", loadContext = true, reason = "Does not have the right data locally")
     void calculatePoolRewardInEpoch213(String poolId) {
         int epoch = 213;
         Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
@@ -217,6 +220,14 @@ public class PoolRewardCalculationTest {
     void calculateDUCKPoolRewardInEpoch212() {
         String poolId = "pool13l0j202yexqh6l0awtee9g354244gmfze09utxz0sn7p7r3ev3m";
         int epoch = 212;
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+    }
+
+    @Test
+    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
+    void calculateViperPoolRewardInEpoch213() {
+        String poolId = "pool166dkk9kx5y6ug9tnvh0dnvxhwt2yca3g5pd5jaqa8t39cgyqqlr";
+        int epoch = 213;
         Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
     }
 

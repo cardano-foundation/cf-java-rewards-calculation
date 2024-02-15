@@ -33,7 +33,7 @@ flowchart
     D --> | <a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87'>Rewards Equation<br /> for Pool n</a> | J[Stake Pool n]
     J --> | <b><i><a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a3151888e3133937b6098efdec72b587d88ba4cd/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L85'>margin & minPoolCost</a></i></b> | K[Operators]
     J --> | <b><i><a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a3151888e3133937b6098efdec72b587d88ba4cd/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L102'>rewards</a></b></i> | L[Delegators]
-    D --> | Capped Pool Rewards | C
+    D --> | Rewards going to<br /> de-registered<br /> stake addresses | C
     L <--> | Stake Key Registration & <br /> Deregistration | M[Deposits]
     K <--> | Stake Pool Registration & <br /> Deregistration | M
     M --> | <a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/1ed16503d7ed592410d55489cc2144762ce718d5/src/main/java/org/cardanofoundation/rewards/calculation/TreasuryCalculation.java#L122'>Unclaimed Refunds for Retired Pools</a> | C

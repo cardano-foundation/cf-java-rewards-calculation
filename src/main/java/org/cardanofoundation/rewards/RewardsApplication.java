@@ -3,7 +3,6 @@ package org.cardanofoundation.rewards;
 import org.cardanofoundation.rewards.data.fetcher.DbSyncDataFetcher;
 import org.cardanofoundation.rewards.data.fetcher.KoiosDataFetcher;
 import org.cardanofoundation.rewards.data.plotter.JsonDataPlotter;
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +15,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
-
-import java.util.List;
 
 @EnableConfigurationProperties
 @EntityScan({"org.cardanofoundation.rewards.*", "org.cardanofoundation.*"})
@@ -46,7 +43,7 @@ public class RewardsApplication implements ApplicationRunner {
   @Autowired
   private KoiosDataFetcher koiosDataFetcher;
 
-  @Autowired
+  @Autowired(required = false)
   private DbSyncDataFetcher dbSyncDataFetcher;
 
   public static void main(String[] args) {
@@ -78,9 +75,12 @@ public class RewardsApplication implements ApplicationRunner {
             }
           }
 
-          for (int epoch = startEpoch; epoch < endEpoch; epoch++) {
-            logger.info("Fetching data for epoch with the Koios data provider " + epoch);
-            koiosDataFetcher.fetch(epoch, override);
+          if (activeProfiles.contains("koios")) {
+            logger.info("Koios data provider is active. Fetching data from Koios...");
+            for (int epoch = startEpoch; epoch < endEpoch; epoch++) {
+                logger.info("Fetching data for epoch with the Koios data provider " + epoch);
+                koiosDataFetcher.fetch(epoch, override);
+            }
           }
       } else if (runMode.equals("plot")) {
         jsonDataPlotter.plot(startEpoch, endEpoch);

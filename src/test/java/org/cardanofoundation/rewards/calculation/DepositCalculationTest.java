@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
+
+import java.math.BigInteger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -45,11 +47,11 @@ public class DepositCalculationTest {
         }
 
         AdaPots adaPotsForNextEpoch = dataProvider.getAdaPotsForEpoch(epoch + 1);
-        double actualDepositsInNextEpoch = adaPotsForNextEpoch.getDeposits();
-        double calculatedDepositsInNextEpoch = DepositCalculation.calculateDepositInEpoch(epoch, dataProvider);
+        BigInteger actualDepositsInNextEpoch = adaPotsForNextEpoch.getDeposits();
+        BigInteger calculatedDepositsInNextEpoch = DepositCalculation.calculateDepositInEpoch(epoch, dataProvider);
 
-        double difference = actualDepositsInNextEpoch - calculatedDepositsInNextEpoch;
-        Assertions.assertEquals(0.0, difference);
+        BigInteger difference = actualDepositsInNextEpoch.subtract(calculatedDepositsInNextEpoch);
+        Assertions.assertEquals(BigInteger.ZERO, difference);
     }
 
     static Stream<Integer> dataProviderRangeUntilEpoch460() {

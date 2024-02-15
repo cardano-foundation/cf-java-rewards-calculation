@@ -5,6 +5,8 @@ import lombok.Getter;
 import org.hibernate.annotations.Immutable;
 import org.springframework.context.annotation.Profile;
 
+import java.math.BigInteger;
+
 @Entity
 @Immutable
 @Getter
@@ -21,22 +23,22 @@ public class DbSyncAdaPots {
     private Integer epoch;
 
     @Column(name = "treasury")
-    private Double treasury;
+    private BigInteger treasury;
 
     @Column(name = "reserves")
-    private Double reserves;
+    private BigInteger reserves;
 
     @Column(name = "rewards")
-    private Double rewards;
+    private BigInteger rewards;
 
     @Column(name = "utxo")
-    private Double utxo;
+    private BigInteger utxo;
 
     @Column(name = "deposits")
-    private Double deposits;
+    private BigInteger deposits;
 
     @Column(name = "fees")
-    private Double fees;
+    private BigInteger fees;
 
     @Column(name = "block_id")
     private Long blockId;

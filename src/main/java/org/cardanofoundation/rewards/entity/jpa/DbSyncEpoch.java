@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.hibernate.annotations.Immutable;
 import org.springframework.context.annotation.Profile;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,10 +18,10 @@ public class DbSyncEpoch {
     private Long id;
 
     @Column(name = "out_sum")
-    private Double output;
+    private BigInteger output;
 
     @Column(name = "fees")
-    private Double fees;
+    private BigInteger fees;
 
     @Column(name = "blk_count")
     private Integer blockCount;

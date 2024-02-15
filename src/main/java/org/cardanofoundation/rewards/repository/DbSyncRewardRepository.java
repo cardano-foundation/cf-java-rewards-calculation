@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Repository
@@ -23,7 +24,7 @@ public interface DbSyncRewardRepository extends ReadOnlyRepository<DbSyncReward,
              	WHERE reward.pool.bech32PoolId = :poolId
              	AND reward.earnedEpoch = :epoch AND (reward.type = 'member' OR reward.type = 'leader')
             """)
-    Double getTotalPoolRewardsInEpoch(String poolId, Integer epoch);
+    BigInteger getTotalPoolRewardsInEpoch(String poolId, Integer epoch);
 
     @Query("""
            SELECT reward from DbSyncReward AS reward

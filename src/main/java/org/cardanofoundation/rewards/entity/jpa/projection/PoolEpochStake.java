@@ -1,7 +1,9 @@
 package org.cardanofoundation.rewards.entity.jpa.projection;
 
+import java.math.BigInteger;
+
 public interface PoolEpochStake {
-    Double getAmount();
+    BigInteger getAmount();
     String getPoolId();
     String getStakeAddress();
     Integer getEpoch();

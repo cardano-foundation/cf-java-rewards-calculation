@@ -53,6 +53,7 @@
     <version.guava>31.1-jre</version.guava>
     <version.hiberate-validator>8.0.1.Final</version.hiberate-validator>
     <version.cardano-client-lib>0.4.3</version.cardano-client-lib>
+    <version.postgres>42.7.1</version.postgres>
   </properties>
 
   <dependencies>
@@ -109,7 +110,7 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <scope>test</scope>
+      <version>${version.postgres}</version>
     </dependency>
 
     <dependency>

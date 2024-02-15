@@ -2,6 +2,8 @@ package org.cardanofoundation.rewards.entity;
 
 import lombok.*;
 
+import java.math.BigInteger;
+
 @Getter
 @Setter
 @Builder
@@ -9,5 +11,5 @@ import lombok.*;
 @AllArgsConstructor
 public class Delegator {
     String stakeAddress;
-    Double activeStake;
+    BigInteger activeStake;
 }

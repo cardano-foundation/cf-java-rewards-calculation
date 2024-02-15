@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
 
+import java.math.BigInteger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -44,10 +45,10 @@ public class FeesCalculationTest {
         }
 
         AdaPots adaPots = dataProvider.getAdaPotsForEpoch(epoch);
-        double fees = FeeCalculation.calculateFeePotInEpoch(epoch, dataProvider);
+        BigInteger fees = FeeCalculation.calculateFeePotInEpoch(epoch, dataProvider);
 
-        double difference = adaPots.getFees() - fees;
-        Assertions.assertEquals(0.0, difference);
+        BigInteger difference = adaPots.getFees().subtract(fees);
+        Assertions.assertEquals(BigInteger.ZERO, difference);
     }
 
     static Stream<Integer> dataProviderRangeUntilEpoch213() {

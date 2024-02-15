@@ -1,11 +1,17 @@
 package org.cardanofoundation.rewards.calculation;
 
+import java.math.BigInteger;
+import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.cardanofoundation.rewards.data.provider.DataProvider;
+import org.cardanofoundation.rewards.data.provider.DbSyncDataProvider;
 import org.cardanofoundation.rewards.data.provider.JsonDataProvider;
 import org.cardanofoundation.rewards.data.provider.KoiosDataProvider;
+import org.cardanofoundation.rewards.entity.AccountUpdate;
+import org.cardanofoundation.rewards.entity.AdaPots;
+import org.cardanofoundation.rewards.entity.PoolDeregistration;
 import org.cardanofoundation.rewards.entity.TreasuryCalculationResult;
 import org.cardanofoundation.rewards.enums.DataProviderType;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -31,11 +37,11 @@ public class TreasuryCalculationTest {
   JsonDataProvider jsonDataProvider;
 
   @Autowired(required = false)
-  DataProvider dbSyncDataProvider;
+  DbSyncDataProvider dbSyncDataProvider;
 
   void Test_calculateTreasury(final int epoch, DataProviderType dataProviderType) {
 
-    DataProvider dataProvider = null;
+    DataProvider dataProvider;
     if (dataProviderType == DataProviderType.KOIOS) {
       dataProvider = koiosDataProvider;
     } else if (dataProviderType == DataProviderType.JSON) {
@@ -45,10 +51,10 @@ public class TreasuryCalculationTest {
     }
 
     TreasuryCalculationResult treasuryCalculationResult = TreasuryCalculation.calculateTreasuryForEpoch(epoch, dataProvider);
+    AdaPots adaPots = dataProvider.getAdaPotsForEpoch(epoch);
 
-    double difference = treasuryCalculationResult.getActualTreasury() - treasuryCalculationResult.getCalculatedTreasury();
-    System.out.println(difference);
-    Assertions.assertTrue(Math.abs(difference) < 1, "The difference " + lovelaceToAda(difference) + " ADA between expected treasury value and actual treasury value is greater than 1 LOVELACE");
+    BigInteger difference = adaPots.getTreasury().subtract(treasuryCalculationResult.getTreasury());
+    Assertions.assertEquals(BigInteger.ZERO, difference, "The difference " + lovelaceToAda(difference.intValue()) + " ADA between expected treasury value and actual treasury value is greater than 1 LOVELACE");
   }
 
   static Stream<Integer> jsonDataProviderRange() {
@@ -63,29 +69,35 @@ public class TreasuryCalculationTest {
 
   private static Stream<Arguments> retiredPoolTestRange() {
     return Stream.of(
-            Arguments.of(210, 0.0),
-            Arguments.of(211, DEPOSIT_POOL_REGISTRATION_IN_LOVELACE),
-            Arguments.of(212, 0.0),
-            Arguments.of(213, DEPOSIT_POOL_REGISTRATION_IN_LOVELACE),
-            Arguments.of(214, DEPOSIT_POOL_REGISTRATION_IN_LOVELACE),
-            Arguments.of(215, DEPOSIT_POOL_REGISTRATION_IN_LOVELACE),
-            Arguments.of(216, 0.0),
-            Arguments.of(219, 0.0),
-            Arguments.of(222, 0.0)
+            Arguments.of(210, BigInteger.ZERO),
+            Arguments.of(211, POOL_DEPOSIT_IN_LOVELACE),
+            Arguments.of(212, BigInteger.ZERO),
+            Arguments.of(213, POOL_DEPOSIT_IN_LOVELACE),
+            Arguments.of(214, POOL_DEPOSIT_IN_LOVELACE),
+            Arguments.of(215, POOL_DEPOSIT_IN_LOVELACE),
+            Arguments.of(216, BigInteger.ZERO),
+            Arguments.of(219, BigInteger.ZERO),
+            Arguments.of(222, BigInteger.ZERO)
     );
   }
   @ParameterizedTest
   @MethodSource("retiredPoolTestRange")
-  void Test_calculateUnclaimedRefundsForRetiredPools(int epoch, double expectedUnclaimedRefunds) {
-    double unclaimedRefunds = TreasuryCalculation.calculateUnclaimedRefundsForRetiredPools(epoch, jsonDataProvider);
+  void Test_calculateUnclaimedRefundsForRetiredPools(int epoch, BigInteger expectedUnclaimedRefunds) {
+    List<PoolDeregistration> retiredPools = jsonDataProvider.getRetiredPoolsInEpoch(epoch);
+    List<AccountUpdate> accountUpdates = jsonDataProvider.getAccountUpdatesUntilEpoch(
+            retiredPools.stream().map(PoolDeregistration::getRewardAddress).toList(), epoch - 1);
+    BigInteger unclaimedRefunds = TreasuryCalculation.calculateUnclaimedRefundsForRetiredPools(retiredPools, accountUpdates);
     Assertions.assertEquals(expectedUnclaimedRefunds, unclaimedRefunds);
   }
 
   @ParameterizedTest
   @MethodSource("retiredPoolTestRange")
   @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
-  void Test_calculateUnclaimedRefundsForRetiredPoolsWithDbSync(int epoch, double expectedUnclaimedRefunds) {
-    double unclaimedRefunds = TreasuryCalculation.calculateUnclaimedRefundsForRetiredPools(epoch, dbSyncDataProvider);
+  void Test_calculateUnclaimedRefundsForRetiredPoolsWithDbSync(int epoch, BigInteger expectedUnclaimedRefunds) {
+    List<PoolDeregistration> retiredPools = dbSyncDataProvider.getRetiredPoolsInEpoch(epoch);
+    List<AccountUpdate> accountUpdates = dbSyncDataProvider.getAccountUpdatesUntilEpoch(
+            retiredPools.stream().map(PoolDeregistration::getRewardAddress).toList(), epoch - 1);
+    BigInteger unclaimedRefunds = TreasuryCalculation.calculateUnclaimedRefundsForRetiredPools(retiredPools, accountUpdates);
     Assertions.assertEquals(expectedUnclaimedRefunds, unclaimedRefunds);
   }
 }

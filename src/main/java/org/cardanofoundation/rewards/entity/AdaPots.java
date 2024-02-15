@@ -2,6 +2,8 @@ package org.cardanofoundation.rewards.entity;
 
 import lombok.*;
 
+import java.math.BigInteger;
+
 @Getter
 @Setter
 @Builder
@@ -9,10 +11,10 @@ import lombok.*;
 @AllArgsConstructor
 public class AdaPots {
     private int epoch;
-    private Double treasury;
-    private Double reserves;
-    private Double rewards;
-    private Double deposits;
-    private Double adaInCirculation;
-    private Double fees;
+    private BigInteger treasury;
+    private BigInteger reserves;
+    private BigInteger rewards;
+    private BigInteger deposits;
+    private BigInteger adaInCirculation;
+    private BigInteger fees;
 }

@@ -2,6 +2,7 @@ package org.cardanofoundation.rewards.entity;
 
 import lombok.*;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Getter
@@ -10,10 +11,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PoolHistory {
-    private Double activeStake;
-    private Double delegatorRewards;
+    private BigInteger activeStake;
+    private BigInteger delegatorRewards;
     private String rewardAddress;
-    private Double poolFees;
+    private BigInteger poolFees;
     private Double margin;
     private Double fixedCost;
     private List<Delegator> delegators;

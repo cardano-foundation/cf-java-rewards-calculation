@@ -4,6 +4,7 @@ import org.cardanofoundation.rewards.entity.jpa.DbSyncEpochStake;
 import org.cardanofoundation.rewards.entity.jpa.projection.PoolEpochStake;
 import org.springframework.data.jpa.repository.Query;
 
+import java.math.BigInteger;
 import java.util.List;
 
 public interface DbSyncEpochStakeRepository extends ReadOnlyRepository<DbSyncEpochStake, Long> {
@@ -14,5 +15,5 @@ public interface DbSyncEpochStakeRepository extends ReadOnlyRepository<DbSyncEpo
     List<PoolEpochStake> getPoolActiveStakeInEpoch(String poolId, Integer epoch);
 
     @Query("SELECT SUM(amount) FROM DbSyncEpochStake WHERE epoch=:epoch")
-    Long getEpochStakeByEpoch(Integer epoch);
+    BigInteger getEpochStakeByEpoch(Integer epoch);
 }

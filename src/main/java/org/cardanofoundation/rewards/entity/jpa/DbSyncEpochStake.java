@@ -6,6 +6,8 @@ import lombok.Getter;
 import org.hibernate.annotations.Immutable;
 import org.springframework.context.annotation.Profile;
 
+import java.math.BigInteger;
+
 @Entity
 @Immutable
 @Getter
@@ -16,7 +18,7 @@ public class DbSyncEpochStake {
     private Long id;
 
     @Column(name = "amount")
-    private Double amount;
+    private BigInteger amount;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "addr_id", nullable = false,
