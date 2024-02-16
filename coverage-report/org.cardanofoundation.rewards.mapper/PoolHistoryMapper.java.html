@@ -2,20 +2,22 @@
 
 import org.cardanofoundation.rewards.entity.PoolHistory;
 
-<span class="nc" id="L5">public class PoolHistoryMapper {</span>
+import java.math.BigInteger;
+
+<span class="nc" id="L7">public class PoolHistoryMapper {</span>
 
     public static PoolHistory fromKoiosPoolHistory(rest.koios.client.backend.api.pool.model.PoolHistory poolHistory) {
-<span class="pc bpc" id="L8" title="1 of 2 branches missed.">        if (poolHistory == null) return null;</span>
+<span class="nc bnc" id="L10" title="All 2 branches missed.">        if (poolHistory == null) return null;</span>
 
-<span class="fc" id="L10">        return PoolHistory.builder()</span>
-<span class="fc" id="L11">            .activeStake(Double.parseDouble(poolHistory.getActiveStake()))</span>
-<span class="fc" id="L12">            .delegatorRewards(Double.parseDouble(poolHistory.getDelegRewards()))</span>
-<span class="fc" id="L13">            .poolFees(Double.parseDouble(poolHistory.getPoolFees()))</span>
-<span class="fc" id="L14">            .margin(Double.parseDouble(String.valueOf(poolHistory.getMargin())))</span>
-<span class="fc" id="L15">            .fixedCost(Double.parseDouble(String.valueOf(poolHistory.getFixedCost())))</span>
-<span class="fc" id="L16">            .blockCount(poolHistory.getBlockCnt())</span>
-<span class="fc" id="L17">            .epoch(poolHistory.getEpochNo())</span>
-<span class="fc" id="L18">            .build();</span>
+<span class="nc" id="L12">        return PoolHistory.builder()</span>
+<span class="nc" id="L13">            .activeStake(new BigInteger(poolHistory.getActiveStake()))</span>
+<span class="nc" id="L14">            .delegatorRewards(new BigInteger(poolHistory.getDelegRewards()))</span>
+<span class="nc" id="L15">            .poolFees(new BigInteger(poolHistory.getPoolFees()))</span>
+<span class="nc" id="L16">            .margin(Double.parseDouble(String.valueOf(poolHistory.getMargin())))</span>
+<span class="nc" id="L17">            .fixedCost(Double.parseDouble(String.valueOf(poolHistory.getFixedCost())))</span>
+<span class="nc" id="L18">            .blockCount(poolHistory.getBlockCnt())</span>
+<span class="nc" id="L19">            .epoch(poolHistory.getEpochNo())</span>
+<span class="nc" id="L20">            .build();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -3,7 +3,6 @@
 import org.cardanofoundation.rewards.data.fetcher.DbSyncDataFetcher;
 import org.cardanofoundation.rewards.data.fetcher.KoiosDataFetcher;
 import org.cardanofoundation.rewards.data.plotter.JsonDataPlotter;
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +16,11 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 
-import java.util.List;
-
 @EnableConfigurationProperties
 @EntityScan({&quot;org.cardanofoundation.rewards.*&quot;, &quot;org.cardanofoundation.*&quot;})
 @SpringBootApplication
-<span class="fc" id="L25">public class RewardsApplication implements ApplicationRunner {</span>
-<span class="fc" id="L26">  private static final Logger logger = LoggerFactory.getLogger(RewardsApplication.class);</span>
+<span class="fc" id="L22">public class RewardsApplication implements ApplicationRunner {</span>
+<span class="fc" id="L23">  private static final Logger logger = LoggerFactory.getLogger(RewardsApplication.class);</span>
 
   @Value(&quot;${application.run.mode}&quot;)
   private String runMode;
@@ -46,41 +43,44 @@ import java.util.List;
   @Autowired
   private KoiosDataFetcher koiosDataFetcher;
 
-  @Autowired
+  @Autowired(required = false)
   private DbSyncDataFetcher dbSyncDataFetcher;
 
   public static void main(String[] args) {
-<span class="nc" id="L53">    SpringApplication.run(RewardsApplication.class, args);</span>
-<span class="nc" id="L54">  }</span>
+<span class="nc" id="L50">    SpringApplication.run(RewardsApplication.class, args);</span>
+<span class="nc" id="L51">  }</span>
 
   @Override
   public void run(ApplicationArguments args) throws Exception {
 
-<span class="pc bpc" id="L59" title="1 of 2 branches missed.">      if (runMode == null) {</span>
-<span class="nc" id="L60">        logger.warn(&quot;No run mode specified. Set the environment variable RUN_MODE in your .env file to 'fetch' or 'plot' or 'test'&quot;);</span>
-<span class="nc" id="L61">        int exitCode = SpringApplication.exit(context, (ExitCodeGenerator) () -&gt; 0);</span>
-<span class="nc" id="L62">        System.exit(exitCode);</span>
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">      if (runMode == null) {</span>
+<span class="nc" id="L57">        logger.warn(&quot;No run mode specified. Set the environment variable RUN_MODE in your .env file to 'fetch' or 'plot' or 'test'&quot;);</span>
+<span class="nc" id="L58">        int exitCode = SpringApplication.exit(context, (ExitCodeGenerator) () -&gt; 0);</span>
+<span class="nc" id="L59">        System.exit(exitCode);</span>
       }
 
-<span class="fc" id="L65">      int startEpoch = 208;</span>
-<span class="fc" id="L66">      int endEpoch = 464;</span>
+<span class="fc" id="L62">      int startEpoch = 208;</span>
+<span class="fc" id="L63">      int endEpoch = 464;</span>
 
-<span class="pc bpc" id="L68" title="1 of 2 branches missed.">      if (runMode.equals(&quot;fetch&quot;)) {</span>
-<span class="nc" id="L69">          boolean override = overrideFetchedData;</span>
-<span class="nc" id="L70">          logger.info(&quot;Override fetched data: &quot; + override);</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">      if (runMode.equals(&quot;fetch&quot;)) {</span>
+<span class="nc" id="L66">          boolean override = overrideFetchedData;</span>
+<span class="nc" id="L67">          logger.info(&quot;Override fetched data: &quot; + override);</span>
 
-<span class="nc bnc" id="L72" title="All 2 branches missed.">          if (activeProfiles.contains(&quot;db-sync&quot;)) {</span>
-<span class="nc" id="L73">            logger.info(&quot;DB Sync data provider is active. Fetching data from DB Sync...&quot;);</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">          if (activeProfiles.contains(&quot;db-sync&quot;)) {</span>
+<span class="nc" id="L70">            logger.info(&quot;DB Sync data provider is active. Fetching data from DB Sync...&quot;);</span>
 
-<span class="nc bnc" id="L75" title="All 2 branches missed.">            for (int epoch = startEpoch; epoch &lt; endEpoch; epoch++) {</span>
-<span class="nc" id="L76">              logger.info(&quot;Fetching data for epoch with the DB sync data provider &quot; + epoch);</span>
-<span class="nc" id="L77">              dbSyncDataFetcher.fetch(epoch, override);</span>
+<span class="nc bnc" id="L72" title="All 2 branches missed.">            for (int epoch = startEpoch; epoch &lt; endEpoch; epoch++) {</span>
+<span class="nc" id="L73">              logger.info(&quot;Fetching data for epoch with the DB sync data provider &quot; + epoch);</span>
+<span class="nc" id="L74">              dbSyncDataFetcher.fetch(epoch, override);</span>
             }
           }
 
-<span class="nc bnc" id="L81" title="All 2 branches missed.">          for (int epoch = startEpoch; epoch &lt; endEpoch; epoch++) {</span>
-<span class="nc" id="L82">            logger.info(&quot;Fetching data for epoch with the Koios data provider &quot; + epoch);</span>
-<span class="nc" id="L83">            koiosDataFetcher.fetch(epoch, override);</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">          if (activeProfiles.contains(&quot;koios&quot;)) {</span>
+<span class="nc" id="L79">            logger.info(&quot;Koios data provider is active. Fetching data from Koios...&quot;);</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">            for (int epoch = startEpoch; epoch &lt; endEpoch; epoch++) {</span>
+<span class="nc" id="L81">                logger.info(&quot;Fetching data for epoch with the Koios data provider &quot; + epoch);</span>
+<span class="nc" id="L82">                koiosDataFetcher.fetch(epoch, override);</span>
+            }
           }
 <span class="pc bpc" id="L85" title="1 of 2 branches missed.">      } else if (runMode.equals(&quot;plot&quot;)) {</span>
 <span class="nc" id="L86">        jsonDataPlotter.plot(startEpoch, endEpoch);</span>

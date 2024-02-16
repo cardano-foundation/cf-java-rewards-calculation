@@ -12,14 +12,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.constants.RewardConstants.TOTAL_LOVELACE;
+import static org.cardanofoundation.rewards.util.BigNumberUtils.divide;
 
 @Service
 @Profile(&quot;db-sync&quot;)
-<span class="fc" id="L22">public class DbSyncDataProvider implements DataProvider {</span>
+<span class="nc" id="L25">public class DbSyncDataProvider implements DataProvider {</span>
 
     @Autowired
     DbSyncEpochRepository dbSyncEpochRepository;
@@ -58,218 +61,283 @@ import static org.cardanofoundation.rewards.constants.RewardConstants.TOTAL_LOVE
 
     @Override
     public AdaPots getAdaPotsForEpoch(int epoch) {
-<span class="nc" id="L61">        DbSyncAdaPots dbSyncAdaPots = dbSyncAdaPotsRepository.findByEpoch(epoch);</span>
-<span class="nc" id="L62">        return AdaPotsMapper.fromDbSyncAdaPots(dbSyncAdaPots);</span>
+<span class="nc" id="L64">        DbSyncAdaPots dbSyncAdaPots = dbSyncAdaPotsRepository.findByEpoch(epoch);</span>
+<span class="nc" id="L65">        return AdaPotsMapper.fromDbSyncAdaPots(dbSyncAdaPots);</span>
     }
 
     @Override
     public Epoch getEpochInfo(int epoch) {
-<span class="nc" id="L67">        DbSyncEpoch dbSyncEpoch = dbSyncEpochRepository.findByNumber(epoch);</span>
-<span class="nc" id="L68">        Epoch epochInfo = EpochMapper.fromDbSyncEpoch(dbSyncEpoch);</span>
+<span class="nc" id="L70">        DbSyncEpoch dbSyncEpoch = dbSyncEpochRepository.findByNumber(epoch);</span>
+<span class="nc" id="L71">        Epoch epochInfo = EpochMapper.fromDbSyncEpoch(dbSyncEpoch);</span>
 
-<span class="nc bnc" id="L70" title="All 2 branches missed.">        if (epoch &lt; 211) {</span>
-<span class="nc" id="L71">            epochInfo.setOBFTBlockCount(epochInfo.getBlockCount());</span>
-<span class="nc" id="L72">            epochInfo.setNonOBFTBlockCount(0);</span>
-<span class="nc bnc" id="L73" title="All 2 branches missed.">        } else if (epoch &gt; 256) {</span>
-<span class="nc" id="L74">            epochInfo.setOBFTBlockCount(0);</span>
-<span class="nc" id="L75">            epochInfo.setNonOBFTBlockCount(epochInfo.getBlockCount());</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">        if (epoch &lt; 211) {</span>
+<span class="nc" id="L74">            epochInfo.setOBFTBlockCount(epochInfo.getBlockCount());</span>
+<span class="nc" id="L75">            epochInfo.setNonOBFTBlockCount(0);</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">        } else if (epoch &gt; 256) {</span>
+<span class="nc" id="L77">            epochInfo.setOBFTBlockCount(0);</span>
+<span class="nc" id="L78">            epochInfo.setNonOBFTBlockCount(epochInfo.getBlockCount());</span>
         } else {
-<span class="nc" id="L77">            Integer nonObftBlocks = dbSyncBlockRepository.getNonOBFTBlocksInEpoch(epoch);</span>
-<span class="nc" id="L78">            Integer obftBlocks = dbSyncBlockRepository.getOBFTBlocksInEpoch(epoch);</span>
-<span class="nc" id="L79">            epochInfo.setOBFTBlockCount(obftBlocks);</span>
-<span class="nc" id="L80">            epochInfo.setNonOBFTBlockCount(nonObftBlocks);</span>
+<span class="nc" id="L80">            Integer nonObftBlocks = dbSyncBlockRepository.getNonOBFTBlocksInEpoch(epoch);</span>
+<span class="nc" id="L81">            Integer obftBlocks = dbSyncBlockRepository.getOBFTBlocksInEpoch(epoch);</span>
+<span class="nc" id="L82">            epochInfo.setOBFTBlockCount(obftBlocks);</span>
+<span class="nc" id="L83">            epochInfo.setNonOBFTBlockCount(nonObftBlocks);</span>
         }
 
-<span class="nc" id="L83">        Long epochStake = dbSyncEpochStakeRepository.getEpochStakeByEpoch(epoch);</span>
-<span class="nc" id="L84">        epochInfo.setActiveStake(epochStake.doubleValue());</span>
+<span class="nc" id="L86">        BigInteger epochStake = dbSyncEpochStakeRepository.getEpochStakeByEpoch(epoch);</span>
+<span class="nc" id="L87">        epochInfo.setActiveStake(epochStake);</span>
 
-<span class="nc" id="L86">        return epochInfo;</span>
+<span class="nc" id="L89">        return epochInfo;</span>
     }
 
     @Override
     public ProtocolParameters getProtocolParametersForEpoch(int epoch) {
-<span class="nc" id="L91">        DbSyncProtocolParameters dbSyncProtocolParameters = dbSyncProtocolParametersRepository.findByEpoch(epoch);</span>
-<span class="nc" id="L92">        return ProtocolParametersMapper.fromDbSyncProtocolParameters(dbSyncProtocolParameters);</span>
+<span class="nc" id="L94">        DbSyncProtocolParameters dbSyncProtocolParameters = dbSyncProtocolParametersRepository.findByEpoch(epoch);</span>
+<span class="nc" id="L95">        return ProtocolParametersMapper.fromDbSyncProtocolParameters(dbSyncProtocolParameters);</span>
     }
 
     @Override
     public PoolHistory getPoolHistory(String poolId, int epoch) {
-<span class="nc" id="L97">        PoolHistory poolHistory = new PoolHistory();</span>
-<span class="nc" id="L98">        List&lt;PoolEpochStake&gt; poolEpochStakes = dbSyncEpochStakeRepository.getPoolActiveStakeInEpoch(poolId, epoch);</span>
-<span class="nc" id="L99">        double activeStake = 0;</span>
-<span class="nc" id="L100">        List&lt;Delegator&gt; delegators = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L101" title="All 2 branches missed.">        for (PoolEpochStake poolEpochStake : poolEpochStakes) {</span>
-<span class="nc" id="L102">            activeStake += poolEpochStake.getAmount();</span>
-<span class="nc" id="L103">            Delegator delegator = Delegator.builder()</span>
-<span class="nc" id="L104">                    .stakeAddress(poolEpochStake.getStakeAddress())</span>
-<span class="nc" id="L105">                    .activeStake(poolEpochStake.getAmount())</span>
-<span class="nc" id="L106">                    .build();</span>
-<span class="nc" id="L107">            delegators.add(delegator);</span>
-<span class="nc" id="L108">        }</span>
+<span class="nc" id="L100">        PoolHistory poolHistory = new PoolHistory();</span>
+<span class="nc" id="L101">        List&lt;PoolEpochStake&gt; poolEpochStakes = dbSyncEpochStakeRepository.getPoolActiveStakeInEpoch(poolId, epoch);</span>
+<span class="nc" id="L102">        BigInteger activeStake = BigInteger.ZERO;</span>
+<span class="nc" id="L103">        List&lt;Delegator&gt; delegators = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">        for (PoolEpochStake poolEpochStake : poolEpochStakes) {</span>
+<span class="nc" id="L105">            activeStake = activeStake.add(poolEpochStake.getAmount());</span>
+<span class="nc" id="L106">            Delegator delegator = Delegator.builder()</span>
+<span class="nc" id="L107">                    .stakeAddress(poolEpochStake.getStakeAddress())</span>
+<span class="nc" id="L108">                    .activeStake(poolEpochStake.getAmount())</span>
+<span class="nc" id="L109">                    .build();</span>
+<span class="nc" id="L110">            delegators.add(delegator);</span>
+<span class="nc" id="L111">        }</span>
 
-<span class="nc bnc" id="L110" title="All 2 branches missed.">        if (delegators.isEmpty()) {</span>
-<span class="nc" id="L111">            return null;</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        if (delegators.isEmpty()) {</span>
+<span class="nc" id="L114">            return null;</span>
         }
 
-<span class="nc" id="L114">        poolHistory.setActiveStake(activeStake);</span>
-<span class="nc" id="L115">        poolHistory.setDelegators(delegators);</span>
+<span class="nc" id="L117">        poolHistory.setActiveStake(activeStake);</span>
+<span class="nc" id="L118">        poolHistory.setDelegators(delegators);</span>
 
-<span class="nc" id="L117">        Integer blockCount = dbSyncBlockRepository.getBlocksMadeByPoolInEpoch(poolId, epoch);</span>
-<span class="nc" id="L118">        poolHistory.setBlockCount(blockCount);</span>
+<span class="nc" id="L120">        Integer blockCount = dbSyncBlockRepository.getBlocksMadeByPoolInEpoch(poolId, epoch);</span>
+<span class="nc" id="L121">        poolHistory.setBlockCount(blockCount);</span>
 
-<span class="nc" id="L120">        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestUpdateForEpoch(poolId, epoch);</span>
-<span class="nc" id="L121">        poolHistory.setFixedCost(dbSyncPoolUpdate.getFixedCost());</span>
-<span class="nc" id="L122">        poolHistory.setMargin(dbSyncPoolUpdate.getMargin());</span>
-<span class="nc" id="L123">        poolHistory.setEpoch(epoch);</span>
+<span class="nc" id="L123">        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestActiveUpdateInEpoch(poolId, epoch);</span>
+<span class="nc" id="L124">        poolHistory.setFixedCost(dbSyncPoolUpdate.getFixedCost());</span>
+<span class="nc" id="L125">        poolHistory.setMargin(dbSyncPoolUpdate.getMargin());</span>
+<span class="nc" id="L126">        poolHistory.setEpoch(epoch);</span>
+<span class="nc" id="L127">        poolHistory.setRewardAddress(dbSyncPoolUpdate.getStakeAddress().getView());</span>
 
-<span class="nc" id="L125">        double totalPoolRewards = dbSyncRewardRepository.getRewardsForPoolInEpoch(poolId, epoch);</span>
+<span class="nc" id="L129">        BigInteger totalPoolRewards = dbSyncRewardRepository.getTotalPoolRewardsInEpoch(poolId, epoch);</span>
 
-<span class="nc" id="L127">        DbSyncAdaPots dbSyncAdaPots = dbSyncAdaPotsRepository.findByEpoch(epoch + 1);</span>
-<span class="nc" id="L128">        double reserves = dbSyncAdaPots.getReserves();</span>
-<span class="nc" id="L129">        double adaInCirculation = TOTAL_LOVELACE - reserves;</span>
-<span class="nc" id="L130">        double relativePoolStake = activeStake / adaInCirculation;</span>
+<span class="nc bnc" id="L131" title="All 2 branches missed.">        if (totalPoolRewards == null) {</span>
+<span class="nc" id="L132">            totalPoolRewards = BigInteger.ZERO;</span>
+        }
 
-<span class="nc" id="L132">        List&lt;DbSyncPoolOwner&gt; owners = dbSyncPoolOwnerRepository.getByPoolUpdateId(dbSyncPoolUpdate.getId());</span>
+<span class="nc" id="L135">        DbSyncAdaPots dbSyncAdaPots = dbSyncAdaPotsRepository.findByEpoch(epoch + 1);</span>
+<span class="nc" id="L136">        BigInteger reserves = dbSyncAdaPots.getReserves();</span>
+<span class="nc" id="L137">        BigInteger adaInCirculation = TOTAL_LOVELACE.subtract(reserves);</span>
+<span class="nc" id="L138">        BigDecimal relativePoolStake = divide(activeStake, adaInCirculation);</span>
 
-<span class="nc" id="L134">        double totalActiveStakeOfOwners = 0.0;</span>
-<span class="nc" id="L135">        double totalMemberRewardsOfOwners = 0.0;</span>
+<span class="nc" id="L140">        List&lt;DbSyncPoolOwner&gt; owners = dbSyncPoolOwnerRepository.getByPoolUpdateId(dbSyncPoolUpdate.getId());</span>
 
-<span class="nc bnc" id="L137" title="All 2 branches missed.">        for (DbSyncPoolOwner owner : owners) {</span>
-<span class="nc" id="L138">            Delegator delegator = poolHistory.getDelegator(owner.getStakeAddress().getView());</span>
-<span class="nc" id="L139">            totalActiveStakeOfOwners += delegator.getActiveStake();</span>
-<span class="nc" id="L140">            totalMemberRewardsOfOwners += PoolRewardCalculation.calculateMemberReward(totalPoolRewards,</span>
-<span class="nc" id="L141">                    poolHistory.getMargin(), poolHistory.getFixedCost(),</span>
-<span class="nc" id="L142">                    delegator.getActiveStake() / adaInCirculation, relativePoolStake);</span>
+<span class="nc" id="L142">        BigInteger totalActiveStakeOfOwners = BigInteger.ZERO;</span>
+<span class="nc" id="L143">        BigInteger totalMemberRewardsOfOwners = BigInteger.ZERO;</span>
 
-<span class="nc" id="L144">        }</span>
+<span class="nc bnc" id="L145" title="All 2 branches missed.">        for (DbSyncPoolOwner owner : owners) {</span>
+<span class="nc" id="L146">            Delegator delegator = poolHistory.getDelegator(owner.getStakeAddress().getView());</span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">            if (delegator != null) {</span>
+<span class="nc" id="L148">                totalActiveStakeOfOwners = totalActiveStakeOfOwners.add(delegator.getActiveStake());</span>
+<span class="nc" id="L149">                totalMemberRewardsOfOwners = totalMemberRewardsOfOwners.add(PoolRewardCalculation.calculateMemberReward(totalPoolRewards,</span>
+<span class="nc" id="L150">                        poolHistory.getMargin(), poolHistory.getFixedCost(),</span>
+<span class="nc" id="L151">                        divide(delegator.getActiveStake(), adaInCirculation), relativePoolStake));</span>
+            }
+<span class="nc" id="L153">        }</span>
 
-<span class="nc" id="L146">        double poolOperatorReward = PoolRewardCalculation.calculateLeaderReward(totalPoolRewards,</span>
-<span class="nc" id="L147">                poolHistory.getMargin(), poolHistory.getFixedCost(),</span>
-                totalActiveStakeOfOwners / adaInCirculation, relativePoolStake);
+<span class="nc" id="L155">        BigInteger poolOperatorReward = PoolRewardCalculation.calculateLeaderReward(totalPoolRewards,</span>
+<span class="nc" id="L156">                poolHistory.getMargin(), poolHistory.getFixedCost(),</span>
+<span class="nc" id="L157">                divide(totalActiveStakeOfOwners, adaInCirculation), relativePoolStake);</span>
 
-<span class="nc" id="L150">        poolHistory.setPoolFees(poolOperatorReward - totalMemberRewardsOfOwners);</span>
-<span class="nc" id="L151">        poolHistory.setDelegatorRewards(totalPoolRewards - poolOperatorReward + totalMemberRewardsOfOwners);</span>
+<span class="nc" id="L159">        poolHistory.setPoolFees(poolOperatorReward.subtract(totalMemberRewardsOfOwners));</span>
+<span class="nc" id="L160">        poolHistory.setDelegatorRewards(totalPoolRewards.subtract(poolOperatorReward).add(totalMemberRewardsOfOwners));</span>
 
-<span class="nc" id="L153">        return poolHistory;</span>
+<span class="nc" id="L162">        return poolHistory;</span>
     }
 
     @Override
     public Double getPoolPledgeInEpoch(String poolId, int epoch) {
-<span class="nc" id="L158">        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestUpdateForEpoch(poolId, epoch);</span>
-<span class="nc" id="L159">        return dbSyncPoolUpdate.getPledge();</span>
+<span class="nc" id="L167">        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestActiveUpdateInEpoch(poolId, epoch);</span>
+
+<span class="nc bnc" id="L169" title="All 2 branches missed.">        if (dbSyncPoolUpdate == null) {</span>
+<span class="nc" id="L170">            return null;</span>
+        }
+
+<span class="nc" id="L173">        return dbSyncPoolUpdate.getPledge();</span>
     }
 
     @Override
     public PoolOwnerHistory getHistoryOfPoolOwnersInEpoch(String poolId, int epoch) {
-<span class="nc" id="L164">        PoolOwnerHistory poolOwnerHistory = new PoolOwnerHistory();</span>
-<span class="nc" id="L165">        poolOwnerHistory.setEpoch(epoch);</span>
+<span class="nc" id="L178">        PoolOwnerHistory poolOwnerHistory = new PoolOwnerHistory();</span>
+<span class="nc" id="L179">        poolOwnerHistory.setEpoch(epoch);</span>
 
-<span class="nc" id="L167">        List&lt;PoolEpochStake&gt; poolEpochStakes = dbSyncEpochStakeRepository.getPoolActiveStakeInEpoch(poolId, epoch);</span>
-<span class="nc" id="L168">        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestUpdateForEpoch(poolId, epoch);</span>
-<span class="nc" id="L169">        List&lt;DbSyncPoolOwner&gt; owners = dbSyncPoolOwnerRepository.getByPoolUpdateId(dbSyncPoolUpdate.getId());</span>
+<span class="nc" id="L181">        List&lt;PoolEpochStake&gt; poolEpochStakes = dbSyncEpochStakeRepository.getPoolActiveStakeInEpoch(poolId, epoch);</span>
+<span class="nc" id="L182">        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestActiveUpdateInEpoch(poolId, epoch);</span>
 
-<span class="nc" id="L171">        List&lt;String&gt; stakeAddresses = owners.stream()</span>
-<span class="nc" id="L172">                .map(DbSyncPoolOwner::getStakeAddress)</span>
-<span class="nc" id="L173">                .map(DbSyncStakeAddress::getView)</span>
-<span class="nc" id="L174">                .toList();</span>
+<span class="nc bnc" id="L184" title="All 2 branches missed.">        if (dbSyncPoolUpdate == null) {</span>
+<span class="nc" id="L185">            return null;</span>
+        }
 
-<span class="nc" id="L176">        double activeStakes = 0.0;</span>
+<span class="nc" id="L188">        List&lt;DbSyncPoolOwner&gt; owners = dbSyncPoolOwnerRepository.getByPoolUpdateId(dbSyncPoolUpdate.getId());</span>
 
-<span class="nc bnc" id="L178" title="All 2 branches missed.">        for (PoolEpochStake poolEpochStake : poolEpochStakes) {</span>
-<span class="nc bnc" id="L179" title="All 2 branches missed.">            if (stakeAddresses.contains(poolEpochStake.getStakeAddress())) {</span>
-<span class="nc" id="L180">                activeStakes += poolEpochStake.getAmount();</span>
+<span class="nc" id="L190">        List&lt;String&gt; stakeAddresses = owners.stream()</span>
+<span class="nc" id="L191">                .map(DbSyncPoolOwner::getStakeAddress)</span>
+<span class="nc" id="L192">                .map(DbSyncStakeAddress::getView)</span>
+<span class="nc" id="L193">                .toList();</span>
+
+<span class="nc" id="L195">        BigInteger activeStakes = BigInteger.ZERO;</span>
+
+<span class="nc bnc" id="L197" title="All 2 branches missed.">        for (PoolEpochStake poolEpochStake : poolEpochStakes) {</span>
+<span class="nc bnc" id="L198" title="All 2 branches missed.">            if (stakeAddresses.contains(poolEpochStake.getStakeAddress())) {</span>
+<span class="nc" id="L199">                activeStakes = activeStakes.add(poolEpochStake.getAmount());</span>
             }
-<span class="nc" id="L182">        }</span>
-<span class="nc" id="L183">        poolOwnerHistory.setStakeAddresses(stakeAddresses);</span>
-<span class="nc" id="L184">        poolOwnerHistory.setActiveStake(activeStakes);</span>
-<span class="nc" id="L185">        return poolOwnerHistory;</span>
+<span class="nc" id="L201">        }</span>
+<span class="nc" id="L202">        poolOwnerHistory.setStakeAddresses(stakeAddresses);</span>
+<span class="nc" id="L203">        poolOwnerHistory.setActiveStake(activeStakes);</span>
+<span class="nc" id="L204">        return poolOwnerHistory;</span>
     }
 
     @Override
     public List&lt;PoolDeregistration&gt; getRetiredPoolsInEpoch(int epoch) {
-<span class="nc" id="L190">        List&lt;DbSyncPoolRetirement&gt; dbSyncPoolRetirements = dbSyncPoolRetirementRepository.getPoolRetirementsByEpoch(epoch);</span>
-<span class="nc" id="L191">        return dbSyncPoolRetirements.stream().map(PoolDeregistrationMapper::fromDbSyncPoolRetirement).toList();</span>
+<span class="nc" id="L209">        List&lt;DbSyncPoolRetirement&gt; dbSyncPoolRetirements = dbSyncPoolRetirementRepository.getPoolRetirementsByEpoch(epoch);</span>
+<span class="nc" id="L210">        List&lt;PoolDeregistration&gt; poolDeregistrations = dbSyncPoolRetirements.stream().map(PoolDeregistrationMapper::fromDbSyncPoolRetirement).toList();</span>
+<span class="nc" id="L211">        List&lt;PoolDeregistration&gt; retiredPools = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L213" title="All 2 branches missed.">        for (PoolDeregistration poolDeregistration : poolDeregistrations) {</span>
+<span class="nc" id="L214">            boolean poolDeregistrationLaterInEpoch = poolDeregistrations.stream().anyMatch(</span>
+<span class="nc bnc" id="L215" title="All 2 branches missed.">                    deregistration -&gt; deregistration.getPoolId().equals(poolDeregistration.getPoolId()) &amp;&amp;</span>
+<span class="nc bnc" id="L216" title="All 2 branches missed.">                            deregistration.getAnnouncedTransactionId() &gt; poolDeregistration.getAnnouncedTransactionId()</span>
+            );
+
+            // To prevent double counting, we only count the pool deregistration if there is no other deregistration
+            // for the same pool later in the epoch
+<span class="nc bnc" id="L221" title="All 2 branches missed.">            if (poolDeregistrationLaterInEpoch) {</span>
+<span class="nc" id="L222">                continue;</span>
+            }
+
+<span class="nc" id="L225">            List&lt;PoolUpdate&gt; poolUpdates = this.getPoolUpdateAfterTransactionIdInEpoch(poolDeregistration.getPoolId(),</span>
+<span class="nc" id="L226">                    poolDeregistration.getAnnouncedTransactionId(), epoch - 1);</span>
+
+            // There is an update after the deregistration, so the pool has not been retired
+<span class="nc bnc" id="L229" title="All 2 branches missed.">            if (poolUpdates.size() == 0) {</span>
+<span class="nc" id="L230">                PoolDeregistration latestPoolRetirementUntilEpoch = this.latestPoolRetirementUntilEpoch(poolDeregistration.getPoolId(), epoch - 1);</span>
+<span class="nc bnc" id="L231" title="All 4 branches missed.">                if (latestPoolRetirementUntilEpoch != null &amp;&amp; latestPoolRetirementUntilEpoch.getRetiringEpoch() != epoch) {</span>
+                    // The pool was retired in a previous epoch for the next epoch, but another deregistration was announced and changed the
+                    // retirement epoch to something else. This means the pool was not retired in this epoch.
+<span class="nc" id="L234">                    continue;</span>
+                }
+
+<span class="nc" id="L237">                DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLatestUpdateInEpoch(poolDeregistration.getPoolId(), epoch);</span>
+<span class="nc" id="L238">                poolDeregistration.setRewardAddress(dbSyncPoolUpdate.getStakeAddress().getView());</span>
+<span class="nc" id="L239">                retiredPools.add(poolDeregistration);</span>
+            }
+<span class="nc" id="L241">        }</span>
+
+<span class="nc" id="L243">        return retiredPools;</span>
     }
 
     @Override
     public List&lt;AccountUpdate&gt; getAccountUpdatesUntilEpoch(List&lt;String&gt; stakeAddresses, int epoch) {
-<span class="nc" id="L196">        List&lt;AccountUpdate&gt; accountUpdates = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L248">        List&lt;AccountUpdate&gt; accountUpdates = new ArrayList&lt;&gt;();</span>
 
-<span class="nc" id="L198">        List&lt;DbSyncAccountDeregistration&gt; stakeDeregistrationsInEpoch =</span>
-<span class="nc" id="L199">                dbSyncStakeDeregistrationRepository.getLatestAccountDeregistrationsUntilEpochForAddresses(stakeAddresses, epoch);</span>
-<span class="nc" id="L200">        List&lt;DbSyncAccountRegistration&gt; stakeRegistrationsInEpoch =</span>
-<span class="nc" id="L201">                dbSyncStakeRegistrationRepository.getLatestAccountRegistrationsUntilEpochForAddresses(stakeAddresses, epoch);</span>
+<span class="nc" id="L250">        List&lt;DbSyncAccountDeregistration&gt; stakeDeregistrationsInEpoch =</span>
+<span class="nc" id="L251">                dbSyncStakeDeregistrationRepository.getLatestAccountDeregistrationsUntilEpochForAddresses(stakeAddresses, epoch);</span>
+<span class="nc" id="L252">        List&lt;DbSyncAccountRegistration&gt; stakeRegistrationsInEpoch =</span>
+<span class="nc" id="L253">                dbSyncStakeRegistrationRepository.getLatestAccountRegistrationsUntilEpochForAddresses(stakeAddresses, epoch);</span>
 
-<span class="nc bnc" id="L203" title="All 2 branches missed.">        for (DbSyncAccountDeregistration deregistration : stakeDeregistrationsInEpoch) {</span>
-<span class="nc" id="L204">            accountUpdates.add(AccountUpdate.builder()</span>
-<span class="nc" id="L205">                    .epoch(deregistration.getEpoch())</span>
-<span class="nc" id="L206">                    .action(AccountUpdateAction.DEREGISTRATION)</span>
-<span class="nc" id="L207">                    .stakeAddress(deregistration.getAddress().getView())</span>
-<span class="nc" id="L208">                    .unixBlockTime(deregistration.getTransaction().getBlock().getTime().getTime())</span>
-<span class="nc" id="L209">                    .build());</span>
-<span class="nc" id="L210">        }</span>
+<span class="nc bnc" id="L255" title="All 2 branches missed.">        for (DbSyncAccountDeregistration deregistration : stakeDeregistrationsInEpoch) {</span>
+<span class="nc" id="L256">            accountUpdates.add(AccountUpdate.builder()</span>
+<span class="nc" id="L257">                    .epoch(deregistration.getEpoch())</span>
+<span class="nc" id="L258">                    .action(AccountUpdateAction.DEREGISTRATION)</span>
+<span class="nc" id="L259">                    .stakeAddress(deregistration.getAddress().getView())</span>
+<span class="nc" id="L260">                    .unixBlockTime(deregistration.getTransaction().getBlock().getTime().getTime())</span>
+<span class="nc" id="L261">                    .build());</span>
+<span class="nc" id="L262">        }</span>
 
-<span class="nc bnc" id="L212" title="All 2 branches missed.">        for (DbSyncAccountRegistration registration : stakeRegistrationsInEpoch) {</span>
-<span class="nc" id="L213">            accountUpdates.add(AccountUpdate.builder()</span>
-<span class="nc" id="L214">                    .epoch(registration.getEpoch())</span>
-<span class="nc" id="L215">                    .action(AccountUpdateAction.REGISTRATION)</span>
-<span class="nc" id="L216">                    .stakeAddress(registration.getAddress().getView())</span>
-<span class="nc" id="L217">                    .unixBlockTime(registration.getTransaction().getBlock().getTime().getTime())</span>
-<span class="nc" id="L218">                    .build());</span>
-<span class="nc" id="L219">        }</span>
+<span class="nc bnc" id="L264" title="All 2 branches missed.">        for (DbSyncAccountRegistration registration : stakeRegistrationsInEpoch) {</span>
+<span class="nc" id="L265">            accountUpdates.add(AccountUpdate.builder()</span>
+<span class="nc" id="L266">                    .epoch(registration.getEpoch())</span>
+<span class="nc" id="L267">                    .action(AccountUpdateAction.REGISTRATION)</span>
+<span class="nc" id="L268">                    .stakeAddress(registration.getAddress().getView())</span>
+<span class="nc" id="L269">                    .unixBlockTime(registration.getTransaction().getBlock().getTime().getTime())</span>
+<span class="nc" id="L270">                    .build());</span>
+<span class="nc" id="L271">        }</span>
 
-<span class="nc" id="L221">        return  accountUpdates;</span>
+<span class="nc" id="L273">        return  accountUpdates;</span>
     }
 
     @Override
     public List&lt;MirCertificate&gt; getMirCertificatesInEpoch(final int epoch) {
-<span class="nc" id="L226">        List&lt;DbSyncReward&gt; mirCertificatesInEpoch = dbSyncRewardRepository.getMIRCertificatesInEpoch(epoch);</span>
-<span class="nc" id="L227">        List&lt;MirCertificate&gt; mirCertificates = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L278">        List&lt;DbSyncReward&gt; mirCertificatesInEpoch = dbSyncRewardRepository.getMIRCertificatesInEpoch(epoch);</span>
+<span class="nc" id="L279">        List&lt;MirCertificate&gt; mirCertificates = new ArrayList&lt;&gt;();</span>
 
-<span class="nc bnc" id="L229" title="All 2 branches missed.">        for (DbSyncReward dbSyncReward : mirCertificatesInEpoch) {</span>
-<span class="nc" id="L230">            MirCertificate mirCertificate = new MirCertificate();</span>
-<span class="nc" id="L231">            mirCertificate.setPot(MirPot.valueOf(dbSyncReward.getType().toUpperCase()));</span>
-<span class="nc" id="L232">            mirCertificate.setTotalRewards(dbSyncReward.getAmount());</span>
-<span class="nc" id="L233">            mirCertificates.add(mirCertificate);</span>
-<span class="nc" id="L234">        }</span>
+<span class="nc bnc" id="L281" title="All 2 branches missed.">        for (DbSyncReward dbSyncReward : mirCertificatesInEpoch) {</span>
+<span class="nc" id="L282">            MirCertificate mirCertificate = new MirCertificate();</span>
+<span class="nc" id="L283">            mirCertificate.setPot(MirPot.valueOf(dbSyncReward.getType().toUpperCase()));</span>
+<span class="nc" id="L284">            mirCertificate.setTotalRewards(dbSyncReward.getAmount());</span>
+<span class="nc" id="L285">            mirCertificates.add(mirCertificate);</span>
+<span class="nc" id="L286">        }</span>
 
-<span class="nc" id="L236">        return mirCertificates;</span>
+<span class="nc" id="L288">        return mirCertificates;</span>
     }
 
     @Override
     public int getPoolRegistrationsInEpoch(int epoch) {
-<span class="nc" id="L241">        return dbSyncPoolUpdateRepository.countPoolRegistrationsInEpoch(epoch);</span>
+<span class="nc" id="L293">        return dbSyncPoolUpdateRepository.countPoolRegistrationsInEpoch(epoch);</span>
     }
 
     @Override
     public List&lt;PoolUpdate&gt; getPoolUpdateAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch) {
-<span class="nc" id="L246">        return dbSyncPoolUpdateRepository.findByBech32PoolIdAfterTransactionIdInEpoch(poolId, transactionId, epoch).stream()</span>
-<span class="nc" id="L247">                .map(PoolUpdateMapper::fromDbSyncPoolUpdate).toList();</span>
+<span class="nc" id="L298">        return dbSyncPoolUpdateRepository.findByBech32PoolIdAfterTransactionIdInEpoch(poolId, transactionId, epoch).stream()</span>
+<span class="nc" id="L299">                .map(PoolUpdateMapper::fromDbSyncPoolUpdate).toList();</span>
     }
 
     @Override
     public PoolDeregistration latestPoolRetirementUntilEpoch(String poolId, int epoch) {
-<span class="nc" id="L252">        DbSyncPoolRetirement dbSyncPoolRetirement = dbSyncPoolRetirementRepository.latestPoolRetirementUntilEpoch(poolId, epoch);</span>
-<span class="nc" id="L253">        return PoolDeregistrationMapper.fromDbSyncPoolRetirement(dbSyncPoolRetirement);</span>
+<span class="nc" id="L304">        DbSyncPoolRetirement dbSyncPoolRetirement = dbSyncPoolRetirementRepository.latestPoolRetirementUntilEpoch(poolId, epoch);</span>
+<span class="nc" id="L305">        return PoolDeregistrationMapper.fromDbSyncPoolRetirement(dbSyncPoolRetirement);</span>
     }
 
     @Override
-    public Double getTransactionDepositsInEpoch(int epoch) {
-<span class="nc" id="L258">        return dbSyncTransactionRepository.getSumOfDepositsInEpoch(epoch);</span>
+    public BigInteger getTransactionDepositsInEpoch(int epoch) {
+<span class="nc" id="L310">        return dbSyncTransactionRepository.getSumOfDepositsInEpoch(epoch);</span>
     }
 
     @Override
-    public Double getSumOfFeesInEpoch(int epoch) {
-<span class="nc" id="L263">        return dbSyncTransactionRepository.getSumOfFeesInEpoch(epoch);</span>
+    public BigInteger getSumOfFeesInEpoch(int epoch) {
+<span class="nc" id="L315">        return dbSyncTransactionRepository.getSumOfFeesInEpoch(epoch);</span>
     }
 
     @Override
-    public Double getSumOfWithdrawalsInEpoch(int epoch) {
-<span class="nc" id="L268">        return dbSyncWithdrawalRepository.getSumOfWithdrawalsInEpoch(epoch);</span>
+    public BigInteger getSumOfWithdrawalsInEpoch(int epoch) {
+<span class="nc" id="L320">        return dbSyncWithdrawalRepository.getSumOfWithdrawalsInEpoch(epoch);</span>
+    }
+
+    @Override
+    public List&lt;Reward&gt; getRewardListForPoolInEpoch(int epoch, String poolId) {
+<span class="nc" id="L325">        List &lt;DbSyncReward&gt; poolRewards = dbSyncRewardRepository.getMemberRewardListForPoolInEpoch(poolId, epoch);</span>
+
+<span class="nc bnc" id="L327" title="All 2 branches missed.">        if (poolRewards.isEmpty()) {</span>
+<span class="nc" id="L328">            return List.of();</span>
+        }
+
+<span class="nc" id="L331">        return poolRewards.stream().map(RewardMapper::fromDbSyncReward).toList();</span>
+    }
+
+    @Override
+    public BigInteger getTotalPoolRewardsInEpoch(String poolId, int epoch) {
+<span class="nc" id="L336">        return dbSyncRewardRepository.getTotalPoolRewardsInEpoch(poolId, epoch);</span>
     }
 
     public List&lt;String&gt; getPoolsThatProducedBlocksInEpoch(int epoch) {
-<span class="nc" id="L272">        return dbSyncBlockRepository.getPoolsThatProducedBlocksInEpoch(epoch);</span>
+<span class="nc" id="L340">        return dbSyncBlockRepository.getPoolsThatProducedBlocksInEpoch(epoch);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

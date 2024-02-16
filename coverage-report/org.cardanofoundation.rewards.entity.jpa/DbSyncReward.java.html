@@ -6,33 +6,35 @@ import lombok.Getter;
 import org.hibernate.annotations.Immutable;
 import org.springframework.context.annotation.Profile;
 
+import java.math.BigInteger;
+
 @Entity
 @Immutable
 @Getter
 @Profile(&quot;db-sync&quot;)
 @Table(name = &quot;reward&quot;)
-<span class="nc" id="L14">public class DbSyncReward {</span>
+<span class="nc" id="L16">public class DbSyncReward {</span>
     @Id
-<span class="nc" id="L16">    private Long id;</span>
+<span class="nc" id="L18">    private Long id;</span>
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = &quot;pool_id&quot;, nullable = false,
             foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = &quot;none&quot;))
     @EqualsAndHashCode.Exclude
-<span class="nc" id="L22">    private DbSyncPoolHash pool;</span>
+<span class="nc" id="L24">    private DbSyncPoolHash pool;</span>
 
-<span class="nc" id="L24">    private Double amount;</span>
-<span class="nc" id="L25">    private String type;</span>
+<span class="nc" id="L26">    private BigInteger amount;</span>
+<span class="nc" id="L27">    private String type;</span>
 
     @ManyToOne
     @JoinColumn(name = &quot;addr_id&quot;, nullable = false,
             foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = &quot;none&quot;))
     @EqualsAndHashCode.Exclude
-<span class="nc" id="L31">    private DbSyncStakeAddress stakeAddress;</span>
+<span class="nc" id="L33">    private DbSyncStakeAddress stakeAddress;</span>
 
     @Column(name = &quot;earned_epoch&quot;)
-<span class="nc" id="L34">    private Long earnedEpoch;</span>
+<span class="nc" id="L36">    private Long earnedEpoch;</span>
     @Column(name = &quot;spendable_epoch&quot;)
-<span class="nc" id="L36">    private Long spendableEpoch;</span>
+<span class="nc" id="L38">    private Long spendableEpoch;</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

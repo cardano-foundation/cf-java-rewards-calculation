@@ -4,38 +4,39 @@ import org.cardanofoundation.rewards.entity.Epoch;
 import org.cardanofoundation.rewards.entity.jpa.DbSyncEpoch;
 import rest.koios.client.backend.api.epoch.model.EpochInfo;
 
+import java.math.BigInteger;
 import java.time.ZoneOffset;
 
-<span class="nc" id="L9">public class EpochMapper {</span>
+<span class="nc" id="L10">public class EpochMapper {</span>
 
     public static Epoch fromKoiosEpochInfo(EpochInfo epochInfo) {
-<span class="pc bpc" id="L12" title="1 of 2 branches missed.">        if (epochInfo == null) return null;</span>
+<span class="pc bpc" id="L13" title="1 of 2 branches missed.">        if (epochInfo == null) return null;</span>
 
-<span class="fc" id="L14">        Double activeStake = null;</span>
-<span class="fc bfc" id="L15" title="All 2 branches covered.">        if (epochInfo.getActiveStake() != null) {</span>
-<span class="fc" id="L16">            activeStake = Double.valueOf(epochInfo.getActiveStake());</span>
+<span class="fc" id="L15">        BigInteger activeStake = null;</span>
+<span class="fc bfc" id="L16" title="All 2 branches covered.">        if (epochInfo.getActiveStake() != null) {</span>
+<span class="fc" id="L17">            activeStake = new BigInteger(epochInfo.getActiveStake());</span>
         }
 
-<span class="fc" id="L19">        return Epoch.builder()</span>
-<span class="fc" id="L20">                .number(epochInfo.getEpochNo())</span>
-<span class="fc" id="L21">                .output(Double.valueOf(epochInfo.getOutSum()))</span>
-<span class="fc" id="L22">                .fees(Double.valueOf(epochInfo.getFees()))</span>
-<span class="fc" id="L23">                .blockCount(epochInfo.getBlkCount())</span>
-<span class="fc" id="L24">                .activeStake(activeStake)</span>
-<span class="fc" id="L25">                .unixTimeFirstBlock(epochInfo.getFirstBlockTime())</span>
-<span class="fc" id="L26">                .unixTimeLastBlock(epochInfo.getLastBlockTime())</span>
-<span class="fc" id="L27">                .build();</span>
+<span class="fc" id="L20">        return Epoch.builder()</span>
+<span class="fc" id="L21">                .number(epochInfo.getEpochNo())</span>
+<span class="fc" id="L22">                .output(new BigInteger(epochInfo.getOutSum()))</span>
+<span class="fc" id="L23">                .fees(new BigInteger(epochInfo.getFees()))</span>
+<span class="fc" id="L24">                .blockCount(epochInfo.getBlkCount())</span>
+<span class="fc" id="L25">                .activeStake(activeStake)</span>
+<span class="fc" id="L26">                .unixTimeFirstBlock(epochInfo.getFirstBlockTime())</span>
+<span class="fc" id="L27">                .unixTimeLastBlock(epochInfo.getLastBlockTime())</span>
+<span class="fc" id="L28">                .build();</span>
     }
 
     public static Epoch fromDbSyncEpoch(DbSyncEpoch dbSyncEpoch) {
-<span class="nc" id="L31">        return Epoch.builder()</span>
-<span class="nc" id="L32">                .number(dbSyncEpoch.getNumber())</span>
-<span class="nc" id="L33">                .fees(dbSyncEpoch.getFees())</span>
-<span class="nc" id="L34">                .blockCount(dbSyncEpoch.getBlockCount())</span>
-<span class="nc" id="L35">                .output(dbSyncEpoch.getOutput())</span>
-<span class="nc" id="L36">                .unixTimeFirstBlock(dbSyncEpoch.getStartTime().toEpochSecond(ZoneOffset.UTC))</span>
-<span class="nc" id="L37">                .unixTimeLastBlock(dbSyncEpoch.getEndTime().toEpochSecond(ZoneOffset.UTC))</span>
-<span class="nc" id="L38">                .build();</span>
+<span class="nc" id="L32">        return Epoch.builder()</span>
+<span class="nc" id="L33">                .number(dbSyncEpoch.getNumber())</span>
+<span class="nc" id="L34">                .fees(dbSyncEpoch.getFees())</span>
+<span class="nc" id="L35">                .blockCount(dbSyncEpoch.getBlockCount())</span>
+<span class="nc" id="L36">                .output(dbSyncEpoch.getOutput())</span>
+<span class="nc" id="L37">                .unixTimeFirstBlock(dbSyncEpoch.getStartTime().toEpochSecond(ZoneOffset.UTC))</span>
+<span class="nc" id="L38">                .unixTimeLastBlock(dbSyncEpoch.getEndTime().toEpochSecond(ZoneOffset.UTC))</span>
+<span class="nc" id="L39">                .build();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

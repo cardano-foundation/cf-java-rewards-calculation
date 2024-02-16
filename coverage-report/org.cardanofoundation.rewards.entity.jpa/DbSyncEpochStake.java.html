@@ -6,31 +6,33 @@ import lombok.Getter;
 import org.hibernate.annotations.Immutable;
 import org.springframework.context.annotation.Profile;
 
+import java.math.BigInteger;
+
 @Entity
 @Immutable
 @Getter
 @Profile(&quot;db-sync&quot;)
 @Table(name = &quot;epoch_stake&quot;)
-<span class="nc" id="L14">public class DbSyncEpochStake {</span>
+<span class="nc" id="L16">public class DbSyncEpochStake {</span>
     @Id
-<span class="nc" id="L16">    private Long id;</span>
+<span class="nc" id="L18">    private Long id;</span>
 
     @Column(name = &quot;amount&quot;)
-<span class="nc" id="L19">    private Double amount;</span>
+<span class="nc" id="L21">    private BigInteger amount;</span>
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = &quot;addr_id&quot;, nullable = false,
             foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = &quot;none&quot;))
     @EqualsAndHashCode.Exclude
-<span class="nc" id="L25">    private DbSyncStakeAddress stakeAddress;</span>
+<span class="nc" id="L27">    private DbSyncStakeAddress stakeAddress;</span>
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = &quot;pool_id&quot;, nullable = false,
             foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = &quot;none&quot;))
     @EqualsAndHashCode.Exclude
-<span class="nc" id="L31">    private DbSyncPoolHash pool;</span>
+<span class="nc" id="L33">    private DbSyncPoolHash pool;</span>
 
     @Column(name = &quot;epoch_no&quot;)
-<span class="nc" id="L34">    private Integer epoch;</span>
+<span class="nc" id="L36">    private Integer epoch;</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

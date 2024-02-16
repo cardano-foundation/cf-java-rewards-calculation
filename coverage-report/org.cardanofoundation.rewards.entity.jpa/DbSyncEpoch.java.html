@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.hibernate.annotations.Immutable;
 import org.springframework.context.annotation.Profile;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 @Entity
@@ -12,26 +13,26 @@ import java.time.LocalDateTime;
 @Getter
 @Profile(&quot;db-sync&quot;)
 @Table(name = &quot;epoch&quot;)
-<span class="nc" id="L15">public class DbSyncEpoch {</span>
+<span class="nc" id="L16">public class DbSyncEpoch {</span>
     @Id
-<span class="nc" id="L17">    private Long id;</span>
+<span class="nc" id="L18">    private Long id;</span>
 
     @Column(name = &quot;out_sum&quot;)
-<span class="nc" id="L20">    private Double output;</span>
+<span class="nc" id="L21">    private BigInteger output;</span>
 
     @Column(name = &quot;fees&quot;)
-<span class="nc" id="L23">    private Double fees;</span>
+<span class="nc" id="L24">    private BigInteger fees;</span>
 
     @Column(name = &quot;blk_count&quot;)
-<span class="nc" id="L26">    private Integer blockCount;</span>
+<span class="nc" id="L27">    private Integer blockCount;</span>
 
     @Column(name = &quot;no&quot;)
-<span class="nc" id="L29">    private Integer number;</span>
+<span class="nc" id="L30">    private Integer number;</span>
 
     @Column(name = &quot;start_time&quot;)
-<span class="nc" id="L32">    private LocalDateTime startTime;</span>
+<span class="nc" id="L33">    private LocalDateTime startTime;</span>
 
     @Column(name = &quot;end_time&quot;)
-<span class="nc" id="L35">    private LocalDateTime endTime;</span>
+<span class="nc" id="L36">    private LocalDateTime endTime;</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

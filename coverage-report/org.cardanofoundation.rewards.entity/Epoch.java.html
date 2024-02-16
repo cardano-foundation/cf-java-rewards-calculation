@@ -2,23 +2,24 @@
 
 import lombok.*;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Getter
-<span class="fc" id="L8">@Setter</span>
-<span class="pc" id="L9">@Builder</span>
-<span class="fc" id="L10">@NoArgsConstructor</span>
-<span class="fc" id="L11">@AllArgsConstructor</span>
+<span class="fc" id="L9">@Setter</span>
+<span class="pc" id="L10">@Builder</span>
+<span class="fc" id="L11">@NoArgsConstructor</span>
+<span class="fc" id="L12">@AllArgsConstructor</span>
 public class Epoch {
-<span class="fc" id="L13">    private int number;</span>
-<span class="nc" id="L14">    private Double output;</span>
-<span class="fc" id="L15">    private Double fees;</span>
-<span class="fc" id="L16">    private int blockCount;</span>
-<span class="fc" id="L17">    private Double activeStake;</span>
-<span class="nc" id="L18">    private List&lt;String&gt; poolsMadeBlocks;</span>
-<span class="fc" id="L19">    private int nonOBFTBlockCount;</span>
-<span class="fc" id="L20">    private int OBFTBlockCount;</span>
-<span class="fc" id="L21">    private long unixTimeFirstBlock;</span>
-<span class="fc" id="L22">    private long unixTimeLastBlock;</span>
+<span class="fc" id="L14">    private int number;</span>
+<span class="nc" id="L15">    private BigInteger output;</span>
+<span class="fc" id="L16">    private BigInteger fees;</span>
+<span class="fc" id="L17">    private int blockCount;</span>
+<span class="nc" id="L18">    private BigInteger activeStake;</span>
+<span class="nc" id="L19">    private List&lt;String&gt; poolsMadeBlocks;</span>
+<span class="fc" id="L20">    private int nonOBFTBlockCount;</span>
+<span class="fc" id="L21">    private int OBFTBlockCount;</span>
+<span class="fc" id="L22">    private long unixTimeFirstBlock;</span>
+<span class="fc" id="L23">    private long unixTimeLastBlock;</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

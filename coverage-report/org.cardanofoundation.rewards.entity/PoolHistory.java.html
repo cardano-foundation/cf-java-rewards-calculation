@@ -2,30 +2,32 @@
 
 import lombok.*;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Getter
-<span class="fc" id="L8">@Setter</span>
-<span class="pc" id="L9">@Builder</span>
-<span class="fc" id="L10">@NoArgsConstructor</span>
-<span class="fc" id="L11">@AllArgsConstructor</span>
+<span class="nc" id="L9">@Setter</span>
+<span class="nc" id="L10">@Builder</span>
+<span class="nc" id="L11">@NoArgsConstructor</span>
+<span class="nc" id="L12">@AllArgsConstructor</span>
 public class PoolHistory {
-<span class="fc" id="L13">    private Double activeStake;</span>
-<span class="fc" id="L14">    private Double delegatorRewards;</span>
-<span class="fc" id="L15">    private Double poolFees;</span>
-<span class="fc" id="L16">    private Double margin;</span>
-<span class="fc" id="L17">    private Double fixedCost;</span>
-<span class="fc" id="L18">    private List&lt;Delegator&gt; delegators;</span>
-<span class="fc" id="L19">    private int blockCount;</span>
-<span class="nc" id="L20">    private int epoch;</span>
+<span class="nc" id="L14">    private BigInteger activeStake;</span>
+<span class="nc" id="L15">    private BigInteger delegatorRewards;</span>
+<span class="nc" id="L16">    private String rewardAddress;</span>
+<span class="nc" id="L17">    private BigInteger poolFees;</span>
+<span class="nc" id="L18">    private Double margin;</span>
+<span class="nc" id="L19">    private Double fixedCost;</span>
+<span class="nc" id="L20">    private List&lt;Delegator&gt; delegators;</span>
+<span class="nc" id="L21">    private int blockCount;</span>
+<span class="nc" id="L22">    private int epoch;</span>
 
     public Delegator getDelegator(String stakeAddress) {
-<span class="nc bnc" id="L23" title="All 2 branches missed.">        for (Delegator delegator : delegators) {</span>
-<span class="nc bnc" id="L24" title="All 2 branches missed.">            if (delegator.getStakeAddress().equals(stakeAddress)) {</span>
-<span class="nc" id="L25">                return delegator;</span>
+<span class="nc bnc" id="L25" title="All 2 branches missed.">        for (Delegator delegator : delegators) {</span>
+<span class="nc bnc" id="L26" title="All 2 branches missed.">            if (delegator.getStakeAddress().equals(stakeAddress)) {</span>
+<span class="nc" id="L27">                return delegator;</span>
             }
-<span class="nc" id="L27">        }</span>
-<span class="nc" id="L28">        return null;</span>
+<span class="nc" id="L29">        }</span>
+<span class="nc" id="L30">        return null;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

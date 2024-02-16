@@ -4,32 +4,34 @@ import org.cardanofoundation.rewards.entity.AdaPots;
 import org.cardanofoundation.rewards.entity.jpa.DbSyncAdaPots;
 import rest.koios.client.backend.api.network.model.Totals;
 
+import java.math.BigInteger;
+
 import static org.cardanofoundation.rewards.constants.RewardConstants.TOTAL_LOVELACE;
 
-<span class="nc" id="L9">public class AdaPotsMapper {</span>
+<span class="nc" id="L11">public class AdaPotsMapper {</span>
 
     public static AdaPots fromKoiosTotals (Totals totals) {
-<span class="pc bpc" id="L12" title="1 of 2 branches missed.">        if (totals == null) return null;</span>
+<span class="nc bnc" id="L14" title="All 2 branches missed.">        if (totals == null) return null;</span>
 
-<span class="fc" id="L14">        return AdaPots.builder()</span>
-<span class="fc" id="L15">                .treasury(Double.parseDouble(totals.getTreasury()))</span>
-<span class="fc" id="L16">                .reserves(Double.parseDouble(totals.getReserves()))</span>
-<span class="fc" id="L17">                .rewards(Double.parseDouble(totals.getReward()))</span>
-<span class="fc" id="L18">                .adaInCirculation(Double.parseDouble(totals.getSupply()))</span>
-<span class="fc" id="L19">                .epoch(totals.getEpochNo())</span>
-<span class="fc" id="L20">                .build();</span>
+<span class="nc" id="L16">        return AdaPots.builder()</span>
+<span class="nc" id="L17">                .treasury(new BigInteger(totals.getTreasury()))</span>
+<span class="nc" id="L18">                .reserves(new BigInteger(totals.getReserves()))</span>
+<span class="nc" id="L19">                .rewards(new BigInteger(totals.getReward()))</span>
+<span class="nc" id="L20">                .adaInCirculation(new BigInteger(totals.getSupply()))</span>
+<span class="nc" id="L21">                .epoch(totals.getEpochNo())</span>
+<span class="nc" id="L22">                .build();</span>
     }
 
     public static AdaPots fromDbSyncAdaPots (DbSyncAdaPots dbSyncAdaPots) {
-<span class="nc" id="L24">        return AdaPots.builder()</span>
-<span class="nc" id="L25">                .treasury(dbSyncAdaPots.getTreasury())</span>
-<span class="nc" id="L26">                .reserves(dbSyncAdaPots.getReserves())</span>
-<span class="nc" id="L27">                .rewards(dbSyncAdaPots.getRewards())</span>
-<span class="nc" id="L28">                .deposits(dbSyncAdaPots.getDeposits())</span>
-<span class="nc" id="L29">                .fees(dbSyncAdaPots.getFees())</span>
-<span class="nc" id="L30">                .adaInCirculation(dbSyncAdaPots.getUtxo())</span>
-<span class="nc" id="L31">                .epoch(dbSyncAdaPots.getEpoch())</span>
-<span class="nc" id="L32">                .build();</span>
+<span class="nc" id="L26">        return AdaPots.builder()</span>
+<span class="nc" id="L27">                .treasury(dbSyncAdaPots.getTreasury())</span>
+<span class="nc" id="L28">                .reserves(dbSyncAdaPots.getReserves())</span>
+<span class="nc" id="L29">                .rewards(dbSyncAdaPots.getRewards())</span>
+<span class="nc" id="L30">                .deposits(dbSyncAdaPots.getDeposits())</span>
+<span class="nc" id="L31">                .fees(dbSyncAdaPots.getFees())</span>
+<span class="nc" id="L32">                .adaInCirculation(dbSyncAdaPots.getUtxo())</span>
+<span class="nc" id="L33">                .epoch(dbSyncAdaPots.getEpoch())</span>
+<span class="nc" id="L34">                .build();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -2,26 +2,28 @@
 
 import org.cardanofoundation.rewards.data.provider.DataProvider;
 
-<span class="nc" id="L5">public class UtxoCalculation {</span>
+import java.math.BigInteger;
 
-    public final static double UTXO_POT_BEGINNING_OF_SHELLY = 31111977147073356.0;
+<span class="nc" id="L7">public class UtxoCalculation {</span>
 
-    public static double calculateUtxoPotInEpoch(int epoch, DataProvider dataProvider) {
-<span class="nc" id="L10">        double utxo = UTXO_POT_BEGINNING_OF_SHELLY;</span>
+<span class="nc" id="L9">    public final static BigInteger UTXO_POT_BEGINNING_OF_SHELLY = BigInteger.valueOf(31111977147073356L);</span>
 
-<span class="nc bnc" id="L12" title="All 2 branches missed.">        if (epoch &gt; 208) {</span>
-<span class="nc" id="L13">            double utxoFromPreviousEpoch = dataProvider.getAdaPotsForEpoch(epoch - 1).getAdaInCirculation();</span>
-<span class="nc" id="L14">            double deposits = dataProvider.getTransactionDepositsInEpoch(epoch - 1);</span>
-<span class="nc" id="L15">            double fees = dataProvider.getSumOfFeesInEpoch(epoch - 1);</span>
-<span class="nc" id="L16">            double withdrawals = 0.0;</span>
+    public static BigInteger calculateUtxoPotInEpoch(int epoch, DataProvider dataProvider) {
+<span class="nc" id="L12">        BigInteger utxo = UTXO_POT_BEGINNING_OF_SHELLY;</span>
 
-<span class="nc bnc" id="L18" title="All 2 branches missed.">            if (epoch &gt; 209) {</span>
-<span class="nc" id="L19">                withdrawals = dataProvider.getSumOfWithdrawalsInEpoch(epoch - 1);</span>
+<span class="nc bnc" id="L14" title="All 2 branches missed.">        if (epoch &gt; 208) {</span>
+<span class="nc" id="L15">            BigInteger utxoFromPreviousEpoch = dataProvider.getAdaPotsForEpoch(epoch - 1).getAdaInCirculation();</span>
+<span class="nc" id="L16">            BigInteger deposits = dataProvider.getTransactionDepositsInEpoch(epoch - 1);</span>
+<span class="nc" id="L17">            BigInteger fees = dataProvider.getSumOfFeesInEpoch(epoch - 1);</span>
+<span class="nc" id="L18">            BigInteger withdrawals = BigInteger.ZERO;</span>
+
+<span class="nc bnc" id="L20" title="All 2 branches missed.">            if (epoch &gt; 209) {</span>
+<span class="nc" id="L21">                withdrawals = dataProvider.getSumOfWithdrawalsInEpoch(epoch - 1);</span>
             }
 
-<span class="nc" id="L22">            utxo = utxoFromPreviousEpoch - deposits - fees + withdrawals;</span>
+<span class="nc" id="L24">            utxo = utxoFromPreviousEpoch.subtract(deposits).subtract(fees).add(withdrawals);</span>
 
-<span class="nc bnc" id="L24" title="All 2 branches missed.">            if (epoch == 236) {</span>
+<span class="nc bnc" id="L26" title="All 2 branches missed.">            if (epoch == 236) {</span>
                 // Todo: verify with yaci-store data provider later
                 /*
                     &quot;The bootstrap addresses from Figure 6 were not intended to include the Byron era redeem
@@ -30,11 +32,11 @@ import org.cardanofoundation.rewards.data.provider.DataProvider;
                     and the Ada contained in them was returned to the reserves.&quot;
                         - shelley-spec-ledger.pdf 17.5 p.115
                  */
-<span class="nc" id="L33">                utxo = utxo - 318200635000000.0;</span>
+<span class="nc" id="L35">                utxo = utxo.subtract(new BigInteger(&quot;318200635000000&quot;));</span>
             }
         }
 
-<span class="nc" id="L37">        return utxo;</span>
+<span class="nc" id="L39">        return utxo;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -5,40 +5,42 @@ import lombok.Getter;
 import org.hibernate.annotations.Immutable;
 import org.springframework.context.annotation.Profile;
 
+import java.math.BigInteger;
+
 @Entity
 @Immutable
 @Getter
 @Profile(&quot;db-sync&quot;)
 @Table(name = &quot;ada_pots&quot;)
-<span class="nc" id="L13">public class DbSyncAdaPots {</span>
+<span class="nc" id="L15">public class DbSyncAdaPots {</span>
     @Id
-<span class="nc" id="L15">    private Long id;</span>
+<span class="nc" id="L17">    private Long id;</span>
 
     @Column(name = &quot;slot_no&quot;)
-<span class="nc" id="L18">    private Long slot;</span>
+<span class="nc" id="L20">    private Long slot;</span>
 
     @Column(name = &quot;epoch_no&quot;)
-<span class="nc" id="L21">    private Integer epoch;</span>
+<span class="nc" id="L23">    private Integer epoch;</span>
 
     @Column(name = &quot;treasury&quot;)
-<span class="nc" id="L24">    private Double treasury;</span>
+<span class="nc" id="L26">    private BigInteger treasury;</span>
 
     @Column(name = &quot;reserves&quot;)
-<span class="nc" id="L27">    private Double reserves;</span>
+<span class="nc" id="L29">    private BigInteger reserves;</span>
 
     @Column(name = &quot;rewards&quot;)
-<span class="nc" id="L30">    private Double rewards;</span>
+<span class="nc" id="L32">    private BigInteger rewards;</span>
 
     @Column(name = &quot;utxo&quot;)
-<span class="nc" id="L33">    private Double utxo;</span>
+<span class="nc" id="L35">    private BigInteger utxo;</span>
 
     @Column(name = &quot;deposits&quot;)
-<span class="nc" id="L36">    private Double deposits;</span>
+<span class="nc" id="L38">    private BigInteger deposits;</span>
 
     @Column(name = &quot;fees&quot;)
-<span class="nc" id="L39">    private Double fees;</span>
+<span class="nc" id="L41">    private BigInteger fees;</span>
 
     @Column(name = &quot;block_id&quot;)
-<span class="nc" id="L42">    private Long blockId;</span>
+<span class="nc" id="L44">    private Long blockId;</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
