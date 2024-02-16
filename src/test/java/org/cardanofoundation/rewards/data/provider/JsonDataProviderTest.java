@@ -22,8 +22,8 @@ public class JsonDataProviderTest {
         AdaPots adaPots = jsonDataProvider.getAdaPotsForEpoch(220);
         Assertions.assertEquals(adaPots.getEpoch(), 220);
         Assertions.assertEquals(adaPots.getTreasury(), new BigInteger("94812346026398"));
-        Assertions.assertEquals(adaPots.getReserves(), new BigInteger("13120582265809833.0"));
-        Assertions.assertEquals(adaPots.getRewards(), new BigInteger("151012138061367.0"));
+        Assertions.assertEquals(adaPots.getReserves(), new BigInteger("13120582265809832"));
+        Assertions.assertEquals(adaPots.getRewards(), new BigInteger("151012138061367"));
     }
 
     @Test

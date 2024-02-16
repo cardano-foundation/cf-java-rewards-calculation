@@ -23,7 +23,7 @@ import static org.cardanofoundation.rewards.util.JsonConverter.writeObjectToJson
 public class DbSyncDataFetcher implements DataFetcher {
 
     private static final Logger logger = LoggerFactory.getLogger(DbSyncDataFetcher.class);
-    @Autowired
+    @Autowired(required = false)
     private DbSyncDataProvider dbSyncDataProvider;
 
     @Value("${json.data-provider.source}")
