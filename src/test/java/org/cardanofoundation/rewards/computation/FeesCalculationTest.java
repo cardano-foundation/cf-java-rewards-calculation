@@ -1,4 +1,4 @@
-package org.cardanofoundation.rewards.calculation;
+package org.cardanofoundation.rewards.computation;
 
 import org.cardanofoundation.rewards.data.provider.DataProvider;
 import org.cardanofoundation.rewards.data.provider.DbSyncDataProvider;
@@ -22,8 +22,7 @@ import java.util.stream.Stream;
 @SpringBootTest
 @ComponentScan
 @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
-public class DepositCalculationTest {
-
+public class FeesCalculationTest {
     @Autowired
     KoiosDataProvider koiosDataProvider;
 
@@ -33,8 +32,7 @@ public class DepositCalculationTest {
     @Autowired
     DbSyncDataProvider dbSyncDataProvider;
 
-    void Test_calculateDeposit(final int epoch, DataProviderType dataProviderType) {
-
+    void Test_calculateFees(final int epoch, DataProviderType dataProviderType) {
         final DataProvider dataProvider;
         if (dataProviderType == DataProviderType.KOIOS) {
             dataProvider = koiosDataProvider;
@@ -46,32 +44,25 @@ public class DepositCalculationTest {
             throw new RuntimeException("Unknown data provider type: " + dataProviderType);
         }
 
-        AdaPots adaPotsForNextEpoch = dataProvider.getAdaPotsForEpoch(epoch + 1);
-        BigInteger actualDepositsInNextEpoch = adaPotsForNextEpoch.getDeposits();
-        BigInteger calculatedDepositsInNextEpoch = DepositCalculation.calculateDepositInEpoch(epoch, dataProvider);
+        AdaPots adaPots = dataProvider.getAdaPotsForEpoch(epoch);
+        BigInteger fees = FeeComputation.calculateFeePotInEpoch(epoch, dataProvider);
 
-        BigInteger difference = actualDepositsInNextEpoch.subtract(calculatedDepositsInNextEpoch);
+        BigInteger difference = adaPots.getFees().subtract(fees);
         Assertions.assertEquals(BigInteger.ZERO, difference);
     }
 
-    static Stream<Integer> dataProviderRangeUntilEpoch460() {
+    static Stream<Integer> dataProviderRangeUntilEpoch213() {
         return IntStream.range(208, 460).boxed();
     }
 
     @ParameterizedTest
-    @MethodSource("dataProviderRangeUntilEpoch460")
-    void Test_calculateDepositsWithDbSyncDataProvider(int epoch) {
-        Test_calculateDeposit(epoch, DataProviderType.DB_SYNC);
+    @MethodSource("dataProviderRangeUntilEpoch213")
+    void Test_calculateFeesWithDbSyncDataProvider(int epoch) {
+        Test_calculateFees(epoch, DataProviderType.DB_SYNC);
     }
 
     @Test
-    void Test_calculateDepositsWithDbSyncDataProviderInEpoch246() {
-        Test_calculateDeposit(246, DataProviderType.DB_SYNC);
+    void Test_calculateFeesWithDbSyncDataProviderForEpoch214() {
+        Test_calculateFees(214, DataProviderType.DB_SYNC);
     }
-
-    @Test
-    void Test_countPoolRegistrationsInEpoch211() {
-        Assertions.assertEquals(54, dbSyncDataProvider.getPoolRegistrationsInEpoch(211));
-    }
-
 }

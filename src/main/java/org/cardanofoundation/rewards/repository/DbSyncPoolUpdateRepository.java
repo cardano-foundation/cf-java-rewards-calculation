@@ -1,6 +1,7 @@
 package org.cardanofoundation.rewards.repository;
 
 import org.cardanofoundation.rewards.entity.jpa.DbSyncPoolUpdate;
+import org.cardanofoundation.rewards.entity.jpa.projection.LatestPoolUpdate;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -17,6 +18,17 @@ public interface DbSyncPoolUpdateRepository extends ReadOnlyRepository<DbSyncPoo
                 AND update.activeEpochNumber <= :epoch
             ORDER BY update.registeredTransaction.id DESC LIMIT 1""")
     DbSyncPoolUpdate findLastestActiveUpdateInEpoch(String poolId, Integer epoch);
+
+    @Query(nativeQuery = true, value = """
+            SELECT pool_update.id, pool_hash.view AS poolId, pledge, margin,
+                   fixed_cost AS fixedCost, stake_address.view AS rewardAddress
+            FROM pool_update
+                JOIN stake_address ON stake_address.id=pool_update.reward_addr_id
+                JOIN pool_hash ON pool_hash.id=hash_id
+            WHERE pool_update.registered_tx_id IN (
+                SELECT MAX(registered_tx_id) FROM pool_update WHERE active_epoch_no <= :epoch GROUP BY hash_id
+            );""")
+    List<LatestPoolUpdate> findLatestActiveUpdatesInEpoch(Integer epoch);
 
     @Query(nativeQuery = true, value = """
             SELECT COUNT(*) FROM (

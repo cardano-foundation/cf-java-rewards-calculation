@@ -1,4 +1,4 @@
-package org.cardanofoundation.rewards.calculation;
+package org.cardanofoundation.rewards.computation;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -28,7 +28,7 @@ import static org.cardanofoundation.rewards.util.CurrencyConverter.lovelaceToAda
 
 @SpringBootTest
 @ComponentScan
-public class TreasuryCalculationTest {
+public class TreasuryComputationTest {
 
   @Autowired
   KoiosDataProvider koiosDataProvider;
@@ -46,26 +46,36 @@ public class TreasuryCalculationTest {
       dataProvider = koiosDataProvider;
     } else if (dataProviderType == DataProviderType.JSON) {
       dataProvider = jsonDataProvider;
+    } else if (dataProviderType == DataProviderType.DB_SYNC) {
+      dataProvider = dbSyncDataProvider;
     } else {
       throw new RuntimeException("Unknown data provider type: " + dataProviderType);
     }
 
-    TreasuryCalculationResult treasuryCalculationResult = TreasuryCalculation.calculateTreasuryForEpoch(epoch, dataProvider);
+    TreasuryCalculationResult treasuryCalculationResult = TreasuryComputation.calculateTreasuryForEpoch(epoch, dataProvider);
     AdaPots adaPots = dataProvider.getAdaPotsForEpoch(epoch);
 
     BigInteger difference = adaPots.getTreasury().subtract(treasuryCalculationResult.getTreasury());
     Assertions.assertEquals(BigInteger.ZERO, difference, "The difference " + lovelaceToAda(difference.intValue()) + " ADA between expected treasury value and actual treasury value is greater than 1 LOVELACE");
   }
 
-  static Stream<Integer> jsonDataProviderRange() {
+  static Stream<Integer> dataProviderRange() {
     return IntStream.range(208, 215).boxed();
   }
 
   @ParameterizedTest
-  @MethodSource("jsonDataProviderRange")
+  @MethodSource("dataProviderRange")
   void Test_calculateTreasuryWithJsonDataProvider(int epoch) {
     Test_calculateTreasury(epoch, DataProviderType.JSON);
   }
+
+  @ParameterizedTest
+  @MethodSource("dataProviderRange")
+  @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
+  void Test_calculateTreasuryWithDbSyncDataProvider(int epoch) {
+    Test_calculateTreasury(epoch, DataProviderType.DB_SYNC);
+  }
+
 
   private static Stream<Arguments> retiredPoolTestRange() {
     return Stream.of(
@@ -86,7 +96,7 @@ public class TreasuryCalculationTest {
     List<PoolDeregistration> retiredPools = jsonDataProvider.getRetiredPoolsInEpoch(epoch);
     List<AccountUpdate> accountUpdates = jsonDataProvider.getAccountUpdatesUntilEpoch(
             retiredPools.stream().map(PoolDeregistration::getRewardAddress).toList(), epoch - 1);
-    BigInteger unclaimedRefunds = TreasuryCalculation.calculateUnclaimedRefundsForRetiredPools(retiredPools, accountUpdates);
+    BigInteger unclaimedRefunds = TreasuryComputation.calculateUnclaimedRefundsForRetiredPools(retiredPools, accountUpdates);
     Assertions.assertEquals(expectedUnclaimedRefunds, unclaimedRefunds);
   }
 
@@ -97,7 +107,7 @@ public class TreasuryCalculationTest {
     List<PoolDeregistration> retiredPools = dbSyncDataProvider.getRetiredPoolsInEpoch(epoch);
     List<AccountUpdate> accountUpdates = dbSyncDataProvider.getAccountUpdatesUntilEpoch(
             retiredPools.stream().map(PoolDeregistration::getRewardAddress).toList(), epoch - 1);
-    BigInteger unclaimedRefunds = TreasuryCalculation.calculateUnclaimedRefundsForRetiredPools(retiredPools, accountUpdates);
+    BigInteger unclaimedRefunds = TreasuryComputation.calculateUnclaimedRefundsForRetiredPools(retiredPools, accountUpdates);
     Assertions.assertEquals(expectedUnclaimedRefunds, unclaimedRefunds);
   }
 }

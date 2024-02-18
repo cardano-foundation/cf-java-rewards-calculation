@@ -1,6 +1,7 @@
 package org.cardanofoundation.rewards.data.provider;
 
 import org.cardanofoundation.rewards.entity.*;
+import org.cardanofoundation.rewards.entity.jpa.projection.LatestStakeAccountUpdate;
 import org.cardanofoundation.rewards.enums.DataType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -82,17 +83,22 @@ public class JsonDataProvider implements DataProvider {
     }
 
     @Override
+    public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch) {
+        return null;
+    }
+
+    @Override
     public PoolHistory getPoolHistory(String poolId, int epoch) {
         return getDataFromJson(POOL_HISTORY, epoch, PoolHistory.class, poolId);
     }
 
     @Override
-    public Double getPoolPledgeInEpoch(String poolId, int epoch) {
+    public BigInteger getPoolPledgeInEpoch(String poolId, int epoch) {
         PoolParameters poolParameters = getDataFromJson(POOL_PARAMETERS, epoch, PoolParameters.class, poolId);
 
         if (poolParameters == null) return null;
 
-        return poolParameters.getPledge();
+        return BigInteger.valueOf(poolParameters.getPledge().longValue());
     }
 
     @Override
@@ -181,6 +187,11 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public List<String> getPoolsThatProducedBlocksInEpoch(int epoch) {
+        return null;
+    }
+
+    @Override
+    public List<LatestStakeAccountUpdate> getLatestStakeAccountUpdates(int epoch, List<String> stakeAddresses) {
         return null;
     }
 }

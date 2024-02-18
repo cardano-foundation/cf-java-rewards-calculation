@@ -14,7 +14,7 @@ public class PoolHistoryMapper {
             .delegatorRewards(new BigInteger(poolHistory.getDelegRewards()))
             .poolFees(new BigInteger(poolHistory.getPoolFees()))
             .margin(Double.parseDouble(String.valueOf(poolHistory.getMargin())))
-            .fixedCost(Double.parseDouble(String.valueOf(poolHistory.getFixedCost())))
+            .fixedCost(new BigInteger(String.valueOf(poolHistory.getFixedCost())))
             .blockCount(poolHistory.getBlockCnt())
             .epoch(poolHistory.getEpochNo())
             .build();

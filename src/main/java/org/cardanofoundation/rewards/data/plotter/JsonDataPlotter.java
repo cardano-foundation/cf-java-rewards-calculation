@@ -1,6 +1,6 @@
 package org.cardanofoundation.rewards.data.plotter;
 
-import org.cardanofoundation.rewards.calculation.TreasuryCalculation;
+import org.cardanofoundation.rewards.computation.TreasuryComputation;
 import org.cardanofoundation.rewards.data.provider.JsonDataProvider;
 import org.cardanofoundation.rewards.entity.TreasuryCalculationResult;
 import org.cardanofoundation.rewards.util.JsonConverter;
@@ -29,7 +29,7 @@ public class JsonDataPlotter implements DataPlotter {
         Map<Integer, TreasuryCalculationResult> epochTreasuryCalculationResultMap = new LinkedHashMap<>();
 
         for (int epoch = epochStart; epoch < epochEnd; epoch++) {
-            TreasuryCalculationResult treasuryCalculationResult = TreasuryCalculation
+            TreasuryCalculationResult treasuryCalculationResult = TreasuryComputation
                     .calculateTreasuryForEpoch(epoch, jsonDataProvider);
             epochTreasuryCalculationResultMap.put(epoch, treasuryCalculationResult);
         }

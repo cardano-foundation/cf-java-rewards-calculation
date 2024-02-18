@@ -1,10 +1,10 @@
-package org.cardanofoundation.rewards.calculation;
+package org.cardanofoundation.rewards.computation;
 
 import org.cardanofoundation.rewards.data.provider.DataProvider;
 
 import java.math.BigInteger;
 
-public class UtxoCalculation {
+public class UtxoComputation {
 
     public final static BigInteger UTXO_POT_BEGINNING_OF_SHELLY = BigInteger.valueOf(31111977147073356L);
 

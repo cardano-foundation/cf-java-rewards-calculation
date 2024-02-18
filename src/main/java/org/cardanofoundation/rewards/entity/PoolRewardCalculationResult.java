@@ -22,7 +22,8 @@ public class PoolRewardCalculationResult {
     BigInteger poolReward;
     BigDecimal apparentPoolPerformance;
     BigInteger poolFee;
+    BigInteger distributedPoolReward;
     Double poolMargin;
-    Double poolCost;
+    BigInteger poolCost;
     List<String> poolOwnerStakeAddresses;
 }

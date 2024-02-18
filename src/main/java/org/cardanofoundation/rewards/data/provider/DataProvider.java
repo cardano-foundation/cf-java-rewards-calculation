@@ -1,6 +1,7 @@
 package org.cardanofoundation.rewards.data.provider;
 
 import org.cardanofoundation.rewards.entity.*;
+import org.cardanofoundation.rewards.entity.jpa.projection.LatestStakeAccountUpdate;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -13,9 +14,10 @@ public interface DataProvider {
 
     public ProtocolParameters getProtocolParametersForEpoch(int epoch);
 
+    public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch);
     public PoolHistory getPoolHistory(String poolId, int epoch);
 
-    public Double getPoolPledgeInEpoch(String poolId, int epoch);
+    public BigInteger getPoolPledgeInEpoch(String poolId, int epoch);
 
     public PoolOwnerHistory getHistoryOfPoolOwnersInEpoch(String poolId, int epoch);
 
@@ -42,4 +44,5 @@ public interface DataProvider {
     public BigInteger getTotalPoolRewardsInEpoch(String poolId, int epoch);
 
     public List<String> getPoolsThatProducedBlocksInEpoch(int epoch);
+    public List<LatestStakeAccountUpdate> getLatestStakeAccountUpdates(int epoch, List<String> stakeAddresses);
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.enums.DataType.*;
@@ -141,7 +142,7 @@ public class KoiosDataFetcher implements DataFetcher {
             }
         }
 
-        Double poolPledge = koiosDataProvider.getPoolPledgeInEpoch(poolId, epoch);
+        BigInteger poolPledge = koiosDataProvider.getPoolPledgeInEpoch(poolId, epoch);
         PoolParameters poolParameters = PoolParameters.builder().epoch(epoch).pledge(poolPledge).build();
 
         try {

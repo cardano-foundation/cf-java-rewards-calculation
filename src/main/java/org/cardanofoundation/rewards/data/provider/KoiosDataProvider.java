@@ -2,6 +2,7 @@ package org.cardanofoundation.rewards.data.provider;
 
 import lombok.RequiredArgsConstructor;
 import org.cardanofoundation.rewards.entity.*;
+import org.cardanofoundation.rewards.entity.jpa.projection.LatestStakeAccountUpdate;
 import org.cardanofoundation.rewards.mapper.*;
 import org.springframework.stereotype.Service;
 import rest.koios.client.backend.api.account.model.AccountHistory;
@@ -97,6 +98,11 @@ public class KoiosDataProvider implements DataProvider {
         return ProtocolParametersMapper.fromKoiosEpochParams(epochParams);
     }
 
+    @Override
+    public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch) {
+        return null;
+    }
+
     public PoolHistory getPoolHistory(String poolId, int epoch) {
         rest.koios.client.backend.api.pool.model.PoolHistory poolHistory = null;
 
@@ -117,7 +123,7 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
-    public Double getPoolPledgeInEpoch(String poolId, int epoch) {
+    public BigInteger getPoolPledgeInEpoch(String poolId, int epoch) {
         List<PoolUpdate> poolUpdates = new ArrayList<>();
         try {
             poolUpdates = koiosBackendService.getPoolService().getPoolUpdatesByPoolBech32(poolId, Options.builder()
@@ -132,7 +138,7 @@ public class KoiosDataProvider implements DataProvider {
         if (poolUpdates.isEmpty()) {
             return null;
         } else {
-            return Double.valueOf(poolUpdates.get(0).getPledge());
+            return new BigInteger(poolUpdates.get(0).getPledge());
         }
     }
 
@@ -275,6 +281,11 @@ public class KoiosDataProvider implements DataProvider {
 
     @Override
     public List<String> getPoolsThatProducedBlocksInEpoch(int epoch) {
+        return null;
+    }
+
+    @Override
+    public List<LatestStakeAccountUpdate> getLatestStakeAccountUpdates(int epoch, List<String> stakeAddresses) {
         return null;
     }
 

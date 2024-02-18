@@ -2,6 +2,8 @@ package org.cardanofoundation.rewards.entity;
 
 import lombok.*;
 
+import java.math.BigInteger;
+
 @Getter
 @Setter
 @Builder
@@ -9,5 +11,5 @@ import lombok.*;
 @NoArgsConstructor
 public class PoolParameters {
     int epoch;
-    Double pledge;
+    BigInteger pledge;
 }

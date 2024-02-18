@@ -11,22 +11,17 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PoolHistory {
+    private String poolId;
     private BigInteger activeStake;
     private BigInteger delegatorRewards;
     private String rewardAddress;
+    private List<String> owners;
+    private BigInteger ownerActiveStake;
     private BigInteger poolFees;
     private Double margin;
-    private Double fixedCost;
+    private BigInteger fixedCost;
+    private BigInteger pledge;
     private List<Delegator> delegators;
     private int blockCount;
     private int epoch;
-
-    public Delegator getDelegator(String stakeAddress) {
-        for (Delegator delegator : delegators) {
-            if (delegator.getStakeAddress().equals(stakeAddress)) {
-                return delegator;
-            }
-        }
-        return null;
-    }
 }

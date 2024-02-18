@@ -107,7 +107,7 @@ public class DbSyncDataFetcher implements DataFetcher {
             }
         }
 
-        Double poolPledge = dbSyncDataProvider.getPoolPledgeInEpoch(poolId, epoch);
+        BigInteger poolPledge = dbSyncDataProvider.getPoolPledgeInEpoch(poolId, epoch);
 
         if (poolPledge == null) {
             logger.error("PoolPledge for pool " + poolId + " in epoch " + epoch + " is null");

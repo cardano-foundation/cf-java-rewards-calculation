@@ -3,6 +3,8 @@ package org.cardanofoundation.rewards.mapper;
 import org.cardanofoundation.rewards.entity.PoolUpdate;
 import org.cardanofoundation.rewards.enums.PoolStatus;
 
+import java.math.BigInteger;
+
 public class PoolUpdateMapper {
 
     public static PoolUpdate fromKoiosPoolUpdate(rest.koios.client.backend.api.pool.model.PoolUpdate poolUpdate) {
@@ -11,9 +13,9 @@ public class PoolUpdateMapper {
         return PoolUpdate.builder()
             .poolId(poolUpdate.getPoolIdBech32())
             .activeEpoch(Math.toIntExact(poolUpdate.getActiveEpochNo()))
-            .fixedCost(Double.parseDouble(String.valueOf(poolUpdate.getFixedCost())))
+            .fixedCost(new BigInteger(String.valueOf(poolUpdate.getFixedCost())))
             .margin(poolUpdate.getMargin())
-            .pledge(Double.parseDouble(String.valueOf(poolUpdate.getPledge())))
+            .pledge(new BigInteger(String.valueOf(poolUpdate.getPledge())))
             .transactionHash(poolUpdate.getTxHash())
             .rewardAddress(poolUpdate.getRewardAddr())
             .owners(poolUpdate.getOwners())

@@ -1,4 +1,4 @@
-package org.cardanofoundation.rewards.calculation;
+package org.cardanofoundation.rewards.computation;
 
 import org.cardanofoundation.rewards.data.provider.DataProvider;
 import org.cardanofoundation.rewards.data.provider.DbSyncDataProvider;
@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
@@ -23,7 +22,7 @@ import java.util.stream.Stream;
 @SpringBootTest
 @ComponentScan
 @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
-public class UtxoCalculationTest {
+public class UtxoComputationTest {
 
     @Autowired
     KoiosDataProvider koiosDataProvider;
@@ -47,7 +46,7 @@ public class UtxoCalculationTest {
         }
 
         AdaPots adaPots = dataProvider.getAdaPotsForEpoch(epoch);
-        BigInteger utxo = UtxoCalculation.calculateUtxoPotInEpoch(epoch, dataProvider);
+        BigInteger utxo = UtxoComputation.calculateUtxoPotInEpoch(epoch, dataProvider);
 
         BigInteger difference = adaPots.getAdaInCirculation().subtract(utxo);
         Assertions.assertEquals(BigInteger.ZERO, difference);

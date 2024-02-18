@@ -14,6 +14,11 @@ public interface DbSyncEpochStakeRepository extends ReadOnlyRepository<DbSyncEpo
         WHERE es.epoch=:epoch AND es.pool.bech32PoolId=:poolId""")
     List<PoolEpochStake> getPoolActiveStakeInEpoch(String poolId, Integer epoch);
 
+    @Query("""
+        SELECT es.amount AS amount, es.epoch AS epoch, es.pool.bech32PoolId as poolId, es.stakeAddress.view as stakeAddress FROM DbSyncEpochStake AS es
+        WHERE es.epoch=:epoch""")
+    List<PoolEpochStake> getAllPoolsActiveStakesInEpoch(Integer epoch);
+
     @Query("SELECT SUM(amount) FROM DbSyncEpochStake WHERE epoch=:epoch")
     BigInteger getEpochStakeByEpoch(Integer epoch);
 }

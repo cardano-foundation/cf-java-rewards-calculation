@@ -3,6 +3,7 @@ package org.cardanofoundation.rewards.entity;
 import lombok.*;
 import org.cardanofoundation.rewards.enums.PoolStatus;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Getter
@@ -16,8 +17,8 @@ public class PoolUpdate {
     private Integer activeEpoch;
     private Integer retiringEpoch;
     private Double margin;
-    private Double fixedCost;
-    private Double pledge;
+    private BigInteger fixedCost;
+    private BigInteger pledge;
     private String rewardAddress;
     private List<String> owners;
 }

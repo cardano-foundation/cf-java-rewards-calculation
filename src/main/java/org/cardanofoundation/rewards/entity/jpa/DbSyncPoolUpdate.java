@@ -6,6 +6,7 @@ import lombok.Getter;
 import org.hibernate.annotations.Immutable;
 import org.springframework.context.annotation.Profile;
 
+import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,13 +25,13 @@ public class DbSyncPoolUpdate {
     @EqualsAndHashCode.Exclude
     private DbSyncPoolHash pool;
 
-    private Double pledge;
+    private BigInteger pledge;
     private Double margin;
     @Column(name = "active_epoch_no")
     private Long activeEpochNumber;
 
     @Column(name = "fixed_cost")
-    private Double fixedCost;
+    private BigInteger fixedCost;
 
     @ManyToOne
     @JoinColumn(name = "registered_tx_id", nullable = false,

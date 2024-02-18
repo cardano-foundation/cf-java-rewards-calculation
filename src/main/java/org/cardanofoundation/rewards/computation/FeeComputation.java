@@ -1,10 +1,10 @@
-package org.cardanofoundation.rewards.calculation;
+package org.cardanofoundation.rewards.computation;
 
 import org.cardanofoundation.rewards.data.provider.DataProvider;
 
 import java.math.BigInteger;
 
-public class FeeCalculation {
+public class FeeComputation {
 
     public static BigInteger calculateFeePotInEpoch(int epoch, DataProvider dataProvider) {
         BigInteger fees = BigInteger.ZERO;

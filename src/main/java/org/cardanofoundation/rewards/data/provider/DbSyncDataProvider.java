@@ -1,9 +1,9 @@
 package org.cardanofoundation.rewards.data.provider;
 
-import org.cardanofoundation.rewards.calculation.PoolRewardCalculation;
+import org.cardanofoundation.rewards.calculation.PoolRewardsCalculation;
 import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.entity.jpa.*;
-import org.cardanofoundation.rewards.entity.jpa.projection.PoolEpochStake;
+import org.cardanofoundation.rewards.entity.jpa.projection.*;
 import org.cardanofoundation.rewards.enums.AccountUpdateAction;
 import org.cardanofoundation.rewards.enums.MirPot;
 import org.cardanofoundation.rewards.mapper.*;
@@ -96,6 +96,87 @@ public class DbSyncDataProvider implements DataProvider {
     }
 
     @Override
+    public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch) {
+        List<PoolHistory> poolHistories = new ArrayList<>();
+        List<PoolEpochStake> epochStakes = dbSyncEpochStakeRepository.getAllPoolsActiveStakesInEpoch(epoch);
+        List<PoolBlocks> allBlocksMadeByPoolsInEpoch = dbSyncBlockRepository.getAllBlocksMadeByPoolsInEpoch(epoch);
+        List<LatestPoolUpdate> latestUpdates = dbSyncPoolUpdateRepository.findLatestActiveUpdatesInEpoch(epoch);
+
+        List<Long> updateIds = latestUpdates.stream()
+                .map(LatestPoolUpdate::getId)
+                .toList();
+
+        List<PoolOwner> owners = dbSyncPoolOwnerRepository.getOwnersByPoolUpdateIds(updateIds);
+
+        List<String> poolIds = epochStakes.stream()
+                .map(PoolEpochStake::getPoolId)
+                .distinct()
+                .toList();
+
+        for (String poolId : poolIds) {
+            PoolHistory poolHistory = new PoolHistory();
+            BigInteger activeStake = BigInteger.ZERO;
+            List<Delegator> delegators = new ArrayList<>();
+            List<PoolEpochStake> poolEpochStakes = epochStakes.stream().filter(poolEpochStake -> poolEpochStake.getPoolId().equals(poolId)).toList();
+
+            for (PoolEpochStake poolEpochStake : poolEpochStakes) {
+                activeStake = activeStake.add(poolEpochStake.getAmount());
+                Delegator delegator = Delegator.builder()
+                        .stakeAddress(poolEpochStake.getStakeAddress())
+                        .activeStake(poolEpochStake.getAmount())
+                        .build();
+                delegators.add(delegator);
+            }
+
+            if (!delegators.isEmpty()) {
+                poolHistory.setActiveStake(activeStake);
+                poolHistory.setDelegators(delegators);
+
+                Integer blockCount = allBlocksMadeByPoolsInEpoch.stream()
+                        .filter(poolBlocks -> poolBlocks.getPoolId().equals(poolId))
+                        .map(PoolBlocks::getBlockCount)
+                        .findFirst()
+                        .orElse(0);
+                poolHistory.setBlockCount(blockCount);
+
+                LatestPoolUpdate latestUpdate = latestUpdates.stream()
+                        .filter(update -> update.getPoolId().equals(poolId))
+                        .findFirst()
+                        .orElse(null);
+
+                if (latestUpdate == null) {
+                    System.out.println("No update for pool " + poolId + " in epoch " + epoch);
+                    continue;
+                }
+
+                poolHistory.setFixedCost(latestUpdate.getFixedCost());
+                poolHistory.setMargin(latestUpdate.getMargin());
+                poolHistory.setRewardAddress(latestUpdate.getRewardAddress());
+                poolHistory.setPledge(latestUpdate.getPledge());
+                poolHistory.setEpoch(epoch);
+                poolHistory.setPoolId(poolId);
+
+                BigInteger activeStakes = BigInteger.ZERO;
+                List<String> stakeAddresses = owners.stream()
+                        .filter(owner -> owner.getPoolId().equals(poolId)).map(PoolOwner::getStakeAddress).toList();
+
+                for (PoolEpochStake poolEpochStake : poolEpochStakes) {
+                    if (stakeAddresses.contains(poolEpochStake.getStakeAddress())) {
+                        activeStakes = activeStakes.add(poolEpochStake.getAmount());
+                    }
+                }
+
+                poolHistory.setOwners(stakeAddresses);
+                poolHistory.setOwnerActiveStake(activeStakes);
+
+                poolHistories.add(poolHistory);
+            }
+        }
+
+        return poolHistories;
+    }
+
+    @Override
     public PoolHistory getPoolHistory(String poolId, int epoch) {
         PoolHistory poolHistory = new PoolHistory();
         List<PoolEpochStake> poolEpochStakes = dbSyncEpochStakeRepository.getPoolActiveStakeInEpoch(poolId, epoch);
@@ -123,47 +204,30 @@ public class DbSyncDataProvider implements DataProvider {
         DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestActiveUpdateInEpoch(poolId, epoch);
         poolHistory.setFixedCost(dbSyncPoolUpdate.getFixedCost());
         poolHistory.setMargin(dbSyncPoolUpdate.getMargin());
+        poolHistory.setPledge(dbSyncPoolUpdate.getPledge());
         poolHistory.setEpoch(epoch);
+        poolHistory.setPoolId(poolId);
         poolHistory.setRewardAddress(dbSyncPoolUpdate.getStakeAddress().getView());
 
-        BigInteger totalPoolRewards = dbSyncRewardRepository.getTotalPoolRewardsInEpoch(poolId, epoch);
+        List<PoolOwner> owners = dbSyncPoolOwnerRepository.getOwnersByPoolUpdateIds(List.of(dbSyncPoolUpdate.getId()));
+        BigInteger activeStakes = BigInteger.ZERO;
+        List<String> stakeAddresses = owners.stream()
+                .filter(owner -> owner.getPoolId().equals(poolId)).map(PoolOwner::getStakeAddress).toList();
 
-        if (totalPoolRewards == null) {
-            totalPoolRewards = BigInteger.ZERO;
-        }
-
-        DbSyncAdaPots dbSyncAdaPots = dbSyncAdaPotsRepository.findByEpoch(epoch + 1);
-        BigInteger reserves = dbSyncAdaPots.getReserves();
-        BigInteger adaInCirculation = TOTAL_LOVELACE.subtract(reserves);
-        BigDecimal relativePoolStake = divide(activeStake, adaInCirculation);
-
-        List<DbSyncPoolOwner> owners = dbSyncPoolOwnerRepository.getByPoolUpdateId(dbSyncPoolUpdate.getId());
-
-        BigInteger totalActiveStakeOfOwners = BigInteger.ZERO;
-        BigInteger totalMemberRewardsOfOwners = BigInteger.ZERO;
-
-        for (DbSyncPoolOwner owner : owners) {
-            Delegator delegator = poolHistory.getDelegator(owner.getStakeAddress().getView());
-            if (delegator != null) {
-                totalActiveStakeOfOwners = totalActiveStakeOfOwners.add(delegator.getActiveStake());
-                totalMemberRewardsOfOwners = totalMemberRewardsOfOwners.add(PoolRewardCalculation.calculateMemberReward(totalPoolRewards,
-                        poolHistory.getMargin(), poolHistory.getFixedCost(),
-                        divide(delegator.getActiveStake(), adaInCirculation), relativePoolStake));
+        for (PoolEpochStake poolEpochStake : poolEpochStakes) {
+            if (stakeAddresses.contains(poolEpochStake.getStakeAddress())) {
+                activeStakes = activeStakes.add(poolEpochStake.getAmount());
             }
         }
 
-        BigInteger poolOperatorReward = PoolRewardCalculation.calculateLeaderReward(totalPoolRewards,
-                poolHistory.getMargin(), poolHistory.getFixedCost(),
-                divide(totalActiveStakeOfOwners, adaInCirculation), relativePoolStake);
-
-        poolHistory.setPoolFees(poolOperatorReward.subtract(totalMemberRewardsOfOwners));
-        poolHistory.setDelegatorRewards(totalPoolRewards.subtract(poolOperatorReward).add(totalMemberRewardsOfOwners));
+        poolHistory.setOwners(stakeAddresses);
+        poolHistory.setOwnerActiveStake(activeStakes);
 
         return poolHistory;
     }
 
     @Override
-    public Double getPoolPledgeInEpoch(String poolId, int epoch) {
+    public BigInteger getPoolPledgeInEpoch(String poolId, int epoch) {
         DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestActiveUpdateInEpoch(poolId, epoch);
 
         if (dbSyncPoolUpdate == null) {
@@ -338,5 +402,10 @@ public class DbSyncDataProvider implements DataProvider {
 
     public List<String> getPoolsThatProducedBlocksInEpoch(int epoch) {
         return dbSyncBlockRepository.getPoolsThatProducedBlocksInEpoch(epoch);
+    }
+
+    @Override
+    public List<LatestStakeAccountUpdate> getLatestStakeAccountUpdates(int epoch, List<String> stakeAddresses) {
+        return dbSyncStakeDeregistrationRepository.getLatestStakeAccountUpdates(epoch, stakeAddresses);
     }
 }

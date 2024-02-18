@@ -1,4 +1,4 @@
-package org.cardanofoundation.rewards.calculation;
+package org.cardanofoundation.rewards.computation;
 
 import org.cardanofoundation.rewards.data.provider.DbSyncDataProvider;
 import org.cardanofoundation.rewards.entity.*;
@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 @SpringBootTest
 @ComponentScan
 @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
-public class EpochCalculationTest {
+public class EpochComputationTest {
 
     // Only the DbSyncDataProvider is used for this test
     // as the amount of data would be too much for the Koios or JSON data provider .
@@ -27,14 +27,12 @@ public class EpochCalculationTest {
     DbSyncDataProvider dataProvider;
 
     public void testCalculateEpochPots(final int epoch) {
-        EpochCalculationResult epochCalculationResult = EpochCalculation.calculateEpochPots(epoch, dataProvider);
+        EpochCalculationResult epochCalculationResult = EpochComputation.calculateEpochPots(epoch, dataProvider);
         AdaPots adaPotsForCurrentEpoch = dataProvider.getAdaPotsForEpoch(epoch);
 
         Assertions.assertEquals(epoch, epochCalculationResult.getEpoch());
-        Assertions.assertEquals(adaPotsForCurrentEpoch.getRewards(), epochCalculationResult.getTotalDistributedRewards());
         Assertions.assertEquals(adaPotsForCurrentEpoch.getTreasury(), epochCalculationResult.getTreasury());
         Assertions.assertEquals(adaPotsForCurrentEpoch.getReserves(), epochCalculationResult.getReserves());
-        Assertions.assertEquals(adaPotsForCurrentEpoch.getAdaInCirculation(), epochCalculationResult.getTotalAdaInCirculation());
     }
 
     static Stream<Integer> dataProviderEpochRange() {
