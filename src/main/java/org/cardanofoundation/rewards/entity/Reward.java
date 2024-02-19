@@ -12,4 +12,5 @@ import java.math.BigInteger;
 public class Reward {
     private BigInteger amount;
     private String stakeAddress;
+    private String poolId;
 }

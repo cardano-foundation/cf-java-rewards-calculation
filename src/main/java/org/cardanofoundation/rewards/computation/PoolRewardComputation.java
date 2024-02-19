@@ -3,10 +3,10 @@ package org.cardanofoundation.rewards.computation;
 import org.cardanofoundation.rewards.data.provider.DataProvider;
 import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.entity.jpa.projection.LatestStakeAccountUpdate;
-import org.cardanofoundation.rewards.enums.AccountUpdateAction;
+import org.cardanofoundation.rewards.entity.jpa.projection.TotalPoolRewards;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.calculation.PoolRewardsCalculation.calculatePoolRewardInEpoch;
@@ -115,7 +115,7 @@ public class PoolRewardComputation {
     public static BigInteger correctOutliers(String poolId, int epoch) {
         BigInteger correction = BigInteger.ZERO;
 
-        if (epoch == 214 && poolId.equals("pool13l0j202yexqh6l0awtee9g354244gmfze09utxz0sn7p7r3ev3m")) {
+        if (epoch == 212 && poolId.equals("pool13l0j202yexqh6l0awtee9g354244gmfze09utxz0sn7p7r3ev3m")) {
             /*
              * The reward_address of pool13l0j202yexqh6l0awtee9g354244gmfze09utxz0sn7p7r3ev3m is also the
              * reward_address of pool1gh4cj5h5glk5992d0wtela324htr0cn8ujvg53pmuds9guxgz2u. Both pools produced
@@ -126,19 +126,19 @@ public class PoolRewardComputation {
              * Affected reward addresses have been paid out due to a MIR certificate afterward.
              */
             correction = new BigInteger(String.valueOf(-814592210));
-        } else if (epoch == 214 && poolId.equals("pool166dkk9kx5y6ug9tnvh0dnvxhwt2yca3g5pd5jaqa8t39cgyqqlr")) {
+        } else if (epoch == 212 && poolId.equals("pool166dkk9kx5y6ug9tnvh0dnvxhwt2yca3g5pd5jaqa8t39cgyqqlr")) {
             // pool1qvvn2l690zm3v2p0f3vd66ly6cfs2wjqx34zpqcx5pwsx3eprtp also produced blocks in epoch 214
             // with the same reward address
             correction = new BigInteger(String.valueOf(-669930045));
-        } else if (epoch == 215 && poolId.equals("pool166dkk9kx5y6ug9tnvh0dnvxhwt2yca3g5pd5jaqa8t39cgyqqlr")) {
+        } else if (epoch == 213 && poolId.equals("pool166dkk9kx5y6ug9tnvh0dnvxhwt2yca3g5pd5jaqa8t39cgyqqlr")) {
             // pool1qvvn2l690zm3v2p0f3vd66ly6cfs2wjqx34zpqcx5pwsx3eprtp also produced blocks in epoch 215
             // with the same reward address
             correction = new BigInteger(String.valueOf(-634057195));
-        } else if (epoch == 215 && poolId.equals("pool17rns3wjyql9jg9xkzw9h88f0kstd693pm6urwxmvejqgsyjw7ta")) {
+        } else if (epoch == 213 && poolId.equals("pool17rns3wjyql9jg9xkzw9h88f0kstd693pm6urwxmvejqgsyjw7ta")) {
             // pool12crd62rxj8yryvshmgwkxza7um3uhaypwdjeel98lnkf529qdw5 &
             // pool1v4adhelnswa7pwv2njn5h84atw08mlc79ll2ewl2kgxhv3cqwql also produced blocks in epoch 215
             // with the same reward address
-            correction = new BigInteger(String.valueOf(-369216375.99999997));
+            correction = new BigInteger(String.valueOf(-369216376));
         }
 
         return correction;
@@ -146,11 +146,23 @@ public class PoolRewardComputation {
 
     public static boolean poolRewardIsValid(PoolRewardCalculationResult poolRewardCalculationResult, DataProvider dataProvider) {
         int epoch  = poolRewardCalculationResult.getEpoch();
-        String poolId = poolRewardCalculationResult.getPoolId();
-        List<Reward> actualPoolRewardsInEpoch = dataProvider.getRewardListForPoolInEpoch(epoch, poolRewardCalculationResult.getPoolId());
-        BigInteger actualPoolReward = dataProvider.getTotalPoolRewardsInEpoch(poolId, epoch);
+        List<Reward> memberRewardsInEpoch = dataProvider.getMemberRewardsInEpoch(epoch);
+        List<TotalPoolRewards> totalPoolRewards = dataProvider.getSumOfMemberAndLeaderRewardsInEpoch(epoch);
+        return poolRewardIsValid(poolRewardCalculationResult, memberRewardsInEpoch, totalPoolRewards);
+    }
 
-        if (actualPoolReward == null || actualPoolReward.equals(BigInteger.ZERO)) {
+    public static boolean poolRewardIsValid(PoolRewardCalculationResult poolRewardCalculationResult, List<Reward> memberRewardsInEpoch, List<TotalPoolRewards> totalPoolRewards) {
+        String poolId = poolRewardCalculationResult.getPoolId();
+
+        BigInteger actualPoolReward = totalPoolRewards.stream()
+                .filter(reward -> reward.getPoolId().equals(poolId))
+                .map(TotalPoolRewards::getAmount)
+                .reduce(BigInteger.ZERO, BigInteger::add);
+        List<Reward> actualPoolRewardsInEpoch = memberRewardsInEpoch.stream()
+                .filter(reward -> reward.getPoolId().equals(poolId))
+                .toList();
+
+        if (actualPoolReward.equals(BigInteger.ZERO)) {
             return poolRewardCalculationResult.getPoolReward().equals(BigInteger.ZERO);
         }
 

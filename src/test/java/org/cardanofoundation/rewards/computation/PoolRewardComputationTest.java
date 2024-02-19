@@ -54,8 +54,11 @@ public class PoolRewardComputationTest {
        PoolRewardCalculationResult poolRewardCalculationResult =
                 PoolRewardComputation.computePoolRewardInEpoch(poolId, epoch, dataProvider);
 
-       List<Reward> actualPoolRewardsInEpoch = dataProvider.getRewardListForPoolInEpoch(epoch, poolId);
-       if (actualPoolRewardsInEpoch == null) {
+       List<Reward> memberRewardsInEpoch = dataProvider.getMemberRewardsInEpoch(epoch);
+       List<Reward> actualPoolRewardsInEpoch = memberRewardsInEpoch.stream()
+               .filter(reward -> reward.getPoolId().equals(poolId))
+               .toList();
+       if (actualPoolRewardsInEpoch.isEmpty()) {
            Assertions.assertEquals(BigInteger.ZERO, poolRewardCalculationResult.getPoolReward());
            return;
        }

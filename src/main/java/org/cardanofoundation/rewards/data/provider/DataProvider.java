@@ -2,6 +2,7 @@ package org.cardanofoundation.rewards.data.provider;
 
 import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.entity.jpa.projection.LatestStakeAccountUpdate;
+import org.cardanofoundation.rewards.entity.jpa.projection.TotalPoolRewards;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -39,10 +40,11 @@ public interface DataProvider {
 
     public BigInteger getSumOfWithdrawalsInEpoch(int epoch);
 
-    public List<Reward> getRewardListForPoolInEpoch(int epoch, String poolId);
+    public List<Reward> getMemberRewardsInEpoch(int epoch);
 
     public BigInteger getTotalPoolRewardsInEpoch(String poolId, int epoch);
 
     public List<String> getPoolsThatProducedBlocksInEpoch(int epoch);
     public List<LatestStakeAccountUpdate> getLatestStakeAccountUpdates(int epoch, List<String> stakeAddresses);
+    public List<TotalPoolRewards> getSumOfMemberAndLeaderRewardsInEpoch(int epoch);
 }

@@ -36,7 +36,7 @@ public class EpochComputationTest {
     }
 
     static Stream<Integer> dataProviderEpochRange() {
-        return IntStream.range(213, 217).boxed();
+        return IntStream.range(210, 217).boxed();
     }
 
     @ParameterizedTest

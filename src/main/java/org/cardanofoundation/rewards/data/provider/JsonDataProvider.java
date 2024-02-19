@@ -2,6 +2,7 @@ package org.cardanofoundation.rewards.data.provider;
 
 import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.entity.jpa.projection.LatestStakeAccountUpdate;
+import org.cardanofoundation.rewards.entity.jpa.projection.TotalPoolRewards;
 import org.cardanofoundation.rewards.enums.DataType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -176,7 +177,7 @@ public class JsonDataProvider implements DataProvider {
     }
 
     @Override
-    public List<Reward> getRewardListForPoolInEpoch(int epoch, String poolId) {
+    public List<Reward> getMemberRewardsInEpoch(int epoch) {
         return null;
     }
 
@@ -192,6 +193,11 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public List<LatestStakeAccountUpdate> getLatestStakeAccountUpdates(int epoch, List<String> stakeAddresses) {
+        return null;
+    }
+
+    @Override
+    public List<TotalPoolRewards> getSumOfMemberAndLeaderRewardsInEpoch(int epoch) {
         return null;
     }
 }

@@ -1,6 +1,5 @@
 package org.cardanofoundation.rewards.data.provider;
 
-import org.cardanofoundation.rewards.calculation.PoolRewardsCalculation;
 import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.entity.jpa.*;
 import org.cardanofoundation.rewards.entity.jpa.projection.*;
@@ -12,12 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.cardanofoundation.rewards.constants.RewardConstants.TOTAL_LOVELACE;
 import static org.cardanofoundation.rewards.util.BigNumberUtils.divide;
 
 @Service
@@ -385,14 +382,25 @@ public class DbSyncDataProvider implements DataProvider {
     }
 
     @Override
-    public List<Reward> getRewardListForPoolInEpoch(int epoch, String poolId) {
-        List <DbSyncReward> poolRewards = dbSyncRewardRepository.getMemberRewardListForPoolInEpoch(poolId, epoch);
+    public List<Reward> getMemberRewardsInEpoch(int epoch) {
+        List <MemberReward> poolRewards = dbSyncRewardRepository.getMemberRewardsInEpoch(epoch);
 
         if (poolRewards.isEmpty()) {
             return List.of();
         }
 
-        return poolRewards.stream().map(RewardMapper::fromDbSyncReward).toList();
+        return poolRewards.stream().map(RewardMapper::fromMemberReward).toList();
+    }
+
+    @Override
+    public List<TotalPoolRewards> getSumOfMemberAndLeaderRewardsInEpoch(int epoch) {
+        List<TotalPoolRewards> totalPoolRewards = dbSyncRewardRepository.getSumOfMemberAndLeaderRewardsInEpoch(epoch);
+
+        if (totalPoolRewards.isEmpty()) {
+            return List.of();
+        } else {
+            return totalPoolRewards;
+        }
     }
 
     @Override

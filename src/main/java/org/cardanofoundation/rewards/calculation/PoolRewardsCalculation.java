@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
-import static org.cardanofoundation.rewards.enums.AccountUpdateAction.fromString;
 import static org.cardanofoundation.rewards.util.BigNumberUtils.*;
 import static org.cardanofoundation.rewards.util.BigNumberUtils.divide;
 

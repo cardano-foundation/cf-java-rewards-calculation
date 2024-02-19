@@ -3,6 +3,7 @@ package org.cardanofoundation.rewards.data.provider;
 import lombok.RequiredArgsConstructor;
 import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.entity.jpa.projection.LatestStakeAccountUpdate;
+import org.cardanofoundation.rewards.entity.jpa.projection.TotalPoolRewards;
 import org.cardanofoundation.rewards.mapper.*;
 import org.springframework.stereotype.Service;
 import rest.koios.client.backend.api.account.model.AccountHistory;
@@ -270,7 +271,7 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
-    public List<Reward> getRewardListForPoolInEpoch(int epoch, String poolId) {
+    public List<Reward> getMemberRewardsInEpoch(int epoch) {
         return null;
     }
 
@@ -286,6 +287,11 @@ public class KoiosDataProvider implements DataProvider {
 
     @Override
     public List<LatestStakeAccountUpdate> getLatestStakeAccountUpdates(int epoch, List<String> stakeAddresses) {
+        return null;
+    }
+
+    @Override
+    public List<TotalPoolRewards> getSumOfMemberAndLeaderRewardsInEpoch(int epoch) {
         return null;
     }
 

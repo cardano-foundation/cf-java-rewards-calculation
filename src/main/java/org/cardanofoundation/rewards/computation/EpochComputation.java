@@ -4,6 +4,7 @@ import org.cardanofoundation.rewards.calculation.PoolRewardsCalculation;
 import org.cardanofoundation.rewards.data.provider.DataProvider;
 import org.cardanofoundation.rewards.entity.*;
 import org.cardanofoundation.rewards.entity.jpa.projection.LatestStakeAccountUpdate;
+import org.cardanofoundation.rewards.entity.jpa.projection.TotalPoolRewards;
 import org.cardanofoundation.rewards.enums.AccountUpdateAction;
 import org.cardanofoundation.rewards.enums.MirPot;
 
@@ -96,20 +97,27 @@ public class EpochComputation {
                 .flatMap(Collection::stream).toList());
         stakeAddresses.addAll(poolHistories.stream().map(PoolHistory::getRewardAddress).toList());
 
-        List<LatestStakeAccountUpdate> accountUpdates = dataProvider.getLatestStakeAccountUpdates(epoch - 2, stakeAddresses);
+        List<LatestStakeAccountUpdate> accountUpdates = dataProvider.getLatestStakeAccountUpdates(epoch, stakeAddresses);
+
+        // Member and total rewards are used in the validation part only
+        List<Reward> memberRewardsInEpoch = dataProvider.getMemberRewardsInEpoch(epoch - 2);
+        List<TotalPoolRewards> totalPoolRewards = dataProvider.getSumOfMemberAndLeaderRewardsInEpoch(epoch - 2);
+
         long end = System.currentTimeMillis();
-        System.out.println("Pools history fetched in " + (end - start) + "ms");
+        System.out.println("Pool and account data fetched in " + (end - start) + "ms");
         for (String poolId : poolIds) {
             start = System.currentTimeMillis();
             System.out.println("[" + processedPools + "/" + poolIds.size() + "] Processing pool: " + poolId);
             PoolHistory poolHistory = poolHistories.stream().filter(history -> history.getPoolId().equals(poolId)).findFirst().orElse(null);
             PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardComputation.computePoolRewardInEpoch(poolId, epoch - 2, protocolParameters, epochInfo, stakePoolRewardsPot, adaInCirculation, poolHistory, accountUpdates);
 
-            /*if (!PoolRewardComputation.poolRewardIsValid(poolRewardCalculationResult, dataProvider)) {
-                return epochCalculationResult;
-            }*/
+            if (!PoolRewardComputation.poolRewardIsValid(poolRewardCalculationResult, memberRewardsInEpoch, totalPoolRewards)) {
+                System.out.println("Pool reward is invalid. Please check the details for pool " + poolId);
+            }
+
             PoolRewardCalculationResults.add(poolRewardCalculationResult);
             totalDistributedRewards = add(totalDistributedRewards, poolRewardCalculationResult.getDistributedPoolReward());
+
             processedPools++;
             end = System.currentTimeMillis();
             System.out.println("Pool processed in " + (end - start) + "ms");
