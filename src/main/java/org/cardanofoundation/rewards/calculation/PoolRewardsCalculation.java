@@ -1,15 +1,15 @@
 package org.cardanofoundation.rewards.calculation;
 
-import org.cardanofoundation.rewards.entity.*;
-import org.cardanofoundation.rewards.entity.jpa.projection.LatestStakeAccountUpdate;
-import org.cardanofoundation.rewards.enums.AccountUpdateAction;
+import org.cardanofoundation.rewards.calculation.entity.*;
+import org.cardanofoundation.rewards.validation.entity.jpa.projection.LatestStakeAccountUpdate;
+import org.cardanofoundation.rewards.calculation.enums.AccountUpdateAction;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
-import static org.cardanofoundation.rewards.util.BigNumberUtils.*;
-import static org.cardanofoundation.rewards.util.BigNumberUtils.divide;
+import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
+import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.divide;
 
 public class PoolRewardsCalculation {
 

@@ -72,9 +72,9 @@ cd cf-java-rewards-calculation
 The pool rewards calculation and also the treasury calculation requires a data provider to perform the calculation.
 This repository offers different data providers and also an interface if you want to add your own provider. The following data providers are available:
 
- - [Koios Data Provider](./src/main/java/org/cardanofoundation/rewards/computation/data/provider/KoiosDataProvider.java)
- - [JSON Data Provider](./src/main/java/org/cardanofoundation/rewards/computation/data/provider/JsonDataProvider.java)
- - [DbSync Data Provider](./src/main/java/org/cardanofoundation/rewards/computation/data/provider/DbSyncDataProvider.java)
+ - [Koios Data Provider](./src/main/java/org/cardanofoundation/rewards/validation/data/provider/KoiosDataProvider.java)
+ - [JSON Data Provider](./src/main/java/org/cardanofoundation/rewards/validation/data/provider/JsonDataProvider.java)
+ - [DbSync Data Provider](./src/main/java/org/cardanofoundation/rewards/validation/data/provider/DbSyncDataProvider.java)
  - Yaci Store Data Provider (Coming Next 👀)
   
 ## 🫡 Roadmap

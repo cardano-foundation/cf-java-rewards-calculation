@@ -1,8 +1,8 @@
 package org.cardanofoundation.rewards.calculation;
 
 import java.math.BigInteger;
-import static org.cardanofoundation.rewards.constants.RewardConstants.POOL_DEPOSIT_IN_LOVELACE;
-import static org.cardanofoundation.rewards.util.BigNumberUtils.multiply;
+import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.POOL_DEPOSIT_IN_LOVELACE;
+import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.multiply;
 
 public class DepositsCalculation {
 

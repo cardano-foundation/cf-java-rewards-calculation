@@ -1,9 +1,10 @@
 package org.cardanofoundation.rewards.data.provider;
 
-import org.cardanofoundation.rewards.computation.PoolRewardComputation;
-import org.cardanofoundation.rewards.computation.TreasuryComputation;
-import org.cardanofoundation.rewards.entity.*;
-import org.cardanofoundation.rewards.enums.MirPot;
+import org.cardanofoundation.rewards.calculation.entity.*;
+import org.cardanofoundation.rewards.validation.PoolRewardComputation;
+import org.cardanofoundation.rewards.validation.TreasuryComputation;
+import org.cardanofoundation.rewards.calculation.enums.MirPot;
+import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static org.cardanofoundation.rewards.util.CurrencyConverter.lovelaceToAda;
+import static org.cardanofoundation.rewards.calculation.util.CurrencyConverter.lovelaceToAda;
 
 @SpringBootTest
 @ComponentScan
