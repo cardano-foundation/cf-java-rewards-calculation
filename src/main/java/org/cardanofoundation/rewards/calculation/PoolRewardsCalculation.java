@@ -204,6 +204,7 @@ public class PoolRewardsCalculation {
         if (accountUpdates.size() > 0 &&
                 (latestAccountUpdates.get(poolRewardCalculationResult.getRewardAddress()) == null ||
                         latestAccountUpdates.get(poolRewardCalculationResult.getRewardAddress()).getAction().equals(AccountUpdateAction.DEREGISTRATION))) {
+            System.out.println("Pool " + poolId + " has been deregistered. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
             poolOperatorReward = BigInteger.ZERO;
         }
 
@@ -216,6 +217,7 @@ public class PoolRewardsCalculation {
             if (accountUpdates.size() > 0 &&
                     (latestAccountUpdates.get(delegator.getStakeAddress()) == null ||
                             latestAccountUpdates.get(delegator.getStakeAddress()).getAction().equals(AccountUpdateAction.DEREGISTRATION))) {
+                System.out.println("Delegator " + delegator.getStakeAddress() + " has been deregistered. Delegator would have received " + poolOperatorReward + " but will not receive any rewards.");
                 continue;
             }
 
@@ -236,5 +238,25 @@ public class PoolRewardsCalculation {
         }
         poolRewardCalculationResult.setMemberRewards(memberRewards);
         return poolRewardCalculationResult;
+    }
+
+    public static BigInteger getEarnedRewardsForDeregisteredStakeAccount(PoolRewardCalculationResult poolRewardCalculationResult, List<String> stakeAddresses) {
+        BigInteger unspendableEarnedRewards = BigInteger.ZERO;
+        String poolRewardAddress = poolRewardCalculationResult.getRewardAddress();
+
+        if (poolRewardCalculationResult.getOperatorReward() != null && stakeAddresses.contains(poolRewardAddress)) {
+            unspendableEarnedRewards = unspendableEarnedRewards.add(poolRewardCalculationResult.getOperatorReward());
+        }
+
+        if (poolRewardCalculationResult.getMemberRewards() == null) {
+            return unspendableEarnedRewards;
+        }
+
+        for (Reward memberReward : poolRewardCalculationResult.getMemberRewards()) {
+            if (stakeAddresses.contains(memberReward.getStakeAddress())) {
+                unspendableEarnedRewards = unspendableEarnedRewards.add(memberReward.getAmount());
+            }
+        }
+        return unspendableEarnedRewards;
     }
 }

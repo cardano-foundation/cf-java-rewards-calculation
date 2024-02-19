@@ -295,6 +295,11 @@ public class KoiosDataProvider implements DataProvider {
         return null;
     }
 
+    @Override
+    public List<String> getStakeAddressDeregistrationsInEpoch(int epoch) {
+        return null;
+    }
+
     private List<Delegator> getPoolMemberInEpoch(String poolId, int epoch) {
         List<Delegator> delegators = new ArrayList<>();
         try {

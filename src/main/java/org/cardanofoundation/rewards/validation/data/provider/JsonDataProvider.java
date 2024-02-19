@@ -200,4 +200,9 @@ public class JsonDataProvider implements DataProvider {
     public List<TotalPoolRewards> getSumOfMemberAndLeaderRewardsInEpoch(int epoch) {
         return null;
     }
+
+    @Override
+    public List<String> getStakeAddressDeregistrationsInEpoch(int epoch) {
+        return null;
+    }
 }

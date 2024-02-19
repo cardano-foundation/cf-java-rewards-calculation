@@ -175,18 +175,20 @@ public class PoolRewardComputation {
                     .orElse(null);
             if (memberReward == null) {
                 System.out.println("Member reward not found for stake address: " + reward.getStakeAddress());
-                return false;
-            }
-            BigInteger difference = reward.getAmount().subtract(memberReward.getAmount()).abs();
+                System.out.println("[" + rewardIndex + "] The expected member " + reward.getStakeAddress() + " reward would be : " + lovelaceToAda(reward.getAmount().intValue()) + " ADA");
+                totalDifference = totalDifference.add(reward.getAmount());
+            } else {
+                BigInteger difference = reward.getAmount().subtract(memberReward.getAmount()).abs();
 
-            if (poolRewardCalculationResult.getPoolOwnerStakeAddresses().contains(reward.getStakeAddress())) {
-                BigInteger poolOwnerReward = poolRewardCalculationResult.getOperatorReward();
-                difference = reward.getAmount().subtract(poolOwnerReward).abs();
-            }
-            totalDifference = totalDifference.add(difference);
+                if (poolRewardCalculationResult.getPoolOwnerStakeAddresses().contains(reward.getStakeAddress())) {
+                    BigInteger poolOwnerReward = poolRewardCalculationResult.getOperatorReward();
+                    difference = reward.getAmount().subtract(poolOwnerReward).abs();
+                }
+                totalDifference = totalDifference.add(difference);
 
-            if (difference.compareTo(BigInteger.ZERO) > 0) {
-                System.out.println("[" + rewardIndex + "] The difference between expected member " + reward.getStakeAddress() + " reward and actual member reward is : " + lovelaceToAda(difference.intValue()) + " ADA");
+                if (difference.compareTo(BigInteger.ZERO) > 0) {
+                    System.out.println("[" + rewardIndex + "] The difference between expected member " + reward.getStakeAddress() + " reward and actual member reward is : " + lovelaceToAda(difference.intValue()) + " ADA");
+                }
             }
             rewardIndex++;
         }

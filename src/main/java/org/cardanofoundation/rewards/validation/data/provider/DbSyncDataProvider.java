@@ -404,6 +404,11 @@ public class DbSyncDataProvider implements DataProvider {
     }
 
     @Override
+    public List<String> getStakeAddressDeregistrationsInEpoch(int epoch) {
+        return dbSyncStakeDeregistrationRepository.getStakeAddressDeregistrationsInEpoch(epoch);
+    }
+
+    @Override
     public BigInteger getTotalPoolRewardsInEpoch(String poolId, int epoch) {
         return dbSyncRewardRepository.getTotalPoolRewardsInEpoch(poolId, epoch);
     }

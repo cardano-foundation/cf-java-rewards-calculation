@@ -59,12 +59,11 @@ public interface DbSyncStakeDeregistrationRepository extends ReadOnlyRepository<
         """)
     List<LatestStakeAccountUpdate> getLatestStakeAccountUpdates(Integer epoch, List<String> stakeAddresses);
 
-    @Query("SELECT deregistration.address.view AS address, 'DEREGISTRATION' AS action, " +
-            "deregistration.transaction.block.time AS unixBlockTime " +
-            "FROM DbSyncAccountDeregistration deregistration WHERE " +
-            "deregistration.epoch <= :epoch AND deregistration.epoch > :epoch-2")
-    List<StakeAccountUpdate> getRecentAccountDeregistrationsBeforeEpoch(Integer epoch);
-
-    @Query("SELECT COUNT(*) FROM DbSyncAccountDeregistration WHERE epoch = :epoch")
-    Integer countDeregistrationsInEpoch(Integer epoch);
+    @Query(nativeQuery = true, value = """
+        SELECT stake_address.view AS stakeAddress FROM stake_deregistration 
+            JOIN tx ON tx.id=stake_deregistration.tx_id JOIN block ON block.id=tx.block_id
+            JOIN stake_address ON stake_deregistration.addr_id=stake_address.id 
+        WHERE block.epoch_no=:epoch
+        """)
+    List<String> getStakeAddressDeregistrationsInEpoch(Integer epoch);
 }

@@ -47,4 +47,6 @@ public interface DataProvider {
     public List<String> getPoolsThatProducedBlocksInEpoch(int epoch);
     public List<LatestStakeAccountUpdate> getLatestStakeAccountUpdates(int epoch, List<String> stakeAddresses);
     public List<TotalPoolRewards> getSumOfMemberAndLeaderRewardsInEpoch(int epoch);
+
+    public List<String> getStakeAddressDeregistrationsInEpoch(int epoch);
 }
