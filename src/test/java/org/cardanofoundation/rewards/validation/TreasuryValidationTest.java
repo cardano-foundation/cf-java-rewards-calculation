@@ -28,7 +28,7 @@ import static org.cardanofoundation.rewards.calculation.util.CurrencyConverter.l
 
 @SpringBootTest
 @ComponentScan
-public class TreasuryComputationTest {
+public class TreasuryValidationTest {
 
   @Autowired
   KoiosDataProvider koiosDataProvider;
@@ -52,7 +52,7 @@ public class TreasuryComputationTest {
       throw new RuntimeException("Unknown data provider type: " + dataProviderType);
     }
 
-    TreasuryCalculationResult treasuryCalculationResult = TreasuryComputation.calculateTreasuryForEpoch(epoch, dataProvider);
+    TreasuryCalculationResult treasuryCalculationResult = TreasuryValidation.calculateTreasuryForEpoch(epoch, dataProvider);
     AdaPots adaPots = dataProvider.getAdaPotsForEpoch(epoch);
 
     BigInteger difference = adaPots.getTreasury().subtract(treasuryCalculationResult.getTreasury());
@@ -96,7 +96,7 @@ public class TreasuryComputationTest {
     List<PoolDeregistration> retiredPools = jsonDataProvider.getRetiredPoolsInEpoch(epoch);
     List<AccountUpdate> accountUpdates = jsonDataProvider.getAccountUpdatesUntilEpoch(
             retiredPools.stream().map(PoolDeregistration::getRewardAddress).toList(), epoch - 1);
-    BigInteger unclaimedRefunds = TreasuryComputation.calculateUnclaimedRefundsForRetiredPools(retiredPools, accountUpdates);
+    BigInteger unclaimedRefunds = TreasuryValidation.calculateUnclaimedRefundsForRetiredPools(retiredPools, accountUpdates);
     Assertions.assertEquals(expectedUnclaimedRefunds, unclaimedRefunds);
   }
 
@@ -107,7 +107,7 @@ public class TreasuryComputationTest {
     List<PoolDeregistration> retiredPools = dbSyncDataProvider.getRetiredPoolsInEpoch(epoch);
     List<AccountUpdate> accountUpdates = dbSyncDataProvider.getAccountUpdatesUntilEpoch(
             retiredPools.stream().map(PoolDeregistration::getRewardAddress).toList(), epoch - 1);
-    BigInteger unclaimedRefunds = TreasuryComputation.calculateUnclaimedRefundsForRetiredPools(retiredPools, accountUpdates);
+    BigInteger unclaimedRefunds = TreasuryValidation.calculateUnclaimedRefundsForRetiredPools(retiredPools, accountUpdates);
     Assertions.assertEquals(expectedUnclaimedRefunds, unclaimedRefunds);
   }
 }

@@ -4,7 +4,7 @@ import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 
 import java.math.BigInteger;
 
-public class FeeComputation {
+public class FeeValidation {
 
     public static BigInteger calculateFeePotInEpoch(int epoch, DataProvider dataProvider) {
         BigInteger fees = BigInteger.ZERO;

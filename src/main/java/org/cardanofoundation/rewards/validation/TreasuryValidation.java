@@ -13,7 +13,7 @@ import java.util.List;
 import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 
-public class TreasuryComputation {
+public class TreasuryValidation {
 
   /*
    * Calculate the reward pot for epoch e with the formula:
@@ -99,7 +99,7 @@ public class TreasuryComputation {
     BigInteger reserveInPreviousEpoch = adaPotsForPreviousEpoch.getReserves();
 
     BigInteger treasuryInPreviousEpoch = adaPotsForPreviousEpoch.getTreasury();
-    BigInteger rewardPot = TreasuryComputation.calculateTotalRewardPotWithEta(
+    BigInteger rewardPot = TreasuryValidation.calculateTotalRewardPotWithEta(
             monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserveInPreviousEpoch, totalFeesForCurrentEpoch);
 
     BigInteger treasuryCut = multiplyAndFloor(rewardPot, treasuryGrowthRate);
@@ -111,7 +111,7 @@ public class TreasuryComputation {
     List<PoolDeregistration> retiredPools = dataProvider.getRetiredPoolsInEpoch(epoch);
     List<AccountUpdate> accountUpdates = dataProvider.getAccountUpdatesUntilEpoch(
             retiredPools.stream().map(PoolDeregistration::getRewardAddress).toList(), epoch - 1);
-    treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(TreasuryComputation.calculateUnclaimedRefundsForRetiredPools(retiredPools, accountUpdates));
+    treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(TreasuryValidation.calculateUnclaimedRefundsForRetiredPools(retiredPools, accountUpdates));
 
     // Check if there was a MIR Certificate in the previous epoch
     BigInteger treasuryWithdrawals = BigInteger.ZERO;

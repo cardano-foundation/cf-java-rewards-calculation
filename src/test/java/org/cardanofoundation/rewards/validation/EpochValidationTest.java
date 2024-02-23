@@ -22,7 +22,7 @@ import static org.cardanofoundation.rewards.calculation.util.CurrencyConverter.l
 @SpringBootTest
 @ComponentScan
 @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
-public class EpochComputationTest {
+public class EpochValidationTest {
 
     // Only the DbSyncDataProvider is used for this test
     // as the amount of data would be too much for the Koios or JSON data provider .
@@ -30,7 +30,7 @@ public class EpochComputationTest {
     DbSyncDataProvider dataProvider;
 
     public void testCalculateEpochPots(final int epoch) {
-        EpochCalculationResult epochCalculationResult = EpochComputation.calculateEpochPots(epoch, dataProvider);
+        EpochCalculationResult epochCalculationResult = EpochValidation.calculateEpochRewardPots(epoch, dataProvider);
         AdaPots adaPotsForCurrentEpoch = dataProvider.getAdaPotsForEpoch(epoch);
 
         System.out.println("Treasury difference: " + lovelaceToAda(adaPotsForCurrentEpoch.getTreasury().subtract(epochCalculationResult.getTreasury()).longValue()));

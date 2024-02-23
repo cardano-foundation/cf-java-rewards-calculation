@@ -10,7 +10,7 @@ import java.util.List;
 import static org.cardanofoundation.rewards.calculation.DepositsCalculation.calculateDepositsInEpoch;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.multiply;
 
-public class DepositsComputation {
+public class DepositsValidation {
 
     public static BigInteger computeDepositsInEpoch(int epoch, DataProvider dataProvider) {
         AdaPots adaPots = dataProvider.getAdaPotsForEpoch(epoch);

@@ -7,9 +7,13 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
+import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.RANDOMNESS_STABILISATION_WINDOW;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.divide;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class PoolRewardsCalculation {
 
     /*
@@ -198,13 +202,12 @@ public class PoolRewardsCalculation {
         BigInteger unspendableEarnedRewards = BigInteger.ZERO;
 
         if (!memberWithUpdates.contains(poolRewardCalculationResult.getRewardAddress()) || memberWithDeregisteredStakeAddresses.contains(poolRewardCalculationResult.getRewardAddress())) {
-            System.out.println("Pool " + poolId + " has been deregistered. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
             AccountUpdate latestStakeAccountUpdate = accountUpdates.stream().filter(accountUpdate -> accountUpdate.getStakeAddress().equals(poolRewardCalculationResult.getRewardAddress())).findFirst().orElse(null);
 
             if (latestStakeAccountUpdate != null &&
                     latestStakeAccountUpdate.getEpoch() == poolHistoryCurrentEpoch.getEpoch() + 1 &&
-                    latestStakeAccountUpdate.getEpochSlot() > 212500) {
-                System.out.println("[unregRU]: " + poolRewardCalculationResult.getRewardAddress() + " has been deregistered. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
+                    latestStakeAccountUpdate.getEpochSlot() > RANDOMNESS_STABILISATION_WINDOW) {
+                log.info("[unregRU]: " + poolRewardCalculationResult.getRewardAddress() + " has been deregistered. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
                 unspendableEarnedRewards = poolOperatorReward;
             }
             poolOperatorReward = BigInteger.ZERO;
@@ -212,7 +215,7 @@ public class PoolRewardsCalculation {
 
         if (ignoreLeaderReward) {
             poolOperatorReward = BigInteger.ZERO;
-            System.out.println("[reward address of multiple pools] Pool " + poolId + " has been ignored. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
+            log.info("[reward address of multiple pools] Pool " + poolId + " has been ignored. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
         }
 
         poolRewardCalculationResult.setOperatorReward(poolOperatorReward);
@@ -229,14 +232,14 @@ public class PoolRewardsCalculation {
                     poolFixedCost, divide(delegator.getActiveStake(), adaInCirculation), relativePoolStake);
 
             if (!memberWithUpdates.contains(delegator.getStakeAddress()) || memberWithDeregisteredStakeAddresses.contains(delegator.getStakeAddress())) {
-                System.out.println("Delegator " + delegator.getStakeAddress() + " has been deregistered. Delegator would have received " + memberReward + " but will not receive any rewards.");
+                log.info("Delegator " + delegator.getStakeAddress() + " has been deregistered. Delegator would have received " + memberReward + " but will not receive any rewards.");
 
                 AccountUpdate latestStakeAccountUpdate = accountUpdates.stream().filter(accountUpdate -> accountUpdate.getStakeAddress().equals(delegator.getStakeAddress())).findFirst().orElse(null);
 
                 if (latestStakeAccountUpdate != null &&
                         latestStakeAccountUpdate.getEpoch() == poolHistoryCurrentEpoch.getEpoch() + 1 &&
                         latestStakeAccountUpdate.getEpochSlot() > 212500) {
-                    System.out.println("[unregRU]: " + delegator.getStakeAddress() + " has been deregistered. Operator would have received " + memberReward + " but will not receive any rewards.");
+                    log.info("[unregRU]: " + delegator.getStakeAddress() + " has been deregistered. Operator would have received " + memberReward + " but will not receive any rewards.");
                     unspendableEarnedRewards = unspendableEarnedRewards.add(memberReward);
                 }
 

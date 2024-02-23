@@ -1,8 +1,8 @@
 package org.cardanofoundation.rewards.data.provider;
 
 import org.cardanofoundation.rewards.calculation.domain.*;
-import org.cardanofoundation.rewards.validation.PoolRewardComputation;
-import org.cardanofoundation.rewards.validation.TreasuryComputation;
+import org.cardanofoundation.rewards.validation.PoolRewardValidation;
+import org.cardanofoundation.rewards.validation.TreasuryValidation;
 import org.cardanofoundation.rewards.calculation.enums.MirPot;
 import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
 import org.junit.jupiter.api.Assertions;
@@ -157,7 +157,7 @@ public class DbSyncDataProviderTest {
     @ParameterizedTest
     @MethodSource("dataProviderRangeUntilEpoch225")
     void Test_calculateTreasuryWithDbSyncDataProvider(final int epoch) {
-        TreasuryCalculationResult treasuryCalculationResult = TreasuryComputation.calculateTreasuryForEpoch(epoch, dbSyncDataProvider);
+        TreasuryCalculationResult treasuryCalculationResult = TreasuryValidation.calculateTreasuryForEpoch(epoch, dbSyncDataProvider);
         AdaPots adaPots = dbSyncDataProvider.getAdaPotsForEpoch(epoch);
 
         BigInteger difference = adaPots.getTreasury().subtract(treasuryCalculationResult.getTreasury());
@@ -168,7 +168,7 @@ public class DbSyncDataProviderTest {
     private void Test_calculatePoolRewardWithDbSyncDataProvider(final String poolId,
                                           final int epoch) {
         PoolRewardCalculationResult poolRewardCalculationResult =
-                PoolRewardComputation.computePoolRewardInEpoch(poolId, epoch, dbSyncDataProvider);
+                PoolRewardValidation.computePoolRewardInEpoch(poolId, epoch, dbSyncDataProvider);
 
         PoolHistory poolHistoryCurrentEpoch = dbSyncDataProvider.getPoolHistory(poolId, epoch);
         if (poolHistoryCurrentEpoch == null) {

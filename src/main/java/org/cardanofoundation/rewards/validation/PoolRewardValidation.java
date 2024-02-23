@@ -2,7 +2,6 @@ package org.cardanofoundation.rewards.validation;
 
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.LatestStakeAccountUpdate;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 
 import java.math.BigInteger;
@@ -14,7 +13,7 @@ import static org.cardanofoundation.rewards.calculation.constants.RewardConstant
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 import static org.cardanofoundation.rewards.calculation.util.CurrencyConverter.lovelaceToAda;
 
-public class PoolRewardComputation {
+public class PoolRewardValidation {
 
     public static PoolRewardCalculationResult computePoolRewardInEpoch(String poolId, int epoch, ProtocolParameters protocolParameters,
                                                                        Epoch epochInfo, BigInteger stakePoolRewardsPot,
@@ -100,7 +99,7 @@ public class PoolRewardComputation {
         double monetaryExpandRate = protocolParameters.getMonetaryExpandRate();
         double treasuryGrowRate = protocolParameters.getTreasuryGrowRate();
 
-        BigInteger totalRewardPot = TreasuryComputation.calculateTotalRewardPotWithEta(
+        BigInteger totalRewardPot = TreasuryValidation.calculateTotalRewardPotWithEta(
                 monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserves, totalFeesForCurrentEpoch);
 
         BigInteger stakePoolRewardsPot = totalRewardPot.subtract(floor(multiply(totalRewardPot, treasuryGrowRate)));
@@ -162,7 +161,9 @@ public class PoolRewardComputation {
             rewardIndex++;
         }
 
-        System.out.println("Total difference: " + lovelaceToAda(totalDifference.intValue()) + " ADA");
+        if (isHigher(totalDifference, BigInteger.ZERO)) {
+            System.out.println("Total difference: " + lovelaceToAda(totalDifference.intValue()) + " ADA");
+        }
 
         BigInteger totalNoReward = BigInteger.ZERO;
         BigInteger coOwnerReward = BigInteger.ZERO;

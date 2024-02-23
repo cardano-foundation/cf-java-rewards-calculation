@@ -27,7 +27,7 @@ import static org.cardanofoundation.rewards.calculation.util.CurrencyConverter.l
 
 @SpringBootTest
 @ComponentScan
-public class PoolRewardComputationTest {
+public class PoolRewardValidationTest {
 
     @Autowired
     KoiosDataProvider koiosDataProvider;
@@ -53,7 +53,7 @@ public class PoolRewardComputationTest {
         }
 
        PoolRewardCalculationResult poolRewardCalculationResult =
-                PoolRewardComputation.computePoolRewardInEpoch(poolId, epoch, dataProvider);
+                PoolRewardValidation.computePoolRewardInEpoch(poolId, epoch, dataProvider);
 
        List<Reward> memberRewardsInEpoch = dataProvider.getMemberRewardsInEpoch(epoch);
        List<Reward> actualPoolRewardsInEpoch = memberRewardsInEpoch.stream()

@@ -1,36 +1,37 @@
-package org.cardanofoundation.rewards.validation;
+package org.cardanofoundation.rewards.calculation;
 
-import org.cardanofoundation.rewards.calculation.PoolRewardsCalculation;
 import org.cardanofoundation.rewards.calculation.domain.*;
-import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.LatestStakeAccountUpdate;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 import org.cardanofoundation.rewards.calculation.enums.MirPot;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
+import static org.cardanofoundation.rewards.calculation.PoolRewardsCalculation.calculatePoolRewardInEpoch;
 import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.TOTAL_LOVELACE;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 import static org.cardanofoundation.rewards.calculation.util.CurrencyConverter.lovelaceToAda;
+import lombok.extern.slf4j.Slf4j;
 
-public class EpochComputation {
+@Slf4j
+public class EpochCalculation {
 
-    public static EpochCalculationResult calculateEpochPots(int epoch, DataProvider dataProvider) {
-        long epochCalculationStart = System.currentTimeMillis();
+    public static EpochCalculationResult calculateEpochRewardPots(int epoch, AdaPots adaPotsForPreviousEpoch,
+                                                                  ProtocolParameters protocolParameters, Epoch epochInfo,
+                                                                  List<PoolDeregistration> retiredPools,
+                                                                  List<AccountUpdate> accountUpdates,
+                                                                  List<MirCertificate> mirCertificates,
+                                                                  List<String> poolsThatProducedBlocksInEpoch,
+                                                                  List<PoolHistory> poolHistories,
+                                                                  List<String> sharedPoolRewardAddressesWithoutReward) {
         EpochCalculationResult epochCalculationResult = EpochCalculationResult.builder().epoch(epoch).build();
 
         double treasuryGrowthRate = 0.2;
         double monetaryExpandRate = 0.003;
         double decentralizationParameter = 1;
 
-        AdaPots adaPotsForPreviousEpoch = dataProvider.getAdaPotsForEpoch(epoch - 1);
-
         BigInteger totalFeesForCurrentEpoch = BigInteger.ZERO;
         int totalBlocksInEpoch = 0;
-
-        ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch - 2);
-        Epoch epochInfo = dataProvider.getEpochInfo(epoch - 2);
 
         /* We need to use the epoch info 2 epochs before as shelley starts in epoch 208 it will be possible to get
            those values from epoch 210 onwards. Before that we need to use the genesis values, but they are not
@@ -52,7 +53,7 @@ public class EpochComputation {
         BigInteger reserveInPreviousEpoch = adaPotsForPreviousEpoch.getReserves();
         BigInteger treasuryInPreviousEpoch = adaPotsForPreviousEpoch.getTreasury();
 
-        BigInteger rewardPot = TreasuryComputation.calculateTotalRewardPotWithEta(
+        BigInteger rewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(
                 monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserveInPreviousEpoch, totalFeesForCurrentEpoch);
 
         BigInteger treasuryCut = multiplyAndFloor(rewardPot, treasuryGrowthRate);
@@ -61,19 +62,16 @@ public class EpochComputation {
 
         // The sum of all the refunds attached to unregistered reward accounts are added to the
         // treasury (see: Pool Reap Transition, p.53, figure 40, shely-ledger.pdf)
-        List<PoolDeregistration> retiredPools = dataProvider.getRetiredPoolsInEpoch(epoch);
-
         if (retiredPools.size() > 0) {
-            // The deposit will pay back one epoch later
-            List<AccountUpdate> accountUpdates = dataProvider.getAccountUpdatesUntilEpoch(
-                    retiredPools.stream().map(PoolDeregistration::getRewardAddress).toList(), epoch - 1);
+            List<String> rewardAddressesOfRetiredPools = retiredPools.stream().map(PoolDeregistration::getRewardAddress).toList();
+            List<AccountUpdate> latestAccountUpdates = accountUpdates.stream()
+                    .filter(update -> rewardAddressesOfRetiredPools.contains(update.getStakeAddress())).toList();
 
             treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(
-                    TreasuryComputation.calculateUnclaimedRefundsForRetiredPools(retiredPools, accountUpdates));
+                    TreasuryCalculation.calculateUnclaimedRefundsForRetiredPools(retiredPools, latestAccountUpdates));
         }
         // Check if there was a MIR Certificate in the previous epoch
         BigInteger treasuryWithdrawals = BigInteger.ZERO;
-        List<MirCertificate> mirCertificates = dataProvider.getMirCertificatesInEpoch(epoch - 1);
         for (MirCertificate mirCertificate : mirCertificates) {
             if (mirCertificate.getPot() == MirPot.TREASURY) {
                 treasuryWithdrawals = treasuryWithdrawals.add(mirCertificate.getTotalRewards());
@@ -81,34 +79,50 @@ public class EpochComputation {
         }
         treasuryForCurrentEpoch = treasuryForCurrentEpoch.subtract(treasuryWithdrawals);
 
-        List<String> poolIds = dataProvider.getPoolsThatProducedBlocksInEpoch(epoch - 2);
         BigInteger totalDistributedRewards = BigInteger.ZERO;
-
         BigInteger adaInCirculation = TOTAL_LOVELACE.subtract(reserveInPreviousEpoch);
         List<PoolRewardCalculationResult> PoolRewardCalculationResults = new ArrayList<>();
 
         int processedPools = 0;
-        long start = System.currentTimeMillis();
-        List<PoolHistory> poolHistories = dataProvider.getHistoryOfAllPoolsInEpoch(epoch - 2);
-        List<AccountUpdate> accountUpdates = dataProvider.getLatestStakeAccountUpdates(epoch - 1);
-
-        // Member and total rewards are used in the validation part only
-        List<Reward> memberRewardsInEpoch = dataProvider.getMemberRewardsInEpoch(epoch - 2);
-        List<TotalPoolRewards> totalPoolRewards = dataProvider.getSumOfMemberAndLeaderRewardsInEpoch(epoch - 2);
-
-        long end = System.currentTimeMillis();
-        System.out.println("Pool and account data fetched in " + (end - start) + "ms");
         BigInteger unspendableEarnedRewards = BigInteger.ZERO;
 
-        List<String> sharedPoolRewardAddressesWithoutReward = dataProvider.findSharedPoolRewardAddressWithoutReward(epoch - 2);
-
-        for (String poolId : poolIds) {
-            System.out.println("[" + processedPools + "/" + poolIds.size() + "] Processing pool: " + poolId);
+        for (String poolId : poolsThatProducedBlocksInEpoch) {
+            log.info("[" + processedPools + "/" + poolsThatProducedBlocksInEpoch.size() + "] Processing pool: " + poolId);
             PoolHistory poolHistory = poolHistories.stream().filter(history -> history.getPoolId().equals(poolId)).findFirst().orElse(null);
-            PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardComputation.computePoolRewardInEpoch(poolId, epoch - 2, protocolParameters, epochInfo, stakePoolRewardsPot, adaInCirculation, poolHistory, accountUpdates, sharedPoolRewardAddressesWithoutReward);
 
-            if (!PoolRewardComputation.poolRewardIsValid(poolRewardCalculationResult, memberRewardsInEpoch, totalPoolRewards)) {
-                System.out.println("Pool reward is invalid. Please check the details for pool " + poolId);
+            PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardCalculationResult
+                    .builder().poolId(poolId).epoch(epoch).poolReward(BigInteger.ZERO).build();
+
+            if(poolHistory != null) {
+                BigInteger activeStakeInEpoch = BigInteger.ZERO;
+                if (epochInfo.getActiveStake() != null) {
+                    activeStakeInEpoch = epochInfo.getActiveStake();
+                }
+
+                if (epoch > 212 && epoch < 255) {
+                    totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();
+                }
+
+                // Step 10 a: Check if pool reward address or member stake addresses have been unregistered before
+                List<String> stakeAddresses = new ArrayList<>();
+                stakeAddresses.add(poolHistory.getRewardAddress());
+                stakeAddresses.addAll(poolHistory.getDelegators().stream().map(Delegator::getStakeAddress).toList());
+
+                List<AccountUpdate> latestAccountUpdates = accountUpdates.stream()
+                        .filter(update -> stakeAddresses.contains(update.getStakeAddress())).toList();
+
+                // There was a different behavior in the previous version of the node
+                // If a pool reward address had been used for multiple pools,
+                // the stake account only received the reward for one of those pools
+                // This is not the case anymore and the stake account receives the reward for all pools
+                // Until the Allegra hard fork, this method will be used to emulate the old behavior
+                boolean ignoreLeaderReward = sharedPoolRewardAddressesWithoutReward.contains(poolId);
+
+                poolRewardCalculationResult = calculatePoolRewardInEpoch(poolId, poolHistory,
+                        totalBlocksInEpoch, protocolParameters,
+                        adaInCirculation, activeStakeInEpoch, stakePoolRewardsPot,
+                        poolHistory.getOwnerActiveStake(), poolHistory.getOwners(),
+                        latestAccountUpdates, ignoreLeaderReward);
             }
 
             PoolRewardCalculationResults.add(poolRewardCalculationResult);
@@ -122,7 +136,7 @@ public class EpochComputation {
         calculatedReserve = add(calculatedReserve, undistributedRewards);
         calculatedReserve = subtract(calculatedReserve, unspendableEarnedRewards);
 
-        System.out.println("Unspendable earned rewards: " + lovelaceToAda(unspendableEarnedRewards.intValue()) + " ADA");
+        log.info("Unspendable earned rewards: " + lovelaceToAda(unspendableEarnedRewards.intValue()) + " ADA");
         treasuryForCurrentEpoch = add(treasuryForCurrentEpoch, unspendableEarnedRewards);
 
         epochCalculationResult.setTotalDistributedRewards(totalDistributedRewards);
@@ -133,10 +147,6 @@ public class EpochComputation {
         epochCalculationResult.setTotalPoolRewardsPot(stakePoolRewardsPot);
         epochCalculationResult.setTotalAdaInCirculation(adaInCirculation);
         epochCalculationResult.setTotalUndistributedRewards(undistributedRewards);
-
-        long epochCalculationEnd = System.currentTimeMillis();
-        System.out.println("Epoch calculation took " +
-                Math.round((epochCalculationEnd - epochCalculationStart) / 1000.0)  + " seconds in total.");
 
         return epochCalculationResult;
     }

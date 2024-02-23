@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 @SpringBootTest
 @ComponentScan
 @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
-public class DepositsComputationTest {
+public class DepositsValidationTest {
 
     @Autowired
     KoiosDataProvider koiosDataProvider;
@@ -48,7 +48,7 @@ public class DepositsComputationTest {
 
         AdaPots adaPotsForNextEpoch = dataProvider.getAdaPotsForEpoch(epoch + 1);
         BigInteger actualDepositsInNextEpoch = adaPotsForNextEpoch.getDeposits();
-        BigInteger calculatedDepositsInNextEpoch = DepositsComputation.computeDepositsInEpoch(epoch, dataProvider);
+        BigInteger calculatedDepositsInNextEpoch = DepositsValidation.computeDepositsInEpoch(epoch, dataProvider);
 
         BigInteger difference = actualDepositsInNextEpoch.subtract(calculatedDepositsInNextEpoch);
         Assertions.assertEquals(BigInteger.ZERO, difference);

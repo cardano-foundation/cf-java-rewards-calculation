@@ -22,8 +22,7 @@ import java.util.stream.Stream;
 @SpringBootTest
 @ComponentScan
 @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
-public class UtxoComputationTest {
-
+public class FeesValidationTest {
     @Autowired
     KoiosDataProvider koiosDataProvider;
 
@@ -33,7 +32,7 @@ public class UtxoComputationTest {
     @Autowired
     DbSyncDataProvider dbSyncDataProvider;
 
-    void Test_calculateUtxoPot(final int epoch, DataProviderType dataProviderType) {
+    void Test_calculateFees(final int epoch, DataProviderType dataProviderType) {
         final DataProvider dataProvider;
         if (dataProviderType == DataProviderType.KOIOS) {
             dataProvider = koiosDataProvider;
@@ -46,9 +45,9 @@ public class UtxoComputationTest {
         }
 
         AdaPots adaPots = dataProvider.getAdaPotsForEpoch(epoch);
-        BigInteger utxo = UtxoComputation.calculateUtxoPotInEpoch(epoch, dataProvider);
+        BigInteger fees = FeeValidation.calculateFeePotInEpoch(epoch, dataProvider);
 
-        BigInteger difference = adaPots.getAdaInCirculation().subtract(utxo);
+        BigInteger difference = adaPots.getFees().subtract(fees);
         Assertions.assertEquals(BigInteger.ZERO, difference);
     }
 
@@ -58,17 +57,12 @@ public class UtxoComputationTest {
 
     @ParameterizedTest
     @MethodSource("dataProviderRangeUntilEpoch213")
-    void Test_calculateUtxoPotWithDbSyncDataProvider(int epoch) {
-        Test_calculateUtxoPot(epoch, DataProviderType.DB_SYNC);
+    void Test_calculateFeesWithDbSyncDataProvider(int epoch) {
+        Test_calculateFees(epoch, DataProviderType.DB_SYNC);
     }
 
     @Test
-    void Test_calculateUtxoPotWithDbSyncDataProviderForEpoch236() {
-        Test_calculateUtxoPot(236, DataProviderType.DB_SYNC);
-    }
-
-    @Test
-    void Test_calculateUtxoPotWithDbSyncDataProviderForEpoch355() {
-        Test_calculateUtxoPot(355, DataProviderType.DB_SYNC);
+    void Test_calculateFeesWithDbSyncDataProviderForEpoch214() {
+        Test_calculateFees(214, DataProviderType.DB_SYNC);
     }
 }

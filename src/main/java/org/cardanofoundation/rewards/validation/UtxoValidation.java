@@ -4,7 +4,7 @@ import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 
 import java.math.BigInteger;
 
-public class UtxoComputation {
+public class UtxoValidation {
 
     public final static BigInteger UTXO_POT_BEGINNING_OF_SHELLY = BigInteger.valueOf(31111977147073356L);
 
