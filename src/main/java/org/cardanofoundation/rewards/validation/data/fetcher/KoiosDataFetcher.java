@@ -1,6 +1,6 @@
 package org.cardanofoundation.rewards.validation.data.fetcher;
 
-import org.cardanofoundation.rewards.calculation.entity.*;
+import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.KoiosDataProvider;
 import org.slf4j.Logger;

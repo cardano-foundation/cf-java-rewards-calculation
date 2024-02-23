@@ -1,9 +1,9 @@
 package org.cardanofoundation.rewards.validation.data.fetcher;
 
 import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
-import org.cardanofoundation.rewards.calculation.entity.PoolHistory;
-import org.cardanofoundation.rewards.calculation.entity.PoolOwnerHistory;
-import org.cardanofoundation.rewards.calculation.entity.PoolParameters;
+import org.cardanofoundation.rewards.calculation.domain.PoolHistory;
+import org.cardanofoundation.rewards.calculation.domain.PoolOwnerHistory;
+import org.cardanofoundation.rewards.calculation.domain.PoolParameters;
 import org.cardanofoundation.rewards.validation.entity.persistence.AggregationsInEpoch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

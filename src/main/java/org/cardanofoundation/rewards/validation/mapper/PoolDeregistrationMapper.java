@@ -1,7 +1,7 @@
 package org.cardanofoundation.rewards.validation.mapper;
 
 import org.cardanofoundation.rewards.validation.entity.jpa.DbSyncPoolRetirement;
-import org.cardanofoundation.rewards.calculation.entity.PoolDeregistration;
+import org.cardanofoundation.rewards.calculation.domain.PoolDeregistration;
 import rest.koios.client.backend.api.pool.model.PoolUpdate;
 
 public class PoolDeregistrationMapper {

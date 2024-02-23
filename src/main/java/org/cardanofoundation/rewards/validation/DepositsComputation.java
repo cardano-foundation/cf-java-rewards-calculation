@@ -1,8 +1,8 @@
 package org.cardanofoundation.rewards.validation;
 
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
-import org.cardanofoundation.rewards.calculation.entity.AdaPots;
-import org.cardanofoundation.rewards.calculation.entity.PoolDeregistration;
+import org.cardanofoundation.rewards.calculation.domain.AdaPots;
+import org.cardanofoundation.rewards.calculation.domain.PoolDeregistration;
 
 import java.math.BigInteger;
 import java.util.List;

@@ -1,6 +1,6 @@
 package org.cardanofoundation.rewards.validation;
 
-import org.cardanofoundation.rewards.calculation.entity.*;
+import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.LatestStakeAccountUpdate;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
@@ -19,7 +19,8 @@ public class PoolRewardComputation {
     public static PoolRewardCalculationResult computePoolRewardInEpoch(String poolId, int epoch, ProtocolParameters protocolParameters,
                                                                        Epoch epochInfo, BigInteger stakePoolRewardsPot,
                                                                        BigInteger adaInCirculation, PoolHistory poolHistoryCurrentEpoch,
-                                                                       List<LatestStakeAccountUpdate> accountUpdates) {
+                                                                       List<AccountUpdate> accountUpdates,
+                                                                       List<String> poolIdsWithSharedRewardAddresses) {
         // Step 1: Get Pool information of current epoch
         // Example: https://api.koios.rest/api/v0/pool_history?_pool_bech32=pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt&_epoch_no=210
 
@@ -45,10 +46,15 @@ public class PoolRewardComputation {
 
         //List<AccountUpdate> accountUpdates = dataProvider.getAccountUpdatesUntilEpoch(stakeAddresses, epoch - 1);
 
-        accountUpdates = accountUpdates.stream()
+        List<AccountUpdate> latestAccountUpdates = accountUpdates.stream()
                 .filter(update -> stakeAddresses.contains(update.getStakeAddress())).toList();
 
-        BigInteger poolOperatorRewardOutlier = correctOutliers(poolId, epoch);
+        // There was a different behavior in the previous version of the node
+        // If a pool reward address had been used for multiple pools,
+        // the stake account only received the reward for one of those pools
+        // This is not the case anymore and the stake account receives the reward for all pools
+        // Until the Allegra hard fork, this method will be used to emulate the old behavior
+        boolean ignoreLeaderReward = poolIdsWithSharedRewardAddresses.contains(poolId);
 
         // shelley-delegation.pdf 5.5.3
         //      "[...]the relative stake of the pool owner(s) (the amount of ada
@@ -57,7 +63,7 @@ public class PoolRewardComputation {
                 totalBlocksInEpoch, protocolParameters,
                 adaInCirculation, activeStakeInEpoch, stakePoolRewardsPot,
                 poolHistoryCurrentEpoch.getOwnerActiveStake(), poolHistoryCurrentEpoch.getOwners(),
-                accountUpdates, poolOperatorRewardOutlier);
+                latestAccountUpdates, ignoreLeaderReward);
 
     }
 
@@ -101,47 +107,10 @@ public class PoolRewardComputation {
 
         PoolHistory poolHistoryCurrentEpoch = dataProvider.getPoolHistory(poolId, epoch);
 
-        List<String> stakeAddresses = new ArrayList<>(poolHistoryCurrentEpoch.getDelegators().stream().map(Delegator::getStakeAddress).toList());
-        stakeAddresses.add(poolHistoryCurrentEpoch.getRewardAddress());
+        List<AccountUpdate> accountUpdates = dataProvider.getLatestStakeAccountUpdates(epoch);
+        List<String> sharedPoolRewardAddressesWithoutReward = dataProvider.findSharedPoolRewardAddressWithoutReward(epoch - 2);
 
-        List<LatestStakeAccountUpdate> accountUpdates = dataProvider.getLatestStakeAccountUpdates(epoch, stakeAddresses);
-        return computePoolRewardInEpoch(poolId, epoch, protocolParameters, epochInfo, stakePoolRewardsPot, adaInCirculation, poolHistoryCurrentEpoch, accountUpdates);
-    }
-
-    /*
-        TODO:   Replace this method with the jpa repository call to find reward address owning
-                multiple pools that produced blocks in the same epoch
-     */
-    public static BigInteger correctOutliers(String poolId, int epoch) {
-        BigInteger correction = BigInteger.ZERO;
-
-        if (epoch == 212 && poolId.equals("pool13l0j202yexqh6l0awtee9g354244gmfze09utxz0sn7p7r3ev3m")) {
-            /*
-             * The reward_address of pool13l0j202yexqh6l0awtee9g354244gmfze09utxz0sn7p7r3ev3m is also the
-             * reward_address of pool1gh4cj5h5glk5992d0wtela324htr0cn8ujvg53pmuds9guxgz2u. Both pools produced
-             * blocks in epoch 214. In a previous node version this caused an outlier where the
-             * leader rewards of pool13l0j202yexqh6l0awtee9g354244gmfze09utxz0sn7p7r3ev3m has been set to 0.
-             *
-             * This behavior has been changed later so that the owner would receive leader rewards for both pools.
-             * Affected reward addresses have been paid out due to a MIR certificate afterward.
-             */
-            correction = new BigInteger(String.valueOf(-814592210));
-        } else if (epoch == 212 && poolId.equals("pool166dkk9kx5y6ug9tnvh0dnvxhwt2yca3g5pd5jaqa8t39cgyqqlr")) {
-            // pool1qvvn2l690zm3v2p0f3vd66ly6cfs2wjqx34zpqcx5pwsx3eprtp also produced blocks in epoch 214
-            // with the same reward address
-            correction = new BigInteger(String.valueOf(-669930045));
-        } else if (epoch == 213 && poolId.equals("pool166dkk9kx5y6ug9tnvh0dnvxhwt2yca3g5pd5jaqa8t39cgyqqlr")) {
-            // pool1qvvn2l690zm3v2p0f3vd66ly6cfs2wjqx34zpqcx5pwsx3eprtp also produced blocks in epoch 215
-            // with the same reward address
-            correction = new BigInteger(String.valueOf(-634057195));
-        } else if (epoch == 213 && poolId.equals("pool17rns3wjyql9jg9xkzw9h88f0kstd693pm6urwxmvejqgsyjw7ta")) {
-            // pool12crd62rxj8yryvshmgwkxza7um3uhaypwdjeel98lnkf529qdw5 &
-            // pool1v4adhelnswa7pwv2njn5h84atw08mlc79ll2ewl2kgxhv3cqwql also produced blocks in epoch 215
-            // with the same reward address
-            correction = new BigInteger(String.valueOf(-369216376));
-        }
-
-        return correction;
+        return computePoolRewardInEpoch(poolId, epoch, protocolParameters, epochInfo, stakePoolRewardsPot, adaInCirculation, poolHistoryCurrentEpoch, accountUpdates, sharedPoolRewardAddressesWithoutReward);
     }
 
     public static boolean poolRewardIsValid(PoolRewardCalculationResult poolRewardCalculationResult, DataProvider dataProvider) {
@@ -215,14 +184,23 @@ public class PoolRewardComputation {
                     coOwnerReward = coOwnerReward.add(memberReward.getAmount());
                 }
             }
-            System.out.println("Total no reward: " + lovelaceToAda(totalNoReward.intValue()) + " ADA");
+
+            if (isHigher(totalNoReward, BigInteger.ZERO)) {
+                System.out.println("Total no reward: " + lovelaceToAda(totalNoReward.intValue()) + " ADA");
+            }
 
             calculatedMemberRewards = poolRewardCalculationResult.getMemberRewards().stream().map(Reward::getAmount).reduce(BigInteger.ZERO, BigInteger::add);
         }
 
-        return actualPoolReward
+        boolean isValid = actualPoolReward
                 .subtract(calculatedMemberRewards.subtract(coOwnerReward)
                         .add(poolRewardCalculationResult.getOperatorReward())).equals(BigInteger.ZERO) &&
                 actualPoolReward.subtract(poolRewardCalculationResult.getDistributedPoolReward()).equals(BigInteger.ZERO);
+
+        if (!isValid) {
+            System.out.println("The difference between expected pool reward and actual pool reward is : " + lovelaceToAda(actualPoolReward.subtract(poolRewardCalculationResult.getDistributedPoolReward()).intValue()) + " ADA");
+        }
+
+        return isValid;
     }
 }

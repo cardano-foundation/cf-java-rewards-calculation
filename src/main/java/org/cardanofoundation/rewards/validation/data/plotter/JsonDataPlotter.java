@@ -2,7 +2,7 @@ package org.cardanofoundation.rewards.validation.data.plotter;
 
 import org.cardanofoundation.rewards.validation.TreasuryComputation;
 import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
-import org.cardanofoundation.rewards.calculation.entity.TreasuryCalculationResult;
+import org.cardanofoundation.rewards.calculation.domain.TreasuryCalculationResult;
 import org.cardanofoundation.rewards.validation.util.JsonConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package org.cardanofoundation.rewards.calculation.entity;
+package org.cardanofoundation.rewards.calculation.domain;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -26,4 +26,5 @@ public class PoolRewardCalculationResult {
     Double poolMargin;
     BigInteger poolCost;
     List<String> poolOwnerStakeAddresses;
+    BigInteger unspendableEarnedRewards;
 }

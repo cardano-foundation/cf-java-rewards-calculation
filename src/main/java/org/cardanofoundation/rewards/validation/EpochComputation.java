@@ -1,7 +1,7 @@
 package org.cardanofoundation.rewards.validation;
 
 import org.cardanofoundation.rewards.calculation.PoolRewardsCalculation;
-import org.cardanofoundation.rewards.calculation.entity.*;
+import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.LatestStakeAccountUpdate;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
@@ -90,14 +90,7 @@ public class EpochComputation {
         int processedPools = 0;
         long start = System.currentTimeMillis();
         List<PoolHistory> poolHistories = dataProvider.getHistoryOfAllPoolsInEpoch(epoch - 2);
-        List<String> stakeAddresses = new ArrayList<>(poolHistories.stream()
-                .map(history -> history.getDelegators().stream()
-                        .map(Delegator::getStakeAddress).toList())
-                .flatMap(Collection::stream).toList());
-        stakeAddresses.addAll(poolHistories.stream().map(PoolHistory::getRewardAddress).toList());
-
-        List<LatestStakeAccountUpdate> accountUpdates = dataProvider.getLatestStakeAccountUpdates(epoch - 1, stakeAddresses);
-        List<String> deregistrationInEpoch = dataProvider.getStakeAddressDeregistrationsInEpoch(epoch - 1);
+        List<AccountUpdate> accountUpdates = dataProvider.getLatestStakeAccountUpdates(epoch - 1);
 
         // Member and total rewards are used in the validation part only
         List<Reward> memberRewardsInEpoch = dataProvider.getMemberRewardsInEpoch(epoch - 2);
@@ -106,11 +99,13 @@ public class EpochComputation {
         long end = System.currentTimeMillis();
         System.out.println("Pool and account data fetched in " + (end - start) + "ms");
         BigInteger unspendableEarnedRewards = BigInteger.ZERO;
+
+        List<String> sharedPoolRewardAddressesWithoutReward = dataProvider.findSharedPoolRewardAddressWithoutReward(epoch - 2);
+
         for (String poolId : poolIds) {
-            start = System.currentTimeMillis();
             System.out.println("[" + processedPools + "/" + poolIds.size() + "] Processing pool: " + poolId);
             PoolHistory poolHistory = poolHistories.stream().filter(history -> history.getPoolId().equals(poolId)).findFirst().orElse(null);
-            PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardComputation.computePoolRewardInEpoch(poolId, epoch - 2, protocolParameters, epochInfo, stakePoolRewardsPot, adaInCirculation, poolHistory, accountUpdates);
+            PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardComputation.computePoolRewardInEpoch(poolId, epoch - 2, protocolParameters, epochInfo, stakePoolRewardsPot, adaInCirculation, poolHistory, accountUpdates, sharedPoolRewardAddressesWithoutReward);
 
             if (!PoolRewardComputation.poolRewardIsValid(poolRewardCalculationResult, memberRewardsInEpoch, totalPoolRewards)) {
                 System.out.println("Pool reward is invalid. Please check the details for pool " + poolId);
@@ -118,22 +113,17 @@ public class EpochComputation {
 
             PoolRewardCalculationResults.add(poolRewardCalculationResult);
             totalDistributedRewards = add(totalDistributedRewards, poolRewardCalculationResult.getDistributedPoolReward());
-
-            unspendableEarnedRewards = unspendableEarnedRewards.add(PoolRewardsCalculation.getEarnedRewardsForDeregisteredStakeAccount(poolRewardCalculationResult, deregistrationInEpoch));
-
+            unspendableEarnedRewards = unspendableEarnedRewards.add(poolRewardCalculationResult.getUnspendableEarnedRewards());
             processedPools++;
-            end = System.currentTimeMillis();
-            System.out.println("Pool processed in " + (end - start) + "ms");
         }
-
-        System.out.println("Unspendable rewards: " + lovelaceToAda(unspendableEarnedRewards.longValue()) + " ADA");
 
         BigInteger calculatedReserve = subtract(reserveInPreviousEpoch, subtract(rewardPot, totalFeesForCurrentEpoch));
         BigInteger undistributedRewards = subtract(stakePoolRewardsPot, totalDistributedRewards);
         calculatedReserve = add(calculatedReserve, undistributedRewards);
-        long epochCalculationEnd = System.currentTimeMillis();
-        System.out.println("Epoch calculation took " +
-                Math.round((epochCalculationEnd - epochCalculationStart) / 1000.0)  + " seconds in total.");
+        calculatedReserve = subtract(calculatedReserve, unspendableEarnedRewards);
+
+        System.out.println("Unspendable earned rewards: " + lovelaceToAda(unspendableEarnedRewards.intValue()) + " ADA");
+        treasuryForCurrentEpoch = add(treasuryForCurrentEpoch, unspendableEarnedRewards);
 
         epochCalculationResult.setTotalDistributedRewards(totalDistributedRewards);
         epochCalculationResult.setTotalRewardsPot(rewardPot);
@@ -143,6 +133,10 @@ public class EpochComputation {
         epochCalculationResult.setTotalPoolRewardsPot(stakePoolRewardsPot);
         epochCalculationResult.setTotalAdaInCirculation(adaInCirculation);
         epochCalculationResult.setTotalUndistributedRewards(undistributedRewards);
+
+        long epochCalculationEnd = System.currentTimeMillis();
+        System.out.println("Epoch calculation took " +
+                Math.round((epochCalculationEnd - epochCalculationStart) / 1000.0)  + " seconds in total.");
 
         return epochCalculationResult;
     }

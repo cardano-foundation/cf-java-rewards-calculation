@@ -1,6 +1,6 @@
 package org.cardanofoundation.rewards.validation.mapper;
 
-import org.cardanofoundation.rewards.calculation.entity.PoolHistory;
+import org.cardanofoundation.rewards.calculation.domain.PoolHistory;
 
 import java.math.BigInteger;
 

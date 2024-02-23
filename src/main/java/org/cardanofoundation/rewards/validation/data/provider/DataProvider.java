@@ -1,6 +1,6 @@
 package org.cardanofoundation.rewards.validation.data.provider;
 
-import org.cardanofoundation.rewards.calculation.entity.*;
+import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.LatestStakeAccountUpdate;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 
@@ -45,8 +45,8 @@ public interface DataProvider {
     public BigInteger getTotalPoolRewardsInEpoch(String poolId, int epoch);
 
     public List<String> getPoolsThatProducedBlocksInEpoch(int epoch);
-    public List<LatestStakeAccountUpdate> getLatestStakeAccountUpdates(int epoch, List<String> stakeAddresses);
+    public List<AccountUpdate> getLatestStakeAccountUpdates(int epoch);
     public List<TotalPoolRewards> getSumOfMemberAndLeaderRewardsInEpoch(int epoch);
 
-    public List<String> getStakeAddressDeregistrationsInEpoch(int epoch);
+    public List<String> findSharedPoolRewardAddressWithoutReward(int epoch);
 }

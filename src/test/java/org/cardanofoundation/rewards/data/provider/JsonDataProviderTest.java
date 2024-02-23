@@ -1,7 +1,7 @@
 package org.cardanofoundation.rewards.data.provider;
 
-import org.cardanofoundation.rewards.calculation.entity.AdaPots;
-import org.cardanofoundation.rewards.calculation.entity.ProtocolParameters;
+import org.cardanofoundation.rewards.calculation.domain.AdaPots;
+import org.cardanofoundation.rewards.calculation.domain.ProtocolParameters;
 import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

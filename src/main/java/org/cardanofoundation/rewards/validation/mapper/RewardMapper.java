@@ -1,6 +1,6 @@
 package org.cardanofoundation.rewards.validation.mapper;
 import org.cardanofoundation.rewards.validation.entity.jpa.DbSyncReward;
-import org.cardanofoundation.rewards.calculation.entity.Reward;
+import org.cardanofoundation.rewards.calculation.domain.Reward;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.MemberReward;
 
 public class RewardMapper {

@@ -4,7 +4,7 @@ import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.KoiosDataProvider;
-import org.cardanofoundation.rewards.calculation.entity.AdaPots;
+import org.cardanofoundation.rewards.calculation.domain.AdaPots;
 import org.cardanofoundation.rewards.validation.enums.DataProviderType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

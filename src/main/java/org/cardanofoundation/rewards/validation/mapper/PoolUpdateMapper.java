@@ -1,7 +1,7 @@
 package org.cardanofoundation.rewards.validation.mapper;
 
 import org.cardanofoundation.rewards.validation.entity.jpa.DbSyncPoolUpdate;
-import org.cardanofoundation.rewards.calculation.entity.PoolUpdate;
+import org.cardanofoundation.rewards.calculation.domain.PoolUpdate;
 
 import java.math.BigInteger;
 

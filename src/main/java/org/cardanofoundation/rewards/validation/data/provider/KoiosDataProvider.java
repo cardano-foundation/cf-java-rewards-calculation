@@ -1,7 +1,7 @@
 package org.cardanofoundation.rewards.validation.data.provider;
 
 import lombok.RequiredArgsConstructor;
-import org.cardanofoundation.rewards.calculation.entity.*;
+import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.LatestStakeAccountUpdate;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 import org.cardanofoundation.rewards.validation.mapper.*;
@@ -246,7 +246,7 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
-    public List<org.cardanofoundation.rewards.calculation.entity.PoolUpdate> getPoolUpdateAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch) {
+    public List<org.cardanofoundation.rewards.calculation.domain.PoolUpdate> getPoolUpdateAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch) {
         return null;
     }
 
@@ -286,7 +286,7 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
-    public List<LatestStakeAccountUpdate> getLatestStakeAccountUpdates(int epoch, List<String> stakeAddresses) {
+    public List<AccountUpdate> getLatestStakeAccountUpdates(int epoch) {
         return null;
     }
 
@@ -296,7 +296,7 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
-    public List<String> getStakeAddressDeregistrationsInEpoch(int epoch) {
+    public List<String> findSharedPoolRewardAddressWithoutReward(int epoch) {
         return null;
     }
 

@@ -19,7 +19,7 @@ public interface DbSyncStakeDeregistrationRepository extends ReadOnlyRepository<
             List<String> addresses, Integer epoch);
 
     @Query(nativeQuery = true, value = """
-            WITH latest_registration AS (
+SELECT stakeAddress, latestUpdateType, block.epoch_slot_no AS epochSlot, block.epoch_no AS epoch FROM (WITH latest_registration AS (
                 SELECT
                     addr_id,
                     MAX(tx_id) AS tx_id
@@ -44,26 +44,29 @@ public interface DbSyncStakeDeregistrationRepository extends ReadOnlyRepository<
             SELECT
                 stake_address.view AS stakeAddress,
                 CASE
-                    WHEN lr.tx_id > ld.tx_id THEN 'REGISTRATION'
+                    WHEN ld.tx_id IS NULL THEN 'REGISTRATION'
+                    WHEN lr.tx_id >= ld.tx_id THEN 'REGISTRATION'
                     WHEN lr.tx_id < ld.tx_id THEN 'DEREGISTRATION'
-                    ELSE 'REGISTRATION'
-                END AS latestUpdateType
+                END AS latestUpdateType,
+				CASE
+					WHEN ld.tx_id IS NULL THEN lr.tx_id
+                    WHEN lr.tx_id >= ld.tx_id THEN lr.tx_id
+                    WHEN lr.tx_id < ld.tx_id THEN ld.tx_id
+                END AS tx_id
             FROM
                 latest_registration lr
             FULL OUTER JOIN
                 latest_deregistration ld ON lr.addr_id = ld.addr_id
             JOIN
-                stake_address ON stake_address.id = lr.addr_id
-            WHERE
-                stake_address.view IN :stakeAddresses
-        """)
-    List<LatestStakeAccountUpdate> getLatestStakeAccountUpdates(Integer epoch, List<String> stakeAddresses);
+                stake_address ON stake_address.id = lr.addr_id )
+    AS latest_update JOIN tx ON tx.id=latest_update.tx_id JOIN block ON block.id = tx.block_id""")
+    List<LatestStakeAccountUpdate> getLatestStakeAccountUpdates(Integer epoch);
 
     @Query(nativeQuery = true, value = """
-        SELECT stake_address.view AS stakeAddress FROM stake_deregistration 
+        SELECT stake_address.view AS stakeAddress FROM stake_deregistration
             JOIN tx ON tx.id=stake_deregistration.tx_id JOIN block ON block.id=tx.block_id
-            JOIN stake_address ON stake_deregistration.addr_id=stake_address.id 
-        WHERE block.epoch_no=:epoch
+            JOIN stake_address ON stake_deregistration.addr_id=stake_address.id
+        WHERE block.epoch_no=:epoch AND epoch_slot_no < :beforeEpochSlot AND epoch_slot_no > :afterEpochSlot
         """)
-    List<String> getStakeAddressDeregistrationsInEpoch(Integer epoch);
+    List<String> getStakeAddressDeregistrationsInEpoch(Integer epoch, Integer beforeEpochSlot, Integer afterEpochSlot);
 }

@@ -1,6 +1,6 @@
 package org.cardanofoundation.rewards.validation.mapper;
 
-import org.cardanofoundation.rewards.calculation.entity.Epoch;
+import org.cardanofoundation.rewards.calculation.domain.Epoch;
 import org.cardanofoundation.rewards.validation.entity.jpa.DbSyncEpoch;
 import rest.koios.client.backend.api.epoch.model.EpochInfo;
 

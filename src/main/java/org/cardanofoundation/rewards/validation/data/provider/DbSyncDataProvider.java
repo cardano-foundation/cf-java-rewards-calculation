@@ -1,6 +1,6 @@
 package org.cardanofoundation.rewards.validation.data.provider;
 
-import org.cardanofoundation.rewards.calculation.entity.*;
+import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.entity.jpa.*;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.*;
 import org.cardanofoundation.rewards.calculation.enums.AccountUpdateAction;
@@ -404,11 +404,6 @@ public class DbSyncDataProvider implements DataProvider {
     }
 
     @Override
-    public List<String> getStakeAddressDeregistrationsInEpoch(int epoch) {
-        return dbSyncStakeDeregistrationRepository.getStakeAddressDeregistrationsInEpoch(epoch);
-    }
-
-    @Override
     public BigInteger getTotalPoolRewardsInEpoch(String poolId, int epoch) {
         return dbSyncRewardRepository.getTotalPoolRewardsInEpoch(poolId, epoch);
     }
@@ -418,7 +413,13 @@ public class DbSyncDataProvider implements DataProvider {
     }
 
     @Override
-    public List<LatestStakeAccountUpdate> getLatestStakeAccountUpdates(int epoch, List<String> stakeAddresses) {
-        return dbSyncStakeDeregistrationRepository.getLatestStakeAccountUpdates(epoch, stakeAddresses);
+    public List<AccountUpdate> getLatestStakeAccountUpdates(int epoch) {
+        List<LatestStakeAccountUpdate> latestStakeAccountUpdates = dbSyncStakeDeregistrationRepository.getLatestStakeAccountUpdates(epoch);
+        return latestStakeAccountUpdates.stream().map(AccountUpdateMapper::fromLatestStakeAccountUpdate).toList();
+    }
+
+    @Override
+    public List<String> findSharedPoolRewardAddressWithoutReward(int epoch) {
+        return dbSyncPoolUpdateRepository.findSharedPoolRewardAddressWithoutReward(epoch);
     }
 }

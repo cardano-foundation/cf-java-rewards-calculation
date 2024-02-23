@@ -1,6 +1,6 @@
 package org.cardanofoundation.rewards.validation.mapper;
 
-import org.cardanofoundation.rewards.calculation.entity.AdaPots;
+import org.cardanofoundation.rewards.calculation.domain.AdaPots;
 import org.cardanofoundation.rewards.validation.entity.jpa.DbSyncAdaPots;
 import rest.koios.client.backend.api.network.model.Totals;
 

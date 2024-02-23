@@ -1,4 +1,4 @@
-package org.cardanofoundation.rewards.calculation.entity;
+package org.cardanofoundation.rewards.calculation.domain;
 
 
 import lombok.Builder;

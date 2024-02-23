@@ -1,6 +1,6 @@
 package org.cardanofoundation.rewards.data.provider;
 
-import org.cardanofoundation.rewards.calculation.entity.*;
+import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.PoolRewardComputation;
 import org.cardanofoundation.rewards.validation.TreasuryComputation;
 import org.cardanofoundation.rewards.calculation.enums.MirPot;

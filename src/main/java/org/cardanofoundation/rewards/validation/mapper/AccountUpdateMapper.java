@@ -1,7 +1,8 @@
 package org.cardanofoundation.rewards.validation.mapper;
 
-import org.cardanofoundation.rewards.calculation.entity.AccountUpdate;
+import org.cardanofoundation.rewards.calculation.domain.AccountUpdate;
 import org.cardanofoundation.rewards.calculation.enums.AccountUpdateAction;
+import org.cardanofoundation.rewards.validation.entity.jpa.projection.LatestStakeAccountUpdate;
 import rest.koios.client.backend.api.account.model.AccountUpdates;
 
 import java.util.ArrayList;
@@ -27,5 +28,14 @@ public class AccountUpdateMapper {
         }
 
         return accountUpdateList;
+    }
+
+    public static AccountUpdate fromLatestStakeAccountUpdate(LatestStakeAccountUpdate latestStakeAccountUpdate) {
+        return AccountUpdate.builder()
+                .stakeAddress(latestStakeAccountUpdate.getStakeAddress())
+                .action(AccountUpdateAction.fromString(latestStakeAccountUpdate.getLatestUpdateType()))
+                .epoch(latestStakeAccountUpdate.getEpoch())
+                .epochSlot(latestStakeAccountUpdate.getEpochSlot().longValue())
+                .build();
     }
 }

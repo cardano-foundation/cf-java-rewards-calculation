@@ -1,6 +1,6 @@
 package org.cardanofoundation.rewards.validation.data.provider;
 
-import org.cardanofoundation.rewards.calculation.entity.*;
+import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.LatestStakeAccountUpdate;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 import org.cardanofoundation.rewards.validation.enums.DataType;
@@ -192,7 +192,7 @@ public class JsonDataProvider implements DataProvider {
     }
 
     @Override
-    public List<LatestStakeAccountUpdate> getLatestStakeAccountUpdates(int epoch, List<String> stakeAddresses) {
+    public List<AccountUpdate> getLatestStakeAccountUpdates(int epoch) {
         return null;
     }
 
@@ -202,7 +202,7 @@ public class JsonDataProvider implements DataProvider {
     }
 
     @Override
-    public List<String> getStakeAddressDeregistrationsInEpoch(int epoch) {
+    public List<String> findSharedPoolRewardAddressWithoutReward(int epoch) {
         return null;
     }
 }

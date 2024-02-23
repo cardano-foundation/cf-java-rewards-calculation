@@ -1,7 +1,6 @@
 package org.cardanofoundation.rewards.calculation;
 
-import org.cardanofoundation.rewards.calculation.entity.*;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.LatestStakeAccountUpdate;
+import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.calculation.enums.AccountUpdateAction;
 
 import java.math.BigDecimal;
@@ -127,7 +126,7 @@ public class PoolRewardsCalculation {
                                                                          int totalBlocksInEpoch, ProtocolParameters protocolParameters,
                                                                          BigInteger adaInCirculation, BigInteger activeStakeInEpoch, BigInteger stakePoolRewardsPot,
                                                                          BigInteger totalActiveStakeOfOwners, List<String> poolOwnerStakeAddresses,
-                                                                         List<LatestStakeAccountUpdate> accountUpdates, BigInteger poolOperatorRewardOutlier) {
+                                                                         List<AccountUpdate> accountUpdates, boolean ignoreLeaderReward) {
         // Step 1: Get Pool information of current epoch
         // Example: https://api.koios.rest/api/v0/pool_history?_pool_bech32=pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt&_epoch_no=210
         PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardCalculationResult.builder()
@@ -135,6 +134,7 @@ public class PoolRewardsCalculation {
                 .poolId(poolId)
                 .poolReward(BigInteger.ZERO)
                 .distributedPoolReward(BigInteger.ZERO)
+                .unspendableEarnedRewards(BigInteger.ZERO)
                 .build();
 
         BigInteger poolStake = poolHistoryCurrentEpoch.getActiveStake();
@@ -190,37 +190,36 @@ public class PoolRewardsCalculation {
         BigInteger poolOperatorReward = PoolRewardsCalculation.calculateLeaderReward(poolReward, poolMargin, poolFixedCost,
                 divide(totalActiveStakeOfOwners, adaInCirculation), relativePoolStake);
 
-        Map<String, AccountUpdate> latestAccountUpdates = new HashMap<>();
-        for (LatestStakeAccountUpdate accountUpdate : accountUpdates) {
-            if (latestAccountUpdates.keySet().stream().noneMatch(stakeAddress -> stakeAddress.equals(accountUpdate.getStakeAddress()))) {
-                latestAccountUpdates.put(accountUpdate.getStakeAddress(),
-                        AccountUpdate.builder()
-                                .stakeAddress(accountUpdate.getStakeAddress())
-                                .action(AccountUpdateAction.fromString(accountUpdate.getLatestUpdateType()))
-                                .build());
-            }
-        }
+        List<String> memberWithDeregisteredStakeAddresses = accountUpdates.stream()
+                .filter(accountUpdate -> accountUpdate.getAction().equals(AccountUpdateAction.DEREGISTRATION))
+                .map(AccountUpdate::getStakeAddress).toList();
+        List<String> memberWithUpdates = accountUpdates.stream().map(AccountUpdate::getStakeAddress).toList();
 
-        if (accountUpdates.size() > 0 &&
-                (latestAccountUpdates.get(poolRewardCalculationResult.getRewardAddress()) == null ||
-                        latestAccountUpdates.get(poolRewardCalculationResult.getRewardAddress()).getAction().equals(AccountUpdateAction.DEREGISTRATION))) {
+        BigInteger unspendableEarnedRewards = BigInteger.ZERO;
+
+        if (!memberWithUpdates.contains(poolRewardCalculationResult.getRewardAddress()) || memberWithDeregisteredStakeAddresses.contains(poolRewardCalculationResult.getRewardAddress())) {
             System.out.println("Pool " + poolId + " has been deregistered. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
+            AccountUpdate latestStakeAccountUpdate = accountUpdates.stream().filter(accountUpdate -> accountUpdate.getStakeAddress().equals(poolRewardCalculationResult.getRewardAddress())).findFirst().orElse(null);
+
+            if (latestStakeAccountUpdate != null &&
+                    latestStakeAccountUpdate.getEpoch() == poolHistoryCurrentEpoch.getEpoch() + 1 &&
+                    latestStakeAccountUpdate.getEpochSlot() > 212500) {
+                System.out.println("[unregRU]: " + poolRewardCalculationResult.getRewardAddress() + " has been deregistered. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
+                unspendableEarnedRewards = poolOperatorReward;
+            }
             poolOperatorReward = BigInteger.ZERO;
         }
 
-        poolOperatorReward = poolOperatorReward.add(poolOperatorRewardOutlier);
+        if (ignoreLeaderReward) {
+            poolOperatorReward = BigInteger.ZERO;
+            System.out.println("[reward address of multiple pools] Pool " + poolId + " has been ignored. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
+        }
+
         poolRewardCalculationResult.setOperatorReward(poolOperatorReward);
         poolRewardCalculationResult.setDistributedPoolReward(poolOperatorReward);
         // Step 11: Calculate pool member reward
         List<Reward> memberRewards = new ArrayList<>();
         for (Delegator delegator : poolHistoryCurrentEpoch.getDelegators()) {
-            if (accountUpdates.size() > 0 &&
-                    (latestAccountUpdates.get(delegator.getStakeAddress()) == null ||
-                            latestAccountUpdates.get(delegator.getStakeAddress()).getAction().equals(AccountUpdateAction.DEREGISTRATION))) {
-                System.out.println("Delegator " + delegator.getStakeAddress() + " has been deregistered. Delegator would have received " + poolOperatorReward + " but will not receive any rewards.");
-                continue;
-            }
-
             if (delegator.getStakeAddress().equals(poolHistoryCurrentEpoch.getRewardAddress()) ||
                     poolOwnerStakeAddresses.contains(delegator.getStakeAddress())) {
                 continue;
@@ -228,6 +227,22 @@ public class PoolRewardsCalculation {
 
             BigInteger memberReward = PoolRewardsCalculation.calculateMemberReward(poolReward, poolMargin,
                     poolFixedCost, divide(delegator.getActiveStake(), adaInCirculation), relativePoolStake);
+
+            if (!memberWithUpdates.contains(delegator.getStakeAddress()) || memberWithDeregisteredStakeAddresses.contains(delegator.getStakeAddress())) {
+                System.out.println("Delegator " + delegator.getStakeAddress() + " has been deregistered. Delegator would have received " + memberReward + " but will not receive any rewards.");
+
+                AccountUpdate latestStakeAccountUpdate = accountUpdates.stream().filter(accountUpdate -> accountUpdate.getStakeAddress().equals(delegator.getStakeAddress())).findFirst().orElse(null);
+
+                if (latestStakeAccountUpdate != null &&
+                        latestStakeAccountUpdate.getEpoch() == poolHistoryCurrentEpoch.getEpoch() + 1 &&
+                        latestStakeAccountUpdate.getEpochSlot() > 212500) {
+                    System.out.println("[unregRU]: " + delegator.getStakeAddress() + " has been deregistered. Operator would have received " + memberReward + " but will not receive any rewards.");
+                    unspendableEarnedRewards = unspendableEarnedRewards.add(memberReward);
+                }
+
+                memberReward = BigInteger.ZERO;
+            }
+
             memberRewards.add(Reward.builder()
                     .amount(memberReward)
                     .stakeAddress(delegator.getStakeAddress())
@@ -237,26 +252,7 @@ public class PoolRewardsCalculation {
                     add(poolRewardCalculationResult.getDistributedPoolReward(), memberReward));
         }
         poolRewardCalculationResult.setMemberRewards(memberRewards);
+        poolRewardCalculationResult.setUnspendableEarnedRewards(unspendableEarnedRewards);
         return poolRewardCalculationResult;
-    }
-
-    public static BigInteger getEarnedRewardsForDeregisteredStakeAccount(PoolRewardCalculationResult poolRewardCalculationResult, List<String> stakeAddresses) {
-        BigInteger unspendableEarnedRewards = BigInteger.ZERO;
-        String poolRewardAddress = poolRewardCalculationResult.getRewardAddress();
-
-        if (poolRewardCalculationResult.getOperatorReward() != null && stakeAddresses.contains(poolRewardAddress)) {
-            unspendableEarnedRewards = unspendableEarnedRewards.add(poolRewardCalculationResult.getOperatorReward());
-        }
-
-        if (poolRewardCalculationResult.getMemberRewards() == null) {
-            return unspendableEarnedRewards;
-        }
-
-        for (Reward memberReward : poolRewardCalculationResult.getMemberRewards()) {
-            if (stakeAddresses.contains(memberReward.getStakeAddress())) {
-                unspendableEarnedRewards = unspendableEarnedRewards.add(memberReward.getAmount());
-            }
-        }
-        return unspendableEarnedRewards;
     }
 }

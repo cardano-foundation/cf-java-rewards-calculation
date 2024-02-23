@@ -1,7 +1,7 @@
 package org.cardanofoundation.rewards.validation;
 
-import org.cardanofoundation.rewards.calculation.entity.PoolRewardCalculationResult;
-import org.cardanofoundation.rewards.calculation.entity.Reward;
+import org.cardanofoundation.rewards.calculation.domain.PoolRewardCalculationResult;
+import org.cardanofoundation.rewards.calculation.domain.Reward;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
@@ -251,6 +251,14 @@ public class PoolRewardComputationTest {
     void calculateViperPoolRewardInEpoch213() {
         String poolId = "pool166dkk9kx5y6ug9tnvh0dnvxhwt2yca3g5pd5jaqa8t39cgyqqlr";
         int epoch = 213;
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+    }
+
+    @Test
+    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
+    void calculateJazzPoolRewardInEpoch214() {
+        String poolId = "pool1h0524mtazrjnzqh5e4u060jsfk8lpsqqjfpa5gygjwuhqu34wvt";
+        int epoch = 214;
         Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
     }
 

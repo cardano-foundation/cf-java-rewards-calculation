@@ -1,7 +1,7 @@
 package org.cardanofoundation.rewards.validation;
 
-import org.cardanofoundation.rewards.calculation.entity.AdaPots;
-import org.cardanofoundation.rewards.calculation.entity.EpochCalculationResult;
+import org.cardanofoundation.rewards.calculation.domain.AdaPots;
+import org.cardanofoundation.rewards.calculation.domain.EpochCalculationResult;
 import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -13,6 +13,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import static org.cardanofoundation.rewards.calculation.util.CurrencyConverter.lovelaceToAda;
 
 /*
  * This class is used to test the calculation of all ada pots for a given epoch.
@@ -31,13 +33,16 @@ public class EpochComputationTest {
         EpochCalculationResult epochCalculationResult = EpochComputation.calculateEpochPots(epoch, dataProvider);
         AdaPots adaPotsForCurrentEpoch = dataProvider.getAdaPotsForEpoch(epoch);
 
+        System.out.println("Treasury difference: " + lovelaceToAda(adaPotsForCurrentEpoch.getTreasury().subtract(epochCalculationResult.getTreasury()).longValue()));
+        System.out.println("Reserves difference: " + lovelaceToAda(adaPotsForCurrentEpoch.getReserves().subtract(epochCalculationResult.getReserves()).longValue()));
+
         Assertions.assertEquals(epoch, epochCalculationResult.getEpoch());
         Assertions.assertEquals(adaPotsForCurrentEpoch.getTreasury(), epochCalculationResult.getTreasury());
         Assertions.assertEquals(adaPotsForCurrentEpoch.getReserves(), epochCalculationResult.getReserves());
     }
 
     static Stream<Integer> dataProviderEpochRange() {
-        return IntStream.range(213, 217).boxed();
+        return IntStream.range(213, 245).boxed();
     }
 
     @ParameterizedTest
