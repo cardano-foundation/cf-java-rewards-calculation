@@ -1,10 +1,9 @@
 package org.cardanofoundation.rewards.validation.data.fetcher;
 
+import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
-import org.cardanofoundation.rewards.calculation.domain.PoolHistory;
-import org.cardanofoundation.rewards.calculation.domain.PoolOwnerHistory;
-import org.cardanofoundation.rewards.calculation.domain.PoolParameters;
-import org.cardanofoundation.rewards.validation.entity.persistence.AggregationsInEpoch;
+import org.cardanofoundation.rewards.validation.entity.jpa.projection.PoolBlocks;
+import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.List;
 
-import static org.cardanofoundation.rewards.validation.enums.DataType.AGGREGATIONS_IN_EPOCH;
+import static org.cardanofoundation.rewards.validation.enums.DataType.*;
 import static org.cardanofoundation.rewards.validation.util.JsonConverter.writeObjectToJsonFile;
 
 @Service
@@ -29,149 +27,239 @@ public class DbSyncDataFetcher implements DataFetcher {
     @Value("${json.data-provider.source}")
     private String sourceFolder;
 
-    private void aggregateValuesInEpoch(int epoch, boolean override) {
-        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, AGGREGATIONS_IN_EPOCH.resourceFolderName, epoch);
+    public void fetchAdaPotsInEpoch(int epoch, boolean override) {
+        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, ADA_POTS.resourceFolderName, epoch);
         File outputFile = new File(filePath);
 
-        File aggregationsInEpochFolder = new File(String.format("%s/%s", sourceFolder, AGGREGATIONS_IN_EPOCH.resourceFolderName));
-        if (!aggregationsInEpochFolder.exists()) {
-            if(!aggregationsInEpochFolder.mkdir()) {
-                logger.error("Failed to create folder for aggregations in epoch");
-                return;
-            }
-        }
-
         if (outputFile.exists() && !override) {
-            logger.info("Skip to aggregate additional values for epoch " + epoch + " because the json file already exists");
+            logger.info("Skip to fetch AdaPots for epoch " + epoch + " because the json file already exists");
             return;
         }
 
-        BigInteger feeSum = dbSyncDataProvider.getSumOfFeesInEpoch(epoch);
-        BigInteger withdrawalsSum = dbSyncDataProvider.getSumOfWithdrawalsInEpoch(epoch);
-        BigInteger depositsSum = dbSyncDataProvider.getTransactionDepositsInEpoch(epoch);
-
-        AggregationsInEpoch aggregationsInEpoch = new AggregationsInEpoch(feeSum, withdrawalsSum, depositsSum);
+        AdaPots adaPots = dbSyncDataProvider.getAdaPotsForEpoch(epoch);
+        if (adaPots == null) {
+            logger.error("Failed to fetch AdaPots for epoch " + epoch);
+            return;
+        }
 
         try {
-            writeObjectToJsonFile(aggregationsInEpoch, filePath);
+            writeObjectToJsonFile(adaPots, filePath);
+        } catch (IOException e) {
+            logger.error("Failed to write AdaPots to json file for epoch " + epoch);
+        }
+    }
+
+    private void fetchProtocolParameters(int epoch, boolean override) {
+        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, PROTOCOL_PARAMETERS.resourceFolderName, epoch);
+        File outputFile = new File(filePath);
+
+        if (outputFile.exists() && !override) {
+            logger.info("Skip to fetch ProtocolParameters for epoch " + epoch + " because the json file already exists");
+            return;
+        }
+
+        ProtocolParameters protocolParameters = dbSyncDataProvider.getProtocolParametersForEpoch(epoch);
+        if (protocolParameters == null) {
+            logger.error("Failed to fetch ProtocolParameters for epoch " + epoch);
+            return;
+        }
+
+        try {
+            writeObjectToJsonFile(protocolParameters, filePath);
+        } catch (IOException e) {
+            logger.error("Failed to write ProtocolParameters to json file for epoch " + epoch);
+        }
+    }
+
+    private void fetchEpochInfo(int epoch, boolean override) {
+        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, EPOCH_INFO.resourceFolderName, epoch);
+        File outputFile = new File(filePath);
+
+        if (outputFile.exists() && !override) {
+            logger.info("Skip to fetch EpochInfo for epoch " + epoch + " because the json file already exists");
+            return;
+        }
+
+        Epoch epochInfo = dbSyncDataProvider.getEpochInfo(epoch);
+        if (epochInfo == null) {
+            logger.error("Failed to fetch EpochInfo for epoch " + epoch);
+            return;
+        }
+
+        try {
+            writeObjectToJsonFile(epochInfo, filePath);
         } catch (IOException e) {
             logger.error("Failed to write EpochInfo to json file for epoch " + epoch);
         }
     }
 
-    private void fetchPoolHistoryByEpoch(String poolId, int epoch, boolean override) {
-        String filePath = String.format("%s/pools/%s/history_epoch_%d.json", sourceFolder, poolId, epoch);
+    private void fetchRetiredPoolsInEpoch(int epoch, boolean override) {
+        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, RETIRED_POOLS.resourceFolderName, epoch);
         File outputFile = new File(filePath);
 
-        File poolIdFolder = new File(String.format("%s/pools/%s", sourceFolder, poolId));
-        if (!poolIdFolder.exists()) {
-            if(!poolIdFolder.mkdir()) {
-                logger.error("Failed to create folder for pool " + poolId);
-                return;
-            }
-        }
-
         if (outputFile.exists() && !override) {
-            logger.info("Skip to fetch PoolHistory for pool " + poolId + " in epoch " + epoch + " because the json file already exists");
+            logger.info("Skip to fetch RetiredPools for epoch " + epoch + " because the json file already exists");
             return;
         }
 
-        PoolHistory poolHistory = dbSyncDataProvider.getPoolHistory(poolId, epoch);
-
-        if (poolHistory == null) {
-            logger.error("PoolHistory for pool " + poolId + " in epoch " + epoch + " is null");
+        List<PoolDeregistration> retiredPools = dbSyncDataProvider.getRetiredPoolsInEpoch(epoch);
+        if (retiredPools == null) {
+            logger.error("Failed to fetch RetiredPools for epoch " + epoch);
             return;
         }
 
         try {
-            writeObjectToJsonFile(poolHistory, filePath);
+            writeObjectToJsonFile(retiredPools, filePath);
         } catch (IOException e) {
-            logger.error("Failed to write pool history to json file for epoch " + epoch);
+            logger.error("Failed to write RetiredPools to json file for epoch " + epoch);
         }
     }
 
-    private void fetchPoolPledgeInEpoch (String poolId, int epoch, boolean override) {
-        String filePath = String.format("%s/pools/%s/parameters_epoch_%d.json", sourceFolder, poolId, epoch);
+    private void fetchBlocksMadeByPoolsInEpoch(int epoch, boolean override) {
+        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, POOL_BLOCKS.resourceFolderName, epoch);
         File outputFile = new File(filePath);
 
         if (outputFile.exists() && !override) {
-            logger.info("Skip to fetch PoolPledge for pool " + poolId + " in epoch " + epoch + " because the json file already exists");
+            logger.info("Skip to fetch PoolsThatProducedBlocks for epoch " + epoch + " because the json file already exists");
             return;
         }
 
-        File poolIdFolder = new File(String.format("%s/pools/%s", sourceFolder, poolId));
-        if (!poolIdFolder.exists()) {
-            if(!poolIdFolder.mkdir()) {
-                logger.error("Failed to create folder for pool " + poolId);
-                return;
-            }
-        }
+        List<PoolBlocks> poolBlocks = dbSyncDataProvider.getBlocksMadeByPoolsInEpoch(epoch);
 
-        BigInteger poolPledge = dbSyncDataProvider.getPoolPledgeInEpoch(poolId, epoch);
-
-        if (poolPledge == null) {
-            logger.error("PoolPledge for pool " + poolId + " in epoch " + epoch + " is null");
+        if (poolBlocks == null) {
+            logger.error("Failed to fetch PoolBlocks for epoch " + epoch);
             return;
         }
-
-        PoolParameters poolParameters = PoolParameters.builder().epoch(epoch).pledge(poolPledge).build();
 
         try {
-            writeObjectToJsonFile(poolParameters, filePath);
+            writeObjectToJsonFile(poolBlocks, filePath);
         } catch (IOException e) {
-            logger.error("Failed to write pool params (pledge) to json file for epoch " + epoch);
+            logger.error("Failed to write PoolsThatProducedBlocks to json file for epoch " + epoch);
         }
     }
 
-    private void fetchPoolOwnersStakeInEpoch(String poolId, int epoch, boolean override) {
-        String filePath = String.format("%s/pools/%s/owner_account_history_epoch_%d.json", sourceFolder, poolId, epoch);
+    private void fetchHistoryOfAllPoolsInEpoch(int epoch, boolean override) {
+        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, POOL_HISTORY.resourceFolderName, epoch);
         File outputFile = new File(filePath);
 
         if (outputFile.exists() && !override) {
-            logger.info("Skip to fetch PoolOwnerStake for pool " + poolId + " in epoch " + epoch + " because the json file already exists");
+            logger.info("Skip to fetch HistoryOfAllPools for epoch " + epoch + " because the json file already exists");
             return;
         }
 
-        File poolIdFolder = new File(String.format("%s/pools/%s", sourceFolder, poolId));
-        if (!poolIdFolder.exists()) {
-            if(!poolIdFolder.mkdir()) {
-                logger.error("Failed to create folder for pool " + poolId);
-                return;
-            }
-        }
-
-        PoolOwnerHistory poolOwnersHistory = dbSyncDataProvider.getHistoryOfPoolOwnersInEpoch(poolId, epoch);
-
-        if (poolOwnersHistory == null) {
-            logger.info("Pool owners history for pool " + poolId + " in epoch " + epoch + " is null");
+        List<PoolBlocks> blocksMadeByPoolsInEpoch = dbSyncDataProvider.getBlocksMadeByPoolsInEpoch(epoch);
+        List<PoolHistory> poolHistories = dbSyncDataProvider.getHistoryOfAllPoolsInEpoch(epoch, blocksMadeByPoolsInEpoch);
+        if (poolHistories == null) {
+            logger.error("Failed to fetch HistoryOfAllPools for epoch " + epoch);
             return;
         }
 
         try {
-            writeObjectToJsonFile(poolOwnersHistory, filePath);
+            writeObjectToJsonFile(poolHistories, filePath);
         } catch (IOException e) {
-            logger.error("Failed to write pool owner stake to json file for epoch " + epoch);
+            logger.error("Failed to write HistoryOfAllPools to json file for epoch " + epoch);
+        }
+    }
+
+    private void fetchLatestStakeAccountUpdates(int epoch, boolean override) {
+        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, ACCOUNT_UPDATES.resourceFolderName, epoch);
+        File outputFile = new File(filePath);
+
+        if (outputFile.exists() && !override) {
+            logger.info("Skip to fetch LatestStakeAccountUpdates for epoch " + epoch + " because the json file already exists");
+            return;
+        }
+
+        List<AccountUpdate> accountUpdates = dbSyncDataProvider.getLatestStakeAccountUpdates(epoch);
+        if (accountUpdates == null) {
+            logger.error("Failed to fetch LatestStakeAccountUpdates for epoch " + epoch);
+            return;
+        }
+
+        try {
+            writeObjectToJsonFile(accountUpdates, filePath);
+        } catch (IOException e) {
+            logger.error("Failed to write LatestStakeAccountUpdates to json file for epoch " + epoch);
+        }
+    }
+
+    private void fetchMemberRewardsInEpoch(int epoch, boolean override) {
+        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, MEMBER_REWARDS.resourceFolderName, epoch);
+        File outputFile = new File(filePath);
+
+        if (outputFile.exists() && !override) {
+            logger.info("Skip to fetch MemberRewards for epoch " + epoch + " because the json file already exists");
+            return;
+        }
+
+        List<Reward> memberRewards = dbSyncDataProvider.getMemberRewardsInEpoch(epoch);
+        if (memberRewards == null) {
+            logger.error("Failed to fetch MemberRewards for epoch " + epoch);
+            return;
+        }
+
+        try {
+            writeObjectToJsonFile(memberRewards, filePath);
+        } catch (IOException e) {
+            logger.error("Failed to write MemberRewards to json file for epoch " + epoch);
+        }
+    }
+
+    private void fetchSumOfMemberAndLeaderRewardsInEpoch(int epoch, boolean override) {
+        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, REWARDS.resourceFolderName, epoch);
+        File outputFile = new File(filePath);
+
+        if (outputFile.exists() && !override) {
+            logger.info("Skip to fetch SumOfMemberAndLeaderRewards for epoch " + epoch + " because the json file already exists");
+            return;
+        }
+
+        List<TotalPoolRewards> totalPoolRewards = dbSyncDataProvider.getSumOfMemberAndLeaderRewardsInEpoch(epoch);
+        if (totalPoolRewards == null) {
+            logger.error("Failed to fetch SumOfMemberAndLeaderRewards for epoch " + epoch);
+            return;
+        }
+
+        try {
+            writeObjectToJsonFile(totalPoolRewards, filePath);
+        } catch (IOException e) {
+            logger.error("Failed to write SumOfMemberAndLeaderRewards to json file for epoch " + epoch);
+        }
+    }
+
+    private void fetchSharedPoolRewardAddressWithoutReward(int epoch, boolean override) {
+        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, REWARDS_OUTLIER.resourceFolderName, epoch);
+        File outputFile = new File(filePath);
+
+        if (outputFile.exists() && !override) {
+            logger.info("Skip to fetch SharedPoolRewardAddressWithoutReward for epoch " + epoch + " because the json file already exists");
+            return;
+        }
+
+        List<String> sharedPoolRewardAddressesWithoutReward = dbSyncDataProvider.findSharedPoolRewardAddressWithoutReward(epoch);
+        if (sharedPoolRewardAddressesWithoutReward == null) {
+            logger.error("Failed to fetch SharedPoolRewardAddressWithoutReward for epoch " + epoch);
+            return;
+        }
+
+        try {
+            writeObjectToJsonFile(sharedPoolRewardAddressesWithoutReward, filePath);
+        } catch (IOException e) {
+            logger.error("Failed to write SharedPoolRewardAddressWithoutReward to json file for epoch " + epoch);
         }
     }
 
     @Override
     public void fetch(int epoch, boolean override) {
-        aggregateValuesInEpoch(epoch, override);
-
-        List<String> poolIds = List.of(
-                "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9",
-                "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt",
-                "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx",
-                "pool1spus7k8cy5qcs82xhw60dwwk2d4vrfs0m5vr2zst04gtq700gjn",
-                "pool1qqqqx69ztfvd83rtafs3mk4lwanehrglmp2vwkjpaguecs2t4c2",
-                "pool13n4jzw847sspllczxgnza7vkq80m8px7mpvwnsqthyy2790vmyc",
-                "pool1ljlmfg7p37ysmea9ra5xqwccue203dpj40w6zlzn5r2cvjrf6tw"
-        );
-
-        for (String poolId : poolIds) {
-            fetchPoolPledgeInEpoch(poolId, epoch, override);
-            fetchPoolHistoryByEpoch(poolId, epoch, override);
-            fetchPoolOwnersStakeInEpoch(poolId, epoch, override);
-        }
+        fetchAdaPotsInEpoch(epoch, override);
+        fetchEpochInfo(epoch, override);
+        fetchProtocolParameters(epoch, override);
+        fetchRetiredPoolsInEpoch(epoch, override);
+        fetchBlocksMadeByPoolsInEpoch(epoch, override);
+        fetchHistoryOfAllPoolsInEpoch(epoch, override);
+        fetchLatestStakeAccountUpdates(epoch, override);
+        fetchMemberRewardsInEpoch(epoch, override);
+        fetchSumOfMemberAndLeaderRewardsInEpoch(epoch, override);
+        fetchSharedPoolRewardAddressWithoutReward(epoch, override);
     }
 }

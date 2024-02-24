@@ -13,8 +13,25 @@ public class JsonConverter {
     }
 
     public static <T> void writeObjectToJsonFile(T objectToWrite, String filePath) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
         File outputFile = new File(filePath);
+
+        if(outputFile.isDirectory()){
+            if (!outputFile.exists()) {
+                boolean output = outputFile.mkdirs();
+                if (!output) {
+                    throw new IOException("Failed to create directory: " + outputFile.getAbsolutePath());
+                }
+            }
+        } else {
+            if (!outputFile.getAbsoluteFile().getParentFile().exists()) {
+                boolean output = outputFile.getAbsoluteFile().getParentFile().mkdirs();
+                if (!output) {
+                    throw new IOException("Failed to create directory: " + outputFile.getAbsoluteFile().getParentFile());
+                }
+            }
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.writeValue(outputFile, objectToWrite);
     }
 

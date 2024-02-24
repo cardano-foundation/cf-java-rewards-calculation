@@ -47,6 +47,7 @@ spring:
         show_sql: false
         format_sql: true
         jdbc:
+          fetch_size: 500
           batch_size: 100
         temp:
           use_jdbc_metadata_defaults: false

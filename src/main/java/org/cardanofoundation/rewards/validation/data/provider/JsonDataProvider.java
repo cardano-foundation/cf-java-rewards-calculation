@@ -2,10 +2,12 @@ package org.cardanofoundation.rewards.validation.data.provider;
 
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.LatestStakeAccountUpdate;
+import org.cardanofoundation.rewards.validation.entity.jpa.projection.PoolBlocks;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 import org.cardanofoundation.rewards.validation.enums.DataType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import rest.koios.client.backend.api.pool.model.PoolBlock;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -84,7 +86,7 @@ public class JsonDataProvider implements DataProvider {
     }
 
     @Override
-    public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch) {
+    public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch, List<PoolBlocks> blocksMadeByPoolsInEpoch) {
         return null;
     }
 
@@ -187,7 +189,7 @@ public class JsonDataProvider implements DataProvider {
     }
 
     @Override
-    public List<String> getPoolsThatProducedBlocksInEpoch(int epoch) {
+    public List<PoolBlocks> getBlocksMadeByPoolsInEpoch(int epoch) {
         return null;
     }
 

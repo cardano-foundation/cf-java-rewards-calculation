@@ -4,8 +4,6 @@ import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.calculation.enums.AccountUpdateAction;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.EXPECTED_SLOT_PER_EPOCH;

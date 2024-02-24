@@ -1,5 +1,7 @@
 package org.cardanofoundation.rewards.validation.data.provider;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.jni.Pool;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.entity.jpa.*;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.*;
@@ -8,16 +10,22 @@ import org.cardanofoundation.rewards.calculation.enums.MirPot;
 import org.cardanofoundation.rewards.validation.mapper.*;
 import org.cardanofoundation.rewards.validation.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.divide;
 
 @Service
+@Slf4j
 @Profile("db-sync")
 public class DbSyncDataProvider implements DataProvider {
 
@@ -56,6 +64,15 @@ public class DbSyncDataProvider implements DataProvider {
     @Autowired
     DbSyncWithdrawalRepository dbSyncWithdrawalRepository;
 
+    @Value("${spring.datasource.url}")
+    private String databaseUrl;
+
+    @Value("${spring.datasource.username}")
+    private String databaseUser;
+
+    @Value("${spring.datasource.password}")
+    private String databasePassword;
+
     @Override
     public AdaPots getAdaPotsForEpoch(int epoch) {
         DbSyncAdaPots dbSyncAdaPots = dbSyncAdaPotsRepository.findByEpoch(epoch);
@@ -92,85 +109,102 @@ public class DbSyncDataProvider implements DataProvider {
         return ProtocolParametersMapper.fromDbSyncProtocolParameters(dbSyncProtocolParameters);
     }
 
-    @Override
-    public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch) {
+    public List<PoolHistory> fetchPoolHistoryInBatches(Integer epoch, int batchSize, List<PoolBlocks> blocksMadeByPoolsInEpoch) {
         List<PoolHistory> poolHistories = new ArrayList<>();
-        List<PoolEpochStake> epochStakes = dbSyncEpochStakeRepository.getAllPoolsActiveStakesInEpoch(epoch);
-        List<PoolBlocks> allBlocksMadeByPoolsInEpoch = dbSyncBlockRepository.getAllBlocksMadeByPoolsInEpoch(epoch);
-        List<LatestPoolUpdate> latestUpdates = dbSyncPoolUpdateRepository.findLatestActiveUpdatesInEpoch(epoch);
+        List<String> poolIds = blocksMadeByPoolsInEpoch.stream()
+                .map(PoolBlocks::getPoolId)
+                .distinct()
+                .toList();
+
+        List<LatestPoolUpdate> latestUpdates = dbSyncPoolUpdateRepository.findLatestActiveUpdatesInEpoch(epoch, poolIds);
 
         List<Long> updateIds = latestUpdates.stream()
                 .map(LatestPoolUpdate::getId)
                 .toList();
 
         List<PoolOwner> owners = dbSyncPoolOwnerRepository.getOwnersByPoolUpdateIds(updateIds);
+        List<List<String>> poolIdBatches = new ArrayList<>();
 
-        List<String> poolIds = epochStakes.stream()
-                .map(PoolEpochStake::getPoolId)
-                .distinct()
-                .toList();
+        for (int i = 0; i < poolIds.size(); i += batchSize) {
+            int end = Math.min(i + batchSize, poolIds.size());
+            List<String> batch = poolIds.subList(i, end);
+            poolIdBatches.add(batch);
+        }
 
-        for (String poolId : poolIds) {
-            PoolHistory poolHistory = new PoolHistory();
-            BigInteger activeStake = BigInteger.ZERO;
-            List<Delegator> delegators = new ArrayList<>();
-            List<PoolEpochStake> poolEpochStakes = epochStakes.stream().filter(poolEpochStake -> poolEpochStake.getPoolId().equals(poolId)).toList();
+        int i = 0;
+        int batches = poolIdBatches.size();
+        for (List<String> poolIdBatch : poolIdBatches) {
+            log.info("fetching pool history batch " + i + " / " + batches + " for epoch " + epoch + " with " + poolIdBatch.size() + " pools");
+            List<PoolEpochStake> poolEpochStakes = dbSyncEpochStakeRepository.getAllPoolsActiveStakesInEpoch(epoch, poolIdBatch);
+            List<Delegator> delegators = poolEpochStakes.stream()
+                    .map(DelegatorMapper::fromPoolEpochStake)
+                    .toList();
 
-            for (PoolEpochStake poolEpochStake : poolEpochStakes) {
-                activeStake = activeStake.add(poolEpochStake.getAmount());
-                Delegator delegator = Delegator.builder()
-                        .stakeAddress(poolEpochStake.getStakeAddress())
-                        .activeStake(poolEpochStake.getAmount())
-                        .build();
-                delegators.add(delegator);
-            }
+            for (String poolId : poolIdBatch) {
+                PoolHistory poolHistory = new PoolHistory();
 
-            if (!delegators.isEmpty()) {
-                poolHistory.setActiveStake(activeStake);
-                poolHistory.setDelegators(delegators);
+                if (!delegators.isEmpty()) {
+                    List<Delegator> poolDelegators = delegators.stream()
+                            .filter(delegator -> delegator.getPoolId().equals(poolId))
+                            .toList();
+                    BigInteger activeStake = poolDelegators.stream()
+                            .map(Delegator::getActiveStake)
+                            .reduce(BigInteger::add)
+                            .orElse(BigInteger.ZERO);
 
-                Integer blockCount = allBlocksMadeByPoolsInEpoch.stream()
-                        .filter(poolBlocks -> poolBlocks.getPoolId().equals(poolId))
-                        .map(PoolBlocks::getBlockCount)
-                        .findFirst()
-                        .orElse(0);
-                poolHistory.setBlockCount(blockCount);
+                    poolHistory.setActiveStake(activeStake);
+                    poolHistory.setDelegators(poolDelegators);
 
-                LatestPoolUpdate latestUpdate = latestUpdates.stream()
-                        .filter(update -> update.getPoolId().equals(poolId))
-                        .findFirst()
-                        .orElse(null);
+                    Integer blockCount = blocksMadeByPoolsInEpoch.stream()
+                            .filter(poolBlocks -> poolBlocks.getPoolId().equals(poolId))
+                            .map(PoolBlocks::getBlockCount)
+                            .findFirst()
+                            .orElse(0);
+                    poolHistory.setBlockCount(blockCount);
 
-                if (latestUpdate == null) {
-                    System.out.println("No update for pool " + poolId + " in epoch " + epoch);
-                    continue;
-                }
+                    LatestPoolUpdate latestUpdate = latestUpdates.stream()
+                            .filter(update -> update.getPoolId().equals(poolId))
+                            .findFirst()
+                            .orElse(null);
 
-                poolHistory.setFixedCost(latestUpdate.getFixedCost());
-                poolHistory.setMargin(latestUpdate.getMargin());
-                poolHistory.setRewardAddress(latestUpdate.getRewardAddress());
-                poolHistory.setPledge(latestUpdate.getPledge());
-                poolHistory.setEpoch(epoch);
-                poolHistory.setPoolId(poolId);
-
-                BigInteger activeStakes = BigInteger.ZERO;
-                List<String> stakeAddresses = owners.stream()
-                        .filter(owner -> owner.getPoolId().equals(poolId)).map(PoolOwner::getStakeAddress).toList();
-
-                for (PoolEpochStake poolEpochStake : poolEpochStakes) {
-                    if (stakeAddresses.contains(poolEpochStake.getStakeAddress())) {
-                        activeStakes = activeStakes.add(poolEpochStake.getAmount());
+                    if (latestUpdate == null) {
+                        System.out.println("No update for pool " + poolId + " in epoch " + epoch);
+                        continue;
                     }
+
+                    poolHistory.setFixedCost(latestUpdate.getFixedCost());
+                    poolHistory.setMargin(latestUpdate.getMargin());
+                    poolHistory.setRewardAddress(latestUpdate.getRewardAddress());
+                    poolHistory.setPledge(latestUpdate.getPledge());
+                    poolHistory.setEpoch(epoch);
+                    poolHistory.setPoolId(poolId);
+
+
+                    List<String> poolOwnerStakeAddresses = owners.stream()
+                            .filter(owner -> owner.getPoolId().equals(poolId)).map(PoolOwner::getStakeAddress).toList();
+
+                    BigInteger poolOwnerActiveStake = BigInteger.ZERO;
+                    for (Delegator poolDelegator : poolDelegators) {
+                        if (poolOwnerStakeAddresses.contains(poolDelegator.getStakeAddress())) {
+                            poolOwnerActiveStake = poolOwnerActiveStake.add(poolDelegator.getActiveStake());
+                        }
+                    }
+
+                    poolHistory.setOwners(poolOwnerStakeAddresses);
+                    poolHistory.setOwnerActiveStake(poolOwnerActiveStake);
+
+                    poolHistories.add(poolHistory);
                 }
-
-                poolHistory.setOwners(stakeAddresses);
-                poolHistory.setOwnerActiveStake(activeStakes);
-
-                poolHistories.add(poolHistory);
             }
+            i++;
         }
 
         return poolHistories;
+    }
+
+    @Override
+    public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch, List<PoolBlocks> blocksMadeByPoolsInEpoch) {
+        return fetchPoolHistoryInBatches(epoch, 20, blocksMadeByPoolsInEpoch);
     }
 
     @Override
@@ -408,8 +442,8 @@ public class DbSyncDataProvider implements DataProvider {
         return dbSyncRewardRepository.getTotalPoolRewardsInEpoch(poolId, epoch);
     }
 
-    public List<String> getPoolsThatProducedBlocksInEpoch(int epoch) {
-        return dbSyncBlockRepository.getPoolsThatProducedBlocksInEpoch(epoch);
+    public List<PoolBlocks> getBlocksMadeByPoolsInEpoch(int epoch) {
+        return dbSyncBlockRepository.getAllBlocksMadeByPoolsInEpoch(epoch);
     }
 
     @Override

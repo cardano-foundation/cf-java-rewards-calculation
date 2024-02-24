@@ -10,7 +10,12 @@ public enum DataType {
     ACCOUNT_UPDATES ("accountUpdates"),
     POOL_OWNER_HISTORY("accountHistory"),
     MIR_CERTIFICATE("mirCertificates"),
-    AGGREGATIONS_IN_EPOCH("aggregationsInEpoch");
+    AGGREGATIONS_IN_EPOCH("aggregationsInEpoch"),
+    RETIRED_POOLS("retiredPools"),
+    MEMBER_REWARDS("memberRewards"),
+    REWARDS("rewards"),
+    REWARDS_OUTLIER("rewardsOutlier"),
+    POOL_BLOCKS("poolBlocks");
 
     public final String resourceFolderName;
 

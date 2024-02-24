@@ -12,4 +12,6 @@ import java.math.BigInteger;
 public class Delegator {
     String stakeAddress;
     BigInteger activeStake;
+    String poolId;
+    Integer epoch;
 }

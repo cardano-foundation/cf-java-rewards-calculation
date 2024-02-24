@@ -3,8 +3,11 @@ package org.cardanofoundation.rewards.validation;
 import org.cardanofoundation.rewards.calculation.EpochCalculation;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
+import org.cardanofoundation.rewards.validation.entity.jpa.projection.PoolBlocks;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -19,8 +22,9 @@ public class EpochValidation {
         Epoch epochInfo = dataProvider.getEpochInfo(epoch - 2);
         List<PoolDeregistration> retiredPools = dataProvider.getRetiredPoolsInEpoch(epoch);
         List<MirCertificate> mirCertificates = dataProvider.getMirCertificatesInEpoch(epoch - 1);
-        List<String> poolIds = dataProvider.getPoolsThatProducedBlocksInEpoch(epoch - 2);
-        List<PoolHistory> poolHistories = dataProvider.getHistoryOfAllPoolsInEpoch(epoch - 2);
+        List<PoolBlocks> blocksMadeByPoolsInEpoch = dataProvider.getBlocksMadeByPoolsInEpoch(epoch - 2);
+        List<String> poolIds = blocksMadeByPoolsInEpoch.stream().map(PoolBlocks::getPoolId).distinct().toList();
+        List<PoolHistory> poolHistories = dataProvider.getHistoryOfAllPoolsInEpoch(epoch - 2, blocksMadeByPoolsInEpoch);
         List<AccountUpdate> accountUpdates = dataProvider.getLatestStakeAccountUpdates(epoch - 1);
         List<Reward> memberRewardsInEpoch = dataProvider.getMemberRewardsInEpoch(epoch - 2);
         List<TotalPoolRewards> totalPoolRewards = dataProvider.getSumOfMemberAndLeaderRewardsInEpoch(epoch - 2);

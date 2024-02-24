@@ -1,8 +1,9 @@
 package org.cardanofoundation.rewards.validation.data.provider;
 
 import org.cardanofoundation.rewards.calculation.domain.*;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.LatestStakeAccountUpdate;
+import org.cardanofoundation.rewards.validation.entity.jpa.projection.PoolBlocks;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
+import rest.koios.client.backend.api.pool.model.PoolBlock;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -15,7 +16,7 @@ public interface DataProvider {
 
     public ProtocolParameters getProtocolParametersForEpoch(int epoch);
 
-    public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch);
+    public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch, List<PoolBlocks> blocksMadeByPoolsInEpoch);
     public PoolHistory getPoolHistory(String poolId, int epoch);
 
     public BigInteger getPoolPledgeInEpoch(String poolId, int epoch);
@@ -44,7 +45,7 @@ public interface DataProvider {
 
     public BigInteger getTotalPoolRewardsInEpoch(String poolId, int epoch);
 
-    public List<String> getPoolsThatProducedBlocksInEpoch(int epoch);
+    public List<PoolBlocks> getBlocksMadeByPoolsInEpoch(int epoch);
     public List<AccountUpdate> getLatestStakeAccountUpdates(int epoch);
     public List<TotalPoolRewards> getSumOfMemberAndLeaderRewardsInEpoch(int epoch);
 

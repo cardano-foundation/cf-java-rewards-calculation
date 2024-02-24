@@ -2,7 +2,7 @@ package org.cardanofoundation.rewards.validation.data.provider;
 
 import lombok.RequiredArgsConstructor;
 import org.cardanofoundation.rewards.calculation.domain.*;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.LatestStakeAccountUpdate;
+import org.cardanofoundation.rewards.validation.entity.jpa.projection.PoolBlocks;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 import org.cardanofoundation.rewards.validation.mapper.*;
 import org.springframework.stereotype.Service;
@@ -36,7 +36,6 @@ public class KoiosDataProvider implements DataProvider {
     public KoiosDataProvider() {
         this.koiosBackendService = BackendFactory.getKoiosMainnetService();
     }
-
 
     public AdaPots getAdaPotsForEpoch(int epoch) {
         Totals totals = null;
@@ -100,7 +99,7 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
-    public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch) {
+    public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch, List<PoolBlocks> blocksMadeByPoolsInEpoch) {
         return null;
     }
 
@@ -281,7 +280,7 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
-    public List<String> getPoolsThatProducedBlocksInEpoch(int epoch) {
+    public List<PoolBlocks> getBlocksMadeByPoolsInEpoch(int epoch) {
         return null;
     }
 
