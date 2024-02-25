@@ -17,12 +17,20 @@ public interface DbSyncStakeRegistrationRepository extends ReadOnlyRepository<Db
     List<DbSyncAccountRegistration> getLatestAccountRegistrationsUntilEpochForAddresses(
             List<String> addresses, Integer epoch);
 
-    @Query("SELECT registration.address.view AS address, 'REGISTRATION' AS action, " +
-            "registration.transaction.block.time AS unixBlockTime " +
-            "FROM DbSyncAccountRegistration registration WHERE " +
-            "registration.epoch <= :epoch AND registration.epoch > :epoch-2")
-    List<StakeAccountUpdate> getRecentAccountRegistrationsBeforeEpoch(Integer epoch);
-
-    @Query("SELECT COUNT(*) FROM DbSyncAccountRegistration WHERE epoch = :epoch")
-    Integer countRegistrationsInEpoch(Integer epoch);
+    @Query(nativeQuery = true, value = """
+            SELECT
+                DISTINCT sa.view AS stakeAddress
+            FROM
+                stake_registration sr
+            JOIN
+                tx ON tx.id = sr.tx_id
+            JOIN
+                block ON block.id = tx.block_id AND  (block.epoch_no < :epoch OR
+                                                     (block.epoch_no = :epoch AND block.epoch_slot_no < :stabilityWindow))
+            JOIN
+                stake_address sa ON sa.id = sr.addr_id
+            WHERE
+                sr.epoch_no <= :epoch AND
+                sa.view IN :stakeAddresses""")
+    List<String> getStakeAddressesWithRegistrationsUntilEpoch(Integer epoch, List<String> stakeAddresses, Long stabilityWindow);
 }

@@ -3,7 +3,6 @@ package org.cardanofoundation.rewards.validation.data.provider;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.PoolBlocks;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
-import rest.koios.client.backend.api.pool.model.PoolBlock;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -50,4 +49,10 @@ public interface DataProvider {
     public List<TotalPoolRewards> getSumOfMemberAndLeaderRewardsInEpoch(int epoch);
 
     public List<String> findSharedPoolRewardAddressWithoutReward(int epoch);
+
+    public List<String> getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow);
+    public List<String> getLateAccountDeregistrationsInEpoch(int epoch, long stabilityWindow);
+    public List<String> getStakeAddressesWithRegistrationsUntilEpoch(Integer epoch, List<String> stakeAddresses,
+                                                                     Long stabilityWindow);
+
 }

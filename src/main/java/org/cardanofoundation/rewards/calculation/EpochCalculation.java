@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.calculation.PoolRewardsCalculation.calculatePoolRewardInEpoch;
+import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.POOL_DEPOSIT_IN_LOVELACE;
 import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.TOTAL_LOVELACE;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 import static org.cardanofoundation.rewards.calculation.util.CurrencyConverter.lovelaceToAda;
@@ -19,10 +20,12 @@ public class EpochCalculation {
     public static EpochCalculationResult calculateEpochRewardPots(int epoch, AdaPots adaPotsForPreviousEpoch,
                                                                   ProtocolParameters protocolParameters, Epoch epochInfo,
                                                                   List<PoolDeregistration> retiredPools,
-                                                                  List<AccountUpdate> accountUpdates,
+                                                                  List<String> deregisteredAccounts,
                                                                   List<MirCertificate> mirCertificates,
                                                                   List<String> poolsThatProducedBlocksInEpoch,
                                                                   List<PoolHistory> poolHistories,
+                                                                  List<String> lateDeregisteredAccounts,
+                                                                  List<String> accountsRegisteredInThePast,
                                                                   List<String> sharedPoolRewardAddressesWithoutReward) {
         EpochCalculationResult epochCalculationResult = EpochCalculationResult.builder().epoch(epoch).build();
 
@@ -64,11 +67,14 @@ public class EpochCalculation {
         // treasury (see: Pool Reap Transition, p.53, figure 40, shely-ledger.pdf)
         if (retiredPools.size() > 0) {
             List<String> rewardAddressesOfRetiredPools = retiredPools.stream().map(PoolDeregistration::getRewardAddress).toList();
-            List<AccountUpdate> latestAccountUpdates = accountUpdates.stream()
-                    .filter(update -> rewardAddressesOfRetiredPools.contains(update.getStakeAddress())).toList();
+            List<String> deregisteredOwnerAccounts = deregisteredAccounts.stream()
+                    .filter(rewardAddressesOfRetiredPools::contains).toList();
+            List<String> lateDeregisteredOwnerAccounts = lateDeregisteredAccounts.stream()
+                    .filter(rewardAddressesOfRetiredPools::contains).toList();
 
-            treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(
-                    TreasuryCalculation.calculateUnclaimedRefundsForRetiredPools(retiredPools, latestAccountUpdates));
+            if (deregisteredOwnerAccounts.size() > 0 || lateDeregisteredOwnerAccounts.size() > 0) {
+                treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(POOL_DEPOSIT_IN_LOVELACE);
+            }
         }
         // Check if there was a MIR Certificate in the previous epoch
         BigInteger treasuryWithdrawals = BigInteger.ZERO;
@@ -108,8 +114,8 @@ public class EpochCalculation {
                 stakeAddresses.add(poolHistory.getRewardAddress());
                 stakeAddresses.addAll(poolHistory.getDelegators().stream().map(Delegator::getStakeAddress).toList());
 
-                List<AccountUpdate> latestAccountUpdates = accountUpdates.stream()
-                        .filter(update -> stakeAddresses.contains(update.getStakeAddress())).toList();
+                List<String> latestAccountDeregistrations = deregisteredAccounts.stream()
+                        .filter(stakeAddresses::contains).toList();
 
                 // There was a different behavior in the previous version of the node
                 // If a pool reward address had been used for multiple pools,
@@ -122,7 +128,7 @@ public class EpochCalculation {
                         totalBlocksInEpoch, protocolParameters,
                         adaInCirculation, activeStakeInEpoch, stakePoolRewardsPot,
                         poolHistory.getOwnerActiveStake(), poolHistory.getOwners(),
-                        latestAccountUpdates, ignoreLeaderReward);
+                        latestAccountDeregistrations, ignoreLeaderReward, lateDeregisteredAccounts, accountsRegisteredInThePast);
             }
 
             PoolRewardCalculationResults.add(poolRewardCalculationResult);

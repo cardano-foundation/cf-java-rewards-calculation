@@ -1,14 +1,11 @@
 package org.cardanofoundation.rewards.validation.data.provider;
 
 import org.cardanofoundation.rewards.calculation.domain.*;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.LatestStakeAccountUpdate;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.PoolBlocks;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 import org.cardanofoundation.rewards.validation.enums.DataType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import rest.koios.client.backend.api.pool.model.PoolBlock;
-
 import java.io.File;
 import java.math.BigInteger;
 import java.util.List;
@@ -205,6 +202,21 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public List<String> findSharedPoolRewardAddressWithoutReward(int epoch) {
+        return null;
+    }
+
+    @Override
+    public List<String> getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow) {
+        return null;
+    }
+
+    @Override
+    public List<String> getLateAccountDeregistrationsInEpoch(int epoch, long stabilityWindow) {
+        return null;
+    }
+
+    @Override
+    public List<String> getStakeAddressesWithRegistrationsUntilEpoch(Integer epoch, List<String> stakeAddresses, Long stabilityWindow) {
         return null;
     }
 }

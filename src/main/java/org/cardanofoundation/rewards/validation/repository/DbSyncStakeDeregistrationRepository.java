@@ -2,7 +2,6 @@ package org.cardanofoundation.rewards.validation.repository;
 
 import org.cardanofoundation.rewards.validation.entity.jpa.DbSyncAccountDeregistration;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.LatestStakeAccountUpdate;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.StakeAccountUpdate;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -63,10 +62,59 @@ SELECT stakeAddress, latestUpdateType, block.epoch_slot_no AS epochSlot, block.e
     List<LatestStakeAccountUpdate> getLatestStakeAccountUpdates(Integer epoch);
 
     @Query(nativeQuery = true, value = """
-        SELECT stake_address.view AS stakeAddress FROM stake_deregistration
-            JOIN tx ON tx.id=stake_deregistration.tx_id JOIN block ON block.id=tx.block_id
-            JOIN stake_address ON stake_deregistration.addr_id=stake_address.id
-        WHERE block.epoch_no=:epoch AND epoch_slot_no < :beforeEpochSlot AND epoch_slot_no > :afterEpochSlot
-        """)
-    List<String> getStakeAddressDeregistrationsInEpoch(Integer epoch, Integer beforeEpochSlot, Integer afterEpochSlot);
+            SELECT
+                sa.view AS stakeAddress
+            FROM
+                stake_deregistration sd
+            JOIN
+                stake_registration sr ON sd.addr_id = sr.addr_id AND sr.epoch_no <= :epoch
+            JOIN
+                tx tx1 ON tx1.id = sd.tx_id
+            JOIN
+                tx tx2 ON tx2.id = sr.tx_id
+            JOIN
+                block block1 ON block1.id = tx1.block_id AND (block1.epoch_no < :epoch OR (
+                                                              block1.epoch_no = :epoch AND
+                                                              block1.epoch_slot_no < :stabilityWindow))
+            JOIN
+                block block2 ON block2.id = tx2.block_id AND (block2.epoch_no < :epoch OR (
+                                                              block2.epoch_no = :epoch AND
+                                                              block2.epoch_slot_no < :stabilityWindow))
+            JOIN
+                stake_address sa ON sa.id = sd.addr_id
+            WHERE
+                sd.epoch_no <= :epoch
+            GROUP BY
+                sa.view
+            HAVING
+                MAX(sd.tx_id) > MAX(sr.tx_id)
+            """)
+    List<String> getAccountDeregistrationsInEpoch(Integer epoch, Long stabilityWindow);
+
+    @Query(nativeQuery = true, value = """
+            SELECT
+            	sa.view AS stakeAddress
+            FROM
+            	stake_deregistration sd
+            JOIN
+            	stake_registration sr ON sd.addr_id = sr.addr_id AND sr.epoch_no <= :epoch
+            JOIN
+            	tx tx1 ON tx1.id = sd.tx_id
+            JOIN
+            	tx tx2 ON tx2.id = sr.tx_id
+            JOIN
+            	block block1 ON block1.id = tx1.block_id AND block1.epoch_no = :epoch AND block1.epoch_slot_no > :stabilityWindow
+            JOIN
+            	block block2 ON block2.id = tx2.block_id AND block2.epoch_no <= :epoch OR (
+            		block2.epoch_no = :epoch AND block2.epoch_slot_no > :stabilityWindow)
+            JOIN
+            	stake_address sa ON sa.id = sd.addr_id
+            WHERE
+            	sd.epoch_no = :epoch
+            GROUP BY
+            	sa.view
+            HAVING
+            	MAX(sd.tx_id) > MAX(sr.tx_id);
+            """)
+    List<String> getLateAccountDeregistrationsInEpoch(Integer epoch, Long stabilityWindow);
 }

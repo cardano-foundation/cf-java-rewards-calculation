@@ -299,6 +299,21 @@ public class KoiosDataProvider implements DataProvider {
         return null;
     }
 
+    @Override
+    public List<String> getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow) {
+        return null;
+    }
+
+    @Override
+    public List<String> getLateAccountDeregistrationsInEpoch(int epoch, long stabilityWindow) {
+        return null;
+    }
+
+    @Override
+    public List<String> getStakeAddressesWithRegistrationsUntilEpoch(Integer epoch, List<String> stakeAddresses, Long stabilityWindow) {
+        return null;
+    }
+
     private List<Delegator> getPoolMemberInEpoch(String poolId, int epoch) {
         List<Delegator> delegators = new ArrayList<>();
         try {

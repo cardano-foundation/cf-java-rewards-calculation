@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
+import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.RANDOMNESS_STABILISATION_WINDOW;
+
 @Slf4j
 public class EpochValidation {
 
@@ -25,18 +27,25 @@ public class EpochValidation {
         List<PoolBlocks> blocksMadeByPoolsInEpoch = dataProvider.getBlocksMadeByPoolsInEpoch(epoch - 2);
         List<String> poolIds = blocksMadeByPoolsInEpoch.stream().map(PoolBlocks::getPoolId).distinct().toList();
         List<PoolHistory> poolHistories = dataProvider.getHistoryOfAllPoolsInEpoch(epoch - 2, blocksMadeByPoolsInEpoch);
-        List<AccountUpdate> accountUpdates = dataProvider.getLatestStakeAccountUpdates(epoch - 1);
+        //List<AccountUpdate> accountUpdates = dataProvider.getLatestStakeAccountUpdates(epoch - 1);
+        List<String> deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);
+        List<String> lateDeregisteredAccounts = dataProvider.getLateAccountDeregistrationsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);
         List<Reward> memberRewardsInEpoch = dataProvider.getMemberRewardsInEpoch(epoch - 2);
         List<TotalPoolRewards> totalPoolRewards = dataProvider.getSumOfMemberAndLeaderRewardsInEpoch(epoch - 2);
         List<String> sharedPoolRewardAddressesWithoutReward = dataProvider.findSharedPoolRewardAddressWithoutReward(epoch - 2);
+
+        List<String> poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).toList();
+        List<String> accountsRegisteredInThePast = dataProvider.getStakeAddressesWithRegistrationsUntilEpoch(epoch - 1, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
+
         long end = System.currentTimeMillis();
         log.info("Obtaining the epoch data took " + Math.round((end - start) / 1000.0) + "s");
         log.info("Start epoch calculation");
 
         start = System.currentTimeMillis();
         EpochCalculationResult epochCalculationResult = EpochCalculation.calculateEpochRewardPots(
-                epoch, adaPotsForPreviousEpoch, protocolParameters, epochInfo, retiredPools, accountUpdates,
-                mirCertificates, poolIds, poolHistories, sharedPoolRewardAddressesWithoutReward);
+                epoch, adaPotsForPreviousEpoch, protocolParameters, epochInfo, retiredPools, deregisteredAccounts,
+                mirCertificates, poolIds, poolHistories, lateDeregisteredAccounts,
+                accountsRegisteredInThePast, sharedPoolRewardAddressesWithoutReward);
         end = System.currentTimeMillis();
         log.info("Epoch calculation took " + Math.round((end - start) / 1000.0) + "s");
         log.info("Start epoch validation");

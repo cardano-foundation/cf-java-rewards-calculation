@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.calculation.PoolRewardsCalculation.calculatePoolRewardInEpoch;
+import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.RANDOMNESS_STABILISATION_WINDOW;
 import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.TOTAL_LOVELACE;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 import static org.cardanofoundation.rewards.calculation.util.CurrencyConverter.lovelaceToAda;
@@ -18,7 +19,8 @@ public class PoolRewardValidation {
     public static PoolRewardCalculationResult computePoolRewardInEpoch(String poolId, int epoch, ProtocolParameters protocolParameters,
                                                                        Epoch epochInfo, BigInteger stakePoolRewardsPot,
                                                                        BigInteger adaInCirculation, PoolHistory poolHistoryCurrentEpoch,
-                                                                       List<AccountUpdate> accountUpdates,
+                                                                       List<String> accountDeregistrations, List<String> lateAccountDeregistrations,
+                                                                       List<String> accountsRegisteredInThePast,
                                                                        List<String> poolIdsWithSharedRewardAddresses) {
         // Step 1: Get Pool information of current epoch
         // Example: https://api.koios.rest/api/v0/pool_history?_pool_bech32=pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt&_epoch_no=210
@@ -45,8 +47,8 @@ public class PoolRewardValidation {
 
         //List<AccountUpdate> accountUpdates = dataProvider.getAccountUpdatesUntilEpoch(stakeAddresses, epoch - 1);
 
-        List<AccountUpdate> latestAccountUpdates = accountUpdates.stream()
-                .filter(update -> stakeAddresses.contains(update.getStakeAddress())).toList();
+        List<String> latestAccountDeregistrations = accountDeregistrations.stream()
+                .filter(stakeAddresses::contains).toList();
 
         // There was a different behavior in the previous version of the node
         // If a pool reward address had been used for multiple pools,
@@ -62,7 +64,8 @@ public class PoolRewardValidation {
                 totalBlocksInEpoch, protocolParameters,
                 adaInCirculation, activeStakeInEpoch, stakePoolRewardsPot,
                 poolHistoryCurrentEpoch.getOwnerActiveStake(), poolHistoryCurrentEpoch.getOwners(),
-                latestAccountUpdates, ignoreLeaderReward);
+                latestAccountDeregistrations, ignoreLeaderReward, lateAccountDeregistrations,
+                accountsRegisteredInThePast);
 
     }
 
@@ -106,10 +109,13 @@ public class PoolRewardValidation {
 
         PoolHistory poolHistoryCurrentEpoch = dataProvider.getPoolHistory(poolId, epoch);
 
-        List<AccountUpdate> accountUpdates = dataProvider.getLatestStakeAccountUpdates(epoch);
-        List<String> sharedPoolRewardAddressesWithoutReward = dataProvider.findSharedPoolRewardAddressWithoutReward(epoch - 2);
+        List<String> accountDeregistrations = dataProvider.getDeregisteredAccountsInEpoch(epoch + 1, RANDOMNESS_STABILISATION_WINDOW);
+        List<String> lateAccountDeregistrations = dataProvider.getLateAccountDeregistrationsInEpoch(epoch + 1, RANDOMNESS_STABILISATION_WINDOW);
+        List<String> sharedPoolRewardAddressesWithoutReward = dataProvider.findSharedPoolRewardAddressWithoutReward(epoch);
+        List<String> accountsRegisteredInThePast = dataProvider.getStakeAddressesWithRegistrationsUntilEpoch(epoch, List.of(poolHistoryCurrentEpoch.getRewardAddress()), RANDOMNESS_STABILISATION_WINDOW);
 
-        return computePoolRewardInEpoch(poolId, epoch, protocolParameters, epochInfo, stakePoolRewardsPot, adaInCirculation, poolHistoryCurrentEpoch, accountUpdates, sharedPoolRewardAddressesWithoutReward);
+        return computePoolRewardInEpoch(poolId, epoch, protocolParameters, epochInfo, stakePoolRewardsPot, adaInCirculation, poolHistoryCurrentEpoch,
+                accountDeregistrations, lateAccountDeregistrations, accountsRegisteredInThePast, sharedPoolRewardAddressesWithoutReward);
     }
 
     public static boolean poolRewardIsValid(PoolRewardCalculationResult poolRewardCalculationResult, DataProvider dataProvider) {
