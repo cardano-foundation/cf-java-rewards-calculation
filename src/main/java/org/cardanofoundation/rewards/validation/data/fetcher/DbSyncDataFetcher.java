@@ -2,6 +2,7 @@ package org.cardanofoundation.rewards.validation.data.fetcher;
 
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
+import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.PoolBlocks;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 import org.slf4j.Logger;
@@ -12,7 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.RANDOMNESS_STABILISATION_WINDOW;
 import static org.cardanofoundation.rewards.validation.enums.DataType.*;
@@ -24,6 +27,9 @@ public class DbSyncDataFetcher implements DataFetcher {
     private static final Logger logger = LoggerFactory.getLogger(DbSyncDataFetcher.class);
     @Autowired(required = false)
     private DbSyncDataProvider dbSyncDataProvider;
+
+    @Autowired(required = false)
+    private JsonDataProvider jsonDataProvider;
 
     @Value("${json.data-provider.source}")
     private String sourceFolder;
@@ -138,6 +144,31 @@ public class DbSyncDataFetcher implements DataFetcher {
         }
     }
 
+    private void fetchStakeAddressesWithRegistrationsUntilEpoch(int epoch, boolean override) {
+        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, PAST_ACCOUNT_REGISTRATIONS.resourceFolderName, epoch);
+        File outputFile = new File(filePath);
+
+        if (outputFile.exists() && !override) {
+            logger.info("Skip to fetch StakeAddressesWithRegistrationsUntilEpoch for epoch " + epoch + " because the json file already exists");
+            return;
+        }
+
+        List<PoolHistory> poolHistories = jsonDataProvider.getHistoryOfAllPoolsInEpoch(epoch - 1, null);
+        HashSet<String> poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).collect(Collectors.toCollection(HashSet::new));
+
+        HashSet<String> accountsRegisteredInThePast = dbSyncDataProvider.getStakeAddressesWithRegistrationsUntilEpoch(epoch, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
+        if (accountsRegisteredInThePast == null) {
+            logger.error("Failed to fetch StakeAddressesWithRegistrationsUntilEpoch for epoch " + epoch);
+            return;
+        }
+
+        try {
+            writeObjectToJsonFile(accountsRegisteredInThePast, filePath);
+        } catch (IOException e) {
+            logger.error("Failed to write StakeAddressesWithRegistrationsUntilEpoch to json file for epoch " + epoch);
+        }
+    }
+
     private void fetchHistoryOfAllPoolsInEpoch(int epoch, boolean override) {
         String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, POOL_HISTORY.resourceFolderName, epoch);
         File outputFile = new File(filePath);
@@ -154,8 +185,8 @@ public class DbSyncDataFetcher implements DataFetcher {
             return;
         }
 
-        List<String> poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).toList();
-        List<String> accountsRegisteredInThePast = dbSyncDataProvider.getStakeAddressesWithRegistrationsUntilEpoch(epoch - 1, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
+        HashSet<String> poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).collect(Collectors.toCollection(HashSet::new));
+        HashSet<String> accountsRegisteredInThePast = dbSyncDataProvider.getStakeAddressesWithRegistrationsUntilEpoch(epoch + 1, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
 
         try {
             writeObjectToJsonFile(poolHistories, filePath);
@@ -189,7 +220,7 @@ public class DbSyncDataFetcher implements DataFetcher {
             return;
         }
 
-        List<String> deregisteredAccountsInEpoch = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch, RANDOMNESS_STABILISATION_WINDOW);
+        HashSet<String> deregisteredAccountsInEpoch = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch, RANDOMNESS_STABILISATION_WINDOW);
         if (deregisteredAccountsInEpoch == null) {
             logger.error("Failed to fetch deregistered accounts for epoch " + epoch);
             return;
@@ -255,7 +286,7 @@ public class DbSyncDataFetcher implements DataFetcher {
             return;
         }
 
-        List<String> sharedPoolRewardAddressesWithoutReward = dbSyncDataProvider.findSharedPoolRewardAddressWithoutReward(epoch);
+        HashSet<String> sharedPoolRewardAddressesWithoutReward = dbSyncDataProvider.findSharedPoolRewardAddressWithoutReward(epoch);
         if (sharedPoolRewardAddressesWithoutReward == null) {
             logger.error("Failed to fetch SharedPoolRewardAddressWithoutReward for epoch " + epoch);
             return;
@@ -277,7 +308,7 @@ public class DbSyncDataFetcher implements DataFetcher {
             return;
         }
 
-        List<String> lateDeregisteredAccounts = dbSyncDataProvider.getLateAccountDeregistrationsInEpoch(epoch, RANDOMNESS_STABILISATION_WINDOW);
+        HashSet<String> lateDeregisteredAccounts = dbSyncDataProvider.getLateAccountDeregistrationsInEpoch(epoch, RANDOMNESS_STABILISATION_WINDOW);
         if (lateDeregisteredAccounts == null) {
             logger.error("Failed to fetch LateAccountDeregistrations for epoch " + epoch);
             return;
@@ -303,5 +334,6 @@ public class DbSyncDataFetcher implements DataFetcher {
         // fetchSumOfMemberAndLeaderRewardsInEpoch(epoch, override);
         fetchSharedPoolRewardAddressWithoutReward(epoch, override);
         fetchMirCertificatesInEpoch(epoch, override);
+        fetchStakeAddressesWithRegistrationsUntilEpoch(epoch, override);
     }
 }

@@ -4,6 +4,7 @@ import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.List;
 
 public interface DataProvider {
@@ -45,11 +46,11 @@ public interface DataProvider {
     public List<AccountUpdate> getLatestStakeAccountUpdates(int epoch);
     public List<TotalPoolRewards> getSumOfMemberAndLeaderRewardsInEpoch(int epoch);
 
-    public List<String> findSharedPoolRewardAddressWithoutReward(int epoch);
+    public HashSet<String> findSharedPoolRewardAddressWithoutReward(int epoch);
 
-    public List<String> getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow);
-    public List<String> getLateAccountDeregistrationsInEpoch(int epoch, long stabilityWindow);
-    public List<String> getStakeAddressesWithRegistrationsUntilEpoch(Integer epoch, List<String> stakeAddresses,
+    public HashSet<String> getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow);
+    public HashSet<String> getLateAccountDeregistrationsInEpoch(int epoch, long stabilityWindow);
+    public HashSet<String> getStakeAddressesWithRegistrationsUntilEpoch(Integer epoch, HashSet<String> stakeAddresses,
                                                                      Long stabilityWindow);
 
 }

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -436,22 +437,22 @@ public class DbSyncDataProvider implements DataProvider {
     }
 
     @Override
-    public List<String> findSharedPoolRewardAddressWithoutReward(int epoch) {
+    public HashSet<String> findSharedPoolRewardAddressWithoutReward(int epoch) {
         return dbSyncPoolUpdateRepository.findSharedPoolRewardAddressWithoutReward(epoch);
     }
 
     @Override
-    public List<String> getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow) {
+    public HashSet<String> getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow) {
         return dbSyncStakeDeregistrationRepository.getAccountDeregistrationsInEpoch(epoch, stabilityWindow);
     }
 
     @Override
-    public List<String> getLateAccountDeregistrationsInEpoch(int epoch, long stabilityWindow) {
+    public HashSet<String> getLateAccountDeregistrationsInEpoch(int epoch, long stabilityWindow) {
         return dbSyncStakeDeregistrationRepository.getLateAccountDeregistrationsInEpoch(epoch,  stabilityWindow);
     }
 
     @Override
-    public List<String> getStakeAddressesWithRegistrationsUntilEpoch(Integer epoch, List<String> stakeAddresses, Long stabilityWindow) {
+    public HashSet<String> getStakeAddressesWithRegistrationsUntilEpoch(Integer epoch, HashSet<String> stakeAddresses, Long stabilityWindow) {
         return dbSyncStakeRegistrationRepository.getStakeAddressesWithRegistrationsUntilEpoch(epoch, stakeAddresses, stabilityWindow);
     }
 }

@@ -5,6 +5,8 @@ import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 
 import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.MAINNET_ALLEGRA_HARDFORK_EPOCH;
@@ -29,14 +31,14 @@ public class EpochValidation {
         List<PoolBlock> blocksMadeByPoolsInEpoch = dataProvider.getBlocksMadeByPoolsInEpoch(epoch - 2);
         List<String> poolIds = blocksMadeByPoolsInEpoch.stream().map(PoolBlock::getPoolId).distinct().toList();
         List<PoolHistory> poolHistories = dataProvider.getHistoryOfAllPoolsInEpoch(epoch - 2, blocksMadeByPoolsInEpoch);
-        List<String> deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);
-        List<String> lateDeregisteredAccounts = dataProvider.getLateAccountDeregistrationsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);
-        List<String> sharedPoolRewardAddressesWithoutReward = List.of();
+        HashSet<String> deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);
+        HashSet<String> lateDeregisteredAccounts = dataProvider.getLateAccountDeregistrationsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);
+        HashSet<String> sharedPoolRewardAddressesWithoutReward = new HashSet<>();
         if (epoch < MAINNET_ALLEGRA_HARDFORK_EPOCH) {
             sharedPoolRewardAddressesWithoutReward = dataProvider.findSharedPoolRewardAddressWithoutReward(epoch - 2);
         }
-        List<String> poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).toList();
-        List<String> accountsRegisteredInThePast = dataProvider.getStakeAddressesWithRegistrationsUntilEpoch(epoch - 1, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
+        HashSet<String> poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).collect(Collectors.toCollection(HashSet::new));
+        HashSet<String> accountsRegisteredInThePast = dataProvider.getStakeAddressesWithRegistrationsUntilEpoch(epoch - 1, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
 
         List<Reward> memberRewardsInEpoch = List.of();
         List<TotalPoolRewards> totalPoolRewards = List.of();

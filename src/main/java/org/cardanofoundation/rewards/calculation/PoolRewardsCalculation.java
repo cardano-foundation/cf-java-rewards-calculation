@@ -124,16 +124,14 @@ public class PoolRewardsCalculation {
                 relativeMemberStake), relativeStakeOfPool));
     }
 
-    public static PoolRewardCalculationResult calculatePoolRewardInEpoch(String poolId, PoolHistory poolHistoryCurrentEpoch,
-                                                                         int totalBlocksInEpoch, ProtocolParameters protocolParameters,
-                                                                         BigInteger adaInCirculation, BigInteger activeStakeInEpoch, BigInteger stakePoolRewardsPot,
-                                                                         BigInteger totalActiveStakeOfOwners, List<String> poolOwnerStakeAddresses,
-                                                                         List<String> deregisteredAccounts, boolean ignoreLeaderReward,
-                                                                         List<String> lateDeregisteredAccounts,
-                                                                         List<String> accountsRegisteredInThePast) {
-        // Step 1: Get Pool information of current epoch
-        // Example: https://api.koios.rest/api/v0/pool_history?_pool_bech32=pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt&_epoch_no=210
-        PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardCalculationResult.builder()
+    public static PoolRewardCalculationResult calculatePoolRewardInEpoch(final String poolId, final PoolHistory poolHistoryCurrentEpoch,
+                                                                         final int totalBlocksInEpoch, final ProtocolParameters protocolParameters,
+                                                                         final BigInteger adaInCirculation, final BigInteger activeStakeInEpoch, BigInteger stakePoolRewardsPot,
+                                                                         final BigInteger totalActiveStakeOfOwners, final List<String> poolOwnerStakeAddresses,
+                                                                         final HashSet<String> deregisteredAccounts, final boolean ignoreLeaderReward,
+                                                                         final HashSet<String> lateDeregisteredAccounts,
+                                                                         final HashSet<String> accountsRegisteredInThePast) {
+        final PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardCalculationResult.builder()
                 .epoch(poolHistoryCurrentEpoch.getEpoch())
                 .poolId(poolId)
                 .poolReward(BigInteger.ZERO)
@@ -141,11 +139,11 @@ public class PoolRewardsCalculation {
                 .unspendableEarnedRewards(BigInteger.ZERO)
                 .build();
 
-        BigInteger poolStake = poolHistoryCurrentEpoch.getActiveStake();
-        BigInteger poolPledge = poolHistoryCurrentEpoch.getPledge();
-        double poolMargin = poolHistoryCurrentEpoch.getMargin();
-        BigInteger poolFixedCost = poolHistoryCurrentEpoch.getFixedCost();
-        int blocksPoolHasMinted = poolHistoryCurrentEpoch.getBlockCount();
+        final BigInteger poolStake = poolHistoryCurrentEpoch.getActiveStake();
+        final BigInteger poolPledge = poolHistoryCurrentEpoch.getPledge();
+        final double poolMargin = poolHistoryCurrentEpoch.getMargin();
+        final BigInteger poolFixedCost = poolHistoryCurrentEpoch.getFixedCost();
+        final int blocksPoolHasMinted = poolHistoryCurrentEpoch.getBlockCount();
 
         poolRewardCalculationResult.setPoolMargin(poolMargin);
         poolRewardCalculationResult.setPoolCost(poolFixedCost);
@@ -159,8 +157,8 @@ public class PoolRewardsCalculation {
         int optimalPoolCount = protocolParameters.getOptimalPoolCount();
         double influenceParam = protocolParameters.getPoolOwnerInfluence();
 
-        // Step 5: Calculate apparent pool performance
-        BigDecimal apparentPoolPerformance =
+        // Calculate apparent pool performance
+        final BigDecimal apparentPoolPerformance =
                 PoolRewardsCalculation.calculateApparentPoolPerformance(poolStake, activeStakeInEpoch,
                         blocksPoolHasMinted, totalBlocksInEpoch, decentralizationParameter);
         poolRewardCalculationResult.setApparentPoolPerformance(apparentPoolPerformance);
@@ -173,11 +171,11 @@ public class PoolRewardsCalculation {
             return poolRewardCalculationResult;
         }
 
-        BigDecimal relativeStakeOfPoolOwner = divide(poolPledge, adaInCirculation);
-        BigDecimal relativePoolStake = divide(poolStake, adaInCirculation);
+        final BigDecimal relativeStakeOfPoolOwner = divide(poolPledge, adaInCirculation);
+        final BigDecimal relativePoolStake = divide(poolStake, adaInCirculation);
 
         // Step 8: Calculate optimal pool reward
-        BigInteger optimalPoolReward =
+        final BigInteger optimalPoolReward =
                 PoolRewardsCalculation.calculateOptimalPoolReward(
                         stakePoolRewardsPot,
                         optimalPoolCount,
@@ -187,7 +185,7 @@ public class PoolRewardsCalculation {
         poolRewardCalculationResult.setOptimalPoolReward(optimalPoolReward);
 
         // Step 9: Calculate pool reward as optimal pool reward * apparent pool performance
-        BigInteger poolReward = PoolRewardsCalculation.calculatePoolReward(optimalPoolReward, apparentPoolPerformance);
+        final BigInteger poolReward = PoolRewardsCalculation.calculatePoolReward(optimalPoolReward, apparentPoolPerformance);
         poolRewardCalculationResult.setPoolReward(poolReward);
 
         // Step 10: Calculate pool operator reward
@@ -214,14 +212,13 @@ public class PoolRewardsCalculation {
             log.info("[reward address of multiple pools] Pool " + poolId + " has been ignored. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
         }
 
-        poolRewardCalculationResult.setOperatorReward(poolOperatorReward);
-        poolRewardCalculationResult.setDistributedPoolReward(poolOperatorReward);
         // Step 11: Calculate pool member reward
-        List<Reward> memberRewards = new ArrayList<>();
+        BigInteger poolMemberRewards = BigInteger.ZERO;
+        final List<Reward> memberRewards = new ArrayList<>();
         for (Delegator delegator : poolHistoryCurrentEpoch.getDelegators()) {
-            String stakeAddress = delegator.getStakeAddress();
-            if (delegator.getStakeAddress().equals(poolHistoryCurrentEpoch.getRewardAddress()) ||
-                    poolOwnerStakeAddresses.contains(delegator.getStakeAddress())) {
+            final String stakeAddress = delegator.getStakeAddress();
+            if (stakeAddress.equals(poolHistoryCurrentEpoch.getRewardAddress()) ||
+                    poolOwnerStakeAddresses.contains(stakeAddress)) {
                 continue;
             }
 
@@ -229,22 +226,23 @@ public class PoolRewardsCalculation {
                     poolFixedCost, divide(delegator.getActiveStake(), adaInCirculation), relativePoolStake);
 
             if (deregisteredAccounts.contains(stakeAddress)) {
-                log.info("Delegator " + delegator.getStakeAddress() + " has been deregistered. Delegator would have received " + memberReward + " but will not receive any rewards.");
+                log.info("Delegator " + stakeAddress + " has been deregistered. Delegator would have received " + memberReward + " but will not receive any rewards.");
                 memberReward = BigInteger.ZERO;
             } else if (lateDeregisteredAccounts.contains(stakeAddress)) {
-                log.info("[unregRU]: " + delegator.getStakeAddress() + " has been deregistered lately. Delegator would have received " + memberReward + " but will not receive any rewards.");
+                log.info("[unregRU]: " + stakeAddress + " has been deregistered lately. Delegator would have received " + memberReward + " but will not receive any rewards.");
                 unspendableEarnedRewards = unspendableEarnedRewards.add(memberReward);
                 memberReward = BigInteger.ZERO;
             }
 
             memberRewards.add(Reward.builder()
                     .amount(memberReward)
-                    .stakeAddress(delegator.getStakeAddress())
+                    .stakeAddress(stakeAddress)
                     .build());
 
-            poolRewardCalculationResult.setDistributedPoolReward(
-                    add(poolRewardCalculationResult.getDistributedPoolReward(), memberReward));
+            poolMemberRewards = poolMemberRewards.add(memberReward);
         }
+        poolRewardCalculationResult.setDistributedPoolReward(poolOperatorReward.add(poolMemberRewards));
+        poolRewardCalculationResult.setOperatorReward(poolOperatorReward);
         poolRewardCalculationResult.setMemberRewards(memberRewards);
         poolRewardCalculationResult.setUnspendableEarnedRewards(unspendableEarnedRewards);
         return poolRewardCalculationResult;

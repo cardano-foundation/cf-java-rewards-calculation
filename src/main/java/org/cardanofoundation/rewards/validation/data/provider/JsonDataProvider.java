@@ -8,7 +8,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.io.File;
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.cardanofoundation.rewards.validation.enums.DataType.*;
 import static org.cardanofoundation.rewards.validation.util.JsonConverter.convertFileJsonToArrayList;
@@ -33,7 +36,7 @@ public class JsonDataProvider implements DataProvider {
         } else if (dataType.equals(LATE_DEREGISTRATIONS)) {
             return String.join(File.separator, sourceFolder, LATE_DEREGISTRATIONS.resourceFolderName, "epoch" + epoch + ".json");
         } else if (dataType.equals(PAST_ACCOUNT_REGISTRATIONS)) {
-            return String.join(File.separator, sourceFolder, PAST_ACCOUNT_REGISTRATIONS.resourceFolderName, "epoch" + (epoch - 1) + ".json");
+            return String.join(File.separator, sourceFolder, PAST_ACCOUNT_REGISTRATIONS.resourceFolderName, "epoch" + epoch + ".json");
         } else if (dataType.equals(POOL_BLOCKS)) {
             return String.join(File.separator, sourceFolder, POOL_BLOCKS.resourceFolderName, "epoch" + epoch + ".json");
         } else if (dataType.equals(ADA_POTS)) {
@@ -75,6 +78,17 @@ public class JsonDataProvider implements DataProvider {
 
         try {
             return convertFileJsonToArrayList(filePath, objectClass);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private <T> HashSet<T> getHashSetFromJson(DataType dataType, Integer epoch, Class<T> objectClass) {
+        String filePath = getResourceFolder(dataType, epoch, null);
+
+        try {
+            return new HashSet<>(Objects.requireNonNull(convertFileJsonToArrayList(filePath, objectClass)));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -210,30 +224,30 @@ public class JsonDataProvider implements DataProvider {
     }
 
     @Override
-    public List<String> findSharedPoolRewardAddressWithoutReward(int epoch) {
-        List<String> sharedPoolRewardAddressesWithoutReward = getListFromJson(REWARDS_OUTLIER, epoch, String.class);
-        if (sharedPoolRewardAddressesWithoutReward == null) return List.of();
+    public HashSet<String> findSharedPoolRewardAddressWithoutReward(int epoch) {
+        HashSet<String> sharedPoolRewardAddressesWithoutReward = getHashSetFromJson(REWARDS_OUTLIER, epoch, String.class);
+        if (sharedPoolRewardAddressesWithoutReward == null) return new HashSet<>();
         return sharedPoolRewardAddressesWithoutReward;
     }
 
     @Override
-    public List<String> getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow) {
-        List<String> deregisteredAccounts = getListFromJson(ACCOUNT_DEREGISTRATION, epoch, String.class);
-        if (deregisteredAccounts == null) return List.of();
+    public HashSet<String> getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow) {
+        HashSet<String> deregisteredAccounts = getHashSetFromJson(ACCOUNT_DEREGISTRATION, epoch, String.class);
+        if (deregisteredAccounts == null) return new HashSet<>();
         return deregisteredAccounts;
     }
 
     @Override
-    public List<String> getLateAccountDeregistrationsInEpoch(int epoch, long stabilityWindow) {
-        List<String> lateDeregisteredAccounts = getListFromJson(LATE_DEREGISTRATIONS, epoch, String.class);
-        if (lateDeregisteredAccounts == null) return List.of();
+    public HashSet<String> getLateAccountDeregistrationsInEpoch(int epoch, long stabilityWindow) {
+        HashSet<String> lateDeregisteredAccounts = getHashSetFromJson(LATE_DEREGISTRATIONS, epoch, String.class);
+        if (lateDeregisteredAccounts == null) return new HashSet<>();
         return lateDeregisteredAccounts;
     }
 
     @Override
-    public List<String> getStakeAddressesWithRegistrationsUntilEpoch(Integer epoch, List<String> stakeAddresses, Long stabilityWindow) {
-        List<String> accountsRegisteredInThePast = getListFromJson(PAST_ACCOUNT_REGISTRATIONS, epoch, String.class);
-        if (accountsRegisteredInThePast == null) return List.of();
-        return accountsRegisteredInThePast.stream().filter(stakeAddresses::contains).toList();
+    public HashSet<String> getStakeAddressesWithRegistrationsUntilEpoch(Integer epoch, HashSet<String> stakeAddresses, Long stabilityWindow) {
+        HashSet<String> accountsRegisteredInThePast = getHashSetFromJson(PAST_ACCOUNT_REGISTRATIONS, epoch, String.class);
+        if (accountsRegisteredInThePast == null) return new HashSet<>();
+        return accountsRegisteredInThePast;
     }
 }

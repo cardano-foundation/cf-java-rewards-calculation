@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Repository
@@ -77,5 +78,5 @@ public interface DbSyncPoolUpdateRepository extends ReadOnlyRepository<DbSyncPoo
             WHERE NOT EXISTS (
              SELECT 1 FROM reward WHERE type = 'leader' AND pool_id=p1.pool_hash_id AND earned_epoch=:epoch
             )""")
-    List<String> findSharedPoolRewardAddressWithoutReward(int epoch);
+    HashSet<String> findSharedPoolRewardAddressWithoutReward(int epoch);
 }

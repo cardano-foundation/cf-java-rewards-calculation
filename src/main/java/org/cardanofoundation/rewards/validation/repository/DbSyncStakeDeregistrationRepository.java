@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Repository
@@ -89,7 +90,7 @@ SELECT stakeAddress, latestUpdateType, block.epoch_slot_no AS epochSlot, block.e
             HAVING
                 MAX(sd.tx_id) > MAX(sr.tx_id)
             """)
-    List<String> getAccountDeregistrationsInEpoch(Integer epoch, Long stabilityWindow);
+    HashSet<String> getAccountDeregistrationsInEpoch(Integer epoch, Long stabilityWindow);
 
     @Query(nativeQuery = true, value = """
             SELECT
@@ -116,5 +117,5 @@ SELECT stakeAddress, latestUpdateType, block.epoch_slot_no AS epochSlot, block.e
             HAVING
             	MAX(sd.tx_id) > MAX(sr.tx_id);
             """)
-    List<String> getLateAccountDeregistrationsInEpoch(Integer epoch, Long stabilityWindow);
+    HashSet<String> getLateAccountDeregistrationsInEpoch(Integer epoch, Long stabilityWindow);
 }

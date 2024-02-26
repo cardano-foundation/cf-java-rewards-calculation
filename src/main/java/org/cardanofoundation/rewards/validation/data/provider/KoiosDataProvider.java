@@ -25,6 +25,7 @@ import rest.koios.client.backend.factory.options.filters.FilterType;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -290,22 +291,22 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
-    public List<String> findSharedPoolRewardAddressWithoutReward(int epoch) {
+    public HashSet<String> findSharedPoolRewardAddressWithoutReward(int epoch) {
         return null;
     }
 
     @Override
-    public List<String> getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow) {
+    public HashSet<String> getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow) {
         return null;
     }
 
     @Override
-    public List<String> getLateAccountDeregistrationsInEpoch(int epoch, long stabilityWindow) {
+    public HashSet<String> getLateAccountDeregistrationsInEpoch(int epoch, long stabilityWindow) {
         return null;
     }
 
     @Override
-    public List<String> getStakeAddressesWithRegistrationsUntilEpoch(Integer epoch, List<String> stakeAddresses, Long stabilityWindow) {
+    public HashSet<String> getStakeAddressesWithRegistrationsUntilEpoch(Integer epoch, HashSet<String> stakeAddresses, Long stabilityWindow) {
         return null;
     }
 
