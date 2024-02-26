@@ -2,9 +2,10 @@ package org.cardanofoundation.rewards.validation;
 
 import org.cardanofoundation.rewards.calculation.domain.AdaPots;
 import org.cardanofoundation.rewards.calculation.domain.EpochCalculationResult;
+import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
+import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +24,14 @@ import static org.cardanofoundation.rewards.calculation.util.CurrencyConverter.l
 @ComponentScan
 @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
 public class EpochValidationTest {
-
-    // Only the DbSyncDataProvider is used for this test
-    // as the amount of data would be too much for the Koios or JSON data provider .
     @Autowired
-    DbSyncDataProvider dataProvider;
+    DbSyncDataProvider dbSyncDataProvider;
 
-    public void testCalculateEpochPots(final int epoch) {
-        EpochCalculationResult epochCalculationResult = EpochValidation.calculateEpochRewardPots(epoch, dataProvider);
+    @Autowired
+    JsonDataProvider jsonDataProvider;
+
+    public void testCalculateEpochPots(final int epoch, DataProvider dataProvider, boolean detailedValidation) {
+        EpochCalculationResult epochCalculationResult = EpochValidation.calculateEpochRewardPots(epoch, dataProvider, detailedValidation);
         AdaPots adaPotsForCurrentEpoch = dataProvider.getAdaPotsForEpoch(epoch);
 
         System.out.println("Treasury difference: " + lovelaceToAda(adaPotsForCurrentEpoch.getTreasury().subtract(epochCalculationResult.getTreasury()).longValue()));
@@ -42,17 +43,18 @@ public class EpochValidationTest {
     }
 
     static Stream<Integer> dataProviderEpochRange() {
-        return IntStream.range(213, 445).boxed();
+        return IntStream.range(213, 460).boxed();
     }
 
     @ParameterizedTest
     @MethodSource("dataProviderEpochRange")
-    public void testCalculateEpochRewardsForEpoch213(int epoch) {
-        testCalculateEpochPots(epoch);
+    public void testCalculateEpochRewardsWithDbSyncDataProvider(int epoch) {
+        testCalculateEpochPots(epoch, dbSyncDataProvider, true);
     }
 
-    @Test
-    public void testCalculateEpochRewardsForEpoch215() {
-        testCalculateEpochPots(215);
+    @ParameterizedTest
+    @MethodSource("dataProviderEpochRange")
+    public void testCalculateEpochRewardsWithJsonDataProvider(int epoch) {
+        testCalculateEpochPots(epoch, jsonDataProvider, false);
     }
 }

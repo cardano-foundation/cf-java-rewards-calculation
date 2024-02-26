@@ -8,8 +8,6 @@ public class DelegatorMapper {
         return Delegator.builder()
                 .stakeAddress(poolEpochStake.getStakeAddress())
                 .activeStake(poolEpochStake.getAmount())
-                .poolId(poolEpochStake.getPoolId())
-                .epoch(poolEpochStake.getEpoch())
                 .build();
     }
 }

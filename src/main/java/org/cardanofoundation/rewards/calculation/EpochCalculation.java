@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.calculation.PoolRewardsCalculation.calculatePoolRewardInEpoch;
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.POOL_DEPOSIT_IN_LOVELACE;
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.TOTAL_LOVELACE;
+import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
+import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.MAINNET_BOOTSTRAP_ADDRESS_AMOUNT;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 import static org.cardanofoundation.rewards.calculation.util.CurrencyConverter.lovelaceToAda;
 import lombok.extern.slf4j.Slf4j;
@@ -122,7 +122,10 @@ public class EpochCalculation {
                 // the stake account only received the reward for one of those pools
                 // This is not the case anymore and the stake account receives the reward for all pools
                 // Until the Allegra hard fork, this method will be used to emulate the old behavior
-                boolean ignoreLeaderReward = sharedPoolRewardAddressesWithoutReward.contains(poolId);
+                boolean ignoreLeaderReward = false;
+                if (epoch < MAINNET_ALLEGRA_HARDFORK_EPOCH) {
+                    ignoreLeaderReward = sharedPoolRewardAddressesWithoutReward.contains(poolId);
+                }
 
                 poolRewardCalculationResult = calculatePoolRewardInEpoch(poolId, poolHistory,
                         totalBlocksInEpoch, protocolParameters,
@@ -141,6 +144,17 @@ public class EpochCalculation {
         BigInteger undistributedRewards = subtract(stakePoolRewardsPot, totalDistributedRewards);
         calculatedReserve = add(calculatedReserve, undistributedRewards);
         calculatedReserve = subtract(calculatedReserve, unspendableEarnedRewards);
+
+        if (epoch == MAINNET_ALLEGRA_HARDFORK_EPOCH) {
+            /*
+                "The bootstrap addresses from Figure 6 were not intended to include the Byron era redeem
+                addresses (those with addrtype 2, see the Byron CDDL spec). These addresses were, however,
+                not spendable in the Shelley era. At the Allegra hard fork they were removed from the UTxO
+                and the Ada contained in them was returned to the reserves."
+                    - shelley-spec-ledger.pdf 17.5 p.115
+             */
+            calculatedReserve = calculatedReserve.add(MAINNET_BOOTSTRAP_ADDRESS_AMOUNT);
+        }
 
         log.info("Unspendable earned rewards: " + lovelaceToAda(unspendableEarnedRewards.intValue()) + " ADA");
         treasuryForCurrentEpoch = add(treasuryForCurrentEpoch, unspendableEarnedRewards);

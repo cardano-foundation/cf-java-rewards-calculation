@@ -67,7 +67,6 @@ git clone https://github.com/cardano-foundation/cf-java-rewards-calculation.git
 cd cf-java-rewards-calculation
 ./mvnw clean test
 ```
-
 #### Data Provider
 The pool rewards calculation and also the treasury calculation requires a data provider to perform the calculation.
 This repository offers different data providers and also an interface if you want to add your own provider. The following data providers are available:
@@ -76,6 +75,29 @@ This repository offers different data providers and also an interface if you wan
  - [JSON Data Provider](./src/main/java/org/cardanofoundation/rewards/validation/data/provider/JsonDataProvider.java)
  - [DbSync Data Provider](./src/main/java/org/cardanofoundation/rewards/validation/data/provider/DbSyncDataProvider.java)
  - Yaci Store Data Provider (Coming Next 👀)
+
+#### Data Fetcher
+
+The data fetcher is used to fetch the data from the data provider and put it into local json files.
+These files can be used to perform the calculation using the JSON Data Provider. The following data fetchers are available:
+
+ - [Koios Data Fetcher](./src/main/java/org/cardanofoundation/rewards/validation/data/fetcher/KoiosDataFetcher.java)
+ - [DbSync Data Fetcher](./src/main/java/org/cardanofoundation/rewards/validation/data/fetcher/DbSyncDataFetcher.java)
+
+To make the application fetching the data, create an .env file with the following content in the `src/main/resources` folder:
+
+```
+SPRING_PROFILES_ACTIVE=db-sync
+
+RUN_MODE=fetch
+OVERWRITE_EXISTING_DATA=false
+
+POSTGRES_USER=<username>
+POSTGRES_PASSWORD=<password>
+POSTGRES_DB=cexplorer
+
+JSON_DATA_SOURCE_FOLDER=/path/to/your/rewards-calculation-test-data
+```
   
 ## 🫡 Roadmap
  - [ ] Add a data provider for [Yaci Store](https://github.com/bloxbean/yaci-store) (scoped indexer 👀)
@@ -84,9 +106,9 @@ This repository offers different data providers and also an interface if you wan
  - [ ] Add a `/docs` folder containing parsable Markdown files to explain MIR certificates and edge cases
  - [ ] Enhance reporting and add values for the other pots as well. Include information from the `/docs` folder
  - [X] Calculate member and operator rewards
- - [ ] Add deposits and utxo pot
- - [ ] Calculate unclaimed rewards that need to go back to the reserves
- - [ ] Put rewards to unregistered stake addresses into the treasury
+ - [X] Add deposits and utxo pot
+ - [X] Calculate unclaimed rewards that need to go back to the reserves
+ - [X] Put rewards to unregistered stake addresses into the treasury
  - [ ] A nice web ui to visualize the rewards calculation
 
 ## 📖 Sources

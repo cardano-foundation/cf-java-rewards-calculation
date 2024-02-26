@@ -23,15 +23,33 @@ public class JsonDataProvider implements DataProvider {
         if (sourceFolder == null) throw new RuntimeException("Invalid source folder for JSON data provider. Please check the JSON_DATA_SOURCE_FOLDER environment variable that you have provided.");
 
         if (dataType.equals(POOL_DEREGISTRATIONS)) {
-            return String.join(File.separator, sourceFolder, "poolDeregistrations", "deregistrations.json");
+            return String.join(File.separator, sourceFolder, POOL_DEREGISTRATIONS.resourceFolderName, "epoch" + epoch + ".json");
+        } else if (dataType.equals(ACCOUNT_UPDATES)) {
+            return String.join(File.separator, sourceFolder, ACCOUNT_UPDATES.resourceFolderName, "epoch" + epoch + ".json");
+        } else if (dataType.equals(REWARDS_OUTLIER)) {
+            return String.join(File.separator, sourceFolder, REWARDS_OUTLIER.resourceFolderName, "epoch" + epoch + ".json");
+        } else if (dataType.equals(ACCOUNT_DEREGISTRATION)) {
+            return String.join(File.separator, sourceFolder, ACCOUNT_DEREGISTRATION.resourceFolderName, "epoch" + epoch + ".json");
+        } else if (dataType.equals(LATE_DEREGISTRATIONS)) {
+            return String.join(File.separator, sourceFolder, LATE_DEREGISTRATIONS.resourceFolderName, "epoch" + epoch + ".json");
+        } else if (dataType.equals(PAST_ACCOUNT_REGISTRATIONS)) {
+            return String.join(File.separator, sourceFolder, PAST_ACCOUNT_REGISTRATIONS.resourceFolderName, "epoch" + (epoch - 1) + ".json");
+        } else if (dataType.equals(POOL_BLOCKS)) {
+            return String.join(File.separator, sourceFolder, POOL_BLOCKS.resourceFolderName, "epoch" + epoch + ".json");
+        } else if (dataType.equals(ADA_POTS)) {
+            return String.join(File.separator, sourceFolder, ADA_POTS.resourceFolderName, "epoch" + epoch + ".json");
+        } else if (dataType.equals(EPOCH_INFO)) {
+            return String.join(File.separator, sourceFolder, EPOCH_INFO.resourceFolderName, "epoch" + epoch + ".json");
+        } else if (dataType.equals(PROTOCOL_PARAMETERS)) {
+            return String.join(File.separator, sourceFolder, PROTOCOL_PARAMETERS.resourceFolderName, "epoch" + epoch + ".json");
         } else if (dataType.equals(POOL_PARAMETERS)) {
-            return String.join(File.separator, sourceFolder, "pools", poolId, "parameters_epoch_" + epoch + ".json");
+            return String.join(File.separator, sourceFolder, POOL_PARAMETERS.resourceFolderName, "epoch" + epoch + ".json");
         } else if (dataType.equals(POOL_HISTORY)) {
-            return String.join(File.separator, sourceFolder, "pools", poolId, "history_epoch_" + epoch + ".json");
+            return String.join(File.separator, sourceFolder, POOL_HISTORY.resourceFolderName, "epoch" + epoch + ".json");
         } else if (dataType.equals(POOL_OWNER_HISTORY)) {
             return String.join(File.separator, sourceFolder, "pools", poolId, "owner_account_history_epoch_" + epoch + ".json");
         } else if (dataType.equals(MIR_CERTIFICATE)) {
-            return String.join(File.separator, sourceFolder, "mirCertificates", "mirCertificates.json");
+            return String.join(File.separator, sourceFolder, MIR_CERTIFICATE.resourceFolderName, "epoch" + epoch + ".json");
         } else {
             return String.join(File.separator, sourceFolder, dataType.resourceFolderName, "epoch" + epoch + ".json");
         }
@@ -83,8 +101,10 @@ public class JsonDataProvider implements DataProvider {
     }
 
     @Override
-    public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch, List<PoolBlocks> blocksMadeByPoolsInEpoch) {
-        return null;
+    public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch, List<PoolBlock> blocksMadeByPoolsInEpoch) {
+        List<PoolHistory> histories = getListFromJson(POOL_HISTORY, epoch, PoolHistory.class);
+        if (histories == null) return List.of();
+        return histories;
     }
 
     @Override
@@ -118,12 +138,9 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public List<PoolDeregistration> getRetiredPoolsInEpoch(int epoch) {
-        List<PoolDeregistration> poolDeregistrations = getListFromJson(POOL_DEREGISTRATIONS, null, PoolDeregistration.class);
+        List<PoolDeregistration> poolDeregistrations = getListFromJson(RETIRED_POOLS, epoch, PoolDeregistration.class);
         if (poolDeregistrations == null) return List.of();
-
-        return poolDeregistrations.stream()
-                .filter(poolDeregistration -> poolDeregistration.getRetiringEpoch() == epoch)
-                .toList();
+        return poolDeregistrations;
     }
 
     @Override
@@ -136,13 +153,8 @@ public class JsonDataProvider implements DataProvider {
     @Override
     public List<MirCertificate> getMirCertificatesInEpoch(int epoch) {
         List<MirCertificate> mirCertificates = getListFromJson(MIR_CERTIFICATE, epoch, MirCertificate.class);
-        Epoch epochInfo = getDataFromJson(EPOCH_INFO, epoch, Epoch.class);
-        if (mirCertificates == null || epochInfo == null) return List.of();
-
-        return mirCertificates.stream()
-                .filter(mirCertificate -> mirCertificate.getBlockTime() <= epochInfo.getUnixTimeLastBlock())
-                .filter(mirCertificate -> mirCertificate.getBlockTime() >= epochInfo.getUnixTimeFirstBlock())
-                .toList();
+        if (mirCertificates == null) return List.of();
+        return mirCertificates;
     }
 
     @Override
@@ -181,13 +193,10 @@ public class JsonDataProvider implements DataProvider {
     }
 
     @Override
-    public BigInteger getTotalPoolRewardsInEpoch(String poolId, int epoch) {
-        return null;
-    }
-
-    @Override
-    public List<PoolBlocks> getBlocksMadeByPoolsInEpoch(int epoch) {
-        return null;
+    public List<PoolBlock> getBlocksMadeByPoolsInEpoch(int epoch) {
+        List<PoolBlock> poolBlocks = getListFromJson(POOL_BLOCKS, epoch, PoolBlock.class);
+        if (poolBlocks == null) return List.of();
+        return poolBlocks;
     }
 
     @Override
@@ -202,21 +211,29 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public List<String> findSharedPoolRewardAddressWithoutReward(int epoch) {
-        return null;
+        List<String> sharedPoolRewardAddressesWithoutReward = getListFromJson(REWARDS_OUTLIER, epoch, String.class);
+        if (sharedPoolRewardAddressesWithoutReward == null) return List.of();
+        return sharedPoolRewardAddressesWithoutReward;
     }
 
     @Override
     public List<String> getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow) {
-        return null;
+        List<String> deregisteredAccounts = getListFromJson(ACCOUNT_DEREGISTRATION, epoch, String.class);
+        if (deregisteredAccounts == null) return List.of();
+        return deregisteredAccounts;
     }
 
     @Override
     public List<String> getLateAccountDeregistrationsInEpoch(int epoch, long stabilityWindow) {
-        return null;
+        List<String> lateDeregisteredAccounts = getListFromJson(LATE_DEREGISTRATIONS, epoch, String.class);
+        if (lateDeregisteredAccounts == null) return List.of();
+        return lateDeregisteredAccounts;
     }
 
     @Override
     public List<String> getStakeAddressesWithRegistrationsUntilEpoch(Integer epoch, List<String> stakeAddresses, Long stabilityWindow) {
-        return null;
+        List<String> accountsRegisteredInThePast = getListFromJson(PAST_ACCOUNT_REGISTRATIONS, epoch, String.class);
+        if (accountsRegisteredInThePast == null) return List.of();
+        return accountsRegisteredInThePast.stream().filter(stakeAddresses::contains).toList();
     }
 }

@@ -2,6 +2,7 @@ package org.cardanofoundation.rewards.validation.repository;
 
 import org.cardanofoundation.rewards.validation.entity.jpa.DbSyncReward;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.MemberReward;
+import org.cardanofoundation.rewards.validation.entity.jpa.projection.MirTransition;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.Query;
@@ -22,19 +23,12 @@ public interface DbSyncRewardRepository extends ReadOnlyRepository<DbSyncReward,
             """)
     List<MemberReward> getMemberRewardsInEpoch(Integer epoch);
 
-    @Query("""
-           SELECT SUM(reward.amount) from DbSyncReward AS reward
-             	WHERE reward.pool.bech32PoolId = :poolId
-             	AND reward.earnedEpoch = :epoch AND (reward.type = 'member' OR reward.type = 'leader')
+    @Query(nativeQuery = true, value = """
+            SELECT SUM(amount) AS totalRewards, type AS pot
+            FROM reward WHERE (reward.type = 'reserves' OR reward.type = 'treasury')
+            AND earned_epoch = :epoch GROUP BY type
             """)
-    BigInteger getTotalPoolRewardsInEpoch(String poolId, Integer epoch);
-
-    @Query("""
-           SELECT reward from DbSyncReward AS reward
-             	WHERE (reward.type = 'reserves' OR reward.type = 'treasury')
-             	AND reward.earnedEpoch = :epoch
-            """)
-    List<DbSyncReward> getMIRCertificatesInEpoch(Integer epoch);
+    List<MirTransition> getMIRCertificatesInEpoch(Integer epoch);
 
     @Query(nativeQuery = true, value = """
             SELECT pool_hash.view AS poolId, SUM(amount) AS amount FROM reward

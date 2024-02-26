@@ -1,4 +1,4 @@
-package org.cardanofoundation.rewards.data.provider;
+package org.cardanofoundation.rewards.validation.data.provider;
 
 import org.cardanofoundation.rewards.calculation.domain.Epoch;
 import org.cardanofoundation.rewards.validation.data.provider.KoiosDataProvider;

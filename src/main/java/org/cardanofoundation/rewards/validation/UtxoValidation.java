@@ -4,6 +4,9 @@ import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 
 import java.math.BigInteger;
 
+import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.MAINNET_ALLEGRA_HARDFORK_EPOCH;
+import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.MAINNET_BOOTSTRAP_ADDRESS_AMOUNT;
+
 public class UtxoValidation {
 
     public final static BigInteger UTXO_POT_BEGINNING_OF_SHELLY = BigInteger.valueOf(31111977147073356L);
@@ -23,7 +26,7 @@ public class UtxoValidation {
 
             utxo = utxoFromPreviousEpoch.subtract(deposits).subtract(fees).add(withdrawals);
 
-            if (epoch == 236) {
+            if (epoch == MAINNET_ALLEGRA_HARDFORK_EPOCH) {
                 // Todo: verify with yaci-store data provider later
                 /*
                     "The bootstrap addresses from Figure 6 were not intended to include the Byron era redeem
@@ -32,7 +35,7 @@ public class UtxoValidation {
                     and the Ada contained in them was returned to the reserves."
                         - shelley-spec-ledger.pdf 17.5 p.115
                  */
-                utxo = utxo.subtract(new BigInteger("318200635000000"));
+                utxo = utxo.subtract(MAINNET_BOOTSTRAP_ADDRESS_AMOUNT);
             }
         }
 

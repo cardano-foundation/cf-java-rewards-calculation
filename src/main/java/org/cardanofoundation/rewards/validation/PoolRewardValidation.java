@@ -9,8 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.calculation.PoolRewardsCalculation.calculatePoolRewardInEpoch;
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.RANDOMNESS_STABILISATION_WINDOW;
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.TOTAL_LOVELACE;
+import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 import static org.cardanofoundation.rewards.calculation.util.CurrencyConverter.lovelaceToAda;
 
@@ -55,7 +54,11 @@ public class PoolRewardValidation {
         // the stake account only received the reward for one of those pools
         // This is not the case anymore and the stake account receives the reward for all pools
         // Until the Allegra hard fork, this method will be used to emulate the old behavior
-        boolean ignoreLeaderReward = poolIdsWithSharedRewardAddresses.contains(poolId);
+        boolean ignoreLeaderReward = false;
+
+        if (epoch < MAINNET_ALLEGRA_HARDFORK_EPOCH) {
+            ignoreLeaderReward = poolIdsWithSharedRewardAddresses.contains(poolId);
+        }
 
         // shelley-delegation.pdf 5.5.3
         //      "[...]the relative stake of the pool owner(s) (the amount of ada

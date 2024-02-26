@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.RANDOMNESS_STABILISATION_WINDOW;
 import static org.cardanofoundation.rewards.validation.enums.DataType.*;
 import static org.cardanofoundation.rewards.validation.util.JsonConverter.writeObjectToJsonFile;
 
@@ -93,6 +94,28 @@ public class DbSyncDataFetcher implements DataFetcher {
         }
     }
 
+    private void fetchMirCertificatesInEpoch(int epoch, boolean override) {
+        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, MIR_CERTIFICATE.resourceFolderName, epoch);
+        File outputFile = new File(filePath);
+
+        if (outputFile.exists() && !override) {
+            logger.info("Skip to fetch MirCertificates for epoch " + epoch + " because the json file already exists");
+            return;
+        }
+
+        List<MirCertificate> mirCertificates = dbSyncDataProvider.getMirCertificatesInEpoch(epoch);
+        if (mirCertificates == null) {
+            logger.error("Failed to fetch MirCertificates for epoch " + epoch);
+            return;
+        }
+
+        try {
+            writeObjectToJsonFile(mirCertificates, filePath);
+        } catch (IOException e) {
+            logger.error("Failed to write MirCertificates to json file for epoch " + epoch);
+        }
+    }
+
     private void fetchRetiredPoolsInEpoch(int epoch, boolean override) {
         String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, RETIRED_POOLS.resourceFolderName, epoch);
         File outputFile = new File(filePath);
@@ -115,29 +138,6 @@ public class DbSyncDataFetcher implements DataFetcher {
         }
     }
 
-    private void fetchBlocksMadeByPoolsInEpoch(int epoch, boolean override) {
-        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, POOL_BLOCKS.resourceFolderName, epoch);
-        File outputFile = new File(filePath);
-
-        if (outputFile.exists() && !override) {
-            logger.info("Skip to fetch PoolsThatProducedBlocks for epoch " + epoch + " because the json file already exists");
-            return;
-        }
-
-        List<PoolBlocks> poolBlocks = dbSyncDataProvider.getBlocksMadeByPoolsInEpoch(epoch);
-
-        if (poolBlocks == null) {
-            logger.error("Failed to fetch PoolBlocks for epoch " + epoch);
-            return;
-        }
-
-        try {
-            writeObjectToJsonFile(poolBlocks, filePath);
-        } catch (IOException e) {
-            logger.error("Failed to write PoolsThatProducedBlocks to json file for epoch " + epoch);
-        }
-    }
-
     private void fetchHistoryOfAllPoolsInEpoch(int epoch, boolean override) {
         String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, POOL_HISTORY.resourceFolderName, epoch);
         File outputFile = new File(filePath);
@@ -147,39 +147,58 @@ public class DbSyncDataFetcher implements DataFetcher {
             return;
         }
 
-        List<PoolBlocks> blocksMadeByPoolsInEpoch = dbSyncDataProvider.getBlocksMadeByPoolsInEpoch(epoch);
+        List<PoolBlock> blocksMadeByPoolsInEpoch = dbSyncDataProvider.getBlocksMadeByPoolsInEpoch(epoch);
         List<PoolHistory> poolHistories = dbSyncDataProvider.getHistoryOfAllPoolsInEpoch(epoch, blocksMadeByPoolsInEpoch);
         if (poolHistories == null) {
             logger.error("Failed to fetch HistoryOfAllPools for epoch " + epoch);
             return;
         }
 
+        List<String> poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).toList();
+        List<String> accountsRegisteredInThePast = dbSyncDataProvider.getStakeAddressesWithRegistrationsUntilEpoch(epoch - 1, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
+
         try {
             writeObjectToJsonFile(poolHistories, filePath);
         } catch (IOException e) {
             logger.error("Failed to write HistoryOfAllPools to json file for epoch " + epoch);
         }
+
+        filePath = String.format("%s/%s/epoch%d.json", sourceFolder, POOL_BLOCKS.resourceFolderName, epoch);
+
+        try {
+            writeObjectToJsonFile(blocksMadeByPoolsInEpoch, filePath);
+        } catch (IOException e) {
+            logger.error("Failed to write blocks made by pools to json file for epoch " + epoch);
+        }
+
+        filePath = String.format("%s/%s/epoch%d.json", sourceFolder, PAST_ACCOUNT_REGISTRATIONS.resourceFolderName, epoch);
+
+        try {
+            writeObjectToJsonFile(accountsRegisteredInThePast, filePath);
+        } catch (IOException e) {
+            logger.error("Failed to write past registered accounts to json file for epoch " + epoch);
+        }
     }
 
-    private void fetchLatestStakeAccountUpdates(int epoch, boolean override) {
-        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, ACCOUNT_UPDATES.resourceFolderName, epoch);
+    private void fetchDeregisteredAccountsInEpoch(int epoch, boolean override) {
+        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, ACCOUNT_DEREGISTRATION.resourceFolderName, epoch);
         File outputFile = new File(filePath);
 
         if (outputFile.exists() && !override) {
-            logger.info("Skip to fetch LatestStakeAccountUpdates for epoch " + epoch + " because the json file already exists");
+            logger.info("Skip to fetch deregistered accounts for epoch " + epoch + " because the json file already exists");
             return;
         }
 
-        List<AccountUpdate> accountUpdates = dbSyncDataProvider.getLatestStakeAccountUpdates(epoch);
-        if (accountUpdates == null) {
-            logger.error("Failed to fetch LatestStakeAccountUpdates for epoch " + epoch);
+        List<String> deregisteredAccountsInEpoch = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch, RANDOMNESS_STABILISATION_WINDOW);
+        if (deregisteredAccountsInEpoch == null) {
+            logger.error("Failed to fetch deregistered accounts for epoch " + epoch);
             return;
         }
 
         try {
-            writeObjectToJsonFile(accountUpdates, filePath);
+            writeObjectToJsonFile(deregisteredAccountsInEpoch, filePath);
         } catch (IOException e) {
-            logger.error("Failed to write LatestStakeAccountUpdates to json file for epoch " + epoch);
+            logger.error("Failed to write deregistered accounts in epoch to json file for epoch " + epoch);
         }
     }
 
@@ -249,17 +268,40 @@ public class DbSyncDataFetcher implements DataFetcher {
         }
     }
 
+    private void fetchLateAccountDeregistrationsInEpoch(int epoch, boolean override) {
+        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, LATE_DEREGISTRATIONS.resourceFolderName, epoch);
+        File outputFile = new File(filePath);
+
+        if (outputFile.exists() && !override) {
+            logger.info("Skip to fetch LateAccountDeregistrations for epoch " + epoch + " because the json file already exists");
+            return;
+        }
+
+        List<String> lateDeregisteredAccounts = dbSyncDataProvider.getLateAccountDeregistrationsInEpoch(epoch, RANDOMNESS_STABILISATION_WINDOW);
+        if (lateDeregisteredAccounts == null) {
+            logger.error("Failed to fetch LateAccountDeregistrations for epoch " + epoch);
+            return;
+        }
+
+        try {
+            writeObjectToJsonFile(lateDeregisteredAccounts, filePath);
+        } catch (IOException e) {
+            logger.error("Failed to write LateAccountDeregistrations to json file for epoch " + epoch);
+        }
+    }
+
     @Override
     public void fetch(int epoch, boolean override) {
         fetchAdaPotsInEpoch(epoch, override);
         fetchEpochInfo(epoch, override);
         fetchProtocolParameters(epoch, override);
         fetchRetiredPoolsInEpoch(epoch, override);
-        fetchBlocksMadeByPoolsInEpoch(epoch, override);
         fetchHistoryOfAllPoolsInEpoch(epoch, override);
-        fetchLatestStakeAccountUpdates(epoch, override);
-        fetchMemberRewardsInEpoch(epoch, override);
-        fetchSumOfMemberAndLeaderRewardsInEpoch(epoch, override);
+        fetchDeregisteredAccountsInEpoch(epoch, override);
+        // fetchMemberRewardsInEpoch(epoch, override);
+        fetchLateAccountDeregistrationsInEpoch(epoch, override);
+        // fetchSumOfMemberAndLeaderRewardsInEpoch(epoch, override);
         fetchSharedPoolRewardAddressWithoutReward(epoch, override);
+        fetchMirCertificatesInEpoch(epoch, override);
     }
 }

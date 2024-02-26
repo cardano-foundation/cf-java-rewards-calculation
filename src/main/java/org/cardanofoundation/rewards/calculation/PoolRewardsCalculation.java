@@ -1,13 +1,11 @@
 package org.cardanofoundation.rewards.calculation;
 
 import org.cardanofoundation.rewards.calculation.domain.*;
-import org.cardanofoundation.rewards.calculation.enums.AccountUpdateAction;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.RANDOMNESS_STABILISATION_WINDOW;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.divide;
 

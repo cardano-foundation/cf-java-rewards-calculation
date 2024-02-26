@@ -2,22 +2,20 @@ package org.cardanofoundation.rewards.validation.data.provider;
 
 import lombok.extern.slf4j.Slf4j;
 import org.cardanofoundation.rewards.calculation.domain.*;
+import org.cardanofoundation.rewards.calculation.domain.PoolBlock;
 import org.cardanofoundation.rewards.validation.entity.jpa.*;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.*;
 import org.cardanofoundation.rewards.calculation.enums.AccountUpdateAction;
 import org.cardanofoundation.rewards.calculation.enums.MirPot;
+import org.cardanofoundation.rewards.validation.entity.jpa.projection.*;
 import org.cardanofoundation.rewards.validation.mapper.*;
 import org.cardanofoundation.rewards.validation.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.EXPECTED_SLOT_PER_EPOCH;
 
 @Service
 @Slf4j
@@ -59,15 +57,6 @@ public class DbSyncDataProvider implements DataProvider {
     @Autowired
     DbSyncWithdrawalRepository dbSyncWithdrawalRepository;
 
-    @Value("${spring.datasource.url}")
-    private String databaseUrl;
-
-    @Value("${spring.datasource.username}")
-    private String databaseUser;
-
-    @Value("${spring.datasource.password}")
-    private String databasePassword;
-
     @Override
     public AdaPots getAdaPotsForEpoch(int epoch) {
         DbSyncAdaPots dbSyncAdaPots = dbSyncAdaPotsRepository.findByEpoch(epoch);
@@ -104,10 +93,10 @@ public class DbSyncDataProvider implements DataProvider {
         return ProtocolParametersMapper.fromDbSyncProtocolParameters(dbSyncProtocolParameters);
     }
 
-    public List<PoolHistory> fetchPoolHistoryInBatches(Integer epoch, int batchSize, List<PoolBlocks> blocksMadeByPoolsInEpoch) {
+    public List<PoolHistory> fetchPoolHistoryInBatches(Integer epoch, int batchSize, List<PoolBlock> blocksMadeByPoolsInEpoch) {
         List<PoolHistory> poolHistories = new ArrayList<>();
         List<String> poolIds = blocksMadeByPoolsInEpoch.stream()
-                .map(PoolBlocks::getPoolId)
+                .map(PoolBlock::getPoolId)
                 .distinct()
                 .toList();
 
@@ -131,28 +120,27 @@ public class DbSyncDataProvider implements DataProvider {
         for (List<String> poolIdBatch : poolIdBatches) {
             log.info("fetching pool history batch " + i + " / " + batches + " for epoch " + epoch + " with " + poolIdBatch.size() + " pools");
             List<PoolEpochStake> poolEpochStakes = dbSyncEpochStakeRepository.getAllPoolsActiveStakesInEpoch(epoch, poolIdBatch);
-            List<Delegator> delegators = poolEpochStakes.stream()
-                    .map(DelegatorMapper::fromPoolEpochStake)
-                    .toList();
 
             for (String poolId : poolIdBatch) {
                 PoolHistory poolHistory = new PoolHistory();
 
+                List<Delegator> delegators = poolEpochStakes.stream()
+                        .filter(epochStake -> epochStake.getPoolId().equals(poolId))
+                        .map(DelegatorMapper::fromPoolEpochStake)
+                        .toList();
+
                 if (!delegators.isEmpty()) {
-                    List<Delegator> poolDelegators = delegators.stream()
-                            .filter(delegator -> delegator.getPoolId().equals(poolId))
-                            .toList();
-                    BigInteger activeStake = poolDelegators.stream()
+                    BigInteger activeStake = delegators.stream()
                             .map(Delegator::getActiveStake)
                             .reduce(BigInteger::add)
                             .orElse(BigInteger.ZERO);
 
                     poolHistory.setActiveStake(activeStake);
-                    poolHistory.setDelegators(poolDelegators);
+                    poolHistory.setDelegators(delegators);
 
                     Integer blockCount = blocksMadeByPoolsInEpoch.stream()
                             .filter(poolBlocks -> poolBlocks.getPoolId().equals(poolId))
-                            .map(PoolBlocks::getBlockCount)
+                            .map(PoolBlock::getBlockCount)
                             .findFirst()
                             .orElse(0);
                     poolHistory.setBlockCount(blockCount);
@@ -179,9 +167,9 @@ public class DbSyncDataProvider implements DataProvider {
                             .filter(owner -> owner.getPoolId().equals(poolId)).map(PoolOwner::getStakeAddress).toList();
 
                     BigInteger poolOwnerActiveStake = BigInteger.ZERO;
-                    for (Delegator poolDelegator : poolDelegators) {
-                        if (poolOwnerStakeAddresses.contains(poolDelegator.getStakeAddress())) {
-                            poolOwnerActiveStake = poolOwnerActiveStake.add(poolDelegator.getActiveStake());
+                    for (Delegator delegator : delegators) {
+                        if (poolOwnerStakeAddresses.contains(delegator.getStakeAddress())) {
+                            poolOwnerActiveStake = poolOwnerActiveStake.add(delegator.getActiveStake());
                         }
                     }
 
@@ -198,7 +186,7 @@ public class DbSyncDataProvider implements DataProvider {
     }
 
     @Override
-    public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch, List<PoolBlocks> blocksMadeByPoolsInEpoch) {
+    public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch, List<PoolBlock> blocksMadeByPoolsInEpoch) {
         return fetchPoolHistoryInBatches(epoch, 20, blocksMadeByPoolsInEpoch);
     }
 
@@ -365,13 +353,13 @@ public class DbSyncDataProvider implements DataProvider {
 
     @Override
     public List<MirCertificate> getMirCertificatesInEpoch(final int epoch) {
-        List<DbSyncReward> mirCertificatesInEpoch = dbSyncRewardRepository.getMIRCertificatesInEpoch(epoch);
+        List<MirTransition> mirTransitions = dbSyncRewardRepository.getMIRCertificatesInEpoch(epoch);
         List<MirCertificate> mirCertificates = new ArrayList<>();
 
-        for (DbSyncReward dbSyncReward : mirCertificatesInEpoch) {
+        for (MirTransition mirTransition : mirTransitions) {
             MirCertificate mirCertificate = new MirCertificate();
-            mirCertificate.setPot(MirPot.valueOf(dbSyncReward.getType().toUpperCase()));
-            mirCertificate.setTotalRewards(dbSyncReward.getAmount());
+            mirCertificate.setPot(MirPot.valueOf(mirTransition.getPot().toUpperCase()));
+            mirCertificate.setTotalRewards(mirTransition.getTotalRewards());
             mirCertificates.add(mirCertificate);
         }
 
@@ -432,13 +420,13 @@ public class DbSyncDataProvider implements DataProvider {
         }
     }
 
-    @Override
-    public BigInteger getTotalPoolRewardsInEpoch(String poolId, int epoch) {
-        return dbSyncRewardRepository.getTotalPoolRewardsInEpoch(poolId, epoch);
-    }
-
-    public List<PoolBlocks> getBlocksMadeByPoolsInEpoch(int epoch) {
-        return dbSyncBlockRepository.getAllBlocksMadeByPoolsInEpoch(epoch);
+    public List<PoolBlock> getBlocksMadeByPoolsInEpoch(int epoch) {
+        return dbSyncBlockRepository.getAllBlocksMadeByPoolsInEpoch(epoch).stream().map(block -> {
+            PoolBlock poolBlock = new PoolBlock();
+            poolBlock.setPoolId(block.getPoolId());
+            poolBlock.setBlockCount(block.getBlockCount());
+            return poolBlock;
+        }).toList();
     }
 
     @Override

@@ -99,7 +99,7 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
-    public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch, List<PoolBlocks> blocksMadeByPoolsInEpoch) {
+    public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch, List<PoolBlock> blocksMadeByPoolsInEpoch) {
         return null;
     }
 
@@ -275,12 +275,7 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
-    public BigInteger getTotalPoolRewardsInEpoch(String poolId, int epoch) {
-        return null;
-    }
-
-    @Override
-    public List<PoolBlocks> getBlocksMadeByPoolsInEpoch(int epoch) {
+    public List<PoolBlock> getBlocksMadeByPoolsInEpoch(int epoch) {
         return null;
     }
 
