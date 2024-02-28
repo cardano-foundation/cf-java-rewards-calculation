@@ -17,7 +17,9 @@ public enum DataType {
     POOL_BLOCKS("poolBlocks"),
     PAST_ACCOUNT_REGISTRATIONS("pastAccountRegistrations"),
     LATE_DEREGISTRATIONS("lateDeregistrations"),
-    ACCOUNT_DEREGISTRATION("accountDeregistrations");
+    ACCOUNT_DEREGISTRATION("accountDeregistrations"),
+    PAST_ACCOUNT_REGISTRATIONS_UNTIL_LAST_EPOCH("pastAccountRegistrationsUntilLastEpoch"),
+    PAST_ACCOUNT_REGISTRATIONS_UNTIL_NOW("pastAccountRegistrationsUntilNow");
 
     public final String resourceFolderName;
 

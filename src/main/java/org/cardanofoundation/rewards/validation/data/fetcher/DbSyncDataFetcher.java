@@ -3,7 +3,6 @@ package org.cardanofoundation.rewards.validation.data.fetcher;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.PoolBlocks;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,7 +144,7 @@ public class DbSyncDataFetcher implements DataFetcher {
     }
 
     private void fetchStakeAddressesWithRegistrationsUntilEpoch(int epoch, boolean override) {
-        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, PAST_ACCOUNT_REGISTRATIONS.resourceFolderName, epoch);
+        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, PAST_ACCOUNT_REGISTRATIONS_UNTIL_LAST_EPOCH.resourceFolderName, epoch);
         File outputFile = new File(filePath);
 
         if (outputFile.exists() && !override) {
@@ -153,19 +152,35 @@ public class DbSyncDataFetcher implements DataFetcher {
             return;
         }
 
-        List<PoolHistory> poolHistories = jsonDataProvider.getHistoryOfAllPoolsInEpoch(epoch - 1, null);
+        List<PoolHistory> poolHistories = jsonDataProvider.getHistoryOfAllPoolsInEpoch(epoch - 2, null);
         HashSet<String> poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).collect(Collectors.toCollection(HashSet::new));
+        List<PoolDeregistration> retiredPools = jsonDataProvider.getRetiredPoolsInEpoch(epoch);
+        poolRewardAddresses.addAll(retiredPools.stream().map(PoolDeregistration::getRewardAddress).collect(Collectors.toSet()));
 
-        HashSet<String> accountsRegisteredInThePast = dbSyncDataProvider.getStakeAddressesWithRegistrationsUntilEpoch(epoch, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
+        HashSet<String> accountsRegisteredInThePast = dbSyncDataProvider.getRegisteredAccountsUntilLastEpoch(epoch, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
         if (accountsRegisteredInThePast == null) {
             logger.error("Failed to fetch StakeAddressesWithRegistrationsUntilEpoch for epoch " + epoch);
-            return;
         }
 
         try {
             writeObjectToJsonFile(accountsRegisteredInThePast, filePath);
         } catch (IOException e) {
-            logger.error("Failed to write StakeAddressesWithRegistrationsUntilEpoch to json file for epoch " + epoch);
+            logger.error("Failed to write accounts registered in the past to json file for epoch " + epoch);
+        }
+
+        HashSet<String> accountsRegisteredUntilNow = dbSyncDataProvider.getRegisteredAccountsUntilNow(epoch, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
+        filePath = String.format("%s/%s/epoch%d.json", sourceFolder, PAST_ACCOUNT_REGISTRATIONS_UNTIL_NOW.resourceFolderName, epoch);
+        outputFile = new File(filePath);
+
+        if (outputFile.exists() && !override) {
+            logger.info("Skip to fetch accountsRegisteredUntilNow for epoch " + epoch + " because the json file already exists");
+            return;
+        }
+
+        try {
+            writeObjectToJsonFile(accountsRegisteredUntilNow, filePath);
+        } catch (IOException e) {
+            logger.error("Failed to write accounts registered until now to json file for epoch " + epoch);
         }
     }
 
@@ -186,7 +201,7 @@ public class DbSyncDataFetcher implements DataFetcher {
         }
 
         HashSet<String> poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).collect(Collectors.toCollection(HashSet::new));
-        HashSet<String> accountsRegisteredInThePast = dbSyncDataProvider.getStakeAddressesWithRegistrationsUntilEpoch(epoch + 1, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
+        HashSet<String> accountsRegisteredInThePast = dbSyncDataProvider.getRegisteredAccountsUntilLastEpoch(epoch + 1, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
 
         try {
             writeObjectToJsonFile(poolHistories, filePath);

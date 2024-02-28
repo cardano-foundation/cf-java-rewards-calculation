@@ -15,6 +15,10 @@ application:
   fetch:
     override: ${OVERWRITE_EXISTING_DATA:false}
 
+logging:
+  level:
+    ROOT: DEBUG
+
 ---
 spring:
   config:

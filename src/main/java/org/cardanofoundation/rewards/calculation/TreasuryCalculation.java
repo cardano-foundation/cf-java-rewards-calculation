@@ -3,7 +3,9 @@ package org.cardanofoundation.rewards.calculation;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.calculation.enums.AccountUpdateAction;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.EXPECTED_SLOT_PER_EPOCH;
@@ -20,7 +22,7 @@ public class TreasuryCalculation {
    */
   public static BigInteger calculateTotalRewardPotWithEta(double monetaryExpandRate, int totalBlocksInEpochByPools,
                                                           double decentralizationParameter, BigInteger reserve, BigInteger fee) {
-    double eta = calculateEta(totalBlocksInEpochByPools, decentralizationParameter);
+    BigDecimal eta = calculateEta(totalBlocksInEpochByPools, decentralizationParameter);
     return multiplyAndFloor(reserve, monetaryExpandRate, eta).add(fee);
   }
 
@@ -33,25 +35,27 @@ public class TreasuryCalculation {
   *
   * See: https://github.com/input-output-hk/cardano-ledger/commit/c4f10d286faadcec9e4437411bce9c6c3b6e51c2
   */
-  private static double calculateEta(int totalBlocksInEpochByPools, double decentralizationParameter) {
+  private static BigDecimal calculateEta(int totalBlocksInEpochByPools, double decentralizationParameter) {
     // shelley-delegation.pdf 5.4.3
 
     if (decentralizationParameter >= 0.8) {
-      return 1.0;
+      return BigDecimal.ONE;
     }
 
     // The number of expected blocks will be the number of slots per epoch times the active slots coefficient
-    double activeSlotsCoeff = 0.05; // See: Non-Updatable Parameters: https://cips.cardano.org/cips/cip9/
+    BigDecimal activeSlotsCoeff = new BigDecimal("0.05"); // See: Non-Updatable Parameters: https://cips.cardano.org/cips/cip9/
 
     // decentralizationParameter is the proportion of blocks that are expected to be produced by stake pools
     // instead of the OBFT (Ouroboros Byzantine Fault Tolerance) nodes. It was introduced close before the Shelley era:
     // https://github.com/input-output-hk/cardano-ledger/commit/c4f10d286faadcec9e4437411bce9c6c3b6e51c2
-    double expectedBlocksInNonOBFTSlots = EXPECTED_SLOT_PER_EPOCH * activeSlotsCoeff * (1 - decentralizationParameter);
+    BigDecimal expectedBlocksInNonOBFTSlots = new BigDecimal(EXPECTED_SLOT_PER_EPOCH )
+            .multiply(activeSlotsCoeff).multiply (new BigDecimal(1 - decentralizationParameter));
 
     // eta is the ratio between the number of blocks that have been produced during the epoch, and
     // the expectation value of blocks that should have been produced during the epoch under
     // ideal conditions.
-    return Math.min(1, totalBlocksInEpochByPools / expectedBlocksInNonOBFTSlots);
+    MathContext mathContext = new MathContext(32);
+    return new BigDecimal(totalBlocksInEpochByPools).divide(expectedBlocksInNonOBFTSlots, mathContext).min(BigDecimal.ONE);
   }
 
   /*

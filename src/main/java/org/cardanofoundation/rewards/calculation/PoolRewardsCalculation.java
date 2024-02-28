@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
+import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.MAINNET_VASIL_HARDFORK_EPOCH;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.divide;
 
@@ -131,13 +132,27 @@ public class PoolRewardsCalculation {
                                                                          final HashSet<String> deregisteredAccounts, final boolean ignoreLeaderReward,
                                                                          final HashSet<String> lateDeregisteredAccounts,
                                                                          final HashSet<String> accountsRegisteredInThePast) {
+        final int earnedEpoch = poolHistoryCurrentEpoch.getEpoch();
         final PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardCalculationResult.builder()
-                .epoch(poolHistoryCurrentEpoch.getEpoch())
+                .epoch(earnedEpoch)
                 .poolId(poolId)
                 .poolReward(BigInteger.ZERO)
                 .distributedPoolReward(BigInteger.ZERO)
                 .unspendableEarnedRewards(BigInteger.ZERO)
                 .build();
+
+        /*
+            babbage-ledger.pdf | 6 Forgo Reward Calculation Prefilter | p. 14
+
+            The reward calculation no longer filters out the unregistered stake credentials when creating
+            a reward update. As in the Shelley era, though, they are still filtered on the epoch boundary
+            when the reward update is applied
+
+        if (spendableEpoch >= MAINNET_VASIL_HARDFORK_EPOCH) {
+            lateDeregisteredAccounts.addAll(deregisteredAccounts);
+            deregisteredAccounts.clear();
+        }
+        */
 
         final BigInteger poolStake = poolHistoryCurrentEpoch.getActiveStake();
         final BigInteger poolPledge = poolHistoryCurrentEpoch.getPledge();
@@ -196,20 +211,20 @@ public class PoolRewardsCalculation {
         String rewardAddress = poolRewardCalculationResult.getRewardAddress();
 
         if (!accountsRegisteredInThePast.contains(rewardAddress)) {
-            log.info(poolRewardCalculationResult.getRewardAddress() + " has never been registered. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
+            log.debug(poolRewardCalculationResult.getRewardAddress() + " has never been registered. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
             poolOperatorReward = BigInteger.ZERO;
         } else if (deregisteredAccounts.contains(rewardAddress)) {
-            log.info(poolRewardCalculationResult.getRewardAddress() + " has been deregistered. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
+            log.debug(poolRewardCalculationResult.getRewardAddress() + " has been deregistered. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
             poolOperatorReward = BigInteger.ZERO;
         } else if (lateDeregisteredAccounts.contains(rewardAddress)) {
-            log.info("[unregRU]: " + poolRewardCalculationResult.getRewardAddress() + " has been deregistered lately. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
+            log.debug("[unregRU]: " + poolRewardCalculationResult.getRewardAddress() + " has been deregistered lately. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
             unspendableEarnedRewards = poolOperatorReward;
             poolOperatorReward = BigInteger.ZERO;
         }
 
         if (ignoreLeaderReward) {
             poolOperatorReward = BigInteger.ZERO;
-            log.info("[reward address of multiple pools] Pool " + poolId + " has been ignored. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
+            log.debug("[reward address of multiple pools] Pool " + poolId + " has been ignored. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
         }
 
         // Step 11: Calculate pool member reward
@@ -226,10 +241,10 @@ public class PoolRewardsCalculation {
                     poolFixedCost, divide(delegator.getActiveStake(), adaInCirculation), relativePoolStake);
 
             if (deregisteredAccounts.contains(stakeAddress)) {
-                log.info("Delegator " + stakeAddress + " has been deregistered. Delegator would have received " + memberReward + " but will not receive any rewards.");
+                log.debug("Delegator " + stakeAddress + " has been deregistered. Delegator would have received " + memberReward + " but will not receive any rewards.");
                 memberReward = BigInteger.ZERO;
             } else if (lateDeregisteredAccounts.contains(stakeAddress)) {
-                log.info("[unregRU]: " + stakeAddress + " has been deregistered lately. Delegator would have received " + memberReward + " but will not receive any rewards.");
+                log.debug("[unregRU]: " + stakeAddress + " has been deregistered lately. Delegator would have received " + memberReward + " but will not receive any rewards.");
                 unspendableEarnedRewards = unspendableEarnedRewards.add(memberReward);
                 memberReward = BigInteger.ZERO;
             }

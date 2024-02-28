@@ -45,22 +45,25 @@ SELECT stakeAddress, latestUpdateType, block.epoch_slot_no AS epochSlot, block.e
                 stake_address.view AS stakeAddress,
                 CASE
                     WHEN ld.tx_id IS NULL THEN 'REGISTRATION'
+                    WHEN lr.tx_id IS NULL THEN 'DEREGISTRATION'
                     WHEN lr.tx_id >= ld.tx_id THEN 'REGISTRATION'
                     WHEN lr.tx_id < ld.tx_id THEN 'DEREGISTRATION'
                 END AS latestUpdateType,
 				CASE
 					WHEN ld.tx_id IS NULL THEN lr.tx_id
+					WHEN lr.tx_id IS NULL THEN NULL
                     WHEN lr.tx_id >= ld.tx_id THEN lr.tx_id
                     WHEN lr.tx_id < ld.tx_id THEN ld.tx_id
                 END AS tx_id
             FROM
                 latest_registration lr
+            JOIN
+                stake_address ON stake_address.id = lr.addr_id AND stake_address.view IN :addresses
             FULL OUTER JOIN
                 latest_deregistration ld ON lr.addr_id = ld.addr_id
-            JOIN
-                stake_address ON stake_address.id = lr.addr_id )
+            )
     AS latest_update JOIN tx ON tx.id=latest_update.tx_id JOIN block ON block.id = tx.block_id""")
-    List<LatestStakeAccountUpdate> getLatestStakeAccountUpdates(Integer epoch);
+    HashSet<LatestStakeAccountUpdate> getLatestStakeAccountUpdates(Integer epoch, HashSet<String> addresses);
 
     @Query(nativeQuery = true, value = """
             SELECT

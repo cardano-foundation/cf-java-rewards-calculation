@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
 import static org.cardanofoundation.rewards.validation.enums.DataType.*;
 import static org.cardanofoundation.rewards.validation.util.JsonConverter.convertFileJsonToArrayList;
 import static org.cardanofoundation.rewards.validation.util.JsonConverter.readJsonFile;
@@ -101,21 +102,43 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public AdaPots getAdaPotsForEpoch(int epoch) {
+        if (epoch < MAINNET_SHELLEY_START_EPOCH) {
+            return AdaPots.builder()
+                    .treasury(BigInteger.ZERO)
+                    .reserves(BigInteger.ZERO)
+                    .rewards(BigInteger.ZERO)
+                    .epoch(epoch)
+                    .build();
+        } else if (epoch == MAINNET_SHELLEY_START_EPOCH) {
+            return AdaPots.builder()
+                    .treasury(MAINNET_SHELLEY_INITIAL_TREASURY)
+                    .reserves(MAINNET_SHELLEY_INITIAL_RESERVES)
+                    .rewards(BigInteger.ZERO)
+                    .epoch(epoch)
+                    .build();
+        }
+
         return getDataFromJson(ADA_POTS, epoch, AdaPots.class);
     }
 
     @Override
     public Epoch getEpochInfo(int epoch) {
+        if (epoch < MAINNET_SHELLEY_START_EPOCH) return null;
+
         return getDataFromJson(EPOCH_INFO, epoch, Epoch.class);
     }
 
     @Override
     public ProtocolParameters getProtocolParametersForEpoch(int epoch) {
+        if (epoch < MAINNET_SHELLEY_START_EPOCH) return null;
+
         return getDataFromJson(PROTOCOL_PARAMETERS, epoch, ProtocolParameters.class);
     }
 
     @Override
     public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch, List<PoolBlock> blocksMadeByPoolsInEpoch) {
+        if (epoch < MAINNET_SHELLEY_START_EPOCH) return List.of();
+
         List<PoolHistory> histories = getListFromJson(POOL_HISTORY, epoch, PoolHistory.class);
         if (histories == null) return List.of();
         return histories;
@@ -208,13 +231,15 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public List<PoolBlock> getBlocksMadeByPoolsInEpoch(int epoch) {
+        if (epoch < MAINNET_SHELLEY_START_EPOCH) return List.of();
+
         List<PoolBlock> poolBlocks = getListFromJson(POOL_BLOCKS, epoch, PoolBlock.class);
         if (poolBlocks == null) return List.of();
         return poolBlocks;
     }
 
     @Override
-    public List<AccountUpdate> getLatestStakeAccountUpdates(int epoch) {
+    public HashSet<AccountUpdate> getLatestStakeAccountUpdates(int epoch, HashSet<String> accounts) {
         return null;
     }
 
@@ -225,6 +250,8 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public HashSet<String> findSharedPoolRewardAddressWithoutReward(int epoch) {
+        if (epoch < MAINNET_SHELLEY_START_EPOCH) return new HashSet<>();
+
         HashSet<String> sharedPoolRewardAddressesWithoutReward = getHashSetFromJson(REWARDS_OUTLIER, epoch, String.class);
         if (sharedPoolRewardAddressesWithoutReward == null) return new HashSet<>();
         return sharedPoolRewardAddressesWithoutReward;
@@ -245,8 +272,15 @@ public class JsonDataProvider implements DataProvider {
     }
 
     @Override
-    public HashSet<String> getStakeAddressesWithRegistrationsUntilEpoch(Integer epoch, HashSet<String> stakeAddresses, Long stabilityWindow) {
-        HashSet<String> accountsRegisteredInThePast = getHashSetFromJson(PAST_ACCOUNT_REGISTRATIONS, epoch, String.class);
+    public HashSet<String> getRegisteredAccountsUntilLastEpoch(Integer epoch, HashSet<String> stakeAddresses, Long stabilityWindow) {
+        HashSet<String> accountsRegisteredInThePast = getHashSetFromJson(PAST_ACCOUNT_REGISTRATIONS_UNTIL_LAST_EPOCH, epoch, String.class);
+        if (accountsRegisteredInThePast == null) return new HashSet<>();
+        return accountsRegisteredInThePast;
+    }
+
+    @Override
+    public HashSet<String> getRegisteredAccountsUntilNow(Integer epoch, HashSet<String> stakeAddresses, Long stabilityWindow) {
+        HashSet<String> accountsRegisteredInThePast = getHashSetFromJson(PAST_ACCOUNT_REGISTRATIONS_UNTIL_NOW, epoch, String.class);
         if (accountsRegisteredInThePast == null) return new HashSet<>();
         return accountsRegisteredInThePast;
     }

@@ -27,9 +27,20 @@ public class EpochCalculation {
                                                                   final List<String> poolsThatProducedBlocksInEpoch,
                                                                   final List<PoolHistory> poolHistories,
                                                                   final HashSet<String> lateDeregisteredAccounts,
-                                                                  final HashSet<String> accountsRegisteredInThePast,
+                                                                  final HashSet<String> registeredAccountsSinceLastEpoch,
+                                                                  final HashSet<String> registeredAccountsUntilNow,
                                                                   final HashSet<String> sharedPoolRewardAddressesWithoutReward) {
         final EpochCalculationResult epochCalculationResult = EpochCalculationResult.builder().epoch(epoch).build();
+
+        if (epoch < 209) {
+            epochCalculationResult.setReserves(MAINNET_SHELLEY_INITIAL_RESERVES);
+            epochCalculationResult.setTreasury(MAINNET_SHELLEY_INITIAL_TREASURY);
+            epochCalculationResult.setTotalDistributedRewards(BigInteger.ZERO);
+            epochCalculationResult.setTotalRewardsPot(BigInteger.ZERO);
+            epochCalculationResult.setTotalPoolRewardsPot(BigInteger.ZERO);
+            epochCalculationResult.setTotalAdaInCirculation(MAINNET_SHELLEY_INITIAL_UTXO);
+            return epochCalculationResult;
+        }
 
         double treasuryGrowthRate = 0.2;
         double monetaryExpandRate = 0.003;
@@ -67,25 +78,41 @@ public class EpochCalculation {
         final BigInteger stakePoolRewardsPot = rewardPot.subtract(treasuryCut);
 
         // The sum of all the refunds attached to unregistered reward accounts are added to the
-        // treasury (see: Pool Reap Transition, p.53, figure 40, shely-ledger.pdf)
+        // treasury (see: Pool Reap Transition, p.53, figure 40, shelley-ledger.pdf)
         if (retiredPools.size() > 0) {
             List<String> rewardAddressesOfRetiredPools = retiredPools.stream().map(PoolDeregistration::getRewardAddress).toList();
             List<String> deregisteredOwnerAccounts = deregisteredAccounts.stream()
                     .filter(rewardAddressesOfRetiredPools::contains).toList();
             List<String> lateDeregisteredOwnerAccounts = lateDeregisteredAccounts.stream()
                     .filter(rewardAddressesOfRetiredPools::contains).toList();
+            List<String> ownerAccountsRegisteredInThePast = registeredAccountsUntilNow.stream()
+                    .filter(rewardAddressesOfRetiredPools::contains).toList();
 
-            if (deregisteredOwnerAccounts.size() > 0 || lateDeregisteredOwnerAccounts.size() > 0) {
-                treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(POOL_DEPOSIT_IN_LOVELACE);
+            /* Check if the reward address of the retired pool has been unregistered before
+               or if the reward address has been unregistered after the randomness stabilization window
+               or if the reward address has not been registered at all */
+            for (PoolDeregistration retiredPool : retiredPools) {
+                String rewardAddress = retiredPool.getRewardAddress();
+                if (deregisteredOwnerAccounts.contains(rewardAddress) ||
+                        lateDeregisteredOwnerAccounts.contains(rewardAddress) ||
+                        !ownerAccountsRegisteredInThePast.contains(rewardAddress)) {
+                    // If the reward address has been unregistered, the deposit is added to the treasury
+                    treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(POOL_DEPOSIT_IN_LOVELACE);
+                }
             }
         }
         // Check if there was a MIR Certificate in the previous epoch
         BigInteger treasuryWithdrawals = BigInteger.ZERO;
+        BigInteger calculatedReserve = subtract(reserveInPreviousEpoch, subtract(rewardPot, totalFeesForCurrentEpoch));
+
         for (MirCertificate mirCertificate : mirCertificates) {
             if (mirCertificate.getPot() == MirPot.TREASURY) {
                 treasuryWithdrawals = treasuryWithdrawals.add(mirCertificate.getTotalRewards());
+            } else if (mirCertificate.getPot() == MirPot.RESERVES) {
+                calculatedReserve = calculatedReserve.subtract(mirCertificate.getTotalRewards());
             }
         }
+
         treasuryForCurrentEpoch = treasuryForCurrentEpoch.subtract(treasuryWithdrawals);
 
         BigInteger totalDistributedRewards = BigInteger.ZERO;
@@ -95,7 +122,7 @@ public class EpochCalculation {
 
         int i = 1;
         for (String poolId : poolsThatProducedBlocksInEpoch) {
-            log.info("[" + i + " / " + poolsThatProducedBlocksInEpoch.size() + "] Processing pool: " + poolId);
+            log.debug("[" + i + " / " + poolsThatProducedBlocksInEpoch.size() + "] Processing pool: " + poolId);
             PoolHistory poolHistory = poolHistories.stream().filter(history -> history.getPoolId().equals(poolId)).findFirst().orElse(null);
 
             PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardCalculationResult
@@ -132,7 +159,7 @@ public class EpochCalculation {
                         blocksInEpoch, protocolParameters,
                         adaInCirculation, activeStakeInEpoch, stakePoolRewardsPot,
                         poolHistory.getOwnerActiveStake(), poolHistory.getOwners(),
-                        delegatorAccountDeregistrations, ignoreLeaderReward, lateDeregisteredDelegators, accountsRegisteredInThePast);
+                        delegatorAccountDeregistrations, ignoreLeaderReward, lateDeregisteredDelegators, registeredAccountsSinceLastEpoch);
             }
 
             totalDistributedRewards = add(totalDistributedRewards, poolRewardCalculationResult.getDistributedPoolReward());
@@ -141,7 +168,6 @@ public class EpochCalculation {
             i++;
         }
 
-        BigInteger calculatedReserve = subtract(reserveInPreviousEpoch, subtract(rewardPot, totalFeesForCurrentEpoch));
         BigInteger undistributedRewards = subtract(stakePoolRewardsPot, totalDistributedRewards);
         calculatedReserve = add(calculatedReserve, undistributedRewards);
         calculatedReserve = subtract(calculatedReserve, unspendableEarnedRewards);
@@ -157,8 +183,16 @@ public class EpochCalculation {
             calculatedReserve = calculatedReserve.add(MAINNET_BOOTSTRAP_ADDRESS_AMOUNT);
         }
 
-        log.info("Unspendable earned rewards: " + lovelaceToAda(unspendableEarnedRewards.intValue()) + " ADA");
+        log.debug("Unspendable earned rewards: " + lovelaceToAda(unspendableEarnedRewards.intValue()) + " ADA");
         treasuryForCurrentEpoch = add(treasuryForCurrentEpoch, unspendableEarnedRewards);
+
+        TreasuryCalculationResult treasuryCalculationResult = TreasuryCalculationResult.builder()
+                .epoch(epoch)
+                .treasury(treasuryForCurrentEpoch)
+                .totalRewardPot(rewardPot)
+                .treasuryWithdrawals(treasuryWithdrawals)
+                .unspendableEarnedRewards(unspendableEarnedRewards)
+                .build();
 
         epochCalculationResult.setTotalDistributedRewards(totalDistributedRewards);
         epochCalculationResult.setTotalRewardsPot(rewardPot);
@@ -168,6 +202,7 @@ public class EpochCalculation {
         epochCalculationResult.setTotalPoolRewardsPot(stakePoolRewardsPot);
         epochCalculationResult.setTotalAdaInCirculation(adaInCirculation);
         epochCalculationResult.setTotalUndistributedRewards(undistributedRewards);
+        epochCalculationResult.setTreasuryCalculationResult(treasuryCalculationResult);
 
         return epochCalculationResult;
     }

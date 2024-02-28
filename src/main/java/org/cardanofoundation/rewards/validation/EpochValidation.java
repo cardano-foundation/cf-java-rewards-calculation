@@ -2,15 +2,17 @@ package org.cardanofoundation.rewards.validation;
 
 import org.cardanofoundation.rewards.calculation.EpochCalculation;
 import org.cardanofoundation.rewards.calculation.domain.*;
+import org.cardanofoundation.rewards.calculation.enums.AccountUpdateAction;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
+
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.MAINNET_ALLEGRA_HARDFORK_EPOCH;
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.RANDOMNESS_STABILISATION_WINDOW;
+import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
 
 @Slf4j
 public class EpochValidation {
@@ -20,9 +22,40 @@ public class EpochValidation {
     }
 
     public static EpochCalculationResult calculateEpochRewardPots(int epoch, DataProvider dataProvider, boolean detailedValidation) {
+        if (epoch < MAINNET_SHELLEY_START_EPOCH) {
+            log.warn("Epoch " + epoch + " is before the start of the Shelley era. No rewards were calculated in this epoch.");
+            return EpochCalculationResult.builder()
+                    .totalRewardsPot(BigInteger.ZERO)
+                    .treasury(BigInteger.ZERO)
+                    .reserves(BigInteger.ZERO)
+                    .treasuryCalculationResult(TreasuryCalculationResult.builder()
+                            .totalRewardPot(BigInteger.ZERO)
+                            .treasury(BigInteger.ZERO)
+                            .treasuryWithdrawals(BigInteger.ZERO)
+                            .unspendableEarnedRewards(BigInteger.ZERO)
+                            .epoch(epoch).build())
+                    .totalDistributedRewards(BigInteger.ZERO)
+                    .epoch(epoch)
+                    .build();
+        } else if (epoch == MAINNET_SHELLEY_START_EPOCH) {
+            return EpochCalculationResult.builder()
+                    .totalRewardsPot(BigInteger.ZERO)
+                    .treasury(BigInteger.ZERO)
+                    .treasuryCalculationResult(TreasuryCalculationResult.builder()
+                            .totalRewardPot(BigInteger.ZERO)
+                            .treasury(BigInteger.ZERO)
+                            .treasuryWithdrawals(BigInteger.ZERO)
+                            .unspendableEarnedRewards(BigInteger.ZERO)
+                            .epoch(epoch).build())
+                    .reserves(MAINNET_SHELLEY_INITIAL_RESERVES)
+                    .totalDistributedRewards(BigInteger.ZERO)
+                    .epoch(epoch)
+                    .build();
+        }
+
         long overallStart = System.currentTimeMillis();
         long start = System.currentTimeMillis();
-        log.info("Start obtaining the epoch data");
+        log.debug("Start obtaining the epoch data");
         AdaPots adaPotsForPreviousEpoch = dataProvider.getAdaPotsForEpoch(epoch - 1);
         ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch - 2);
         Epoch epochInfo = dataProvider.getEpochInfo(epoch - 2);
@@ -38,7 +71,9 @@ public class EpochValidation {
             sharedPoolRewardAddressesWithoutReward = dataProvider.findSharedPoolRewardAddressWithoutReward(epoch - 2);
         }
         HashSet<String> poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).collect(Collectors.toCollection(HashSet::new));
-        HashSet<String> accountsRegisteredInThePast = dataProvider.getStakeAddressesWithRegistrationsUntilEpoch(epoch - 1, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
+        poolRewardAddresses.addAll(retiredPools.stream().map(PoolDeregistration::getRewardAddress).collect(Collectors.toSet()));
+        HashSet<String> registeredAccountsSinceLastEpoch = dataProvider.getRegisteredAccountsUntilLastEpoch(epoch, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
+        HashSet<String> registeredAccountsUntilNow = dataProvider.getRegisteredAccountsUntilNow(epoch, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
 
         List<Reward> memberRewardsInEpoch = List.of();
         List<TotalPoolRewards> totalPoolRewards = List.of();
@@ -47,32 +82,32 @@ public class EpochValidation {
             totalPoolRewards = dataProvider.getSumOfMemberAndLeaderRewardsInEpoch(epoch - 2);
         }
         long end = System.currentTimeMillis();
-        log.info("Obtaining the epoch data took " + Math.round((end - start) / 1000.0) + "s");
-        log.info("Start epoch calculation");
+        log.debug("Obtaining the epoch data took " + Math.round((end - start) / 1000.0) + "s");
+        log.debug("Start epoch calculation");
 
         start = System.currentTimeMillis();
         EpochCalculationResult epochCalculationResult = EpochCalculation.calculateEpochRewardPots(
                 epoch, adaPotsForPreviousEpoch, protocolParameters, epochInfo, retiredPools, deregisteredAccounts,
                 mirCertificates, poolIds, poolHistories, lateDeregisteredAccounts,
-                accountsRegisteredInThePast, sharedPoolRewardAddressesWithoutReward);
+                registeredAccountsSinceLastEpoch, registeredAccountsUntilNow, sharedPoolRewardAddressesWithoutReward);
         end = System.currentTimeMillis();
-        log.info("Epoch calculation took " + Math.round((end - start) / 1000.0) + "s");
+        log.debug("Epoch calculation took " + Math.round((end - start) / 1000.0) + "s");
 
         if (detailedValidation) {
-            log.info("Start epoch validation");
+            log.debug("Start epoch validation");
 
             start = System.currentTimeMillis();
             for (PoolRewardCalculationResult poolRewardCalculationResult : epochCalculationResult.getPoolRewardCalculationResults()) {
                 if (!PoolRewardValidation.poolRewardIsValid(poolRewardCalculationResult, memberRewardsInEpoch, totalPoolRewards)) {
-                    log.info("Pool reward is invalid. Please check the details for pool " + poolRewardCalculationResult.getPoolId());
+                    log.debug("Pool reward is invalid. Please check the details for pool " + poolRewardCalculationResult.getPoolId());
                 }
             }
             end = System.currentTimeMillis();
-            log.info("Epoch validation took " + Math.round((end - start) / 1000.0) + "s");
+            log.debug("Epoch validation took " + Math.round((end - start) / 1000.0) + "s");
         }
 
         long overallEnd = System.currentTimeMillis();
-        log.info("Overall calculation and validation took " +
+        log.info("Overall calculation and validation of epoch " + epoch + " took " +
                 Math.round((overallEnd - overallStart) / 1000.0)  + " seconds in total.");
 
         return epochCalculationResult;
