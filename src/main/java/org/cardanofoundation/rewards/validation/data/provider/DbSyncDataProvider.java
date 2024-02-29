@@ -3,6 +3,7 @@ package org.cardanofoundation.rewards.validation.data.provider;
 import lombok.extern.slf4j.Slf4j;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.calculation.domain.PoolBlock;
+import org.cardanofoundation.rewards.validation.domain.PoolReward;
 import org.cardanofoundation.rewards.validation.entity.jpa.*;
 import org.cardanofoundation.rewards.calculation.enums.AccountUpdateAction;
 import org.cardanofoundation.rewards.calculation.enums.MirPot;
@@ -401,24 +402,24 @@ public class DbSyncDataProvider implements DataProvider {
     }
 
     @Override
-    public List<Reward> getMemberRewardsInEpoch(int epoch) {
-        List <MemberReward> poolRewards = dbSyncRewardRepository.getMemberRewardsInEpoch(epoch);
+    public HashSet<Reward> getMemberRewardsInEpoch(int epoch) {
+        HashSet<MemberReward> poolRewards = dbSyncRewardRepository.getMemberRewardsInEpoch(epoch);
 
         if (poolRewards.isEmpty()) {
-            return List.of();
+            return new HashSet<>();
         }
 
-        return poolRewards.stream().map(RewardMapper::fromMemberReward).toList();
+        return poolRewards.stream().map(RewardMapper::fromMemberReward).collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
-    public List<TotalPoolRewards> getSumOfMemberAndLeaderRewardsInEpoch(int epoch) {
-        List<TotalPoolRewards> totalPoolRewards = dbSyncRewardRepository.getSumOfMemberAndLeaderRewardsInEpoch(epoch);
+    public HashSet<PoolReward> getTotalPoolRewardsInEpoch(int epoch) {
+        HashSet<TotalPoolRewards> totalPoolRewards = dbSyncRewardRepository.getSumOfMemberAndLeaderRewardsInEpoch(epoch);
 
         if (totalPoolRewards.isEmpty()) {
-            return List.of();
+            return new HashSet<>();
         } else {
-            return totalPoolRewards;
+            return totalPoolRewards.stream().map(totalPoolReward -> PoolReward.fromTotalPoolRewards(totalPoolReward, epoch)).collect(Collectors.toCollection(HashSet::new));
         }
     }
 

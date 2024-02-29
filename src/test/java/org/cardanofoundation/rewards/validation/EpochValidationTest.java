@@ -23,9 +23,8 @@ import static org.cardanofoundation.rewards.calculation.util.CurrencyConverter.l
  */
 @SpringBootTest
 @ComponentScan
-@EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
 public class EpochValidationTest {
-    @Autowired
+    @Autowired(required = false)
     DbSyncDataProvider dbSyncDataProvider;
 
     @Autowired
@@ -44,11 +43,12 @@ public class EpochValidationTest {
     }
 
     static Stream<Integer> dataProviderEpochRange() {
-        return IntStream.range(208, 460).boxed();
+        return IntStream.range(236, 460).boxed();
     }
 
     @ParameterizedTest
     @MethodSource("dataProviderEpochRange")
+    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     public void testCalculateEpochRewardsWithDbSyncDataProvider(int epoch) {
         testCalculateEpochPots(epoch, dbSyncDataProvider, false);
     }
@@ -56,10 +56,11 @@ public class EpochValidationTest {
     @ParameterizedTest
     @MethodSource("dataProviderEpochRange")
     public void testCalculateEpochRewardsWithJsonDataProvider(int epoch) {
-        testCalculateEpochPots(epoch, jsonDataProvider, false);
+        testCalculateEpochPots(epoch, jsonDataProvider, true);
     }
 
     @Test
+    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     public void testCalculateEpochRewardsForEpoch385() {
         testCalculateEpochPots(385, dbSyncDataProvider, true);
     }

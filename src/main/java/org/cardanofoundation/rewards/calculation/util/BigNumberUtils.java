@@ -16,8 +16,17 @@ public class BigNumberUtils {
                 .round(new MathContext(0, RoundingMode.FLOOR)).toBigInteger();
     }
 
+    public static BigInteger multiplyAndFloor(BigInteger a, BigDecimal b, BigDecimal c) {
+        return new BigDecimal(a).multiply(b).multiply(c).round(new MathContext(0, RoundingMode.FLOOR)).toBigInteger();
+    }
+
     public static BigInteger multiplyAndFloor(BigInteger a, double b, double c) {
         return new BigDecimal(a).multiply(BigDecimal.valueOf(b).multiply(BigDecimal.valueOf(c)))
+                .round(new MathContext(0, RoundingMode.FLOOR)).toBigInteger();
+    }
+
+    public static BigInteger multiplyAndFloor(BigInteger a, BigDecimal b) {
+        return new BigDecimal(a).multiply(b)
                 .round(new MathContext(0, RoundingMode.FLOOR)).toBigInteger();
     }
 
@@ -182,7 +191,15 @@ public class BigNumberUtils {
         return a.compareTo(b) < 0;
     }
 
+    public static boolean isLower(BigDecimal a, BigDecimal b) {
+        return a.compareTo(b) < 0;
+    }
+
     public static boolean isHigher(BigInteger a, BigInteger b) {
+        return a.compareTo(b) > 0;
+    }
+
+    public static boolean isHigher(BigDecimal a, BigDecimal b) {
         return a.compareTo(b) > 0;
     }
 

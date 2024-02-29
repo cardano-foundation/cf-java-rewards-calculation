@@ -28,11 +28,11 @@ public class PoolRewardsCalculation {
      *
      * See Haskell implementation: https://github.com/input-output-hk/cardano-ledger/blob/64459cc87094331c79d11880e0a4c81b9a721ab0/eras/shelley/impl/src/Cardano/Ledger/Shelley/Rewards.hs#L87C32-L87C44
      */
-    public static BigDecimal calculateApparentPoolPerformance(final BigInteger activePoolStake, final BigInteger totalActiveEpochStake, final int blocksMintedByPool, final int blocksMintedByStakePools, final double decentralizationParam) {
+    public static BigDecimal calculateApparentPoolPerformance(final BigInteger activePoolStake, final BigInteger totalActiveEpochStake, final int blocksMintedByPool, final int blocksMintedByStakePools, final BigDecimal decentralizationParam) {
         BigDecimal poolStake = new BigDecimal(activePoolStake);
         BigDecimal totalEpochStake = new BigDecimal(totalActiveEpochStake);
 
-        if (decentralizationParam >= 0.8) {
+        if (decentralizationParam.compareTo(BigDecimal.valueOf(0.8)) >= 0) {
             return BigDecimal.ONE;
         } else if (isZero(poolStake) || isZero(totalEpochStake)) {
             return BigDecimal.ZERO;
@@ -65,7 +65,7 @@ public class PoolRewardsCalculation {
      *
      * See the Haskell implementation: https://github.com/input-output-hk/cardano-ledger/blob/e722881568155fc39550a8dfabda3efeb263a1e5/shelley/chain-and-ledger/executable-spec/src/Shelley/Spec/Ledger/EpochBoundary.hs#L111
      */
-    public static BigInteger calculateOptimalPoolReward(BigInteger totalAvailableRewards, int optimalPoolCount, double influence, BigDecimal relativeStakeOfPool, BigDecimal relativeStakeOfPoolOwner) {
+    public static BigInteger calculateOptimalPoolReward(BigInteger totalAvailableRewards, int optimalPoolCount, BigDecimal influence, BigDecimal relativeStakeOfPool, BigDecimal relativeStakeOfPoolOwner) {
 
         BigDecimal sizeOfASaturatedPool = divide(BigDecimal.ONE, optimalPoolCount);
         BigDecimal cappedRelativeStake = min(relativeStakeOfPool, sizeOfASaturatedPool);
@@ -134,7 +134,6 @@ public class PoolRewardsCalculation {
                                                                          final HashSet<String> lateDeregisteredAccounts,
                                                                          final HashSet<String> accountsRegisteredInThePast) {
         final int earnedEpoch = poolHistoryCurrentEpoch.getEpoch();
-        final int spendableEpoch = earnedEpoch + 2;
         final PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardCalculationResult.builder()
                 .epoch(earnedEpoch)
                 .poolId(poolId)
@@ -169,9 +168,9 @@ public class PoolRewardsCalculation {
             return poolRewardCalculationResult;
         }
 
-        double decentralizationParameter = protocolParameters.getDecentralisation();
+        BigDecimal decentralizationParameter = protocolParameters.getDecentralisation();
         int optimalPoolCount = protocolParameters.getOptimalPoolCount();
-        double influenceParam = protocolParameters.getPoolOwnerInfluence();
+        BigDecimal influenceParam = protocolParameters.getPoolOwnerInfluence();
 
         // Calculate apparent pool performance
         final BigDecimal apparentPoolPerformance =
@@ -242,7 +241,7 @@ public class PoolRewardsCalculation {
                 shelley-ledger.pdf | 17.4 Reward aggregation | p. 114
              */
             if (stakeAddress.equals(poolHistoryCurrentEpoch.getRewardAddress())
-                    && spendableEpoch < MAINNET_ALLEGRA_HARDFORK_EPOCH) {
+                    && earnedEpoch < MAINNET_ALLEGRA_HARDFORK_EPOCH) {
                 continue;
             }
 

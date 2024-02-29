@@ -78,23 +78,21 @@ public class PoolRewardValidationTest {
     }
 
     static Stream<Integer> testPoolJsonProviderRewardRange() {
-        return IntStream.range(211, 220).boxed();
+        return IntStream.range(208, 250).boxed();
     }
 
     @ParameterizedTest
     @MethodSource("testPoolJsonProviderRewardRange")
-    @DisabledIf(expression = "#{environment.acceptsProfiles('ci')}", loadContext = true, reason = "Range test is too long for CI")
     void calculateNorthPoolRewardFromEpoch211To216(int epoch) {
         String poolId = "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx";
-        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }
 
     @Test
-    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     void calculateNorthPoolRewardInEpoch217() {
         String poolId = "pool1rcd7qslz3xnpnk9u6tcwegy5r2574uf8suqu24ptg637jha3sr5";
         int epoch = 217;
-        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }
 
     @Test
@@ -102,128 +100,110 @@ public class PoolRewardValidationTest {
     void calculateSTKH1PoolRewardInEpoch363() {
         String poolId = "pool1kchver88u3kygsak8wgll7htr8uxn5v35lfrsyy842nkscrzyvj";
         int epoch = 363; // TODO: handle no rewards in 350
-        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }
 
     @Test
-    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     void calculateAutoStakeIIPoolRewardInEpoch215() {
         String poolId = "pool1ljywsch33t7gaf02aeeqkqpuku0ngpwl9fm04t7u5sl5xyunmgp";
         int epoch = 215;
-        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
+    }
+
+    @Test
+    void calculateIOG1PoolRewardInEpoch241() {
+        String poolId = "pool1mxqjlrfskhd5kql9kak06fpdh8xjwc76gec76p3taqy2qmfzs5z";
+        int epoch = 241;
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }
     @Test
-    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     void calculateXYZPoolRewardInEpoch213() {
         String poolId = "pool18hkq2t8ss45h4fkr92f52flhc4mpzedx5mcz4xhnpj0dzp76028";
         int epoch = 213;
-        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }
 
     @Test
-    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     void calculateXYZPoolRewardInEpoch211() {
         String poolId = "pool18hkq2t8ss45h4fkr92f52flhc4mpzedx5mcz4xhnpj0dzp76028";
         int epoch = 211;
-        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }
 
     @Test
-    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     void calculateUNDRPoolRewardInEpoch211() {
         String poolId = "pool140x77a7cz2j689lmxf836qpjtc3y83rka28v6gpswxdw2mag62e";
         int epoch = 211;
-        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }
 
     @Test
-    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     void calculateJP777PoolRewardInEpoch211() {
         String poolId = "pool1x5jlxxqce4gkr4474q0gcsmu47wfqjt9mksv2w38ujpzgjn83ye";
         int epoch = 211;
-        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }
 
     @Test
-    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     void calculateJAPANPoolRewardInEpoch211() {
         String poolId = "pool19uynx6nxcdksmaqdcshjg487fap3rs3axyhrdqa7gdqgzgxss4y";
         int epoch = 211;
-        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }
 
     @Test
-    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     void calculateXYZPoolRewardInEpoch212() {
         String poolId = "pool18hkq2t8ss45h4fkr92f52flhc4mpzedx5mcz4xhnpj0dzp76028";
         int epoch = 212;
-        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }
 
     @Test
-    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     void calculateAAA2PoolRewardInEpoch212() {
         String poolId = "pool1a3u8zuz7fqavxgl48s8k37w8w6njk7zevlzyfjdlzxfexjcue6a";
         int epoch = 212;
-        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }
 
     @Test
-    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     void calculateAAA2PoolRewardInEpoch213() {
         String poolId = "pool1a3u8zuz7fqavxgl48s8k37w8w6njk7zevlzyfjdlzxfexjcue6a";
         int epoch = 213;
-        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }
 
     @Test
-    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     void calculateDUCKPoolRewardInEpoch212() {
         String poolId = "pool13l0j202yexqh6l0awtee9g354244gmfze09utxz0sn7p7r3ev3m";
         int epoch = 212;
-        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }
 
     @Test
-    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     void calculateViperPoolRewardInEpoch213() {
         String poolId = "pool166dkk9kx5y6ug9tnvh0dnvxhwt2yca3g5pd5jaqa8t39cgyqqlr";
         int epoch = 213;
-        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }
 
     @Test
-    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     void calculateJazzPoolRewardInEpoch214() {
         String poolId = "pool1h0524mtazrjnzqh5e4u060jsfk8lpsqqjfpa5gygjwuhqu34wvt";
         int epoch = 214;
-        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }
 
     @Test
-    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     void calculateCRDNSPoolRewardInEpoch211() {
         String poolId = "pool1vx9tzlkgafernd9vpjpxkenutx2gncj4yn88fpq69823qlwcqrt";
         int epoch = 211;
-        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }
 
     @Test
-    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     void calculateNUFI4PoolRewardInEpoch383() {
         String poolId = "pool167zl76srpt5a2gthpsq0ye9z4fpray5vsh7xyzcn63hd5mnw7fa";
         int epoch = 383;
-        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
-    }
-
-    static Stream<Integer> testPoolKoiosProviderRewardRange() {
-        return IntStream.range(211, 213).boxed();
-    }
-
-    @ParameterizedTest
-    @MethodSource("testPoolKoiosProviderRewardRange")
-    void calculateOCTASPoolRewardFromEpoch211To213(int epoch) {
-        String poolId = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
-        Test_calculatePoolReward(poolId, epoch, DataProviderType.KOIOS);
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }
 }

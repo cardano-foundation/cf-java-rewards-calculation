@@ -2,8 +2,8 @@ package org.cardanofoundation.rewards.validation;
 
 import org.cardanofoundation.rewards.calculation.EpochCalculation;
 import org.cardanofoundation.rewards.calculation.domain.*;
-import org.cardanofoundation.rewards.calculation.enums.AccountUpdateAction;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
+import org.cardanofoundation.rewards.validation.domain.PoolReward;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 
 import java.math.BigInteger;
@@ -67,7 +67,7 @@ public class EpochValidation {
         HashSet<String> deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);
         HashSet<String> lateDeregisteredAccounts = dataProvider.getLateAccountDeregistrationsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);
         HashSet<String> sharedPoolRewardAddressesWithoutReward = new HashSet<>();
-        if (epoch < MAINNET_ALLEGRA_HARDFORK_EPOCH) {
+        if (epoch - 2 < MAINNET_ALLEGRA_HARDFORK_EPOCH) {
             sharedPoolRewardAddressesWithoutReward = dataProvider.findSharedPoolRewardAddressWithoutReward(epoch - 2);
         }
         HashSet<String> poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).collect(Collectors.toCollection(HashSet::new));
@@ -75,11 +75,11 @@ public class EpochValidation {
         HashSet<String> registeredAccountsSinceLastEpoch = dataProvider.getRegisteredAccountsUntilLastEpoch(epoch, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
         HashSet<String> registeredAccountsUntilNow = dataProvider.getRegisteredAccountsUntilNow(epoch, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
 
-        List<Reward> memberRewardsInEpoch = List.of();
-        List<TotalPoolRewards> totalPoolRewards = List.of();
+        HashSet<Reward> memberRewardsInEpoch = new HashSet<>();
+        HashSet<PoolReward> totalPoolRewards = new HashSet<>();
         if (detailedValidation) {
             memberRewardsInEpoch = dataProvider.getMemberRewardsInEpoch(epoch - 2);
-            totalPoolRewards = dataProvider.getSumOfMemberAndLeaderRewardsInEpoch(epoch - 2);
+            totalPoolRewards = dataProvider.getTotalPoolRewardsInEpoch(epoch - 2);
         }
         long end = System.currentTimeMillis();
         log.debug("Obtaining the epoch data took " + Math.round((end - start) / 1000.0) + "s");

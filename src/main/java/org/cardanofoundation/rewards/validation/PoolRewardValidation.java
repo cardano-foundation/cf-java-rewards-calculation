@@ -1,10 +1,13 @@
 package org.cardanofoundation.rewards.validation;
 
 import lombok.extern.slf4j.Slf4j;
+import org.cardanofoundation.rewards.calculation.TreasuryCalculation;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
+import org.cardanofoundation.rewards.validation.domain.PoolReward;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -76,22 +79,21 @@ public class PoolRewardValidation {
     }
 
     public static PoolRewardCalculationResult computePoolRewardInEpoch(String poolId, int epoch, DataProvider dataProvider) {
+        // The Shelley era and the ada pot system started on mainnet in epoch 208.
+        // Fee and treasury values are 0 for epoch 208.
+        if (epoch < MAINNET_SHELLEY_START_EPOCH) {
+            log.warn("Epoch " + epoch + " is before the start of the Shelley era. No rewards were calculated in this epoch.");
+            return PoolRewardCalculationResult.builder().poolId(poolId).epoch(epoch).poolReward(BigInteger.ZERO).build();
+        } else if (epoch == MAINNET_SHELLEY_START_EPOCH) {
+            return PoolRewardCalculationResult.builder().poolId(poolId).epoch(epoch).poolReward(BigInteger.ZERO).build();
+        }
+
         // Get Epoch information of current epoch
         // Source: https://api.koios.rest/api/v0/epoch_info?_epoch_no=211
         Epoch epochInfo = dataProvider.getEpochInfo(epoch);
-
-        // The Shelley era and the ada pot system started on mainnet in epoch 208.
-        // Fee and treasury values are 0 for epoch 208.
-        BigInteger totalFeesForCurrentEpoch = BigInteger.ZERO;
-        if (epoch > 209) {
-            totalFeesForCurrentEpoch = epochInfo.getFees();
-        }
+        BigInteger totalFeesForCurrentEpoch = epochInfo.getFees();
 
         int totalBlocksInEpoch = epochInfo.getBlockCount();
-
-        if (epoch > 212 && epoch < 255) {
-            totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();
-        }
 
         // Get the ada reserves for the next epoch because it was already updated (int the previous step)
         AdaPots adaPotsForNextEpoch = dataProvider.getAdaPotsForEpoch(epoch + 1);
@@ -104,11 +106,15 @@ public class PoolRewardValidation {
         ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch);
 
         // Calculate total available reward for pools (total reward pot after treasury cut)
-        double decentralizationParameter = protocolParameters.getDecentralisation();
-        double monetaryExpandRate = protocolParameters.getMonetaryExpandRate();
-        double treasuryGrowRate = protocolParameters.getTreasuryGrowRate();
+        BigDecimal decentralizationParameter = protocolParameters.getDecentralisation();
+        BigDecimal monetaryExpandRate = protocolParameters.getMonetaryExpandRate();
+        BigDecimal treasuryGrowRate = protocolParameters.getTreasuryGrowRate();
 
-        BigInteger totalRewardPot = TreasuryValidation.calculateTotalRewardPotWithEta(
+        if (epoch > 212 && epoch < 255) {
+            totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();
+        }
+
+        BigInteger totalRewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(
                 monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserves, totalFeesForCurrentEpoch);
 
         BigInteger stakePoolRewardsPot = totalRewardPot.subtract(floor(multiply(totalRewardPot, treasuryGrowRate)));
@@ -118,7 +124,13 @@ public class PoolRewardValidation {
         HashSet<String> accountDeregistrations = dataProvider.getDeregisteredAccountsInEpoch(epoch + 1, RANDOMNESS_STABILISATION_WINDOW);
         HashSet<String> lateAccountDeregistrations = dataProvider.getLateAccountDeregistrationsInEpoch(epoch + 1, RANDOMNESS_STABILISATION_WINDOW);
         HashSet<String> sharedPoolRewardAddressesWithoutReward = dataProvider.findSharedPoolRewardAddressWithoutReward(epoch);
-        HashSet<String> accountsRegisteredInThePast = dataProvider.getRegisteredAccountsUntilLastEpoch(epoch, new HashSet<>(List.of(poolHistoryCurrentEpoch.getRewardAddress())), RANDOMNESS_STABILISATION_WINDOW);
+
+        HashSet<String> rewardAddresses = new HashSet<>();
+        if (poolHistoryCurrentEpoch != null) {
+            rewardAddresses = new HashSet<>(List.of(poolHistoryCurrentEpoch.getRewardAddress()));
+        }
+
+        HashSet<String> accountsRegisteredInThePast = dataProvider.getRegisteredAccountsUntilLastEpoch(epoch, rewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
 
         return computePoolRewardInEpoch(poolId, epoch, protocolParameters, epochInfo, stakePoolRewardsPot, adaInCirculation, poolHistoryCurrentEpoch,
                 accountDeregistrations, lateAccountDeregistrations, accountsRegisteredInThePast, sharedPoolRewardAddressesWithoutReward);
@@ -126,17 +138,17 @@ public class PoolRewardValidation {
 
     public static boolean poolRewardIsValid(PoolRewardCalculationResult poolRewardCalculationResult, DataProvider dataProvider) {
         int epoch  = poolRewardCalculationResult.getEpoch();
-        List<Reward> memberRewardsInEpoch = dataProvider.getMemberRewardsInEpoch(epoch);
-        List<TotalPoolRewards> totalPoolRewards = dataProvider.getSumOfMemberAndLeaderRewardsInEpoch(epoch);
+        HashSet<Reward> memberRewardsInEpoch = dataProvider.getMemberRewardsInEpoch(epoch);
+        HashSet<PoolReward> totalPoolRewards = dataProvider.getTotalPoolRewardsInEpoch(epoch);
         return poolRewardIsValid(poolRewardCalculationResult, memberRewardsInEpoch, totalPoolRewards);
     }
 
-    public static boolean poolRewardIsValid(PoolRewardCalculationResult poolRewardCalculationResult, List<Reward> memberRewardsInEpoch, List<TotalPoolRewards> totalPoolRewards) {
+    public static boolean poolRewardIsValid(PoolRewardCalculationResult poolRewardCalculationResult, HashSet<Reward> memberRewardsInEpoch, HashSet<PoolReward> totalPoolRewards) {
         String poolId = poolRewardCalculationResult.getPoolId();
 
         BigInteger actualPoolReward = totalPoolRewards.stream()
                 .filter(reward -> reward.getPoolId().equals(poolId))
-                .map(TotalPoolRewards::getAmount)
+                .map(PoolReward::getAmount)
                 .reduce(BigInteger.ZERO, BigInteger::add);
         List<Reward> actualPoolRewardsInEpoch = memberRewardsInEpoch.stream()
                 .filter(reward -> reward.getPoolId().equals(poolId))

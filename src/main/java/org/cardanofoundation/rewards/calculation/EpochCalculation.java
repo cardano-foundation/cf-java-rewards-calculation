@@ -3,6 +3,7 @@ package org.cardanofoundation.rewards.calculation;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.calculation.enums.MirPot;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,7 +33,16 @@ public class EpochCalculation {
                                                                   final HashSet<String> sharedPoolRewardAddressesWithoutReward) {
         final EpochCalculationResult epochCalculationResult = EpochCalculationResult.builder().epoch(epoch).build();
 
-        if (epoch < 209) {
+        if (epoch < MAINNET_SHELLEY_START_EPOCH) {
+            log.warn("Epoch " + epoch + " is before the start of the Shelley era. No rewards were calculated in this epoch.");
+            epochCalculationResult.setReserves(BigInteger.ZERO);
+            epochCalculationResult.setTreasury(BigInteger.ZERO);
+            epochCalculationResult.setTotalDistributedRewards(BigInteger.ZERO);
+            epochCalculationResult.setTotalRewardsPot(BigInteger.ZERO);
+            epochCalculationResult.setTotalPoolRewardsPot(BigInteger.ZERO);
+            epochCalculationResult.setTotalAdaInCirculation(BigInteger.ZERO);
+            return epochCalculationResult;
+        } else if (epoch == MAINNET_SHELLEY_START_EPOCH) {
             epochCalculationResult.setReserves(MAINNET_SHELLEY_INITIAL_RESERVES);
             epochCalculationResult.setTreasury(MAINNET_SHELLEY_INITIAL_TREASURY);
             epochCalculationResult.setTotalDistributedRewards(BigInteger.ZERO);
@@ -42,26 +52,19 @@ public class EpochCalculation {
             return epochCalculationResult;
         }
 
-        double treasuryGrowthRate = 0.2;
-        double monetaryExpandRate = 0.003;
-        double decentralizationParameter = 1;
-
         BigInteger totalFeesForCurrentEpoch = BigInteger.ZERO;
         int totalBlocksInEpoch = 0;
 
-        /* We need to use the epoch info 2 epochs before as shelley starts in epoch 208 it will be possible to get
-           those values from epoch 210 onwards. Before that we need to use the genesis values, but they are not
-           needed anyway if the decentralization parameter is > 0.8.
-           See: shelley-delegation.pdf 5.4.3 */
-        if (epoch > 209) {
+        BigDecimal treasuryGrowthRate = protocolParameters.getTreasuryGrowRate();
+        BigDecimal monetaryExpandRate = protocolParameters.getMonetaryExpandRate();
+        BigDecimal decentralizationParameter = protocolParameters.getDecentralisation();
+        BigInteger activeStakeInEpoch = BigInteger.ZERO;
+
+        if (epochInfo != null) {
+            activeStakeInEpoch = epochInfo.getActiveStake();
             totalFeesForCurrentEpoch = epochInfo.getFees();
-            treasuryGrowthRate = protocolParameters.getTreasuryGrowRate();
-            monetaryExpandRate = protocolParameters.getMonetaryExpandRate();
-            decentralizationParameter = protocolParameters.getDecentralisation();
-
             totalBlocksInEpoch = epochInfo.getBlockCount();
-
-            if (decentralizationParameter < 0.8 && decentralizationParameter > 0.0) {
+            if (isLower(decentralizationParameter, BigDecimal.valueOf(0.8)) && isHigher(decentralizationParameter, BigDecimal.ZERO)) {
                 totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();
             }
         }
@@ -96,7 +99,8 @@ public class EpochCalculation {
                 if (deregisteredOwnerAccounts.contains(rewardAddress) ||
                         lateDeregisteredOwnerAccounts.contains(rewardAddress) ||
                         !ownerAccountsRegisteredInThePast.contains(rewardAddress)) {
-                    // If the reward address has been unregistered, the deposit is added to the treasury
+                    // If the reward address has been unregistered, the deposit can not be returned
+                    // and will be added to the treasury instead (Pool Reap see: shelley-ledger.pdf p.53)
                     treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(POOL_DEPOSIT_IN_LOVELACE);
                 }
             }
@@ -114,7 +118,6 @@ public class EpochCalculation {
         }
 
         treasuryForCurrentEpoch = treasuryForCurrentEpoch.subtract(treasuryWithdrawals);
-
         BigInteger totalDistributedRewards = BigInteger.ZERO;
         final BigInteger adaInCirculation = TOTAL_LOVELACE.subtract(reserveInPreviousEpoch);
         final List<PoolRewardCalculationResult> poolRewardCalculationResults = new ArrayList<>();
@@ -124,24 +127,21 @@ public class EpochCalculation {
         for (String poolId : poolsThatProducedBlocksInEpoch) {
             log.debug("[" + i + " / " + poolsThatProducedBlocksInEpoch.size() + "] Processing pool: " + poolId);
             PoolHistory poolHistory = poolHistories.stream().filter(history -> history.getPoolId().equals(poolId)).findFirst().orElse(null);
-
             PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardCalculationResult
                     .builder().poolId(poolId).epoch(epoch).poolReward(BigInteger.ZERO).build();
 
             if(poolHistory != null) {
-                BigInteger activeStakeInEpoch = BigInteger.ZERO;
-                if (epochInfo.getActiveStake() != null) {
-                    activeStakeInEpoch = epochInfo.getActiveStake();
-                }
-
-                // Step 10 a: Check if pool reward address or member stake addresses have been unregistered before
+                // Get the reward addresses of the pool and the reward addresses of its delegators
                 final HashSet<String> stakeAddresses = new HashSet<>();
                 stakeAddresses.add(poolHistory.getRewardAddress());
                 stakeAddresses.addAll(poolHistory.getDelegators().stream().map(Delegator::getStakeAddress).toList());
-
+                // We need the get the registration state of those accounts. If they were unregistered before
+                // the randomness stabilization window, they will not receive any rewards. The remaining of the
+                // reward pot will go back to the reserves
                 final HashSet<String> delegatorAccountDeregistrations = deregisteredAccounts.stream()
                         .filter(stakeAddresses::contains).collect(Collectors.toCollection(HashSet::new));
-
+                // If they were unregistered after the randomness stabilization window, rewards will be calculated
+                // but they will not be spendable and will be added to the treasury instead
                 final HashSet<String> lateDeregisteredDelegators = lateDeregisteredAccounts.stream()
                         .filter(stakeAddresses::contains).collect(Collectors.toCollection(HashSet::new));
 
@@ -151,7 +151,7 @@ public class EpochCalculation {
                 // This is not the case anymore and the stake account receives the reward for all pools
                 // Until the Allegra hard fork, this method will be used to emulate the old behavior
                 boolean ignoreLeaderReward = false;
-                if (epoch < MAINNET_ALLEGRA_HARDFORK_EPOCH) {
+                if (epoch - 2 < MAINNET_ALLEGRA_HARDFORK_EPOCH) {
                     ignoreLeaderReward = sharedPoolRewardAddressesWithoutReward.contains(poolId);
                 }
 

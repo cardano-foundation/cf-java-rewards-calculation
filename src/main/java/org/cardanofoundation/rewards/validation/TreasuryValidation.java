@@ -1,10 +1,12 @@
 package org.cardanofoundation.rewards.validation;
 
+import org.cardanofoundation.rewards.calculation.TreasuryCalculation;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.calculation.enums.AccountUpdateAction;
 import org.cardanofoundation.rewards.calculation.enums.MirPot;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -15,52 +17,10 @@ import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 
 public class TreasuryValidation {
 
-  /*
-   * Calculate the reward pot for epoch e with the formula:
-   *
-   * rewards(e) = floor(monetary_expand_rate * eta * reserve(e - 1) + fee(e - 1))
-   * rewards(e) = 0, if e < 209
-   */
-  public static BigInteger calculateTotalRewardPotWithEta(double monetaryExpandRate, int totalBlocksInEpochByPools,
-                                                          double decentralizationParameter, BigInteger reserve, BigInteger fee) {
-    double eta = calculateEta(totalBlocksInEpochByPools, decentralizationParameter);
-    return multiplyAndFloor(reserve, monetaryExpandRate, eta).add(fee);
-  }
-
-  /*
-  * Calculate eta using the decentralisation parameter and the formula:
-  *
-  * eta(totalBlocksInEpochMadeByPools, decentralisation) = 1, if decentralisation >= 0.8, otherwise
-  * eta(totalBlocksInEpochMadeByPools, decentralisation) =
-  *   min(1, totalBlocksInEpochMadeByPools / ((1 - decentralisation) * expectedSlotPerEpoch * activeSlotsCoeff))
-  *
-  * See: https://github.com/input-output-hk/cardano-ledger/commit/c4f10d286faadcec9e4437411bce9c6c3b6e51c2
-  */
-  private static double calculateEta(int totalBlocksInEpochByPools, double decentralizationParameter) {
-    // shelley-delegation.pdf 5.4.3
-
-    if (decentralizationParameter >= 0.8) {
-      return 1.0;
-    }
-
-    // The number of expected blocks will be the number of slots per epoch times the active slots coefficient
-    double activeSlotsCoeff = 0.05; // See: Non-Updatable Parameters: https://cips.cardano.org/cips/cip9/
-
-    // decentralizationParameter is the proportion of blocks that are expected to be produced by stake pools
-    // instead of the OBFT (Ouroboros Byzantine Fault Tolerance) nodes. It was introduced close before the Shelley era:
-    // https://github.com/input-output-hk/cardano-ledger/commit/c4f10d286faadcec9e4437411bce9c6c3b6e51c2
-    double expectedBlocksInNonOBFTSlots = EXPECTED_SLOT_PER_EPOCH * activeSlotsCoeff * (1 - decentralizationParameter);
-
-    // eta is the ratio between the number of blocks that have been produced during the epoch, and
-    // the expectation value of blocks that should have been produced during the epoch under
-    // ideal conditions.
-    return Math.min(1, totalBlocksInEpochByPools / expectedBlocksInNonOBFTSlots);
-  }
-
   public static TreasuryCalculationResult calculateTreasuryForEpoch(int epoch, DataProvider dataProvider) {
     // The Shelley era and the ada pot system started on mainnet in epoch 208.
     // Fee and treasury values are 0 for epoch 208.
-    if (epoch == 208) {
+    if (epoch == MAINNET_SHELLEY_START_EPOCH) {
         return TreasuryCalculationResult.builder()
                 .treasury(BigInteger.ZERO)
                 .epoch(epoch)
@@ -69,9 +29,9 @@ public class TreasuryValidation {
                 .build();
     }
 
-    double treasuryGrowthRate = 0.2;
-    double monetaryExpandRate = 0.003;
-    double decentralizationParameter = 1;
+    BigDecimal treasuryGrowthRate = MAINNET_SHELLEY_START_TREASURY_GROW_RATE;
+    BigDecimal monetaryExpandRate = MAINNET_SHELLEY_START_MONETARY_EXPAND_RATE;
+    BigDecimal decentralizationParameter = MAINNET_SHELLEY_START_DECENTRALISATION;
 
     AdaPots adaPotsForPreviousEpoch = dataProvider.getAdaPotsForEpoch(epoch - 1);
     BigInteger totalFeesForCurrentEpoch = BigInteger.ZERO;
@@ -91,7 +51,8 @@ public class TreasuryValidation {
 
       totalBlocksInEpoch = epochInfo.getBlockCount();
 
-      if (decentralizationParameter < 0.8 && decentralizationParameter > 0.0) {
+      BigDecimal decentralisationThreshold = new BigDecimal("0.8");
+      if (isLower(decentralizationParameter, decentralisationThreshold) && isHigher(decentralizationParameter, BigDecimal.ZERO)) {
         totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();
       }
     }
@@ -99,7 +60,7 @@ public class TreasuryValidation {
     BigInteger reserveInPreviousEpoch = adaPotsForPreviousEpoch.getReserves();
 
     BigInteger treasuryInPreviousEpoch = adaPotsForPreviousEpoch.getTreasury();
-    BigInteger rewardPot = TreasuryValidation.calculateTotalRewardPotWithEta(
+    BigInteger rewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(
             monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserveInPreviousEpoch, totalFeesForCurrentEpoch);
 
     BigInteger treasuryCut = multiplyAndFloor(rewardPot, treasuryGrowthRate);

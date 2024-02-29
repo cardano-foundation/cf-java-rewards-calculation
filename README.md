@@ -1,4 +1,4 @@
-# Cardano Rewards Calculation 🚧️ Under Construction 🚧️
+# Cardano Rewards Calculation
 
 <p align="left">
 <img alt="Tests" src="https://github.com/cardano-foundation/cf-java-rewards-calculation/actions/workflows/tests.yaml/badge.svg?branch=main" />
@@ -8,7 +8,13 @@
 <a href="https://opensource.org/licenses/MIT"><img alt="License" src="https://img.shields.io/badge/License-MIT-green.svg" /></a>
 </p>
 
-This java project is used to calculate the rewards of the Cardano network. It aims to be both an edge case documentation and formula implementation.
+This project is aims to target *multiple goals*. First of all, it tries to *re-implement the cardano ledger rules* for calculating 
+the [ADA pots](https://cexplorer.io/pot) (Treasury, Reserves, Rewards, Deposits, Utxo, Fees), as well as the rewards for stake pool operators and delegators. 
+The second goal is to use this implementation to *[validate the rewards calculation](https://cardano-foundation.github.io/cf-java-rewards-calculation/report-latest/treasury_calculation.html)* of the Cardano blockchain by providing a *different implementation of the [ledger specification](https://github.com/IntersectMBO/cardano-ledger?tab=readme-ov-file#cardano-ledger)*.
+The third goal is to *provide a library* that can be used in other project (such as [yaci-store](https://github.com/bloxbean/yaci-store)) to serve the rewards data *independently of [DB Sync](https://github.com/IntersectMBO/cardano-db-sync)*. 
+Last but not least, this project could also be used to *understand the influence of protocol parameters* and the flow of ADA through an interactive report.
+
+🚧️ The calculation is currently correct until the beginning of the Babbage era. 🚧️
 
 ## 🧪 Test Reports
 
@@ -20,24 +26,24 @@ We also generate for each version of this project calculation reports. These rep
 
 ```mermaid
 flowchart
-    A[Total Transaction Fees <br />at Epoch n] --> B[<a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/TreasuryCalculation.java#L42'>Total Reward Pot <br />at Epoch n</a/>]
-    B --> | <b><i><a href='https://cips.cardano.org/cips/cip9/#updatableprotocolparameters'>treasuryGrowthRate</a></b></i> | C[<a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/TreasuryCalculation.java#L17'>Treasury</a/>]
-    B --> | 1 - <b><i><a href='https://cips.cardano.org/cips/cip9/#updatableprotocolparameters'>treasuryGrowthRate</a></b></i> | D[<a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/test/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculationTest.java#L63'>Stake Pool Rewards Pot <br />at Epoch n</a/>]
-    subgraph ADA_POTS[" "]
-    D --> | Unclaimed Rewards | E["ADA Reserves<br /> (monetary expansion) <br /> Started at ~14B ADA"]
-    E --> | <b><i><a href='https://cips.cardano.org/cips/cip9/#updatableprotocolparameters'>monetaryExpandRate</a></b></i> * <a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/main/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L19'>Performance of all Stake Pools</a> | B
-    C --> F[Payouts e.g. for <br /><a href='https://projectcatalyst.io/'>Project Catalyst</a>]
-    D --> | <a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87'>Rewards Equation<br /> for Pool 1</a> | G[Stake Pool 1]
-    D --> | <a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87'>Rewards Equation<br /> for Pool 2</a> | H[Stake Pool 2]
-    D --> I[...]
-    D --> | <a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a794130dc0e320426725a58b8b15f1fbe726b2de/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L87'>Rewards Equation<br /> for Pool n</a> | J[Stake Pool n]
-    J --> | <b><i><a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a3151888e3133937b6098efdec72b587d88ba4cd/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L85'>margin & minPoolCost</a></i></b> | K[Operators]
-    J --> | <b><i><a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/a3151888e3133937b6098efdec72b587d88ba4cd/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardCalculation.java#L102'>rewards</a></b></i> | L[Delegators]
-    D --> | Rewards going to<br /> de-registered<br /> stake addresses | C
-    L <--> | Stake Key Registration & <br /> Deregistration | M[Deposits]
-    K <--> | Stake Pool Registration & <br /> Deregistration | M
-    M --> | <a href='https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/1ed16503d7ed592410d55489cc2144762ce718d5/src/main/java/org/cardanofoundation/rewards/calculation/TreasuryCalculation.java#L122'>Unclaimed Refunds for Retired Pools</a> | C
-    end
+    A[Total Transaction Fees <br />at Epoch n] --> B[Total Reward Pot <br />at Epoch n]
+    B --> | <b><i>treasuryGrowthRate</b></i> | C[Treasury]
+    B --> | 1 - <b><i>treasuryGrowthRate</b></i> | D[Stake Pool Rewards Pot <br />at Epoch n]
+        subgraph ADA_POTS[" "]
+        D --> | Unclaimed Rewards | E["ADA Reserves<br /> (monetary expansion) <br /> Started at ~14B ADA"]
+        E --> | <b><i>monetaryExpandRate</a></b></i> * Performance of all Stake Pools | B
+        C --> F[Payouts e.g. for <br />Project Catalyst]
+        D --> | Rewards Equation<br /> for Pool 1 | G[Stake Pool 1]
+        D --> | ewards Equation<br /> for Pool 2 | H[Stake Pool 2]
+        D --> I[...]
+        D --> | Rewards Equation<br /> for Pool n | J[Stake Pool n]
+        J --> | <b><i>margin & minPoolCost</i></b> | K[Operators]
+        J --> | <b><i>rewards</i></b> | L[Delegators]
+        D --> | Rewards going to<br /> de-registered<br /> stake addresses | C
+        L <--> | Stake Key Registration & <br /> Deregistration | M[Deposits]
+        K <--> | Stake Pool Registration & <br /> Deregistration | M
+        M --> | Unclaimed Refunds for Retired Pools | C
+        end
 
     style A fill:#5C8DFF,stroke:#5C8DFF
     style B fill:#5C8DFF,stroke:#5C8DFF
@@ -74,7 +80,6 @@ This repository offers different data providers and also an interface if you wan
  - [Koios Data Provider](./src/main/java/org/cardanofoundation/rewards/validation/data/provider/KoiosDataProvider.java)
  - [JSON Data Provider](./src/main/java/org/cardanofoundation/rewards/validation/data/provider/JsonDataProvider.java)
  - [DbSync Data Provider](./src/main/java/org/cardanofoundation/rewards/validation/data/provider/DbSyncDataProvider.java)
- - Yaci Store Data Provider (Coming Next 👀)
 
 #### Data Fetcher
 
@@ -98,9 +103,9 @@ POSTGRES_DB=cexplorer
 
 JSON_DATA_SOURCE_FOLDER=/path/to/your/rewards-calculation-test-data
 ```
+`⚠️ The actual rewards data will also be fetched but only used from the validator and not within the calculation package.`
   
 ## 🫡 Roadmap
- - [ ] Add a data provider for [Yaci Store](https://github.com/bloxbean/yaci-store) (scoped indexer 👀)
  - [ ] Create REST endpoints to get the rewards as a service
  - [X] Include MIR certificates
  - [ ] Add a `/docs` folder containing parsable Markdown files to explain MIR certificates and edge cases
@@ -109,11 +114,12 @@ JSON_DATA_SOURCE_FOLDER=/path/to/your/rewards-calculation-test-data
  - [X] Add deposits and utxo pot
  - [X] Calculate unclaimed rewards that need to go back to the reserves
  - [X] Put rewards to unregistered stake addresses into the treasury
- - [ ] A nice web ui to visualize the rewards calculation
+ - [ ] Create a web ui to visualize the rewards calculation
+ - [ ] Find out the root cause of the difference between the actual rewards and the calculated rewards beginning with epoch 350
 
 ## 📖 Sources
  - [Shelley Cardano Delegation Specification](https://github.com/input-output-hk/cardano-ledger/releases/download/cardano-ledger-spec-2023-04-03/shelley-ledger.pdf)
  - [Shelley Cardano Ledger Specification](https://github.com/input-output-hk/cardano-ledger/releases/download/cardano-ledger-spec-2023-04-03/shelley-ledger.pdf)
- - [Protocol Parameters - CIP-0009](https://cips.cardano.org/cips/cip9/)
+ - [Protocol Parameters - CIP-0009](https://cips.cardano.org/cips/cip9/#updatableprotocolparameters)
  - Beavr Cardano Stake Pool: [How is the Rewards Pot (R) Calculated](https://archive.ph/HQfoV/fb8166e31d2bf61d3d6ca769e7785f2a96530f8e.webp)
  - [History of Protocol Parameters](https://beta.explorer.cardano.org/en/protocol-parameters/)

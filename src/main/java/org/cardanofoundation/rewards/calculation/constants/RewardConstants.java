@@ -1,5 +1,6 @@
 package org.cardanofoundation.rewards.calculation.constants;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public class RewardConstants {
@@ -18,4 +19,10 @@ public class RewardConstants {
   public static final double ACTIVE_SLOT_COEFFICIENT = 0.05;
   public static final long RANDOMNESS_STABILISATION_WINDOW = Math.round(
           (4 * GENESIS_CONFIG_SECURITY_PARAMETER) / ACTIVE_SLOT_COEFFICIENT);
+
+  public static final BigDecimal MAINNET_SHELLEY_START_DECENTRALISATION = BigDecimal.valueOf(1.0);
+  public static final BigDecimal MAINNET_SHELLEY_START_TREASURY_GROW_RATE = BigDecimal.valueOf(0.2);
+  public static final BigDecimal MAINNET_SHELLEY_START_MONETARY_EXPAND_RATE = BigDecimal.valueOf(0.003);
+  public static final int MAINNET_SHELLEY_START_OPTIMAL_POOL_COUNT = 150;
+  public static final BigDecimal MAINNET_SHELLEY_START_POOL_OWNER_INFLUENCE = BigDecimal.valueOf(0.03);
 }

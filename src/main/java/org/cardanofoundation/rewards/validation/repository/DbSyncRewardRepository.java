@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.List;
 
 @Repository
@@ -21,7 +22,7 @@ public interface DbSyncRewardRepository extends ReadOnlyRepository<DbSyncReward,
             JOIN stake_address ON stake_address.id=reward.addr_id
             WHERE earned_epoch=:epoch AND pool_id IS NOT NULL AND type='member';
             """)
-    List<MemberReward> getMemberRewardsInEpoch(Integer epoch);
+    HashSet<MemberReward> getMemberRewardsInEpoch(Integer epoch);
 
     @Query(nativeQuery = true, value = """
             SELECT SUM(amount) AS totalRewards, type AS pot
@@ -35,7 +36,7 @@ public interface DbSyncRewardRepository extends ReadOnlyRepository<DbSyncReward,
                 JOIN pool_hash ON pool_hash.id=reward.pool_id
             WHERE earned_epoch=:epoch AND pool_id IS NOT NULL AND (type='member' OR type='leader') GROUP BY pool_id, pool_hash.view
             """)
-    List<TotalPoolRewards> getSumOfMemberAndLeaderRewardsInEpoch(Integer epoch);
+    HashSet<TotalPoolRewards> getSumOfMemberAndLeaderRewardsInEpoch(Integer epoch);
 
     @Query("""
            SELECT reward from DbSyncReward AS reward

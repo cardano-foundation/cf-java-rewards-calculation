@@ -2,8 +2,7 @@ package org.cardanofoundation.rewards.validation.data.provider;
 
 import lombok.RequiredArgsConstructor;
 import org.cardanofoundation.rewards.calculation.domain.*;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.PoolBlocks;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
+import org.cardanofoundation.rewards.validation.domain.PoolReward;
 import org.cardanofoundation.rewards.validation.mapper.*;
 import org.springframework.stereotype.Service;
 import rest.koios.client.backend.api.account.model.AccountHistory;
@@ -95,6 +94,8 @@ public class KoiosDataProvider implements DataProvider {
         } catch (ApiException e) {
             e.printStackTrace();
         }
+
+        if (epochParams == null) return new ProtocolParameters();
 
         return ProtocolParametersMapper.fromKoiosEpochParams(epochParams);
     }
@@ -271,7 +272,7 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
-    public List<Reward> getMemberRewardsInEpoch(int epoch) {
+    public HashSet<Reward> getMemberRewardsInEpoch(int epoch) {
         return null;
     }
 
@@ -286,7 +287,7 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
-    public List<TotalPoolRewards> getSumOfMemberAndLeaderRewardsInEpoch(int epoch) {
+    public HashSet<PoolReward> getTotalPoolRewardsInEpoch(int epoch) {
         return null;
     }
 

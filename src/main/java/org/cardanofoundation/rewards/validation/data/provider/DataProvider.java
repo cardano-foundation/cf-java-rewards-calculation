@@ -1,6 +1,7 @@
 package org.cardanofoundation.rewards.validation.data.provider;
 
 import org.cardanofoundation.rewards.calculation.domain.*;
+import org.cardanofoundation.rewards.validation.domain.PoolReward;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 
 import java.math.BigInteger;
@@ -40,11 +41,11 @@ public interface DataProvider {
 
     public BigInteger getSumOfWithdrawalsInEpoch(int epoch);
 
-    public List<Reward> getMemberRewardsInEpoch(int epoch);
+    public HashSet<Reward> getMemberRewardsInEpoch(int epoch);
 
     public List<PoolBlock> getBlocksMadeByPoolsInEpoch(int epoch);
     public HashSet<AccountUpdate> getLatestStakeAccountUpdates(int epoch, HashSet<String> accounts);
-    public List<TotalPoolRewards> getSumOfMemberAndLeaderRewardsInEpoch(int epoch);
+    public HashSet<PoolReward> getTotalPoolRewardsInEpoch(int epoch);
 
     public HashSet<String> findSharedPoolRewardAddressWithoutReward(int epoch);
 

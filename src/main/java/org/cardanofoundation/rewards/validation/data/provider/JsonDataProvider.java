@@ -1,6 +1,7 @@
 package org.cardanofoundation.rewards.validation.data.provider;
 
 import org.cardanofoundation.rewards.calculation.domain.*;
+import org.cardanofoundation.rewards.validation.domain.PoolReward;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.PoolBlocks;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 import org.cardanofoundation.rewards.validation.enums.DataType;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.io.File;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -89,7 +91,9 @@ public class JsonDataProvider implements DataProvider {
         String filePath = getResourceFolder(dataType, epoch, null);
 
         try {
-            return new HashSet<>(Objects.requireNonNull(convertFileJsonToArrayList(filePath, objectClass)));
+            ArrayList<T> objectList = convertFileJsonToArrayList(filePath, objectClass);
+            if (objectList == null) return null;
+            return new HashSet<>(objectList);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -130,7 +134,7 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public ProtocolParameters getProtocolParametersForEpoch(int epoch) {
-        if (epoch < MAINNET_SHELLEY_START_EPOCH) return null;
+        if (epoch < MAINNET_SHELLEY_START_EPOCH) return new ProtocolParameters();
 
         return getDataFromJson(PROTOCOL_PARAMETERS, epoch, ProtocolParameters.class);
     }
@@ -146,7 +150,8 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public PoolHistory getPoolHistory(String poolId, int epoch) {
-        return getDataFromJson(POOL_HISTORY, epoch, PoolHistory.class, poolId);
+        List<PoolHistory> poolHistories = getHistoryOfAllPoolsInEpoch(epoch, null);
+        return poolHistories.stream().filter(history -> history.getPoolId().equals(poolId)).findFirst().orElse(null);
     }
 
     @Override
@@ -225,8 +230,12 @@ public class JsonDataProvider implements DataProvider {
     }
 
     @Override
-    public List<Reward> getMemberRewardsInEpoch(int epoch) {
-        return null;
+    public HashSet<Reward> getMemberRewardsInEpoch(int epoch) {
+        if (epoch < MAINNET_SHELLEY_START_EPOCH) return new HashSet<>();
+
+        HashSet<Reward> rewards = getHashSetFromJson(MEMBER_REWARDS, epoch, Reward.class);
+        if (rewards == null) return new HashSet<>();
+        return rewards;
     }
 
     @Override
@@ -244,8 +253,12 @@ public class JsonDataProvider implements DataProvider {
     }
 
     @Override
-    public List<TotalPoolRewards> getSumOfMemberAndLeaderRewardsInEpoch(int epoch) {
-        return null;
+    public HashSet<PoolReward> getTotalPoolRewardsInEpoch(int epoch) {
+        if (epoch < MAINNET_SHELLEY_START_EPOCH) return new HashSet<>();
+
+        HashSet<PoolReward> totalPoolRewards = getHashSetFromJson(REWARDS, epoch, PoolReward.class);
+        if (totalPoolRewards == null) return new HashSet<>();
+        return totalPoolRewards;
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.cardanofoundation.rewards.validation.data.fetcher;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
+import org.cardanofoundation.rewards.validation.domain.PoolReward;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -257,7 +258,7 @@ public class DbSyncDataFetcher implements DataFetcher {
             return;
         }
 
-        List<Reward> memberRewards = dbSyncDataProvider.getMemberRewardsInEpoch(epoch);
+        HashSet<Reward> memberRewards = dbSyncDataProvider.getMemberRewardsInEpoch(epoch);
         if (memberRewards == null) {
             logger.error("Failed to fetch MemberRewards for epoch " + epoch);
             return;
@@ -279,7 +280,7 @@ public class DbSyncDataFetcher implements DataFetcher {
             return;
         }
 
-        List<TotalPoolRewards> totalPoolRewards = dbSyncDataProvider.getSumOfMemberAndLeaderRewardsInEpoch(epoch);
+        HashSet<PoolReward> totalPoolRewards = dbSyncDataProvider.getTotalPoolRewardsInEpoch(epoch);
         if (totalPoolRewards == null) {
             logger.error("Failed to fetch SumOfMemberAndLeaderRewards for epoch " + epoch);
             return;
@@ -344,9 +345,9 @@ public class DbSyncDataFetcher implements DataFetcher {
         fetchRetiredPoolsInEpoch(epoch, override);
         fetchHistoryOfAllPoolsInEpoch(epoch, override);
         fetchDeregisteredAccountsInEpoch(epoch, override);
-        // fetchMemberRewardsInEpoch(epoch, override);
+        fetchMemberRewardsInEpoch(epoch, override);
         fetchLateAccountDeregistrationsInEpoch(epoch, override);
-        // fetchSumOfMemberAndLeaderRewardsInEpoch(epoch, override);
+        fetchSumOfMemberAndLeaderRewardsInEpoch(epoch, override);
         fetchSharedPoolRewardAddressWithoutReward(epoch, override);
         fetchMirCertificatesInEpoch(epoch, override);
         fetchStakeAddressesWithRegistrationsUntilEpoch(epoch, override);
