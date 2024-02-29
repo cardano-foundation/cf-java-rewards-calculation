@@ -20,6 +20,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.MAINNET_SHELLEY_START_EPOCH;
+
 @Service
 @Slf4j
 @Profile("db-sync")
@@ -68,6 +70,10 @@ public class DbSyncDataProvider implements DataProvider {
 
     @Override
     public Epoch getEpochInfo(int epoch) {
+        if (epoch < MAINNET_SHELLEY_START_EPOCH) {
+            return null;
+        }
+
         DbSyncEpoch dbSyncEpoch = dbSyncEpochRepository.findByNumber(epoch);
         Epoch epochInfo = EpochMapper.fromDbSyncEpoch(dbSyncEpoch);
 
@@ -103,7 +109,7 @@ public class DbSyncDataProvider implements DataProvider {
                 .distinct()
                 .toList();
 
-        List<LatestPoolUpdate> latestUpdates = dbSyncPoolUpdateRepository.findLatestActiveUpdatesInEpoch(epoch, poolIds);
+        HashSet<LatestPoolUpdate> latestUpdates = dbSyncPoolUpdateRepository.findLatestActiveUpdatesInEpoch(epoch, poolIds);
 
         List<Long> updateIds = latestUpdates.stream()
                 .map(LatestPoolUpdate::getId)
@@ -122,15 +128,15 @@ public class DbSyncDataProvider implements DataProvider {
         int batches = poolIdBatches.size();
         for (List<String> poolIdBatch : poolIdBatches) {
             log.info("fetching pool history batch " + i + " / " + batches + " for epoch " + epoch + " with " + poolIdBatch.size() + " pools");
-            List<PoolEpochStake> poolEpochStakes = dbSyncEpochStakeRepository.getAllPoolsActiveStakesInEpoch(epoch, poolIdBatch);
+            HashSet<PoolEpochStake> poolEpochStakes = dbSyncEpochStakeRepository.getAllPoolsActiveStakesInEpoch(epoch, poolIdBatch);
 
             for (String poolId : poolIdBatch) {
                 PoolHistory poolHistory = new PoolHistory();
 
-                List<Delegator> delegators = poolEpochStakes.stream()
+                HashSet<Delegator> delegators = poolEpochStakes.stream()
                         .filter(epochStake -> epochStake.getPoolId().equals(poolId))
                         .map(DelegatorMapper::fromPoolEpochStake)
-                        .toList();
+                        .collect(Collectors.toCollection(HashSet::new));
 
                 if (!delegators.isEmpty()) {
                     BigInteger activeStake = delegators.stream()
@@ -198,7 +204,7 @@ public class DbSyncDataProvider implements DataProvider {
         PoolHistory poolHistory = new PoolHistory();
         List<PoolEpochStake> poolEpochStakes = dbSyncEpochStakeRepository.getPoolActiveStakeInEpoch(poolId, epoch);
         BigInteger activeStake = BigInteger.ZERO;
-        List<Delegator> delegators = new ArrayList<>();
+        HashSet<Delegator> delegators = new HashSet<>();
         for (PoolEpochStake poolEpochStake : poolEpochStakes) {
             activeStake = activeStake.add(poolEpochStake.getAmount());
             Delegator delegator = Delegator.builder()

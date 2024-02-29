@@ -3,6 +3,7 @@ package org.cardanofoundation.rewards.calculation.domain;
 import lombok.*;
 
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.List;
 
 @Getter
@@ -21,7 +22,7 @@ public class PoolHistory {
     private Double margin;
     private BigInteger fixedCost;
     private BigInteger pledge;
-    private List<Delegator> delegators;
+    private HashSet<Delegator> delegators;
     private int blockCount;
     private int epoch;
 }

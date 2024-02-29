@@ -6,6 +6,7 @@ import org.cardanofoundation.rewards.validation.entity.jpa.projection.PoolEpochS
 import org.springframework.data.jpa.repository.Query;
 
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.List;
 
 public interface DbSyncEpochStakeRepository extends ReadOnlyRepository<DbSyncEpochStake, Long> {
@@ -22,7 +23,7 @@ public interface DbSyncEpochStakeRepository extends ReadOnlyRepository<DbSyncEpo
             	JOIN pool_hash ON pool_hash.id=epoch_stake.pool_id
             	JOIN stake_address ON stake_address.id = epoch_stake.addr_id
             WHERE epoch_no=:epoch AND pool_hash.view IN :poolIds AND amount > 0""")
-    List<PoolEpochStake> getAllPoolsActiveStakesInEpoch(Integer epoch, List<String> poolIds);
+    HashSet<PoolEpochStake> getAllPoolsActiveStakesInEpoch(Integer epoch, List<String> poolIds);
 
     @Query("SELECT SUM(amount) FROM DbSyncEpochStake WHERE epoch=:epoch")
     BigInteger getEpochStakeByEpoch(Integer epoch);

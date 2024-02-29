@@ -111,10 +111,11 @@ public class PoolRewardValidationTest {
     }
 
     @Test
+    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     void calculateIOG1PoolRewardInEpoch241() {
         String poolId = "pool1mxqjlrfskhd5kql9kak06fpdh8xjwc76gec76p3taqy2qmfzs5z";
         int epoch = 241;
-        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
     }
     @Test
     void calculateXYZPoolRewardInEpoch213() {

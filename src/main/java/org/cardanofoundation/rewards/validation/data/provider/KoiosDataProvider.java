@@ -119,7 +119,7 @@ public class KoiosDataProvider implements DataProvider {
 
         if (history == null) return null;
 
-        List<Delegator> poolMemberInEpoch = getPoolMemberInEpoch(poolId, epoch);
+        HashSet<Delegator> poolMemberInEpoch = getPoolMemberInEpoch(poolId, epoch);
         history.setDelegators(poolMemberInEpoch);
         return history;
     }
@@ -316,8 +316,8 @@ public class KoiosDataProvider implements DataProvider {
         return null;
     }
 
-    private List<Delegator> getPoolMemberInEpoch(String poolId, int epoch) {
-        List<Delegator> delegators = new ArrayList<>();
+    private HashSet<Delegator> getPoolMemberInEpoch(String poolId, int epoch) {
+        HashSet<Delegator> delegators = new HashSet<>();
         try {
             List<PoolDelegatorHistory> poolDelegatorsHistory = koiosBackendService
                     .getPoolService().getPoolDelegatorsHistory(poolId, epoch, Options.EMPTY).getValue();
