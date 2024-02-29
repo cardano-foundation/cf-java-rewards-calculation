@@ -6,6 +6,7 @@ import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class EpochValidationTest {
 
         Assertions.assertEquals(epoch, epochCalculationResult.getEpoch());
         Assertions.assertEquals(adaPotsForCurrentEpoch.getTreasury(), epochCalculationResult.getTreasury());
-        //Assertions.assertEquals(adaPotsForCurrentEpoch.getReserves(), epochCalculationResult.getReserves());
+        Assertions.assertEquals(adaPotsForCurrentEpoch.getReserves(), epochCalculationResult.getReserves());
     }
 
     static Stream<Integer> dataProviderEpochRange() {
@@ -56,5 +57,10 @@ public class EpochValidationTest {
     @MethodSource("dataProviderEpochRange")
     public void testCalculateEpochRewardsWithJsonDataProvider(int epoch) {
         testCalculateEpochPots(epoch, jsonDataProvider, false);
+    }
+
+    @Test
+    public void testCalculateEpochRewardsForEpoch385() {
+        testCalculateEpochPots(385, dbSyncDataProvider, true);
     }
 }

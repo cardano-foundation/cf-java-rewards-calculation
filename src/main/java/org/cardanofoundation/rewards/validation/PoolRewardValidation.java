@@ -155,8 +155,8 @@ public class PoolRewardValidation {
                     .findFirst()
                     .orElse(null);
             if (memberReward == null) {
-                log.debug("Member reward not found for stake address: " + reward.getStakeAddress());
-                log.debug("[" + rewardIndex + "] The expected member " + reward.getStakeAddress() + " reward would be : " + reward.getAmount().longValue() + " Lovelace");
+                log.info("Member reward not found for stake address: " + reward.getStakeAddress());
+                log.info("[" + rewardIndex + "] The expected member " + reward.getStakeAddress() + " reward would be : " + reward.getAmount().longValue() + " Lovelace");
                 totalDifference = totalDifference.add(reward.getAmount());
             } else {
                 BigInteger difference = reward.getAmount().subtract(memberReward.getAmount()).abs();
@@ -168,14 +168,14 @@ public class PoolRewardValidation {
                 totalDifference = totalDifference.add(difference);
 
                 if (difference.compareTo(BigInteger.ZERO) > 0) {
-                    log.debug("[" + rewardIndex + "] The difference between expected member " + reward.getStakeAddress() + " reward and actual member reward is : " + reward.getAmount().longValue() + " Lovelace");
+                    log.info("[" + rewardIndex + "] The difference between expected member " + reward.getStakeAddress() + " reward and actual member reward is : " + reward.getAmount().longValue() + " Lovelace");
                 }
             }
             rewardIndex++;
         }
 
         if (isHigher(totalDifference, BigInteger.ZERO)) {
-            log.debug("Total difference: " + totalDifference.longValue() + " Lovelace");
+            log.info("Total difference: " + totalDifference.longValue() + " Lovelace");
         }
 
         BigInteger totalNoReward = BigInteger.ZERO;
@@ -192,7 +192,7 @@ public class PoolRewardValidation {
                         .orElse(null);
                 if (actualReward == null && isHigher(memberReward.getAmount(), BigInteger.ZERO) && !poolRewardCalculationResult.getPoolOwnerStakeAddresses().contains(memberReward.getStakeAddress())) {
                     totalNoReward = totalNoReward.add(memberReward.getAmount());
-                    log.debug("No reward! The difference between expected member " + memberReward.getStakeAddress() + " reward and actual member reward is : " + memberReward.getAmount().longValue() + " Lovelace");
+                    log.info("No reward! The difference between expected member " + memberReward.getStakeAddress() + " reward and actual member reward is : " + memberReward.getAmount().longValue() + " Lovelace");
                 }
 
                 // Co-owner reward is not included in the member rewards and would be added to the reward address of the pool
@@ -202,7 +202,7 @@ public class PoolRewardValidation {
             }
 
             if (isHigher(totalNoReward, BigInteger.ZERO)) {
-                log.debug("Total no reward: " + totalNoReward.longValue() + " Lovelace");
+                log.info("Total no reward: " + totalNoReward.longValue() + " Lovelace");
             }
 
             calculatedMemberRewards = poolRewardCalculationResult.getMemberRewards().stream().map(Reward::getAmount).reduce(BigInteger.ZERO, BigInteger::add);
@@ -214,7 +214,7 @@ public class PoolRewardValidation {
                 actualPoolReward.subtract(poolRewardCalculationResult.getDistributedPoolReward()).equals(BigInteger.ZERO);
 
         if (!isValid) {
-            log.debug("The difference between expected pool reward and actual pool reward is : " + actualPoolReward.subtract(poolRewardCalculationResult.getDistributedPoolReward()).longValue() + " Lovelace");
+            log.info("The difference between expected pool reward and actual pool reward is : " + actualPoolReward.subtract(poolRewardCalculationResult.getDistributedPoolReward()).longValue() + " Lovelace");
         }
 
         return isValid;

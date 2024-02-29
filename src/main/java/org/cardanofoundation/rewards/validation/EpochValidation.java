@@ -99,7 +99,7 @@ public class EpochValidation {
             start = System.currentTimeMillis();
             for (PoolRewardCalculationResult poolRewardCalculationResult : epochCalculationResult.getPoolRewardCalculationResults()) {
                 if (!PoolRewardValidation.poolRewardIsValid(poolRewardCalculationResult, memberRewardsInEpoch, totalPoolRewards)) {
-                    log.debug("Pool reward is invalid. Please check the details for pool " + poolRewardCalculationResult.getPoolId());
+                    log.info("Pool reward is invalid. Please check the details for pool " + poolRewardCalculationResult.getPoolId());
                 }
             }
             end = System.currentTimeMillis();

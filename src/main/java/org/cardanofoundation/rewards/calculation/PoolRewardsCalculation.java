@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
+import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.MAINNET_ALLEGRA_HARDFORK_EPOCH;
 import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.MAINNET_VASIL_HARDFORK_EPOCH;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.divide;
@@ -133,6 +134,7 @@ public class PoolRewardsCalculation {
                                                                          final HashSet<String> lateDeregisteredAccounts,
                                                                          final HashSet<String> accountsRegisteredInThePast) {
         final int earnedEpoch = poolHistoryCurrentEpoch.getEpoch();
+        final int spendableEpoch = earnedEpoch + 2;
         final PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardCalculationResult.builder()
                 .epoch(earnedEpoch)
                 .poolId(poolId)
@@ -147,12 +149,11 @@ public class PoolRewardsCalculation {
             The reward calculation no longer filters out the unregistered stake credentials when creating
             a reward update. As in the Shelley era, though, they are still filtered on the epoch boundary
             when the reward update is applied
-
-        if (spendableEpoch >= MAINNET_VASIL_HARDFORK_EPOCH) {
+        */
+        if (earnedEpoch >= MAINNET_VASIL_HARDFORK_EPOCH) {
             lateDeregisteredAccounts.addAll(deregisteredAccounts);
             deregisteredAccounts.clear();
         }
-        */
 
         final BigInteger poolStake = poolHistoryCurrentEpoch.getActiveStake();
         final BigInteger poolPledge = poolHistoryCurrentEpoch.getPledge();
@@ -232,8 +233,20 @@ public class PoolRewardsCalculation {
         final List<Reward> memberRewards = new ArrayList<>();
         for (Delegator delegator : poolHistoryCurrentEpoch.getDelegators()) {
             final String stakeAddress = delegator.getStakeAddress();
-            if (stakeAddress.equals(poolHistoryCurrentEpoch.getRewardAddress()) ||
-                    poolOwnerStakeAddresses.contains(stakeAddress)) {
+
+            /*
+                "[...] the value of rewards in the reward function should be computed using an aggregating
+                union so that leader rewards from multiple sources are aggregated.
+                This was corrected at the Allegra hard fork"
+
+                shelley-ledger.pdf | 17.4 Reward aggregation | p. 114
+             */
+            if (stakeAddress.equals(poolHistoryCurrentEpoch.getRewardAddress())
+                    && spendableEpoch < MAINNET_ALLEGRA_HARDFORK_EPOCH) {
+                continue;
+            }
+
+            if (poolOwnerStakeAddresses.contains(stakeAddress)) {
                 continue;
             }
 

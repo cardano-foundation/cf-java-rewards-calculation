@@ -39,8 +39,8 @@ public class PoolRewardValidationTest {
     DbSyncDataProvider dbSyncDataProvider;
 
     private void Test_calculatePoolReward(final String poolId,
-                                                   final int epoch,
-                                                   final DataProviderType dataProviderType) {
+                                          final int epoch,
+                                          final DataProviderType dataProviderType) {
         DataProvider dataProvider;
         if (dataProviderType == DataProviderType.KOIOS) {
             dataProvider = koiosDataProvider;
@@ -205,6 +205,14 @@ public class PoolRewardValidationTest {
     void calculateCRDNSPoolRewardInEpoch211() {
         String poolId = "pool1vx9tzlkgafernd9vpjpxkenutx2gncj4yn88fpq69823qlwcqrt";
         int epoch = 211;
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+    }
+
+    @Test
+    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
+    void calculateNUFI4PoolRewardInEpoch383() {
+        String poolId = "pool167zl76srpt5a2gthpsq0ye9z4fpray5vsh7xyzcn63hd5mnw7fa";
+        int epoch = 383;
         Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
     }
 

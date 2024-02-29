@@ -183,7 +183,7 @@ public class EpochCalculation {
             calculatedReserve = calculatedReserve.add(MAINNET_BOOTSTRAP_ADDRESS_AMOUNT);
         }
 
-        log.debug("Unspendable earned rewards: " + lovelaceToAda(unspendableEarnedRewards.intValue()) + " ADA");
+        log.debug("Unspendable earned rewards: " + lovelaceToAda(unspendableEarnedRewards.longValue()) + " ADA");
         treasuryForCurrentEpoch = add(treasuryForCurrentEpoch, unspendableEarnedRewards);
 
         TreasuryCalculationResult treasuryCalculationResult = TreasuryCalculationResult.builder()
