@@ -22,7 +22,7 @@ jobs:
 
       - name: 🔨 Build
         run: |
-          mvn --batch-mode --update-snapshots clean package -DskipTests
+          ./mvnw --batch-mode --update-snapshots clean package -DskipTests
 
       - name: ⬇️ Download test data
         uses: keithweaver/aws-s3-github-action@v1.0.0
@@ -44,7 +44,7 @@ jobs:
 
       - name: 🎳 Test
         run: |
-          mvn --batch-mode --update-snapshots test
+          ./mvnw --batch-mode --update-snapshots test
 
       - name: 📊️ Publish coverage report to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
