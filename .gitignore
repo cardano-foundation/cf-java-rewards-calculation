@@ -36,7 +36,8 @@ build/
 ### VS Code ###
 .vscode/
 /logs/
-
+/validation/logs
+/calculation/logs
 !Dockerfile
 
 ### Environment variables ###

@@ -1,4 +1,4 @@
-package org.cardanofoundation.rewards.validation;
+package org.cardanofoundation.rewards;
 
 import org.cardanofoundation.rewards.validation.data.fetcher.DbSyncDataFetcher;
 import org.cardanofoundation.rewards.validation.data.fetcher.KoiosDataFetcher;
