@@ -1,7 +1,6 @@
 package org.cardanofoundation.rewards.validation;
 
 import org.cardanofoundation.rewards.calculation.domain.PoolRewardCalculationResult;
-import org.cardanofoundation.rewards.calculation.domain.Reward;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
@@ -14,16 +13,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.context.junit.jupiter.DisabledIf;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
-
-import java.math.BigInteger;
-import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
-import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.isHigher;
-import static org.cardanofoundation.rewards.calculation.util.CurrencyConverter.lovelaceToAda;
 
 @SpringBootTest
 @ComponentScan
@@ -202,9 +194,10 @@ public class PoolRewardValidationTest {
     }
 
     @Test
+    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     void calculateNUFI4PoolRewardInEpoch383() {
         String poolId = "pool167zl76srpt5a2gthpsq0ye9z4fpray5vsh7xyzcn63hd5mnw7fa";
         int epoch = 383;
-        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
     }
 }

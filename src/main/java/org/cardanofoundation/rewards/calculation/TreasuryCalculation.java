@@ -2,16 +2,95 @@ package org.cardanofoundation.rewards.calculation;
 
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.calculation.enums.AccountUpdateAction;
+import org.cardanofoundation.rewards.calculation.enums.MirPot;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
-import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.multiplyAndFloor;
+import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 
 public class TreasuryCalculation {
+
+  public static TreasuryCalculationResult calculateTreasuryInEpoch(int epoch, ProtocolParameters protocolParameters,
+                                                                   AdaPots adaPotsForPreviousEpoch, Epoch epochInfo,
+                                                                   List<PoolDeregistration> retiredPools,
+                                                                   List<MirCertificate> mirCertificates,
+                                                                   final HashSet<String> deregisteredAccounts,
+                                                                   final HashSet<String> lateDeregisteredAccounts,
+                                                                   final HashSet<String> registeredAccountsUntilNow,
+                                                                   BigInteger unspendableEarnedRewards) {
+    // The Shelley era and the ada pot system started on mainnet in epoch 208.
+    // Fee and treasury values are 0 for epoch 208.
+    if (epoch <= MAINNET_SHELLEY_START_EPOCH) {
+      return TreasuryCalculationResult.builder()
+              .treasury(BigInteger.ZERO)
+              .epoch(epoch)
+              .totalRewardPot(BigInteger.ZERO)
+              .treasuryWithdrawals(BigInteger.ZERO)
+              .unspendableEarnedRewards(BigInteger.ZERO)
+              .build();
+    }
+
+    BigInteger totalFeesForCurrentEpoch = BigInteger.ZERO;
+    int totalBlocksInEpoch = 0;
+
+    BigDecimal treasuryGrowthRate = protocolParameters.getTreasuryGrowRate();
+    BigDecimal monetaryExpandRate = protocolParameters.getMonetaryExpandRate();
+    BigDecimal decentralizationParameter = protocolParameters.getDecentralisation();
+
+    if (epochInfo != null) {
+      totalFeesForCurrentEpoch = epochInfo.getFees();
+      totalBlocksInEpoch = epochInfo.getBlockCount();
+      if (isLower(decentralizationParameter, BigDecimal.valueOf(0.8)) && isHigher(decentralizationParameter, BigDecimal.ZERO)) {
+        totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();
+      }
+    }
+
+    final BigInteger reserveInPreviousEpoch = adaPotsForPreviousEpoch.getReserves();
+    final BigInteger treasuryInPreviousEpoch = adaPotsForPreviousEpoch.getTreasury();
+
+    final BigInteger totalRewardPot = calculateTotalRewardPotWithEta(
+            monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserveInPreviousEpoch, totalFeesForCurrentEpoch);
+
+    final BigInteger treasuryCut = multiplyAndFloor(totalRewardPot, treasuryGrowthRate);
+    BigInteger treasuryForCurrentEpoch = treasuryInPreviousEpoch.add(treasuryCut);
+
+    if (retiredPools.size() > 0) {
+      List<String> rewardAddressesOfRetiredPools = retiredPools.stream().map(PoolDeregistration::getRewardAddress).toList();
+      HashSet<String> deregisteredRewardAccounts = deregisteredAccounts.stream()
+              .filter(rewardAddressesOfRetiredPools::contains).collect(Collectors.toCollection(HashSet::new));
+      deregisteredRewardAccounts.addAll(lateDeregisteredAccounts.stream()
+              .filter(rewardAddressesOfRetiredPools::contains).collect(Collectors.toSet()));
+      List<String> ownerAccountsRegisteredInThePast = registeredAccountsUntilNow.stream()
+              .filter(rewardAddressesOfRetiredPools::contains).toList();
+
+      BigInteger unclaimedRefunds = calculateUnclaimedRefundsForRetiredPools(retiredPools, deregisteredRewardAccounts, ownerAccountsRegisteredInThePast);
+      treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(unclaimedRefunds);
+    }
+
+    BigInteger treasuryWithdrawals = BigInteger.ZERO;
+    for (MirCertificate mirCertificate : mirCertificates) {
+      if (mirCertificate.getPot() == MirPot.TREASURY) {
+        treasuryWithdrawals = treasuryWithdrawals.add(mirCertificate.getTotalRewards());
+      }
+    }
+
+    treasuryForCurrentEpoch = treasuryForCurrentEpoch.subtract(treasuryWithdrawals);
+    treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(unspendableEarnedRewards);
+
+    return TreasuryCalculationResult.builder()
+            .treasury(treasuryForCurrentEpoch)
+            .epoch(epoch)
+            .totalRewardPot(totalRewardPot)
+            .treasuryWithdrawals(treasuryWithdrawals)
+            .unspendableEarnedRewards(unspendableEarnedRewards)
+            .build();
+    }
 
   /*
    * Calculate the reward pot for epoch e with the formula:
@@ -49,7 +128,7 @@ public class TreasuryCalculation {
     // instead of the OBFT (Ouroboros Byzantine Fault Tolerance) nodes. It was introduced close before the Shelley era:
     // https://github.com/input-output-hk/cardano-ledger/commit/c4f10d286faadcec9e4437411bce9c6c3b6e51c2
     BigDecimal expectedBlocksInNonOBFTSlots = new BigDecimal(EXPECTED_SLOT_PER_EPOCH )
-            .multiply(activeSlotsCoeff).multiply (BigDecimal.ONE.subtract(decentralizationParameter));
+            .multiply(activeSlotsCoeff).multiply(BigDecimal.ONE.subtract(decentralizationParameter));
 
     // eta is the ratio between the number of blocks that have been produced during the epoch, and
     // the expectation value of blocks that should have been produced during the epoch under
@@ -64,17 +143,24 @@ public class TreasuryCalculation {
     https://github.com/input-output-hk/cardano-ledger/blob/9e2f8151e3b9a0dde9faeb29a7dd2456e854427c/eras/shelley/formal-spec/epoch.tex#L546C9-L547C87
    */
   public static BigInteger calculateUnclaimedRefundsForRetiredPools(List<PoolDeregistration> retiredPools,
-                                                                    List<AccountUpdate> latestAccountUpdates) {
-    BigInteger refunds = BigInteger.ZERO;
-
+                                                                    HashSet<String> deregisteredRewardAccounts,
+                                                                    List<String> ownerAccountsRegisteredInThePast) {
+    BigInteger unclaimedRefunds = BigInteger.ZERO;
     if (retiredPools.size() > 0) {
-      for (AccountUpdate lastAccountUpdate : latestAccountUpdates) {
-        if (lastAccountUpdate.getAction() == AccountUpdateAction.DEREGISTRATION) {
-          refunds = refunds.add(POOL_DEPOSIT_IN_LOVELACE);
+    /* Check if the reward address of the retired pool has been unregistered before
+       or if the reward address has been unregistered after the randomness stabilization window
+       or if the reward address has not been registered at all */
+      for (PoolDeregistration retiredPool : retiredPools) {
+        String rewardAddress = retiredPool.getRewardAddress();
+        if (deregisteredRewardAccounts.contains(rewardAddress) ||
+                !ownerAccountsRegisteredInThePast.contains(rewardAddress)) {
+          // If the reward address has been unregistered, the deposit can not be returned
+          // and will be added to the treasury instead (Pool Reap see: shelley-ledger.pdf p.53)
+          unclaimedRefunds = unclaimedRefunds.add(POOL_DEPOSIT_IN_LOVELACE);
         }
       }
     }
 
-    return refunds;
+    return unclaimedRefunds;
   }
 }

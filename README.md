@@ -1,4 +1,4 @@
-# Cardano Rewards Calculation
+# Cardano Rewards Calculation 🧮
 
 <p align="left">
 <img alt="Tests" src="https://github.com/cardano-foundation/cf-java-rewards-calculation/actions/workflows/tests.yaml/badge.svg?branch=main" />
@@ -27,21 +27,21 @@ We also generate for each version of this project calculation reports. These rep
 ```mermaid
 flowchart
     A[Total Transaction Fees <br />at Epoch n] --> B[Total Reward Pot <br />at Epoch n]
-    B --> | <b><i>treasuryGrowthRate</b></i> | C[Treasury]
-    B --> | 1 - <b><i>treasuryGrowthRate</b></i> | D[Stake Pool Rewards Pot <br />at Epoch n]
+    B --> | treasuryGrowthRate | C[Treasury]
+    B --> | 1 - treasuryGrowthRate | D[Stake Pool Rewards Pot <br />at Epoch n]
         subgraph ADA_POTS[" "]
         D --> | Unclaimed Rewards | E["ADA Reserves<br /> (monetary expansion) <br /> Started at ~14B ADA"]
-        E --> | <b><i>monetaryExpandRate</a></b></i> * Performance of all Stake Pools | B
+        E --> | monetaryExpandRate * Performance of all Stake Pools | B
         C --> F[Payouts e.g. for <br />Project Catalyst]
         D --> | Rewards Equation<br /> for Pool 1 | G[Stake Pool 1]
         D --> | ewards Equation<br /> for Pool 2 | H[Stake Pool 2]
         D --> I[...]
         D --> | Rewards Equation<br /> for Pool n | J[Stake Pool n]
-        J --> | <b><i>margin & minPoolCost</i></b> | K[Operators]
-        J --> | <b><i>rewards</i></b> | L[Delegators]
+        J --> | margin & minPoolCost | K[Operators]
+        J --> | rewards | L[Delegators]
         D --> | Rewards going to<br /> de-registered<br /> stake addresses | C
-        L <--> | Stake Key Registration & <br /> Deregistration | M[Deposits]
-        K <--> | Stake Pool Registration & <br /> Deregistration | M
+        L <--> | Stake Key Registrations + <br /> Deregistrations | M[Deposits]
+        K <--> | Stake Pool Registrations + <br /> Deregistrations | M
         M --> | Unclaimed Refunds for Retired Pools | C
         end
 
@@ -60,20 +60,69 @@ flowchart
     style ADA_POTS fill:#f6f9ff,stroke:#f6f9ff
 ```
 
+## 🤓Interesting Findings
+
+While the flowchart above shows the calculation of the Ada pots in general, there are some more aspects that need to be considered:
+
+- The point in time 🕑. The reward calculation starts at slot `(4 * 2160) / 0.05) = 172800` (48h) each epoch. Before the Babbage era, 
+  accounts that were de-registered **before** this point in time were not considered for the rewards calculation.  
+  This means that the rewards for the de-registered stake addresses are not considered in the rewards calculation. 
+  Those rewards were not distributed and went therefore back to the **reserves**. Accounts that deregistered **after** 
+  this point in time, but before the end of the epoch, were considered for the rewards calculation. But as it is not 
+  possible to send rewards to a de-registered stake address, the rewards went back to the **treasury**.
+- At the Allegra hard fork, the (pre-Shelley) bootstrap addresses were removed from the UTxO and the Ada contained in them was returned to the reserves.
+- There was a different behavior (pre-Allegra): If a pool reward address had been used for multiple pools,
+  the stake account only received the reward for one of those pools and did also not get any member rewards.
+  This **behavior has changed in mainnet epoch 236** with the Allegra hard fork. Now, the stake account receives the rewards for all pools (including member rewards).
+- Transaction fees and a part of the reserve is used to build the total reward pot. It is often mentioned that
+  the monetary expansion rate (protocol parameter) is used to calculate the part coming from the reserves.
+  While this is true, the actual calculation is a multiplication of the monetary expansion rate and the performance of all stake pools `eta`.
+  `Eta` is the ratio of the blocks produced **by pools** in an epoch and the expected blocks `(432000 slots per epoch / 20 sec per block = 21600)`.
+  With beginning of Shelly the blocks were produced by OBFT nodes and not by pools. Therefore, the performance of all stake pools would be 0.
+  The decentralization parameter `d` has been introduced to slightly increase the amount of **expected blocks produced by pools**.
+  In the time when `d` was above 0.8 `eta` was set to 1.0. `d` decreased over time from 1.0 to 0.0 and disappeared completely with the Vasil hard fork.
+- The pool deposit is currently 500 Ada. This deposit will be returned (on the next epoch boundary) to the pool reward address when the pool is retired.
+  However, if the deposit could not be returned (e.g. because the pool reward address is de-registered), the **deposit will be added to the treasury** instead.
+- Pool updates override pool deregistrations. This means that if a pool is updated before the end of the epoch, the pool will not be retired and the deposit will not be returned.
+
 ## 🚀 Getting Started
 
-#### Prerequisites
-
-Java 17
-
-#### Build & Test
+Make sure to have Java 17 installed and run the following commands:
 
 ```
 git clone https://github.com/cardano-foundation/cf-java-rewards-calculation.git
 cd cf-java-rewards-calculation
 ./mvnw clean test
 ```
+
+## 📦 Usage
+
+In the near future you can use the calculation part of this repository as a library in your own project as it will be accessible 
+through maven central.
+
+For now the structure of the repository is divided in two parts:
+ 
+- calculation package
+  - rewards
+    - [EpochCalculation](./src/main/java/org/cardanofoundation/rewards/calculation/EpochCalculation.java)
+    - [DepositsCalculation](./src/main/java/org/cardanofoundation/rewards/calculation/DepositsCalculation.java)
+    - [PoolRewardsCalculation](./src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardsCalculation.java)
+    - [TreasuryCalculation](./src/main/java/org/cardanofoundation/rewards/calculation/TreasuryCalculation.java)
+
+- validation package
+  - [EpochValidation](./src/main/java/org/cardanofoundation/rewards/validation/EpochValidation.java)
+  - [DepositsValidation](./src/main/java/org/cardanofoundation/rewards/validation/DepositsValidation.java)
+  - [PoolRewardValidation](./src/main/java/org/cardanofoundation/rewards/validation/PoolRewardValidation.java)
+  - [TreasuryValidation](./src/main/java/org/cardanofoundation/rewards/validation/TreasuryValidation.java)
+  - ...
+
+While the calculation package is used as a pure re-implementation of the ledger specification,
+the validation package is used to get the needed data (e.g. registration/deregistration certificates, epoch stakes, etc.) 
+from the data provider and execute the calculation. Furthermore, the validation package is used to compare the calculated
+values with the actual values using DB Sync as ground truth.
+
 #### Data Provider
+
 The pool rewards calculation and also the treasury calculation requires a data provider to perform the calculation.
 This repository offers different data providers and also an interface if you want to add your own provider. The following data providers are available:
 
@@ -106,16 +155,15 @@ JSON_DATA_SOURCE_FOLDER=/path/to/your/rewards-calculation-test-data
 `⚠️ The actual rewards data will also be fetched but only used from the validator and not within the calculation package.`
   
 ## 🫡 Roadmap
- - [ ] Create REST endpoints to get the rewards as a service
- - [X] Include MIR certificates
+ - [ ] Provide a library through maven central to use the calculation in other projects
+ - [ ] Enhance reporting and add values for the other pots as well. Display the flow of Ada within an epoch
+ - [ ] Find out the root cause of the difference between the actual rewards and the calculated rewards beginning with epoch 350
  - [ ] Add a `/docs` folder containing parsable Markdown files to explain MIR certificates and edge cases
- - [ ] Enhance reporting and add values for the other pots as well. Include information from the `/docs` folder
+ - [X] Include MIR certificates
  - [X] Calculate member and operator rewards
  - [X] Add deposits and utxo pot
  - [X] Calculate unclaimed rewards that need to go back to the reserves
  - [X] Put rewards to unregistered stake addresses into the treasury
- - [ ] Create a web ui to visualize the rewards calculation
- - [ ] Find out the root cause of the difference between the actual rewards and the calculated rewards beginning with epoch 350
 
 ## 📖 Sources
  - [Shelley Cardano Delegation Specification](https://github.com/input-output-hk/cardano-ledger/releases/download/cardano-ledger-spec-2023-04-03/shelley-ledger.pdf)

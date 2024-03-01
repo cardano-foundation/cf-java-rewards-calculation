@@ -41,7 +41,9 @@ public class PoolRewardValidation {
 
         int totalBlocksInEpoch = epochInfo.getBlockCount();
 
-        if (epoch > 212 && epoch < 255) {
+        BigDecimal decentralizationParameter = protocolParameters.getDecentralisation();
+        BigDecimal decentralizationThreshold = BigDecimal.valueOf(0.8);
+        if (isLower(decentralizationParameter, decentralizationThreshold) && isHigher(decentralizationParameter, BigDecimal.ZERO)) {
             totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();
         }
 
@@ -110,7 +112,8 @@ public class PoolRewardValidation {
         BigDecimal monetaryExpandRate = protocolParameters.getMonetaryExpandRate();
         BigDecimal treasuryGrowRate = protocolParameters.getTreasuryGrowRate();
 
-        if (epoch > 212 && epoch < 255) {
+        BigDecimal decentralizationThreshold = BigDecimal.valueOf(0.8);
+        if (isLower(decentralizationParameter, decentralizationThreshold) && isHigher(decentralizationParameter, BigDecimal.ZERO)) {
             totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();
         }
 
@@ -130,7 +133,7 @@ public class PoolRewardValidation {
             rewardAddresses = new HashSet<>(List.of(poolHistoryCurrentEpoch.getRewardAddress()));
         }
 
-        HashSet<String> accountsRegisteredInThePast = dataProvider.getRegisteredAccountsUntilLastEpoch(epoch, rewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
+        HashSet<String> accountsRegisteredInThePast = dataProvider.getRegisteredAccountsUntilLastEpoch(epoch + 2, rewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
 
         return computePoolRewardInEpoch(poolId, epoch, protocolParameters, epochInfo, stakePoolRewardsPot, adaInCirculation, poolHistoryCurrentEpoch,
                 accountDeregistrations, lateAccountDeregistrations, accountsRegisteredInThePast, sharedPoolRewardAddressesWithoutReward);
