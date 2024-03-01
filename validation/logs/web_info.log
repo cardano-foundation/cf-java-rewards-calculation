@@ -1,0 +1,286 @@
+2024-03-01 23:12:34.772 [background-preinit] INFO  org.hibernate.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.1.Final
+2024-03-01 23:12:34.785 [main] INFO  o.c.rewards.validation.TreasuryValidationTest - Starting TreasuryValidationTest using Java 18.0.2.1 with PID 14734 (started by fabianbormann in /Users/fabianbormann/workspace/cf-java-rewards-calculation/validation)
+2024-03-01 23:12:34.787 [main] INFO  o.c.rewards.validation.TreasuryValidationTest - The following 1 profile is active: "json"
+2024-03-01 23:12:35.726 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-03-01 23:12:35.864 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 131 ms. Found 2 JPA repository interfaces.
+2024-03-01 23:12:36.574 [main] INFO  org.flywaydb.core.internal.license.VersionPrinter - Flyway Community Edition 9.16.0 by Redgate
+2024-03-01 23:12:36.574 [main] INFO  org.flywaydb.core.internal.license.VersionPrinter - See release notes here: https://rd.gt/416ObMi
+2024-03-01 23:12:36.575 [main] INFO  org.flywaydb.core.internal.license.VersionPrinter - 
+2024-03-01 23:12:36.580 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-03-01 23:12:36.769 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:d472c13c-6843-4985-9b63-6d2aeb6a4240 user=SA
+2024-03-01 23:12:36.774 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-03-01 23:12:36.797 [main] INFO  o.f.core.internal.database.base.BaseDatabaseType - Database: jdbc:h2:mem:d472c13c-6843-4985-9b63-6d2aeb6a4240 (H2 2.2)
+2024-03-01 23:12:36.843 [main] INFO  org.flywaydb.core.internal.command.DbValidate - Successfully validated 0 migrations (execution time 00:00.003s)
+2024-03-01 23:12:36.849 [main] INFO  o.f.c.i.schemahistory.JdbcTableSchemaHistory - Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2024-03-01 23:12:36.880 [main] INFO  org.flywaydb.core.internal.command.DbMigrate - Current version of schema "PUBLIC": << Empty Schema >>
+2024-03-01 23:12:36.881 [main] INFO  org.flywaydb.core.internal.command.DbMigrate - Schema "PUBLIC" is up to date. No migration necessary.
+2024-03-01 23:12:37.111 [main] INFO  org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-03-01 23:12:37.148 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.2.7.Final
+2024-03-01 23:12:37.152 [main] INFO  org.hibernate.cfg.Environment - HHH000406: Using bytecode reflection optimizer
+2024-03-01 23:12:37.249 [main] INFO  o.h.bytecode.internal.BytecodeProviderInitiator - HHH000021: Bytecode provider name : bytebuddy
+2024-03-01 23:12:37.358 [main] INFO  o.s.o.j.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-03-01 23:12:37.616 [main] INFO  o.h.bytecode.internal.BytecodeProviderInitiator - HHH000021: Bytecode provider name : bytebuddy
+2024-03-01 23:12:38.581 [main] INFO  o.h.e.t.jta.platform.internal.JtaPlatformInitiator - HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2024-03-01 23:12:38.585 [main] INFO  o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-03-01 23:12:38.640 [main] INFO  r.k.client.backend.factory.impl.BackendServiceImpl - Koios URL: https://api.koios.rest/api/v1/
+2024-03-01 23:12:39.838 [main] INFO  o.s.data.jpa.repository.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2024-03-01 23:12:40.388 [main] INFO  o.c.rewards.validation.TreasuryValidationTest - Started TreasuryValidationTest in 6.188 seconds (process running for 8.154)
+2024-03-01 23:12:41.598 [main] INFO  o.s.t.c.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [org.cardanofoundation.rewards.validation.data.provider.JsonDataProviderTest]: JsonDataProviderTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2024-03-01 23:12:41.640 [main] INFO  o.s.b.t.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration org.cardanofoundation.rewards.validation.RewardsApplication for test class org.cardanofoundation.rewards.validation.data.provider.JsonDataProviderTest
+2024-03-01 23:12:41.671 [main] INFO  o.s.t.c.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [org.cardanofoundation.rewards.validation.data.provider.KoiosDataProviderTest]: KoiosDataProviderTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2024-03-01 23:12:41.672 [main] INFO  o.s.b.t.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration org.cardanofoundation.rewards.validation.RewardsApplication for test class org.cardanofoundation.rewards.validation.data.provider.KoiosDataProviderTest
+2024-03-01 23:13:17.322 [main] INFO  o.s.t.c.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [org.cardanofoundation.rewards.validation.EpochValidationTest]: EpochValidationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2024-03-01 23:13:17.340 [main] INFO  o.s.b.t.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration org.cardanofoundation.rewards.validation.RewardsApplication for test class org.cardanofoundation.rewards.validation.EpochValidationTest
+2024-03-01 23:13:17.465 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 209 took 0 seconds in total.
+2024-03-01 23:13:17.511 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 210 took 0 seconds in total.
+2024-03-01 23:13:17.529 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 211 took 0 seconds in total.
+2024-03-01 23:13:17.551 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 212 took 0 seconds in total.
+2024-03-01 23:13:18.105 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 213 took 1 seconds in total.
+2024-03-01 23:13:18.776 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 214 took 1 seconds in total.
+2024-03-01 23:13:19.558 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 215 took 1 seconds in total.
+2024-03-01 23:13:20.462 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 216 took 1 seconds in total.
+2024-03-01 23:13:21.514 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 217 took 1 seconds in total.
+2024-03-01 23:13:22.779 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 218 took 1 seconds in total.
+2024-03-01 23:13:24.182 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 219 took 1 seconds in total.
+2024-03-01 23:13:24.201 [main] INFO  o.s.t.c.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [org.cardanofoundation.rewards.RewardsApplicationTests]: RewardsApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2024-03-01 23:13:24.308 [main] INFO  o.s.t.c.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProviderTest]: DbSyncDataProviderTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2024-03-01 23:13:24.310 [main] INFO  o.s.b.t.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration org.cardanofoundation.rewards.validation.RewardsApplication for test class org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProviderTest
+2024-03-01 23:13:24.323 [main] INFO  o.s.t.c.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [org.cardanofoundation.rewards.validation.PoolRewardValidationTest]: PoolRewardValidationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2024-03-01 23:13:24.325 [main] INFO  o.s.b.t.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration org.cardanofoundation.rewards.validation.RewardsApplication for test class org.cardanofoundation.rewards.validation.PoolRewardValidationTest
+2024-03-01 23:13:30.369 [main] INFO  o.s.t.c.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [org.cardanofoundation.rewards.validation.UtxoValidationTest]: UtxoValidationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2024-03-01 23:13:30.380 [main] INFO  o.s.b.t.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration org.cardanofoundation.rewards.validation.RewardsApplication for test class org.cardanofoundation.rewards.validation.UtxoValidationTest
+2024-03-01 23:13:30.391 [main] INFO  o.s.t.c.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [org.cardanofoundation.rewards.validation.FeesValidationTest]: FeesValidationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2024-03-01 23:13:30.392 [main] INFO  o.s.b.t.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration org.cardanofoundation.rewards.validation.RewardsApplication for test class org.cardanofoundation.rewards.validation.FeesValidationTest
+2024-03-01 23:13:30.394 [main] INFO  o.s.t.c.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [org.cardanofoundation.rewards.validation.DepositsValidationTest]: DepositsValidationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2024-03-01 23:13:30.395 [main] INFO  o.s.b.t.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration org.cardanofoundation.rewards.validation.RewardsApplication for test class org.cardanofoundation.rewards.validation.DepositsValidationTest
+2024-03-01 23:13:30.415 [SpringApplicationShutdownHook] INFO  o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-03-01 23:13:30.418 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-03-01 23:13:30.422 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2024-03-01 23:14:38.723 [background-preinit] INFO  org.hibernate.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.1.Final
+2024-03-01 23:14:38.746 [main] INFO  o.c.rewards.RewardsApplicationTests - Starting RewardsApplicationTests using Java 18.0.2.1 with PID 14803 (started by fabianbormann in /Users/fabianbormann/workspace/cf-java-rewards-calculation/validation)
+2024-03-01 23:14:38.748 [main] INFO  o.c.rewards.RewardsApplicationTests - The following 1 profile is active: "json"
+2024-03-01 23:14:39.687 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-03-01 23:14:39.766 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 72 ms. Found 2 JPA repository interfaces.
+2024-03-01 23:14:40.599 [main] INFO  org.flywaydb.core.internal.license.VersionPrinter - Flyway Community Edition 9.16.0 by Redgate
+2024-03-01 23:14:40.599 [main] INFO  org.flywaydb.core.internal.license.VersionPrinter - See release notes here: https://rd.gt/416ObMi
+2024-03-01 23:14:40.600 [main] INFO  org.flywaydb.core.internal.license.VersionPrinter - 
+2024-03-01 23:14:40.606 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-03-01 23:14:40.793 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:de7351c7-a837-4783-9ac4-388b2b159b95 user=SA
+2024-03-01 23:14:40.798 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-03-01 23:14:40.831 [main] INFO  o.f.core.internal.database.base.BaseDatabaseType - Database: jdbc:h2:mem:de7351c7-a837-4783-9ac4-388b2b159b95 (H2 2.2)
+2024-03-01 23:14:40.879 [main] INFO  org.flywaydb.core.internal.command.DbValidate - Successfully validated 0 migrations (execution time 00:00.005s)
+2024-03-01 23:14:40.884 [main] INFO  o.f.c.i.schemahistory.JdbcTableSchemaHistory - Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2024-03-01 23:14:40.916 [main] INFO  org.flywaydb.core.internal.command.DbMigrate - Current version of schema "PUBLIC": << Empty Schema >>
+2024-03-01 23:14:40.917 [main] INFO  org.flywaydb.core.internal.command.DbMigrate - Schema "PUBLIC" is up to date. No migration necessary.
+2024-03-01 23:14:41.183 [main] INFO  org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-03-01 23:14:41.226 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.2.7.Final
+2024-03-01 23:14:41.229 [main] INFO  org.hibernate.cfg.Environment - HHH000406: Using bytecode reflection optimizer
+2024-03-01 23:14:41.318 [main] INFO  o.h.bytecode.internal.BytecodeProviderInitiator - HHH000021: Bytecode provider name : bytebuddy
+2024-03-01 23:14:41.425 [main] INFO  o.s.o.j.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-03-01 23:14:41.672 [main] INFO  o.h.bytecode.internal.BytecodeProviderInitiator - HHH000021: Bytecode provider name : bytebuddy
+2024-03-01 23:14:42.633 [main] INFO  o.h.e.t.jta.platform.internal.JtaPlatformInitiator - HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2024-03-01 23:14:42.639 [main] INFO  o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-03-01 23:14:42.691 [main] INFO  r.k.client.backend.factory.impl.BackendServiceImpl - Koios URL: https://api.koios.rest/api/v1/
+2024-03-01 23:14:43.894 [main] INFO  o.s.data.jpa.repository.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2024-03-01 23:14:44.422 [main] INFO  o.c.rewards.RewardsApplicationTests - Started RewardsApplicationTests in 6.363 seconds (process running for 7.505)
+2024-03-01 23:14:44.995 [SpringApplicationShutdownHook] INFO  o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-03-01 23:14:44.997 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-03-01 23:14:45.001 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2024-03-01 23:15:03.372 [background-preinit] INFO  org.hibernate.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.1.Final
+2024-03-01 23:15:03.392 [main] INFO  o.c.rewards.validation.TreasuryValidationTest - Starting TreasuryValidationTest using Java 18.0.2.1 with PID 14822 (started by fabianbormann in /Users/fabianbormann/workspace/cf-java-rewards-calculation/validation)
+2024-03-01 23:15:03.394 [main] INFO  o.c.rewards.validation.TreasuryValidationTest - The following 1 profile is active: "json"
+2024-03-01 23:15:04.326 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-03-01 23:15:04.466 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 134 ms. Found 2 JPA repository interfaces.
+2024-03-01 23:15:05.167 [main] INFO  org.flywaydb.core.internal.license.VersionPrinter - Flyway Community Edition 9.16.0 by Redgate
+2024-03-01 23:15:05.167 [main] INFO  org.flywaydb.core.internal.license.VersionPrinter - See release notes here: https://rd.gt/416ObMi
+2024-03-01 23:15:05.167 [main] INFO  org.flywaydb.core.internal.license.VersionPrinter - 
+2024-03-01 23:15:05.172 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-03-01 23:15:05.338 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:af3ab5da-f850-4458-8f83-516b61399f21 user=SA
+2024-03-01 23:15:05.342 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-03-01 23:15:05.364 [main] INFO  o.f.core.internal.database.base.BaseDatabaseType - Database: jdbc:h2:mem:af3ab5da-f850-4458-8f83-516b61399f21 (H2 2.2)
+2024-03-01 23:15:05.409 [main] INFO  org.flywaydb.core.internal.command.DbValidate - Successfully validated 0 migrations (execution time 00:00.003s)
+2024-03-01 23:15:05.413 [main] INFO  o.f.c.i.schemahistory.JdbcTableSchemaHistory - Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2024-03-01 23:15:05.450 [main] INFO  org.flywaydb.core.internal.command.DbMigrate - Current version of schema "PUBLIC": << Empty Schema >>
+2024-03-01 23:15:05.451 [main] INFO  org.flywaydb.core.internal.command.DbMigrate - Schema "PUBLIC" is up to date. No migration necessary.
+2024-03-01 23:15:05.687 [main] INFO  org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-03-01 23:15:05.723 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.2.7.Final
+2024-03-01 23:15:05.726 [main] INFO  org.hibernate.cfg.Environment - HHH000406: Using bytecode reflection optimizer
+2024-03-01 23:15:05.825 [main] INFO  o.h.bytecode.internal.BytecodeProviderInitiator - HHH000021: Bytecode provider name : bytebuddy
+2024-03-01 23:15:05.926 [main] INFO  o.s.o.j.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-03-01 23:15:06.161 [main] INFO  o.h.bytecode.internal.BytecodeProviderInitiator - HHH000021: Bytecode provider name : bytebuddy
+2024-03-01 23:15:07.152 [main] INFO  o.h.e.t.jta.platform.internal.JtaPlatformInitiator - HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2024-03-01 23:15:07.159 [main] INFO  o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-03-01 23:15:07.222 [main] INFO  r.k.client.backend.factory.impl.BackendServiceImpl - Koios URL: https://api.koios.rest/api/v1/
+2024-03-01 23:15:08.458 [main] INFO  o.s.data.jpa.repository.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2024-03-01 23:15:09.017 [main] INFO  o.c.rewards.validation.TreasuryValidationTest - Started TreasuryValidationTest in 6.182 seconds (process running for 7.948)
+2024-03-01 23:15:10.131 [main] INFO  o.s.t.c.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [org.cardanofoundation.rewards.validation.data.provider.JsonDataProviderTest]: JsonDataProviderTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2024-03-01 23:15:10.167 [main] INFO  o.s.b.t.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration org.cardanofoundation.rewards.validation.RewardsApplication for test class org.cardanofoundation.rewards.validation.data.provider.JsonDataProviderTest
+2024-03-01 23:15:10.200 [main] INFO  o.s.t.c.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [org.cardanofoundation.rewards.validation.data.provider.KoiosDataProviderTest]: KoiosDataProviderTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2024-03-01 23:15:10.202 [main] INFO  o.s.b.t.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration org.cardanofoundation.rewards.validation.RewardsApplication for test class org.cardanofoundation.rewards.validation.data.provider.KoiosDataProviderTest
+2024-03-01 23:15:47.498 [main] INFO  o.s.t.c.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [org.cardanofoundation.rewards.validation.EpochValidationTest]: EpochValidationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2024-03-01 23:15:47.508 [main] INFO  o.s.b.t.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration org.cardanofoundation.rewards.validation.RewardsApplication for test class org.cardanofoundation.rewards.validation.EpochValidationTest
+2024-03-01 23:15:47.581 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 209 took 0 seconds in total.
+2024-03-01 23:15:47.616 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 210 took 0 seconds in total.
+2024-03-01 23:15:47.632 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 211 took 0 seconds in total.
+2024-03-01 23:15:47.654 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 212 took 0 seconds in total.
+2024-03-01 23:15:48.206 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 213 took 1 seconds in total.
+2024-03-01 23:15:48.780 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 214 took 1 seconds in total.
+2024-03-01 23:15:49.436 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 215 took 1 seconds in total.
+2024-03-01 23:15:50.277 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 216 took 1 seconds in total.
+2024-03-01 23:15:51.293 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 217 took 1 seconds in total.
+2024-03-01 23:15:52.521 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 218 took 1 seconds in total.
+2024-03-01 23:15:53.967 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 219 took 1 seconds in total.
+2024-03-01 23:15:54.050 [main] INFO  o.s.t.c.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProviderTest]: DbSyncDataProviderTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2024-03-01 23:15:54.054 [main] INFO  o.s.b.t.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration org.cardanofoundation.rewards.validation.RewardsApplication for test class org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProviderTest
+2024-03-01 23:15:54.063 [main] INFO  o.s.t.c.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [org.cardanofoundation.rewards.validation.PoolRewardValidationTest]: PoolRewardValidationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2024-03-01 23:15:54.066 [main] INFO  o.s.b.t.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration org.cardanofoundation.rewards.validation.RewardsApplication for test class org.cardanofoundation.rewards.validation.PoolRewardValidationTest
+2024-03-01 23:15:59.928 [main] INFO  o.s.t.c.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [org.cardanofoundation.rewards.validation.UtxoValidationTest]: UtxoValidationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2024-03-01 23:15:59.940 [main] INFO  o.s.b.t.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration org.cardanofoundation.rewards.validation.RewardsApplication for test class org.cardanofoundation.rewards.validation.UtxoValidationTest
+2024-03-01 23:15:59.950 [main] INFO  o.s.t.c.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [org.cardanofoundation.rewards.validation.FeesValidationTest]: FeesValidationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2024-03-01 23:15:59.954 [main] INFO  o.s.b.t.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration org.cardanofoundation.rewards.validation.RewardsApplication for test class org.cardanofoundation.rewards.validation.FeesValidationTest
+2024-03-01 23:15:59.956 [main] INFO  o.s.t.c.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [org.cardanofoundation.rewards.validation.DepositsValidationTest]: DepositsValidationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2024-03-01 23:15:59.958 [main] INFO  o.s.b.t.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration org.cardanofoundation.rewards.validation.RewardsApplication for test class org.cardanofoundation.rewards.validation.DepositsValidationTest
+2024-03-01 23:15:59.976 [SpringApplicationShutdownHook] INFO  o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-03-01 23:15:59.980 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-03-01 23:15:59.983 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2024-03-01 23:16:24.271 [background-preinit] INFO  org.hibernate.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.1.Final
+2024-03-01 23:16:24.286 [main] INFO  o.c.rewards.validation.EpochValidationTest - Starting EpochValidationTest using Java 18.0.2.1 with PID 14853 (started by fabianbormann in /Users/fabianbormann/workspace/cf-java-rewards-calculation/validation)
+2024-03-01 23:16:24.287 [main] INFO  o.c.rewards.validation.EpochValidationTest - The following 1 profile is active: "json"
+2024-03-01 23:16:25.298 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-03-01 23:16:25.450 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 146 ms. Found 2 JPA repository interfaces.
+2024-03-01 23:16:26.171 [main] INFO  org.flywaydb.core.internal.license.VersionPrinter - Flyway Community Edition 9.16.0 by Redgate
+2024-03-01 23:16:26.172 [main] INFO  org.flywaydb.core.internal.license.VersionPrinter - See release notes here: https://rd.gt/416ObMi
+2024-03-01 23:16:26.172 [main] INFO  org.flywaydb.core.internal.license.VersionPrinter - 
+2024-03-01 23:16:26.177 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-03-01 23:16:26.357 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:04c5c9d0-0f75-4461-bb92-72611adb15c8 user=SA
+2024-03-01 23:16:26.363 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-03-01 23:16:26.394 [main] INFO  o.f.core.internal.database.base.BaseDatabaseType - Database: jdbc:h2:mem:04c5c9d0-0f75-4461-bb92-72611adb15c8 (H2 2.2)
+2024-03-01 23:16:26.446 [main] INFO  org.flywaydb.core.internal.command.DbValidate - Successfully validated 0 migrations (execution time 00:00.004s)
+2024-03-01 23:16:26.454 [main] INFO  o.f.c.i.schemahistory.JdbcTableSchemaHistory - Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2024-03-01 23:16:26.480 [main] INFO  org.flywaydb.core.internal.command.DbMigrate - Current version of schema "PUBLIC": << Empty Schema >>
+2024-03-01 23:16:26.481 [main] INFO  org.flywaydb.core.internal.command.DbMigrate - Schema "PUBLIC" is up to date. No migration necessary.
+2024-03-01 23:16:26.734 [main] INFO  org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-03-01 23:16:26.769 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.2.7.Final
+2024-03-01 23:16:26.771 [main] INFO  org.hibernate.cfg.Environment - HHH000406: Using bytecode reflection optimizer
+2024-03-01 23:16:26.878 [main] INFO  o.h.bytecode.internal.BytecodeProviderInitiator - HHH000021: Bytecode provider name : bytebuddy
+2024-03-01 23:16:26.971 [main] INFO  o.s.o.j.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-03-01 23:16:27.233 [main] INFO  o.h.bytecode.internal.BytecodeProviderInitiator - HHH000021: Bytecode provider name : bytebuddy
+2024-03-01 23:16:28.173 [main] INFO  o.h.e.t.jta.platform.internal.JtaPlatformInitiator - HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2024-03-01 23:16:28.177 [main] INFO  o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-03-01 23:16:28.244 [main] INFO  r.k.client.backend.factory.impl.BackendServiceImpl - Koios URL: https://api.koios.rest/api/v1/
+2024-03-01 23:16:29.448 [main] INFO  o.s.data.jpa.repository.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2024-03-01 23:16:30.012 [main] INFO  o.c.rewards.validation.EpochValidationTest - Started EpochValidationTest in 6.355 seconds (process running for 7.827)
+2024-03-01 23:16:30.728 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 209 took 0 seconds in total.
+2024-03-01 23:16:30.779 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 210 took 0 seconds in total.
+2024-03-01 23:16:30.817 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 211 took 0 seconds in total.
+2024-03-01 23:16:30.855 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 212 took 0 seconds in total.
+2024-03-01 23:16:31.195 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 213 took 0 seconds in total.
+2024-03-01 23:16:31.390 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 214 took 0 seconds in total.
+2024-03-01 23:16:31.540 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 215 took 0 seconds in total.
+2024-03-01 23:16:31.692 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 216 took 0 seconds in total.
+2024-03-01 23:16:31.820 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 217 took 0 seconds in total.
+2024-03-01 23:16:31.946 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 218 took 0 seconds in total.
+2024-03-01 23:16:32.094 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 219 took 0 seconds in total.
+2024-03-01 23:16:32.243 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 220 took 0 seconds in total.
+2024-03-01 23:16:32.380 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 221 took 0 seconds in total.
+2024-03-01 23:16:32.591 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 222 took 0 seconds in total.
+2024-03-01 23:16:32.806 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 223 took 0 seconds in total.
+2024-03-01 23:16:32.964 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 224 took 0 seconds in total.
+2024-03-01 23:16:33.111 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 225 took 0 seconds in total.
+2024-03-01 23:16:33.243 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 226 took 0 seconds in total.
+2024-03-01 23:16:33.383 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 227 took 0 seconds in total.
+2024-03-01 23:16:33.529 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 228 took 0 seconds in total.
+2024-03-01 23:16:33.663 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 229 took 0 seconds in total.
+2024-03-01 23:16:33.841 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 230 took 0 seconds in total.
+2024-03-01 23:16:33.984 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 231 took 0 seconds in total.
+2024-03-01 23:16:34.169 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 232 took 0 seconds in total.
+2024-03-01 23:16:34.328 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 233 took 0 seconds in total.
+2024-03-01 23:16:34.501 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 234 took 0 seconds in total.
+2024-03-01 23:16:34.682 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 235 took 0 seconds in total.
+2024-03-01 23:16:34.936 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 236 took 0 seconds in total.
+2024-03-01 23:16:35.158 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 237 took 0 seconds in total.
+2024-03-01 23:16:35.398 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 238 took 0 seconds in total.
+2024-03-01 23:16:35.625 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 239 took 0 seconds in total.
+2024-03-01 23:16:35.860 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 240 took 0 seconds in total.
+2024-03-01 23:16:36.094 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 241 took 0 seconds in total.
+2024-03-01 23:16:36.364 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 242 took 0 seconds in total.
+2024-03-01 23:16:36.674 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 243 took 0 seconds in total.
+2024-03-01 23:16:37.047 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 244 took 0 seconds in total.
+2024-03-01 23:16:37.409 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 245 took 0 seconds in total.
+2024-03-01 23:16:37.740 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 246 took 0 seconds in total.
+2024-03-01 23:16:38.100 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 247 took 0 seconds in total.
+2024-03-01 23:16:38.517 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 248 took 0 seconds in total.
+2024-03-01 23:16:38.978 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 249 took 0 seconds in total.
+2024-03-01 23:16:39.492 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 250 took 1 seconds in total.
+2024-03-01 23:16:40.057 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 251 took 1 seconds in total.
+2024-03-01 23:16:40.711 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 252 took 1 seconds in total.
+2024-03-01 23:16:41.425 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 253 took 1 seconds in total.
+2024-03-01 23:16:42.131 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 254 took 1 seconds in total.
+2024-03-01 23:16:42.975 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 255 took 1 seconds in total.
+2024-03-01 23:16:43.825 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 256 took 1 seconds in total.
+2024-03-01 23:16:44.825 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 257 took 1 seconds in total.
+2024-03-01 23:16:45.999 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 258 took 1 seconds in total.
+2024-03-01 23:16:47.044 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 259 took 1 seconds in total.
+2024-03-01 23:16:48.166 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 260 took 1 seconds in total.
+2024-03-01 23:16:49.411 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 261 took 1 seconds in total.
+2024-03-01 23:16:50.639 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 262 took 1 seconds in total.
+2024-03-01 23:16:51.915 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 263 took 1 seconds in total.
+2024-03-01 23:16:53.233 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 264 took 1 seconds in total.
+2024-03-01 23:16:54.733 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 265 took 1 seconds in total.
+2024-03-01 23:16:56.226 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 266 took 1 seconds in total.
+2024-03-01 23:16:57.775 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 267 took 2 seconds in total.
+2024-03-01 23:16:59.382 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 268 took 2 seconds in total.
+2024-03-01 23:17:01.067 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 269 took 2 seconds in total.
+2024-03-01 23:17:02.900 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 270 took 2 seconds in total.
+2024-03-01 23:17:04.709 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 271 took 2 seconds in total.
+2024-03-01 23:17:06.544 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 272 took 2 seconds in total.
+2024-03-01 23:17:08.506 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 273 took 2 seconds in total.
+2024-03-01 23:17:10.404 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 274 took 2 seconds in total.
+2024-03-01 23:17:12.431 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 275 took 2 seconds in total.
+2024-03-01 23:17:14.474 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 276 took 2 seconds in total.
+2024-03-01 23:17:16.573 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 277 took 2 seconds in total.
+2024-03-01 23:17:18.683 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 278 took 2 seconds in total.
+2024-03-01 23:17:20.822 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 279 took 2 seconds in total.
+2024-03-01 23:17:23.025 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 280 took 2 seconds in total.
+2024-03-01 23:17:25.248 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 281 took 2 seconds in total.
+2024-03-01 23:17:27.565 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 282 took 2 seconds in total.
+2024-03-01 23:17:30.033 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 283 took 2 seconds in total.
+2024-03-01 23:17:32.372 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 284 took 2 seconds in total.
+2024-03-01 23:17:34.905 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 285 took 3 seconds in total.
+2024-03-01 23:17:37.869 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 286 took 3 seconds in total.
+2024-03-01 23:17:40.693 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 287 took 3 seconds in total.
+2024-03-01 23:17:43.566 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 288 took 3 seconds in total.
+2024-03-01 23:17:46.529 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 289 took 3 seconds in total.
+2024-03-01 23:17:49.661 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 290 took 3 seconds in total.
+2024-03-01 23:17:52.777 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 291 took 3 seconds in total.
+2024-03-01 23:17:56.080 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 292 took 3 seconds in total.
+2024-03-01 23:17:59.180 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 293 took 3 seconds in total.
+2024-03-01 23:18:02.673 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 294 took 3 seconds in total.
+2024-03-01 23:18:06.073 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 295 took 3 seconds in total.
+2024-03-01 23:18:09.525 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 296 took 3 seconds in total.
+2024-03-01 23:18:12.941 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 297 took 3 seconds in total.
+2024-03-01 23:18:16.516 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 298 took 4 seconds in total.
+2024-03-01 23:18:20.111 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 299 took 4 seconds in total.
+2024-03-01 23:18:24.081 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 300 took 4 seconds in total.
+2024-03-01 23:18:27.822 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 301 took 4 seconds in total.
+2024-03-01 23:18:31.631 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 302 took 4 seconds in total.
+2024-03-01 23:18:35.718 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 303 took 4 seconds in total.
+2024-03-01 23:18:39.669 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 304 took 4 seconds in total.
+2024-03-01 23:18:43.772 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 305 took 4 seconds in total.
+2024-03-01 23:18:47.940 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 306 took 4 seconds in total.
+2024-03-01 23:18:52.511 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 307 took 5 seconds in total.
+2024-03-01 23:18:56.935 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 308 took 4 seconds in total.
+2024-03-01 23:19:01.693 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 309 took 5 seconds in total.
+2024-03-01 23:19:06.280 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 310 took 5 seconds in total.
+2024-03-01 23:19:11.084 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 311 took 5 seconds in total.
+2024-03-01 23:19:15.997 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 312 took 5 seconds in total.
+2024-03-01 23:19:20.961 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 313 took 5 seconds in total.
+2024-03-01 23:19:25.779 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 314 took 5 seconds in total.
+2024-03-01 23:19:30.698 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 315 took 5 seconds in total.
+2024-03-01 23:19:35.915 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 316 took 5 seconds in total.
+2024-03-01 23:19:41.228 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 317 took 5 seconds in total.
+2024-03-01 23:19:46.336 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 318 took 5 seconds in total.
+2024-03-01 23:19:51.624 [main] INFO  o.c.rewards.validation.EpochValidation - Overall calculation and validation of epoch 319 took 5 seconds in total.
+2024-03-01 23:19:51.654 [SpringApplicationShutdownHook] INFO  o.s.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-03-01 23:19:51.660 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-03-01 23:19:51.664 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
