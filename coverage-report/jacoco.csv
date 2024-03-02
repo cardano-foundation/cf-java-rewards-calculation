@@ -12,9 +12,9 @@ cf-rewards-validation,org.cardanofoundation.rewards.validation.mapper,AccountUpd
 cf-rewards-validation,org.cardanofoundation.rewards.validation.mapper,EpochMapper,32,46,1,3,9,13,3,2,2,1
 cf-rewards-validation,org.cardanofoundation.rewards.validation.mapper,PoolUpdateMapper,77,0,4,0,22,0,5,0,3,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation.mapper,AdaPotsMapper,63,0,2,0,18,0,4,0,3,0
-cf-rewards-validation,org.cardanofoundation.rewards.validation.data.provider,DbSyncDataProvider,988,0,60,0,229,0,66,0,36,0
+cf-rewards-validation,org.cardanofoundation.rewards.validation.data.provider,DbSyncDataProvider,998,0,60,0,231,0,66,0,36,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation.data.provider,KoiosDataProvider,406,118,24,10,131,24,39,9,27,4
-cf-rewards-validation,org.cardanofoundation.rewards.validation.data.provider,JsonDataProvider,258,526,27,51,39,89,36,38,12,23
+cf-rewards-validation,org.cardanofoundation.rewards.validation.data.provider,JsonDataProvider,250,534,25,53,39,89,34,40,12,23
 cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSyncPoolOwner,12,0,0,0,4,0,4,0,4,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSyncPoolHash,9,0,0,0,3,0,3,0,3,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSyncStakeAddress,9,0,0,0,3,0,3,0,3,0
@@ -37,7 +37,7 @@ cf-rewards-validation,org.cardanofoundation.rewards.validation,TreasuryValidatio
 cf-rewards-validation,org.cardanofoundation.rewards.validation,PoolRewardValidation,97,454,18,34,15,99,18,18,1,9
 cf-rewards-validation,org.cardanofoundation.rewards.validation,DepositsValidation,33,0,2,0,10,0,3,0,2,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation,UtxoValidation,59,0,6,0,14,0,6,0,3,0
-cf-rewards-validation,org.cardanofoundation.rewards.validation,EpochValidation,89,226,8,6,26,51,8,3,2,2
+cf-rewards-validation,org.cardanofoundation.rewards.validation,EpochValidation,38,277,4,10,16,61,6,5,2,2
 cf-rewards-validation,org.cardanofoundation.rewards.validation,FeeValidation,16,0,2,0,5,0,3,0,2,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation.enums,DataType,0,144,0,0,0,23,0,2,0,2
 cf-rewards-validation,org.cardanofoundation.rewards.validation.enums,DbSyncRewardType,78,0,4,0,14,0,6,0,4,0
