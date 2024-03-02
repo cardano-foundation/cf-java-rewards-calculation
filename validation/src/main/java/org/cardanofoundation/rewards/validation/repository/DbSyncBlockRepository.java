@@ -44,6 +44,8 @@ public interface DbSyncBlockRepository extends ReadOnlyRepository<DbSyncBlock, L
            """)
     Integer getOBFTBlocksInEpoch(@Param("epoch") Integer epoch);
 
+    Integer countByEpochNo(Integer epochNo);
+
     @Query("""
             select distinct block.slotLeader.pool.bech32PoolId from DbSyncBlock AS block
                 where block.epochNo = :epoch

@@ -1,7 +1,6 @@
 package org.cardanofoundation.rewards.validation.data.provider;
 
 import org.cardanofoundation.rewards.calculation.domain.Epoch;
-import org.cardanofoundation.rewards.validation.data.provider.KoiosDataProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

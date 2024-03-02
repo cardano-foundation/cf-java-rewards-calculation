@@ -75,7 +75,11 @@ public class DbSyncDataProvider implements DataProvider {
         }
 
         DbSyncEpoch dbSyncEpoch = dbSyncEpochRepository.findByNumber(epoch);
+        // We need to fetch the block count separately from the epoch
+        // because of https://github.com/IntersectMBO/cardano-db-sync/issues/1457
+        Integer blockCount = dbSyncBlockRepository.countByEpochNo(epoch);
         Epoch epochInfo = EpochMapper.fromDbSyncEpoch(dbSyncEpoch);
+        epochInfo.setBlockCount(blockCount);
 
         if (epoch < 211) {
             epochInfo.setOBFTBlockCount(epochInfo.getBlockCount());

@@ -1,26 +1,16 @@
 package org.cardanofoundation.rewards.validation.data.provider;
 
 import org.cardanofoundation.rewards.calculation.domain.*;
-import org.cardanofoundation.rewards.validation.PoolRewardValidation;
-import org.cardanofoundation.rewards.validation.TreasuryValidation;
 import org.cardanofoundation.rewards.calculation.enums.MirPot;
-import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
-import org.cardanofoundation.rewards.validation.domain.TreasuryValidationResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
-
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import static org.cardanofoundation.rewards.calculation.util.CurrencyConverter.lovelaceToAda;
 
 @SpringBootTest
 @ComponentScan
@@ -61,10 +51,10 @@ public class DbSyncDataProviderTest {
     @Test
     public void testGetProtocolParameters() {
         ProtocolParameters protocolParameters = dbSyncDataProvider.getProtocolParametersForEpoch(220);
-        Assertions.assertEquals(protocolParameters.getDecentralisation(), 0.64);
-        Assertions.assertEquals(protocolParameters.getTreasuryGrowRate(), 0.2);
-        Assertions.assertEquals(protocolParameters.getMonetaryExpandRate(), 0.003);
-        Assertions.assertEquals(protocolParameters.getPoolOwnerInfluence(), 0.3);
+        Assertions.assertEquals(protocolParameters.getDecentralisation(), BigDecimal.valueOf(0.64));
+        Assertions.assertEquals(protocolParameters.getTreasuryGrowRate(), BigDecimal.valueOf(0.2));
+        Assertions.assertEquals(protocolParameters.getMonetaryExpandRate(), BigDecimal.valueOf(0.003));
+        Assertions.assertEquals(protocolParameters.getPoolOwnerInfluence(), BigDecimal.valueOf(0.3));
         Assertions.assertEquals(protocolParameters.getOptimalPoolCount(), 150);
     }
 
@@ -75,7 +65,7 @@ public class DbSyncDataProviderTest {
         PoolHistory poolHistory = dbSyncDataProvider.getPoolHistory(poolId, epoch);
         Assertions.assertEquals(poolHistory.getActiveStake(), new BigInteger("27523186299296"));
         Assertions.assertEquals(poolHistory.getBlockCount(), 10);
-        Assertions.assertEquals(poolHistory.getFixedCost(), 340000000.0);
+        Assertions.assertEquals(poolHistory.getFixedCost(), new BigInteger("340000000"));
         Assertions.assertEquals(poolHistory.getMargin(), 0.009);
         Assertions.assertEquals(poolHistory.getDelegatorRewards(), new BigInteger("14877804008"));
         Assertions.assertEquals(poolHistory.getPoolFees(), new BigInteger("475116283"));

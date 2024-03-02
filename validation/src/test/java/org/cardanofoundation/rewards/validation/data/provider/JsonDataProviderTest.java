@@ -2,7 +2,6 @@ package org.cardanofoundation.rewards.validation.data.provider;
 
 import org.cardanofoundation.rewards.calculation.domain.AdaPots;
 import org.cardanofoundation.rewards.calculation.domain.ProtocolParameters;
-import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
