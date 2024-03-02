@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.6.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.5.0...v0.6.0) (2024-03-02)
+
+
+### Features
+
+* add epoch calculation and refactor validation class ([9fcadab](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/9fcadabd53a55d5f9bf5a3c2226a510c7fab1d7f))
+* create an overall epoch calculation for all pots ([3cdee2e](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/3cdee2e7492e4f7e9fab6df5f002c553c1066cbe))
+* handle pool owner rewards in pool reward calculation ([81e3ee7](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/81e3ee78bddd1c201ff99ebab7136c76c40157a7))
+* handle Shelly ADA flow correctly ([0524849](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/0524849acafec020d3fd01d3eb518b6df3a75b81))
+* implement missing methods in JSON data provider to run a whole epoch calculation ([312bfb5](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/312bfb5b7e2ef377070847bcd0fbaf288426ca5a))
+* improve validation speed as well ([6f35fc5](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/6f35fc50628b163b7a7347130cdd690e47c76bd2))
+* reduce epoch calculation time from 30 min to 20 sec. ([c5f90e7](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/c5f90e75c0bc416d8ae60fb200430aa491d34344))
+* use BigInteger to prevent rounding issues. Utxo pot is now 100% correct ([dc0c7af](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/dc0c7af8ba1af7b95c344f9f7feb2ba7eeb00e38))
+* use HashSet to improve the performance ([60ea7d2](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/60ea7d297e5a4830133e4e6fbe44f8d04a29934b))
+* whole epoch calculation correct for epoch 213 ([1a48a89](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/1a48a89661ca6169f9f5ca96f40d9b0d6529c806))
+
+
+### Bug Fixes
+
+* add outlier and null checks so that epoch 214 is now also 100% correct ([e10ada0](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/e10ada0d4a0cdca35453c7d35f0bf06eb2d496a0))
+* ajust plot and report feature according to the latest changes ([1e6b38e](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/1e6b38e937ae06ac3a3d98cf5e8aa16814ef890d))
+* change epoch for pool pledge ([b980b47](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/b980b475ff3aced74955c8374c8469c212728f57))
+* correct epoch for getting the latest pool update ([493b66e](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/493b66e123b62e1efabbc922192eafc983ba3f18))
+* implemented reward union like described in 17.4 of the shelly ledger spec. The reserves are now almost correct with dbsync until epoch 350 ([088779a](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/088779a98291d9c2f5b2363bce1848225888c8d4))
+* introduce BigDecimals to prevent rounding issues and add a floor rounding to the pool reward pot calculation ([18211c5](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/18211c5aac9a3a8e8ee3dca02ffcf8dfa260c41b))
+* repair tests ([235f9d1](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/235f9d1182d1b0ee703d24793cb31cc90efb6d02))
+* resolve bug in method to fetch the pool owner from the latest update id ([097d308](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/097d3081d11d06fc0763e456e0dd8da877c4f63c))
+
 ## [0.5.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.4.0...v0.5.0) (2024-01-29)
 
 
