@@ -37,10 +37,10 @@ jobs:
 
       - name: 🍀 Generate .env file
         run: |
-          echo "SPRING_PROFILES_ACTIVE=ci" >> src/test/resources/.env
-          echo "RUN_MODE=test" >> src/test/resources/.env
-          echo "OVERWRITE_EXISTING_DATA=false" >> src/test/resources/.env
-          echo "JSON_DATA_SOURCE_FOLDER=./rewards-calculation-test-data" >> src/test/resources/.env
+          echo "SPRING_PROFILES_ACTIVE=ci" >> validation/src/main/resources/.env
+          echo "RUN_MODE=test" >> validation/src/main/resources/.env
+          echo "OVERWRITE_EXISTING_DATA=false" >> validation/src/main/resources/.env
+          echo "JSON_DATA_SOURCE_FOLDER=./rewards-calculation-test-data" >> validation/src/main/resources/.env
 
       - name: 🎳 Test
         run: |
