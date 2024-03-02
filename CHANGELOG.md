@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.1](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.6.0...v0.6.1) (2024-03-02)
+
+
+### Bug Fixes
+
+* add a workaround to fix an issue with the block count in dbsync epoch table ([5603d5f](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/5603d5f66076ecca6d9437250b1d3096fc97e6e8))
+
 ## [0.6.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.5.0...v0.6.0) (2024-03-02)
 
 
