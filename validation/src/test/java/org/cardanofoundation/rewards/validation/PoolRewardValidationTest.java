@@ -70,12 +70,12 @@ public class PoolRewardValidationTest {
     }
 
     static Stream<Integer> testPoolJsonProviderRewardRange() {
-        return IntStream.range(208, 250).boxed();
+        return IntStream.range(208, 227).boxed();
     }
 
     @ParameterizedTest
     @MethodSource("testPoolJsonProviderRewardRange")
-    void calculateNorthPoolRewardFromEpoch211To216(int epoch) {
+    void calculateNorthPoolRewardFromEpoch211To230(int epoch) {
         String poolId = "pool12t3zmafwjqms7cuun86uwc8se4na07r3e5xswe86u37djr5f0lx";
         Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
     }

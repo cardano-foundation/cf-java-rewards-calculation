@@ -4,6 +4,7 @@ import org.cardanofoundation.rewards.validation.entity.jpa.DbSyncAccountDeregist
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.LatestStakeAccountUpdate;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashSet;
@@ -16,7 +17,8 @@ public interface DbSyncStakeDeregistrationRepository extends ReadOnlyRepository<
             "deregistration.address.view IN :addresses AND deregistration.epoch <= :epoch " +
             "ORDER BY deregistration.transaction.id DESC")
     List<DbSyncAccountDeregistration> getLatestAccountDeregistrationsUntilEpochForAddresses(
-            List<String> addresses, Integer epoch);
+            @Param("addresses") List<String> addresses,
+            @Param("epoch") Integer epoch);
 
     @Query(nativeQuery = true, value = """
 SELECT stakeAddress, latestUpdateType, block.epoch_slot_no AS epochSlot, block.epoch_no AS epoch FROM (WITH latest_registration AS (
@@ -63,7 +65,8 @@ SELECT stakeAddress, latestUpdateType, block.epoch_slot_no AS epochSlot, block.e
                 latest_deregistration ld ON lr.addr_id = ld.addr_id
             )
     AS latest_update JOIN tx ON tx.id=latest_update.tx_id JOIN block ON block.id = tx.block_id""")
-    HashSet<LatestStakeAccountUpdate> getLatestStakeAccountUpdates(Integer epoch, HashSet<String> addresses);
+    HashSet<LatestStakeAccountUpdate> getLatestStakeAccountUpdates(@Param("epoch") Integer epoch,
+                                                                   @Param("addresses") HashSet<String> addresses);
 
     @Query(nativeQuery = true, value = """
             SELECT
@@ -93,7 +96,8 @@ SELECT stakeAddress, latestUpdateType, block.epoch_slot_no AS epochSlot, block.e
             HAVING
                 MAX(sd.tx_id) > MAX(sr.tx_id)
             """)
-    HashSet<String> getAccountDeregistrationsInEpoch(Integer epoch, Long stabilityWindow);
+    HashSet<String> getAccountDeregistrationsInEpoch(@Param("epoch") Integer epoch,
+                                                     @Param("stabilityWindow") Long stabilityWindow);
 
     @Query(nativeQuery = true, value = """
             SELECT
@@ -120,5 +124,6 @@ SELECT stakeAddress, latestUpdateType, block.epoch_slot_no AS epochSlot, block.e
             HAVING
             	MAX(sd.tx_id) > MAX(sr.tx_id);
             """)
-    HashSet<String> getLateAccountDeregistrationsInEpoch(Integer epoch, Long stabilityWindow);
+    HashSet<String> getLateAccountDeregistrationsInEpoch(@Param("epoch") Integer epoch,
+                                                         @Param("stabilityWindow") Long stabilityWindow);
 }

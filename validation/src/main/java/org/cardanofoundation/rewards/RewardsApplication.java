@@ -34,6 +34,15 @@ public class RewardsApplication implements ApplicationRunner {
   @Value("${json.data-provider.source}")
   private String sourceFolder;
 
+  @Value("${json.data-fetcher.start-epoch}")
+  private int dataFetcherStartEpoch;
+
+  @Value("${json.data-fetcher.end-epoch}")
+  private int dataFetcherEndEpoch;
+
+  @Value("${json.data-fetcher.skip-validation-data}")
+  private boolean skipValidationData;
+
   @Autowired
   private ApplicationContext context;
 
@@ -59,8 +68,8 @@ public class RewardsApplication implements ApplicationRunner {
         System.exit(exitCode);
       }
 
-      int startEpoch = 208;
-      int endEpoch = 464;
+      int startEpoch = dataFetcherStartEpoch;
+      int endEpoch = dataFetcherEndEpoch;
 
       if (runMode.equals("fetch")) {
           boolean override = overrideFetchedData;
@@ -71,7 +80,7 @@ public class RewardsApplication implements ApplicationRunner {
 
             for (int epoch = startEpoch; epoch < endEpoch; epoch++) {
               logger.info("Fetching data for epoch with the DB sync data provider " + epoch);
-              dbSyncDataFetcher.fetch(epoch, override);
+              dbSyncDataFetcher.fetch(epoch, override, skipValidationData);
             }
           }
 
@@ -79,7 +88,7 @@ public class RewardsApplication implements ApplicationRunner {
             logger.info("Koios data provider is active. Fetching data from Koios...");
             for (int epoch = startEpoch; epoch < endEpoch; epoch++) {
                 logger.info("Fetching data for epoch with the Koios data provider " + epoch);
-                koiosDataFetcher.fetch(epoch, override);
+                koiosDataFetcher.fetch(epoch, override, skipValidationData);
             }
           }
       } else if (runMode.equals("plot")) {

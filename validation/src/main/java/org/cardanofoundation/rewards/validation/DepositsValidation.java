@@ -8,7 +8,6 @@ import java.math.BigInteger;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.calculation.DepositsCalculation.calculateDepositsInEpoch;
-import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.multiply;
 
 public class DepositsValidation {
 

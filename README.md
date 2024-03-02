@@ -60,7 +60,7 @@ flowchart
     style ADA_POTS fill:#f6f9ff,stroke:#f6f9ff
 ```
 
-## 🤓Interesting Findings
+## 🤓 Interesting Findings
 
 While the flowchart above shows the calculation of the Ada pots in general, there are some more aspects that need to be considered:
 
@@ -103,17 +103,16 @@ through maven central.
 For now the structure of the repository is divided in two parts:
  
 - calculation package
-  - rewards
-    - [EpochCalculation](./src/main/java/org/cardanofoundation/rewards/calculation/EpochCalculation.java)
-    - [DepositsCalculation](./src/main/java/org/cardanofoundation/rewards/calculation/DepositsCalculation.java)
-    - [PoolRewardsCalculation](./src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardsCalculation.java)
-    - [TreasuryCalculation](./src/main/java/org/cardanofoundation/rewards/calculation/TreasuryCalculation.java)
+  - [EpochCalculation](calculation/src/main/java/org/cardanofoundation/rewards/calculation/EpochCalculation.java)
+  - [DepositsCalculation](calculation/src/main/java/org/cardanofoundation/rewards/calculation/DepositsCalculation.java)
+  - [PoolRewardsCalculation](calculation/src/main/java/org/cardanofoundation/rewards/calculation/PoolRewardsCalculation.java)
+  - [TreasuryCalculation](calculation/src/main/java/org/cardanofoundation/rewards/calculation/TreasuryCalculation.java)
 
 - validation package
-  - [EpochValidation](./src/main/java/org/cardanofoundation/rewards/validation/EpochValidation.java)
-  - [DepositsValidation](./src/main/java/org/cardanofoundation/rewards/validation/DepositsValidation.java)
-  - [PoolRewardValidation](./src/main/java/org/cardanofoundation/rewards/validation/PoolRewardValidation.java)
-  - [TreasuryValidation](./src/main/java/org/cardanofoundation/rewards/validation/TreasuryValidation.java)
+  - [EpochValidation](validation/src/main/java/org/cardanofoundation/rewards/validation/EpochValidation.java)
+  - [DepositsValidation](validation/src/main/java/org/cardanofoundation/rewards/validation/DepositsValidation.java)
+  - [PoolRewardValidation](validation/src/main/java/org/cardanofoundation/rewards/validation/PoolRewardValidation.java)
+  - [TreasuryValidation](validation/src/main/java/org/cardanofoundation/rewards/validation/TreasuryValidation.java)
   - ...
 
 While the calculation package is used as a pure re-implementation of the ledger specification,
@@ -126,25 +125,28 @@ values with the actual values using DB Sync as ground truth.
 The pool rewards calculation and also the treasury calculation requires a data provider to perform the calculation.
 This repository offers different data providers and also an interface if you want to add your own provider. The following data providers are available:
 
- - [Koios Data Provider](./src/main/java/org/cardanofoundation/rewards/validation/data/provider/KoiosDataProvider.java)
- - [JSON Data Provider](./src/main/java/org/cardanofoundation/rewards/validation/data/provider/JsonDataProvider.java)
- - [DbSync Data Provider](./src/main/java/org/cardanofoundation/rewards/validation/data/provider/DbSyncDataProvider.java)
+ - [Koios Data Provider](validation/src/main/java/org/cardanofoundation/rewards/validation/data/provider/KoiosDataProvider.java)
+ - [JSON Data Provider](validation/src/main/java/org/cardanofoundation/rewards/validation/data/provider/JsonDataProvider.java)
+ - [DbSync Data Provider](validation/src/main/java/org/cardanofoundation/rewards/validation/data/provider/DbSyncDataProvider.java)
 
 #### Data Fetcher
 
 The data fetcher is used to fetch the data from the data provider and put it into local json files.
 These files can be used to perform the calculation using the JSON Data Provider. The following data fetchers are available:
 
- - [Koios Data Fetcher](./src/main/java/org/cardanofoundation/rewards/validation/data/fetcher/KoiosDataFetcher.java)
- - [DbSync Data Fetcher](./src/main/java/org/cardanofoundation/rewards/validation/data/fetcher/DbSyncDataFetcher.java)
+ - [Koios Data Fetcher](validation/src/main/java/org/cardanofoundation/rewards/validation/data/fetcher/KoiosDataFetcher.java)
+ - [DbSync Data Fetcher](validation/src/main/java/org/cardanofoundation/rewards/validation/data/fetcher/DbSyncDataFetcher.java)
 
-To make the application fetching the data, create an .env file with the following content in the `src/main/resources` folder:
+To make the application fetching the data, create an `.env` file with the following content in the [validation resources folder](validation/src/main/resources/.env):
 
 ```
 SPRING_PROFILES_ACTIVE=db-sync
 
 RUN_MODE=fetch
 OVERWRITE_EXISTING_DATA=false
+DATA_FETCHER_START_EPOCH=<start-epoch>
+DATA_FETCHER_END_EPOCH=<end-epoch>
+DATA_FETCHER_SKIP_VALIDATION_DATA=<true|false>
 
 POSTGRES_USER=<username>
 POSTGRES_PASSWORD=<password>
@@ -152,8 +154,22 @@ POSTGRES_DB=cexplorer
 
 JSON_DATA_SOURCE_FOLDER=/path/to/your/rewards-calculation-test-data
 ```
-`⚠️ The actual rewards data will also be fetched but only used from the validator and not within the calculation package.`
+`⚠️ The actual rewards data will also be fetched when setting DATA_FETCHER_SKIP_VALIDATION_DATA=false, but it is only used from the validator and not within the calculation itself.`
   
+#### Data Plotter
+
+The data plotter is used to generate the report. The following data plotters are available:
+
+ - [Koios Data Plotter](./validation/src/main/java/org/cardanofoundation/rewards/validation/data/plotter/JsonDataPlotter.java)
+
+To use the application to make the report, create an `.env` file with the following content in the [validation resources folder](validation/src/main/resources/.env):
+
+```
+SPRING_PROFILES_ACTIVE=json
+RUN_MODE=plot
+JSON_DATA_SOURCE_FOLDER=/path/to/your/rewards-calculation-test-data
+```
+
 ## 🫡 Roadmap
  - [ ] Provide a library through maven central to use the calculation in other projects
  - [ ] Enhance reporting and add values for the other pots as well. Display the flow of Ada within an epoch

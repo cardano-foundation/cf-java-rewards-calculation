@@ -338,18 +338,21 @@ public class DbSyncDataFetcher implements DataFetcher {
     }
 
     @Override
-    public void fetch(int epoch, boolean override) {
+    public void fetch(int epoch, boolean override, boolean skipValidationData) {
         fetchAdaPotsInEpoch(epoch, override);
         fetchEpochInfo(epoch, override);
         fetchProtocolParameters(epoch, override);
         fetchRetiredPoolsInEpoch(epoch, override);
         fetchHistoryOfAllPoolsInEpoch(epoch, override);
         fetchDeregisteredAccountsInEpoch(epoch, override);
-        fetchMemberRewardsInEpoch(epoch, override);
         fetchLateAccountDeregistrationsInEpoch(epoch, override);
-        fetchSumOfMemberAndLeaderRewardsInEpoch(epoch, override);
         fetchSharedPoolRewardAddressWithoutReward(epoch, override);
         fetchMirCertificatesInEpoch(epoch, override);
         fetchStakeAddressesWithRegistrationsUntilEpoch(epoch, override);
+
+        if (!skipValidationData) {
+            fetchMemberRewardsInEpoch(epoch, override);
+            fetchSumOfMemberAndLeaderRewardsInEpoch(epoch, override);
+        }
     }
 }

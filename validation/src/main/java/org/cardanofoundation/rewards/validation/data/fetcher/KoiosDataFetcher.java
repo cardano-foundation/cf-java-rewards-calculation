@@ -210,7 +210,7 @@ public class KoiosDataFetcher implements DataFetcher {
     }
 
     @Override
-    public void fetch(int epoch, boolean override) {
+    public void fetch(int epoch, boolean override, boolean skipValidationData) {
         fetchAdaPots(epoch, override);
         fetchEpochInfo(epoch, override);
         fetchProtocolParameters(epoch, override);

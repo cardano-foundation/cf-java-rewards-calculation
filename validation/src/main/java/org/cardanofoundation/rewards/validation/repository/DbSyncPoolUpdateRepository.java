@@ -4,6 +4,7 @@ import org.cardanofoundation.rewards.validation.entity.jpa.DbSyncPoolUpdate;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.LatestPoolUpdate;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashSet;
@@ -18,7 +19,8 @@ public interface DbSyncPoolUpdateRepository extends ReadOnlyRepository<DbSyncPoo
                 WHERE update.pool.bech32PoolId = :poolId
                 AND update.activeEpochNumber <= :epoch
             ORDER BY update.registeredTransaction.id DESC LIMIT 1""")
-    DbSyncPoolUpdate findLastestActiveUpdateInEpoch(String poolId, Integer epoch);
+    DbSyncPoolUpdate findLastestActiveUpdateInEpoch(@Param("poolId") String poolId,
+                                                    @Param("epoch") Integer epoch);
 
     @Query(nativeQuery = true, value = """
             SELECT pool_update.id, pool_hash.view AS poolId, pledge, margin,
@@ -32,7 +34,8 @@ public interface DbSyncPoolUpdateRepository extends ReadOnlyRepository<DbSyncPoo
             	) AS latest_update ON latest_update.hash_id=pool_update.hash_id AND latest_update.registered_tx_id=pool_update.registered_tx_id
             WHERE pool_update.active_epoch_no <= :epoch
             """)
-    HashSet<LatestPoolUpdate> findLatestActiveUpdatesInEpoch(Integer epoch, List<String> poolIds);
+    HashSet<LatestPoolUpdate> findLatestActiveUpdatesInEpoch(@Param("epoch") Integer epoch,
+                                                             @Param("poolIds") List<String> poolIds);
 
     @Query(nativeQuery = true, value = """
             SELECT COUNT(*) FROM (
@@ -41,7 +44,7 @@ public interface DbSyncPoolUpdateRepository extends ReadOnlyRepository<DbSyncPoo
             	GROUP BY hash_id) AS pool_registrations
             JOIN tx ON pool_registrations.registered_tx_id=tx.id JOIN block ON tx.block_id=block.id WHERE block.epoch_no=:epoch
             """)
-    Integer countPoolRegistrationsInEpoch(Integer epoch);
+    Integer countPoolRegistrationsInEpoch(@Param("epoch") Integer epoch);
 
     @Query("""
            SELECT update FROM DbSyncPoolUpdate AS update
@@ -49,14 +52,17 @@ public interface DbSyncPoolUpdateRepository extends ReadOnlyRepository<DbSyncPoo
                AND update.registeredTransaction.id > :transactionId
                AND update.registeredTransaction.block.epochNo <= :epoch
            ORDER BY update.registeredTransaction.id DESC""")
-    List<DbSyncPoolUpdate> findByBech32PoolIdAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch);
+    List<DbSyncPoolUpdate> findByBech32PoolIdAfterTransactionIdInEpoch(@Param("poolId") String poolId,
+                                                                       @Param("transactionId") long transactionId,
+                                                                       @Param("epoch") int epoch);
 
     @Query("""
            SELECT update FROM DbSyncPoolUpdate AS update
                WHERE update.pool.bech32PoolId = :poolId
                AND update.registeredTransaction.block.epochNo <= :epoch
            ORDER BY update.registeredTransaction.id DESC LIMIT 1""")
-    DbSyncPoolUpdate findLatestUpdateInEpoch(String poolId, int epoch);
+    DbSyncPoolUpdate findLatestUpdateInEpoch(@Param("poolId") String poolId,
+                                             @Param("epoch") int epoch);
 
     @Query(nativeQuery = true, value = """
             WITH active_pool AS (
@@ -81,5 +87,5 @@ public interface DbSyncPoolUpdateRepository extends ReadOnlyRepository<DbSyncPoo
             WHERE NOT EXISTS (
              SELECT 1 FROM reward WHERE type = 'leader' AND pool_id=p1.pool_hash_id AND earned_epoch=:epoch
             )""")
-    HashSet<String> findSharedPoolRewardAddressWithoutReward(int epoch);
+    HashSet<String> findSharedPoolRewardAddressWithoutReward(@Param("epoch") int epoch);
 }

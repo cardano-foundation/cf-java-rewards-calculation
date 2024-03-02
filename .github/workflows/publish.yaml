@@ -1,4 +1,4 @@
-name: Run Plot Action and Upload Results
+name: 📊 Run Plot Action and Upload Results
 
 on:
   push:
@@ -26,35 +26,10 @@ jobs:
         run: |
           pip install yq
 
-      - name: ⬇️ Download test data
-        uses: keithweaver/aws-s3-github-action@v1.0.0
-        with:
-          command: cp
-          source: ${{ secrets.AWS_S3_BUCKET }}
-          destination: ./rewards-calculation-test-data
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: ${{ secrets.AWS_REGION }}
-          flags: --recursive
-
-      - name: 🍀 Generate .env file
-        run: |
-          echo "SPRING_PROFILES_ACTIVE=ci" >> src/main/resources/.env
-          echo "RUN_MODE=plot" >> src/main/resources/.env
-          echo "OVERWRITE_EXISTING_DATA=false" >> src/main/resources/.env
-          echo "JSON_DATA_SOURCE_FOLDER=./rewards-calculation-test-data" >> src/main/resources/.env
-
-      - name: Build
-        run: |
-          mvn --batch-mode --update-snapshots clean package -DskipTests && mv target/rewards-*.jar target/rewards-calculation.jar
-
-      - name: 📊 Generate plots
-        run: java -jar target/rewards-calculation.jar
-
       - name: JSON result to js file
         run: |
           echo -e "const treasuryCalculationResult = $(cat ./report/treasury_calculation_result.json)" > ./report/treasury_calculation_result.js
-        
+
       - name: 👀 Lookup metadata for report
         run: |
           echo "VERSION=$(xq -r .project.version pom.xml)" >> $GITHUB_ENV

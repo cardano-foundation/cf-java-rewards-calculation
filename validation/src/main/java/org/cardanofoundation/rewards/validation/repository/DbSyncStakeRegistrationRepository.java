@@ -4,6 +4,7 @@ import org.cardanofoundation.rewards.validation.entity.jpa.DbSyncAccountRegistra
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.StakeAccountUpdate;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashSet;
@@ -16,7 +17,7 @@ public interface DbSyncStakeRegistrationRepository extends ReadOnlyRepository<Db
             "registration.address.view IN :addresses AND registration.epoch <= :epoch " +
             "ORDER BY registration.transaction.id DESC")
     List<DbSyncAccountRegistration> getLatestAccountRegistrationsUntilEpochForAddresses(
-            List<String> addresses, Integer epoch);
+            @Param("addresses") List<String> addresses, @Param("epoch") Integer epoch);
 
     @Query(nativeQuery = true, value = """
             SELECT
@@ -33,5 +34,7 @@ public interface DbSyncStakeRegistrationRepository extends ReadOnlyRepository<Db
             WHERE
                 sr.epoch_no <= :epoch AND
                 sa.view IN :stakeAddresses""")
-    HashSet<String> getStakeAddressesWithRegistrationsUntilEpoch(Integer epoch, HashSet<String> stakeAddresses, Long stabilityWindow);
+    HashSet<String> getStakeAddressesWithRegistrationsUntilEpoch(@Param("epoch") Integer epoch,
+                                                                 @Param("stakeAddresses") HashSet<String> stakeAddresses,
+                                                                 @Param("stabilityWindow") Long stabilityWindow);
 }

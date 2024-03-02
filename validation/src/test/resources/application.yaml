@@ -8,6 +8,10 @@ spring:
 json:
   data-provider:
     source: ${JSON_DATA_SOURCE_FOLDER}
+  data-fetcher:
+    start-epoch: ${DATA_FETCHER_START_EPOCH:208}
+    end-epoch: ${DATA_FETCHER_END_EPOCH:230}
+    skip-validation-data: ${DATA_FETCHER_SKIP_VALIDATION_DATA:false}
 
 application:
   run:

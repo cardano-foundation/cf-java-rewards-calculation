@@ -4,6 +4,7 @@ import org.cardanofoundation.rewards.validation.entity.jpa.DbSyncBlock;
 import org.cardanofoundation.rewards.validation.entity.jpa.projection.PoolBlocks;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,7 +19,8 @@ public interface DbSyncBlockRepository extends ReadOnlyRepository<DbSyncBlock, L
             LEFT JOIN pool_hash ON pool_hash.id=slot_leader.pool_hash_id
             WHERE block.epoch_no = :epoch and pool_hash.view = :poolId
             """)
-    Integer getBlocksMadeByPoolInEpoch(String poolId, Integer epoch);
+    Integer getBlocksMadeByPoolInEpoch(@Param("poolId") String poolId,
+                                       @Param("epoch") Integer epoch);
 
     @Query(nativeQuery = true, value = """
             SELECT count(*) as blockCount, pool_hash.view as poolId from block
@@ -26,26 +28,26 @@ public interface DbSyncBlockRepository extends ReadOnlyRepository<DbSyncBlock, L
             LEFT JOIN pool_hash ON pool_hash.id=slot_leader.pool_hash_id
             WHERE block.epoch_no = :epoch AND pool_hash.view IS NOT NULL GROUP BY pool_hash.view;
             """)
-    List<PoolBlocks> getAllBlocksMadeByPoolsInEpoch(Integer epoch);
+    List<PoolBlocks> getAllBlocksMadeByPoolsInEpoch(@Param("epoch") Integer epoch);
 
    @Query("""
               select count(*) from DbSyncBlock AS block
                     where block.epochNo = :epoch
                     and block.slotLeader.pool is NOT NULL
            """)
-    Integer getNonOBFTBlocksInEpoch(Integer epoch);
+    Integer getNonOBFTBlocksInEpoch(@Param("epoch") Integer epoch);
 
     @Query("""
               select count(*) from DbSyncBlock AS block
                     where block.epochNo = :epoch
                     and block.slotLeader.pool is NULL
            """)
-    Integer getOBFTBlocksInEpoch(Integer epoch);
+    Integer getOBFTBlocksInEpoch(@Param("epoch") Integer epoch);
 
     @Query("""
             select distinct block.slotLeader.pool.bech32PoolId from DbSyncBlock AS block
                 where block.epochNo = :epoch
                 and block.slotLeader.pool is not NULL
            """)
-    List<String> getPoolsThatProducedBlocksInEpoch(Integer epoch);
+    List<String> getPoolsThatProducedBlocksInEpoch(@Param("epoch") Integer epoch);
 }
