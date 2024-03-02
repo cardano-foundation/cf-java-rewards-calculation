@@ -29,7 +29,7 @@ jobs:
         with:
           command: cp
           source: ${{ secrets.AWS_S3_BUCKET }}
-          destination: ./rewards-calculation-test-data
+          destination: ${{ github.workspace }}/rewards-calculation-test-data
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: ${{ secrets.AWS_REGION }}
@@ -40,7 +40,7 @@ jobs:
           echo "SPRING_PROFILES_ACTIVE=ci" >> validation/src/main/resources/.env
           echo "RUN_MODE=test" >> validation/src/main/resources/.env
           echo "OVERWRITE_EXISTING_DATA=false" >> validation/src/main/resources/.env
-          echo "JSON_DATA_SOURCE_FOLDER=./rewards-calculation-test-data" >> validation/src/main/resources/.env
+          echo "JSON_DATA_SOURCE_FOLDER=${{ github.workspace }}/rewards-calculation-test-data" >> validation/src/main/resources/.env
 
       - name: 🎳 Test
         run: |
