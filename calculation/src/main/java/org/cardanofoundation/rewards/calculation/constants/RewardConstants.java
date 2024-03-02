@@ -14,7 +14,7 @@ public class RewardConstants {
   public static final int GENESIS_CONFIG_SECURITY_PARAMETER = 2160;
   public static final int MAINNET_SHELLEY_START_EPOCH = 208;
   public static final int MAINNET_ALLEGRA_HARDFORK_EPOCH = 236;
-  public static final int MAINNET_VASIL_HARDFORK_EPOCH = 350;
+  public static final int MAINNET_VASIL_HARDFORK_EPOCH = 365;
   public static final BigInteger MAINNET_BOOTSTRAP_ADDRESS_AMOUNT = new BigInteger("318200635000000");
   public static final double ACTIVE_SLOT_COEFFICIENT = 0.05;
   public static final long RANDOMNESS_STABILISATION_WINDOW = Math.round(
