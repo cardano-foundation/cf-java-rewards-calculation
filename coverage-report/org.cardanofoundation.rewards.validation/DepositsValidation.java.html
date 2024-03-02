@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DepositsValidation.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cf-rewards-validation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.validation</a> &gt; <span class="el_source">DepositsValidation.java</span></div><h1>DepositsValidation.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.validation;
+
+import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
+import org.cardanofoundation.rewards.calculation.domain.AdaPots;
+import org.cardanofoundation.rewards.calculation.domain.PoolDeregistration;
+
+import java.math.BigInteger;
+import java.util.List;
+
+import static org.cardanofoundation.rewards.calculation.DepositsCalculation.calculateDepositsInEpoch;
+
+<span class="nc" id="L12">public class DepositsValidation {</span>
+
+    public static BigInteger computeDepositsInEpoch(int epoch, DataProvider dataProvider) {
+<span class="nc" id="L15">        AdaPots adaPots = dataProvider.getAdaPotsForEpoch(epoch);</span>
+<span class="nc" id="L16">        BigInteger depositsInPreviousEpoch = adaPots.getDeposits();</span>
+<span class="nc" id="L17">        BigInteger transactionDepositsInEpoch = BigInteger.ZERO;</span>
+<span class="nc" id="L18">        List&lt;PoolDeregistration&gt; retiredPoolsInEpoch = List.of();</span>
+
+<span class="nc bnc" id="L20" title="All 2 branches missed.">        if (epoch &gt; 207) {</span>
+<span class="nc" id="L21">            transactionDepositsInEpoch = dataProvider.getTransactionDepositsInEpoch(epoch);</span>
+<span class="nc" id="L22">            retiredPoolsInEpoch = dataProvider.getRetiredPoolsInEpoch(epoch + 1);</span>
+        }
+
+<span class="nc" id="L25">        return calculateDepositsInEpoch(depositsInPreviousEpoch,</span>
+<span class="nc" id="L26">                transactionDepositsInEpoch, retiredPoolsInEpoch.size());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

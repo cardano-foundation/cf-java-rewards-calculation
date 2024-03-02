@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RewardsApplication.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cardano-reward-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards</a> &gt; <span class="el_source">RewardsApplication.java</span></div><h1>RewardsApplication.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RewardsApplication.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cf-rewards-validation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards</a> &gt; <span class="el_source">RewardsApplication.java</span></div><h1>RewardsApplication.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards;
 
-import org.cardanofoundation.rewards.data.fetcher.DbSyncDataFetcher;
-import org.cardanofoundation.rewards.data.fetcher.KoiosDataFetcher;
-import org.cardanofoundation.rewards.data.plotter.JsonDataPlotter;
+import org.cardanofoundation.rewards.validation.data.fetcher.DbSyncDataFetcher;
+import org.cardanofoundation.rewards.validation.data.fetcher.KoiosDataFetcher;
+import org.cardanofoundation.rewards.validation.data.plotter.JsonDataPlotter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +34,15 @@ import org.springframework.context.ApplicationContext;
   @Value(&quot;${json.data-provider.source}&quot;)
   private String sourceFolder;
 
+  @Value(&quot;${json.data-fetcher.start-epoch}&quot;)
+  private int dataFetcherStartEpoch;
+
+  @Value(&quot;${json.data-fetcher.end-epoch}&quot;)
+  private int dataFetcherEndEpoch;
+
+  @Value(&quot;${json.data-fetcher.skip-validation-data}&quot;)
+  private boolean skipValidationData;
+
   @Autowired
   private ApplicationContext context;
 
@@ -47,52 +56,52 @@ import org.springframework.context.ApplicationContext;
   private DbSyncDataFetcher dbSyncDataFetcher;
 
   public static void main(String[] args) {
-<span class="nc" id="L50">    SpringApplication.run(RewardsApplication.class, args);</span>
-<span class="nc" id="L51">  }</span>
+<span class="nc" id="L59">    SpringApplication.run(RewardsApplication.class, args);</span>
+<span class="nc" id="L60">  }</span>
 
   @Override
   public void run(ApplicationArguments args) throws Exception {
 
-<span class="pc bpc" id="L56" title="1 of 2 branches missed.">      if (runMode == null) {</span>
-<span class="nc" id="L57">        logger.warn(&quot;No run mode specified. Set the environment variable RUN_MODE in your .env file to 'fetch' or 'plot' or 'test'&quot;);</span>
-<span class="nc" id="L58">        int exitCode = SpringApplication.exit(context, (ExitCodeGenerator) () -&gt; 0);</span>
-<span class="nc" id="L59">        System.exit(exitCode);</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">      if (runMode == null) {</span>
+<span class="nc" id="L66">        logger.warn(&quot;No run mode specified. Set the environment variable RUN_MODE in your .env file to 'fetch' or 'plot' or 'test'&quot;);</span>
+<span class="nc" id="L67">        int exitCode = SpringApplication.exit(context, (ExitCodeGenerator) () -&gt; 0);</span>
+<span class="nc" id="L68">        System.exit(exitCode);</span>
       }
 
-<span class="fc" id="L62">      int startEpoch = 208;</span>
-<span class="fc" id="L63">      int endEpoch = 464;</span>
+<span class="fc" id="L71">      int startEpoch = dataFetcherStartEpoch;</span>
+<span class="fc" id="L72">      int endEpoch = dataFetcherEndEpoch;</span>
 
-<span class="pc bpc" id="L65" title="1 of 2 branches missed.">      if (runMode.equals(&quot;fetch&quot;)) {</span>
-<span class="nc" id="L66">          boolean override = overrideFetchedData;</span>
-<span class="nc" id="L67">          logger.info(&quot;Override fetched data: &quot; + override);</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">      if (runMode.equals(&quot;fetch&quot;)) {</span>
+<span class="nc" id="L75">          boolean override = overrideFetchedData;</span>
+<span class="nc" id="L76">          logger.info(&quot;Override fetched data: &quot; + override);</span>
 
-<span class="nc bnc" id="L69" title="All 2 branches missed.">          if (activeProfiles.contains(&quot;db-sync&quot;)) {</span>
-<span class="nc" id="L70">            logger.info(&quot;DB Sync data provider is active. Fetching data from DB Sync...&quot;);</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">          if (activeProfiles.contains(&quot;db-sync&quot;)) {</span>
+<span class="nc" id="L79">            logger.info(&quot;DB Sync data provider is active. Fetching data from DB Sync...&quot;);</span>
 
-<span class="nc bnc" id="L72" title="All 2 branches missed.">            for (int epoch = startEpoch; epoch &lt; endEpoch; epoch++) {</span>
-<span class="nc" id="L73">              logger.info(&quot;Fetching data for epoch with the DB sync data provider &quot; + epoch);</span>
-<span class="nc" id="L74">              dbSyncDataFetcher.fetch(epoch, override);</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">            for (int epoch = startEpoch; epoch &lt; endEpoch; epoch++) {</span>
+<span class="nc" id="L82">              logger.info(&quot;Fetching data for epoch with the DB sync data provider &quot; + epoch);</span>
+<span class="nc" id="L83">              dbSyncDataFetcher.fetch(epoch, override, skipValidationData);</span>
             }
           }
 
-<span class="nc bnc" id="L78" title="All 2 branches missed.">          if (activeProfiles.contains(&quot;koios&quot;)) {</span>
-<span class="nc" id="L79">            logger.info(&quot;Koios data provider is active. Fetching data from Koios...&quot;);</span>
-<span class="nc bnc" id="L80" title="All 2 branches missed.">            for (int epoch = startEpoch; epoch &lt; endEpoch; epoch++) {</span>
-<span class="nc" id="L81">                logger.info(&quot;Fetching data for epoch with the Koios data provider &quot; + epoch);</span>
-<span class="nc" id="L82">                koiosDataFetcher.fetch(epoch, override);</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">          if (activeProfiles.contains(&quot;koios&quot;)) {</span>
+<span class="nc" id="L88">            logger.info(&quot;Koios data provider is active. Fetching data from Koios...&quot;);</span>
+<span class="nc bnc" id="L89" title="All 2 branches missed.">            for (int epoch = startEpoch; epoch &lt; endEpoch; epoch++) {</span>
+<span class="nc" id="L90">                logger.info(&quot;Fetching data for epoch with the Koios data provider &quot; + epoch);</span>
+<span class="nc" id="L91">                koiosDataFetcher.fetch(epoch, override, skipValidationData);</span>
             }
           }
-<span class="pc bpc" id="L85" title="1 of 2 branches missed.">      } else if (runMode.equals(&quot;plot&quot;)) {</span>
-<span class="nc" id="L86">        jsonDataPlotter.plot(startEpoch, endEpoch);</span>
-<span class="pc bpc" id="L87" title="1 of 2 branches missed.">      } else if (!runMode.equals(&quot;test&quot;)) {</span>
-<span class="nc" id="L88">          logger.warn(&quot;Unknown run mode: &quot; + runMode);</span>
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">      } else if (runMode.equals(&quot;plot&quot;)) {</span>
+<span class="nc" id="L95">        jsonDataPlotter.plot(startEpoch, endEpoch);</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">      } else if (!runMode.equals(&quot;test&quot;)) {</span>
+<span class="nc" id="L97">          logger.warn(&quot;Unknown run mode: &quot; + runMode);</span>
       }
 
-<span class="pc bpc" id="L91" title="1 of 2 branches missed.">      if (!runMode.equals(&quot;test&quot;)) {</span>
-<span class="nc" id="L92">          logger.info(&quot;Done. Exiting...&quot;);</span>
-<span class="nc" id="L93">          int exitCode = SpringApplication.exit(context, () -&gt; 0);</span>
-<span class="nc" id="L94">          System.exit(exitCode);</span>
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">      if (!runMode.equals(&quot;test&quot;)) {</span>
+<span class="nc" id="L101">          logger.info(&quot;Done. Exiting...&quot;);</span>
+<span class="nc" id="L102">          int exitCode = SpringApplication.exit(context, () -&gt; 0);</span>
+<span class="nc" id="L103">          System.exit(exitCode);</span>
       }
-<span class="fc" id="L96">  }</span>
+<span class="fc" id="L105">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TreasuryValidation.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cf-rewards-validation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.validation</a> &gt; <span class="el_source">TreasuryValidation.java</span></div><h1>TreasuryValidation.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.validation;
+
+import org.cardanofoundation.rewards.calculation.TreasuryCalculation;
+import org.cardanofoundation.rewards.calculation.domain.*;
+import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
+import org.cardanofoundation.rewards.calculation.enums.AccountUpdateAction;
+import org.cardanofoundation.rewards.validation.domain.TreasuryValidationResult;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
+
+<span class="nc" id="L17">public class TreasuryValidation {</span>
+
+  public static TreasuryValidationResult calculateTreasuryForEpoch(int epoch, DataProvider dataProvider) {
+<span class="fc" id="L20">    AdaPots adaPotsForPreviousEpoch = dataProvider.getAdaPotsForEpoch(epoch - 1);</span>
+<span class="fc" id="L21">    ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch - 2);</span>
+<span class="fc" id="L22">    Epoch epochInfo = dataProvider.getEpochInfo(epoch - 2);</span>
+<span class="fc" id="L23">    List&lt;PoolDeregistration&gt; retiredPools = dataProvider.getRetiredPoolsInEpoch(epoch);</span>
+<span class="fc" id="L24">    List&lt;MirCertificate&gt; mirCertificates = dataProvider.getMirCertificatesInEpoch(epoch - 1);</span>
+<span class="fc" id="L25">    List&lt;PoolBlock&gt; blocksMadeByPoolsInEpoch = dataProvider.getBlocksMadeByPoolsInEpoch(epoch - 2);</span>
+<span class="fc" id="L26">    List&lt;PoolHistory&gt; poolHistories = dataProvider.getHistoryOfAllPoolsInEpoch(epoch - 2, blocksMadeByPoolsInEpoch);</span>
+<span class="fc" id="L27">    HashSet&lt;String&gt; deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);</span>
+<span class="fc" id="L28">    HashSet&lt;String&gt; lateDeregisteredAccounts = dataProvider.getLateAccountDeregistrationsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);</span>
+<span class="fc" id="L29">    HashSet&lt;String&gt; poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).collect(Collectors.toCollection(HashSet::new));</span>
+<span class="fc" id="L30">    poolRewardAddresses.addAll(retiredPools.stream().map(PoolDeregistration::getRewardAddress).collect(Collectors.toSet()));</span>
+<span class="fc" id="L31">    HashSet&lt;String&gt; registeredAccountsUntilNow = dataProvider.getRegisteredAccountsUntilNow(epoch, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);</span>
+
+<span class="fc" id="L33">    TreasuryCalculationResult treasuryCalculationResult = TreasuryCalculation.calculateTreasuryInEpoch(epoch, protocolParameters, adaPotsForPreviousEpoch, epochInfo, retiredPools, mirCertificates, deregisteredAccounts, lateDeregisteredAccounts, registeredAccountsUntilNow, BigInteger.ZERO);</span>
+
+<span class="fc" id="L35">    TreasuryValidationResult treasuryValidationResult = TreasuryValidationResult.fromTreasuryCalculationResult(treasuryCalculationResult);</span>
+<span class="fc" id="L36">    AdaPots adaPotsForCurrentEpoch = dataProvider.getAdaPotsForEpoch(epoch);</span>
+<span class="fc" id="L37">    treasuryValidationResult.setActualTreasury(adaPotsForCurrentEpoch.getTreasury());</span>
+<span class="fc" id="L38">    return treasuryValidationResult;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

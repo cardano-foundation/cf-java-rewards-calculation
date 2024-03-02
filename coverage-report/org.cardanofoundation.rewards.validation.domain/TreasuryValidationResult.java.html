@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TreasuryValidationResult.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cf-rewards-validation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.validation.domain</a> &gt; <span class="el_source">TreasuryValidationResult.java</span></div><h1>TreasuryValidationResult.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.validation.domain;
+
+import lombok.*;
+import org.cardanofoundation.rewards.calculation.domain.TreasuryCalculationResult;
+
+import java.math.BigInteger;
+
+@Getter
+<span class="pc" id="L9">@Setter</span>
+<span class="pc" id="L10">@Builder</span>
+<span class="nc" id="L11">@NoArgsConstructor</span>
+<span class="fc" id="L12">@AllArgsConstructor</span>
+public class TreasuryValidationResult {
+<span class="nc" id="L14">    int epoch;</span>
+<span class="fc" id="L15">    BigInteger calculatedTreasury;</span>
+<span class="nc" id="L16">    BigInteger totalRewardPot;</span>
+<span class="nc" id="L17">    BigInteger treasuryWithdrawals;</span>
+<span class="fc" id="L18">    BigInteger actualTreasury;</span>
+<span class="nc" id="L19">    BigInteger unspendableEarnedRewards;</span>
+
+    public static TreasuryValidationResult fromTreasuryCalculationResult(TreasuryCalculationResult treasuryCalculationResult) {
+<span class="pc bpc" id="L22" title="1 of 2 branches missed.">        if (treasuryCalculationResult == null) {</span>
+<span class="nc" id="L23">            return null;</span>
+        }
+
+<span class="fc" id="L26">        return TreasuryValidationResult.builder()</span>
+<span class="fc" id="L27">                .epoch(treasuryCalculationResult.getEpoch())</span>
+<span class="fc" id="L28">                .calculatedTreasury(treasuryCalculationResult.getTreasury())</span>
+<span class="fc" id="L29">                .totalRewardPot(treasuryCalculationResult.getTotalRewardPot())</span>
+<span class="fc" id="L30">                .treasuryWithdrawals(treasuryCalculationResult.getTreasuryWithdrawals())</span>
+<span class="fc" id="L31">                .unspendableEarnedRewards(treasuryCalculationResult.getUnspendableEarnedRewards())</span>
+<span class="fc" id="L32">                .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

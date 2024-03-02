@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UtxoValidation.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cf-rewards-validation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.validation</a> &gt; <span class="el_source">UtxoValidation.java</span></div><h1>UtxoValidation.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.validation;
+
+import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
+
+import java.math.BigInteger;
+
+import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.MAINNET_ALLEGRA_HARDFORK_EPOCH;
+import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.MAINNET_BOOTSTRAP_ADDRESS_AMOUNT;
+
+<span class="nc" id="L10">public class UtxoValidation {</span>
+
+<span class="nc" id="L12">    public final static BigInteger UTXO_POT_BEGINNING_OF_SHELLY = BigInteger.valueOf(31111977147073356L);</span>
+
+    public static BigInteger calculateUtxoPotInEpoch(int epoch, DataProvider dataProvider) {
+<span class="nc" id="L15">        BigInteger utxo = UTXO_POT_BEGINNING_OF_SHELLY;</span>
+
+<span class="nc bnc" id="L17" title="All 2 branches missed.">        if (epoch &gt; 208) {</span>
+<span class="nc" id="L18">            BigInteger utxoFromPreviousEpoch = dataProvider.getAdaPotsForEpoch(epoch - 1).getAdaInCirculation();</span>
+<span class="nc" id="L19">            BigInteger deposits = dataProvider.getTransactionDepositsInEpoch(epoch - 1);</span>
+<span class="nc" id="L20">            BigInteger fees = dataProvider.getSumOfFeesInEpoch(epoch - 1);</span>
+<span class="nc" id="L21">            BigInteger withdrawals = BigInteger.ZERO;</span>
+
+<span class="nc bnc" id="L23" title="All 2 branches missed.">            if (epoch &gt; 209) {</span>
+<span class="nc" id="L24">                withdrawals = dataProvider.getSumOfWithdrawalsInEpoch(epoch - 1);</span>
+            }
+
+<span class="nc" id="L27">            utxo = utxoFromPreviousEpoch.subtract(deposits).subtract(fees).add(withdrawals);</span>
+
+<span class="nc bnc" id="L29" title="All 2 branches missed.">            if (epoch == MAINNET_ALLEGRA_HARDFORK_EPOCH) {</span>
+                // Todo: verify with yaci-store data provider later
+                /*
+                    &quot;The bootstrap addresses from Figure 6 were not intended to include the Byron era redeem
+                    addresses (those with addrtype 2, see the Byron CDDL spec). These addresses were, however,
+                    not spendable in the Shelley era. At the Allegra hard fork they were removed from the UTxO
+                    and the Ada contained in them was returned to the reserves.&quot;
+                        - shelley-spec-ledger.pdf 17.5 p.115
+                 */
+<span class="nc" id="L38">                utxo = utxo.subtract(MAINNET_BOOTSTRAP_ADDRESS_AMOUNT);</span>
+            }
+        }
+
+<span class="nc" id="L42">        return utxo;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
