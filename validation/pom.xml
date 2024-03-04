@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.cardanofoundation</groupId>
         <artifactId>cf-rewards</artifactId>
-        <version>0.6.2</version>
+        <version>0.6.3</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
