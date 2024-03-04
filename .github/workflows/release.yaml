@@ -20,3 +20,5 @@ jobs:
           release-type: simple
           extra-files: |
             pom.xml
+            validation/pom.xml
+            calculation/pom.xml

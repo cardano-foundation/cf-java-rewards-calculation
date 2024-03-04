@@ -1,7 +1,6 @@
 package org.cardanofoundation.rewards.calculation;
 
 import org.cardanofoundation.rewards.calculation.domain.*;
-import org.cardanofoundation.rewards.calculation.enums.AccountUpdateAction;
 import org.cardanofoundation.rewards.calculation.enums.MirPot;
 
 import java.math.BigDecimal;
@@ -127,7 +126,7 @@ public class TreasuryCalculation {
     // decentralizationParameter is the proportion of blocks that are expected to be produced by stake pools
     // instead of the OBFT (Ouroboros Byzantine Fault Tolerance) nodes. It was introduced close before the Shelley era:
     // https://github.com/input-output-hk/cardano-ledger/commit/c4f10d286faadcec9e4437411bce9c6c3b6e51c2
-    BigDecimal expectedBlocksInNonOBFTSlots = new BigDecimal(EXPECTED_SLOT_PER_EPOCH )
+    BigDecimal expectedBlocksInNonOBFTSlots = new BigDecimal(EXPECTED_SLOTS_PER_EPOCH)
             .multiply(activeSlotsCoeff).multiply(BigDecimal.ONE.subtract(decentralizationParameter));
 
     // eta is the ratio between the number of blocks that have been produced during the epoch, and

@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.RANDOMNESS_STABILISATION_WINDOW;
+import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
 import static org.cardanofoundation.rewards.validation.enums.DataType.*;
 import static org.cardanofoundation.rewards.validation.util.JsonConverter.writeObjectToJsonFile;
 
@@ -227,7 +227,7 @@ public class DbSyncDataFetcher implements DataFetcher {
         }
     }
 
-    private void fetchDeregisteredAccountsInEpoch(int epoch, boolean override) {
+    private void fetchDeregisteredAccountsInEpoch(int epoch, boolean override, boolean mainnet) {
         String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, ACCOUNT_DEREGISTRATION.resourceFolderName, epoch);
         File outputFile = new File(filePath);
 
@@ -236,7 +236,12 @@ public class DbSyncDataFetcher implements DataFetcher {
             return;
         }
 
-        HashSet<String> deregisteredAccountsInEpoch = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch, RANDOMNESS_STABILISATION_WINDOW);
+        long stabilityWindow = RANDOMNESS_STABILISATION_WINDOW;
+        if (mainnet && epoch >= MAINNET_VASIL_HARDFORK_EPOCH) {
+            stabilityWindow = EXPECTED_SLOTS_PER_EPOCH;
+        }
+
+        HashSet<String> deregisteredAccountsInEpoch = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch, stabilityWindow);
         if (deregisteredAccountsInEpoch == null) {
             logger.error("Failed to fetch deregistered accounts for epoch " + epoch);
             return;
@@ -315,7 +320,11 @@ public class DbSyncDataFetcher implements DataFetcher {
         }
     }
 
-    private void fetchLateAccountDeregistrationsInEpoch(int epoch, boolean override) {
+    private void fetchLateAccountDeregistrationsInEpoch(int epoch, boolean override, boolean mainnet) {
+        if (mainnet && epoch >= MAINNET_VASIL_HARDFORK_EPOCH) {
+            return;
+        }
+
         String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, LATE_DEREGISTRATIONS.resourceFolderName, epoch);
         File outputFile = new File(filePath);
 
@@ -344,8 +353,8 @@ public class DbSyncDataFetcher implements DataFetcher {
         fetchProtocolParameters(epoch, override);
         fetchRetiredPoolsInEpoch(epoch, override);
         fetchHistoryOfAllPoolsInEpoch(epoch, override);
-        fetchDeregisteredAccountsInEpoch(epoch, override);
-        fetchLateAccountDeregistrationsInEpoch(epoch, override);
+        fetchDeregisteredAccountsInEpoch(epoch, override, true);
+        fetchLateAccountDeregistrationsInEpoch(epoch, override, true);
         fetchSharedPoolRewardAddressWithoutReward(epoch, override);
         fetchMirCertificatesInEpoch(epoch, override);
         fetchStakeAddressesWithRegistrationsUntilEpoch(epoch, override);
