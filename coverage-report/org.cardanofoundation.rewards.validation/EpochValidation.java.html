@@ -64,53 +64,61 @@ import static org.cardanofoundation.rewards.calculation.constants.RewardConstant
 <span class="fc" id="L64">        List&lt;PoolBlock&gt; blocksMadeByPoolsInEpoch = dataProvider.getBlocksMadeByPoolsInEpoch(epoch - 2);</span>
 <span class="fc" id="L65">        List&lt;String&gt; poolIds = blocksMadeByPoolsInEpoch.stream().map(PoolBlock::getPoolId).distinct().toList();</span>
 <span class="fc" id="L66">        List&lt;PoolHistory&gt; poolHistories = dataProvider.getHistoryOfAllPoolsInEpoch(epoch - 2, blocksMadeByPoolsInEpoch);</span>
-<span class="fc" id="L67">        HashSet&lt;String&gt; deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);</span>
-<span class="fc" id="L68">        HashSet&lt;String&gt; lateDeregisteredAccounts = dataProvider.getLateAccountDeregistrationsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);</span>
-<span class="fc" id="L69">        HashSet&lt;String&gt; sharedPoolRewardAddressesWithoutReward = new HashSet&lt;&gt;();</span>
-<span class="pc bpc" id="L70" title="1 of 2 branches missed.">        if (epoch - 2 &lt; MAINNET_ALLEGRA_HARDFORK_EPOCH) {</span>
-<span class="fc" id="L71">            sharedPoolRewardAddressesWithoutReward = dataProvider.findSharedPoolRewardAddressWithoutReward(epoch - 2);</span>
-        }
-<span class="fc" id="L73">        HashSet&lt;String&gt; poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).collect(Collectors.toCollection(HashSet::new));</span>
-<span class="fc" id="L74">        poolRewardAddresses.addAll(retiredPools.stream().map(PoolDeregistration::getRewardAddress).collect(Collectors.toSet()));</span>
-<span class="fc" id="L75">        HashSet&lt;String&gt; registeredAccountsSinceLastEpoch = dataProvider.getRegisteredAccountsUntilLastEpoch(epoch, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);</span>
-<span class="fc" id="L76">        HashSet&lt;String&gt; registeredAccountsUntilNow = dataProvider.getRegisteredAccountsUntilNow(epoch, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);</span>
 
-<span class="fc" id="L78">        HashSet&lt;Reward&gt; memberRewardsInEpoch = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L79">        HashSet&lt;PoolReward&gt; totalPoolRewards = new HashSet&lt;&gt;();</span>
-<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        if (detailedValidation) {</span>
-<span class="fc" id="L81">            memberRewardsInEpoch = dataProvider.getMemberRewardsInEpoch(epoch - 2);</span>
-<span class="fc" id="L82">            totalPoolRewards = dataProvider.getTotalPoolRewardsInEpoch(epoch - 2);</span>
+        HashSet&lt;String&gt; deregisteredAccounts;
+<span class="fc" id="L69">        HashSet&lt;String&gt; lateDeregisteredAccounts = new HashSet&lt;&gt;();</span>
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_VASIL_HARDFORK_EPOCH) {</span>
+<span class="fc" id="L71">            deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);</span>
+<span class="fc" id="L72">            lateDeregisteredAccounts = dataProvider.getLateAccountDeregistrationsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);</span>
+        } else {
+<span class="nc" id="L74">            deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, EXPECTED_SLOTS_PER_EPOCH);</span>
         }
-<span class="fc" id="L84">        long end = System.currentTimeMillis();</span>
-<span class="fc" id="L85">        log.debug(&quot;Obtaining the epoch data took &quot; + Math.round((end - start) / 1000.0) + &quot;s&quot;);</span>
-<span class="fc" id="L86">        log.debug(&quot;Start epoch calculation&quot;);</span>
 
-<span class="fc" id="L88">        start = System.currentTimeMillis();</span>
-<span class="fc" id="L89">        EpochCalculationResult epochCalculationResult = EpochCalculation.calculateEpochRewardPots(</span>
+<span class="fc" id="L77">        HashSet&lt;String&gt; sharedPoolRewardAddressesWithoutReward = new HashSet&lt;&gt;();</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">        if (epoch - 2 &lt; MAINNET_ALLEGRA_HARDFORK_EPOCH) {</span>
+<span class="fc" id="L79">            sharedPoolRewardAddressesWithoutReward = dataProvider.findSharedPoolRewardAddressWithoutReward(epoch - 2);</span>
+        }
+<span class="fc" id="L81">        HashSet&lt;String&gt; poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).collect(Collectors.toCollection(HashSet::new));</span>
+<span class="fc" id="L82">        poolRewardAddresses.addAll(retiredPools.stream().map(PoolDeregistration::getRewardAddress).collect(Collectors.toSet()));</span>
+<span class="fc" id="L83">        HashSet&lt;String&gt; registeredAccountsSinceLastEpoch = dataProvider.getRegisteredAccountsUntilLastEpoch(epoch, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);</span>
+<span class="fc" id="L84">        HashSet&lt;String&gt; registeredAccountsUntilNow = dataProvider.getRegisteredAccountsUntilNow(epoch, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);</span>
+
+<span class="fc" id="L86">        HashSet&lt;Reward&gt; memberRewardsInEpoch = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L87">        HashSet&lt;PoolReward&gt; totalPoolRewards = new HashSet&lt;&gt;();</span>
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">        if (detailedValidation) {</span>
+<span class="fc" id="L89">            memberRewardsInEpoch = dataProvider.getMemberRewardsInEpoch(epoch - 2);</span>
+<span class="fc" id="L90">            totalPoolRewards = dataProvider.getTotalPoolRewardsInEpoch(epoch - 2);</span>
+        }
+<span class="fc" id="L92">        long end = System.currentTimeMillis();</span>
+<span class="fc" id="L93">        log.debug(&quot;Obtaining the epoch data took &quot; + Math.round((end - start) / 1000.0) + &quot;s&quot;);</span>
+<span class="fc" id="L94">        log.debug(&quot;Start epoch calculation&quot;);</span>
+
+<span class="fc" id="L96">        start = System.currentTimeMillis();</span>
+<span class="fc" id="L97">        EpochCalculationResult epochCalculationResult = EpochCalculation.calculateEpochRewardPots(</span>
                 epoch, adaPotsForPreviousEpoch, protocolParameters, epochInfo, retiredPools, deregisteredAccounts,
                 mirCertificates, poolIds, poolHistories, lateDeregisteredAccounts,
                 registeredAccountsSinceLastEpoch, registeredAccountsUntilNow, sharedPoolRewardAddressesWithoutReward);
-<span class="fc" id="L93">        end = System.currentTimeMillis();</span>
-<span class="fc" id="L94">        log.debug(&quot;Epoch calculation took &quot; + Math.round((end - start) / 1000.0) + &quot;s&quot;);</span>
+<span class="fc" id="L101">        end = System.currentTimeMillis();</span>
+<span class="fc" id="L102">        log.debug(&quot;Epoch calculation took &quot; + Math.round((end - start) / 1000.0) + &quot;s&quot;);</span>
 
-<span class="pc bpc" id="L96" title="1 of 2 branches missed.">        if (detailedValidation) {</span>
-<span class="fc" id="L97">            log.debug(&quot;Start epoch validation&quot;);</span>
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">        if (detailedValidation) {</span>
+<span class="fc" id="L105">            log.debug(&quot;Start epoch validation&quot;);</span>
 
-<span class="fc" id="L99">            start = System.currentTimeMillis();</span>
-<span class="fc bfc" id="L100" title="All 2 branches covered.">            for (PoolRewardCalculationResult poolRewardCalculationResult : epochCalculationResult.getPoolRewardCalculationResults()) {</span>
-<span class="fc bfc" id="L101" title="All 2 branches covered.">                if (!PoolRewardValidation.poolRewardIsValid(poolRewardCalculationResult, memberRewardsInEpoch, totalPoolRewards)) {</span>
-<span class="fc" id="L102">                    log.info(&quot;Pool reward is invalid. Please check the details for pool &quot; + poolRewardCalculationResult.getPoolId());</span>
+<span class="fc" id="L107">            start = System.currentTimeMillis();</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">            for (PoolRewardCalculationResult poolRewardCalculationResult : epochCalculationResult.getPoolRewardCalculationResults()) {</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">                if (!PoolRewardValidation.poolRewardIsValid(poolRewardCalculationResult, memberRewardsInEpoch, totalPoolRewards)) {</span>
+<span class="fc" id="L110">                    log.info(&quot;Pool reward is invalid. Please check the details for pool &quot; + poolRewardCalculationResult.getPoolId());</span>
                 }
-<span class="fc" id="L104">            }</span>
-<span class="fc" id="L105">            end = System.currentTimeMillis();</span>
-<span class="fc" id="L106">            log.debug(&quot;Epoch validation took &quot; + Math.round((end - start) / 1000.0) + &quot;s&quot;);</span>
+<span class="fc" id="L112">            }</span>
+<span class="fc" id="L113">            end = System.currentTimeMillis();</span>
+<span class="fc" id="L114">            log.debug(&quot;Epoch validation took &quot; + Math.round((end - start) / 1000.0) + &quot;s&quot;);</span>
         }
 
-<span class="fc" id="L109">        long overallEnd = System.currentTimeMillis();</span>
-<span class="fc" id="L110">        log.info(&quot;Overall calculation and validation of epoch &quot; + epoch + &quot; took &quot; +</span>
-<span class="fc" id="L111">                Math.round((overallEnd - overallStart) / 1000.0)  + &quot; seconds in total.&quot;);</span>
+<span class="fc" id="L117">        long overallEnd = System.currentTimeMillis();</span>
+<span class="fc" id="L118">        log.info(&quot;Overall calculation and validation of epoch &quot; + epoch + &quot; took &quot; +</span>
+<span class="fc" id="L119">                Math.round((overallEnd - overallStart) / 1000.0)  + &quot; seconds in total.&quot;);</span>
 
-<span class="fc" id="L113">        return epochCalculationResult;</span>
+<span class="fc" id="L121">        return epochCalculationResult;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
