@@ -5,7 +5,6 @@ import org.cardanofoundation.rewards.calculation.TreasuryCalculation;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.validation.domain.PoolReward;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -124,8 +123,15 @@ public class PoolRewardValidation {
 
         PoolHistory poolHistoryCurrentEpoch = dataProvider.getPoolHistory(poolId, epoch);
 
-        HashSet<String> accountDeregistrations = dataProvider.getDeregisteredAccountsInEpoch(epoch + 1, RANDOMNESS_STABILISATION_WINDOW);
-        HashSet<String> lateAccountDeregistrations = dataProvider.getLateAccountDeregistrationsInEpoch(epoch + 1, RANDOMNESS_STABILISATION_WINDOW);
+        HashSet<String> accountDeregistrations;
+        HashSet<String> lateAccountDeregistrations = new HashSet<>();
+        if (epoch < MAINNET_VASIL_HARDFORK_EPOCH) {
+            accountDeregistrations = dataProvider.getDeregisteredAccountsInEpoch(epoch + 1, RANDOMNESS_STABILISATION_WINDOW);
+            lateAccountDeregistrations = dataProvider.getLateAccountDeregistrationsInEpoch(epoch + 1, RANDOMNESS_STABILISATION_WINDOW);
+        } else {
+            accountDeregistrations = dataProvider.getDeregisteredAccountsInEpoch(epoch + 1, EXPECTED_SLOTS_PER_EPOCH);
+        }
+
         HashSet<String> sharedPoolRewardAddressesWithoutReward = dataProvider.findSharedPoolRewardAddressWithoutReward(epoch);
 
         HashSet<String> rewardAddresses = new HashSet<>();
@@ -158,6 +164,7 @@ public class PoolRewardValidation {
                 .toList();
 
         if (actualPoolReward.equals(BigInteger.ZERO)) {
+            log.info("Pool reward is zero for pool " + poolId + " but calculated pool reward is " + poolRewardCalculationResult.getPoolReward().longValue() + " Lovelace");
             return poolRewardCalculationResult.getPoolReward().equals(BigInteger.ZERO);
         }
 
@@ -183,7 +190,7 @@ public class PoolRewardValidation {
                 totalDifference = totalDifference.add(difference);
 
                 if (difference.compareTo(BigInteger.ZERO) > 0) {
-                    log.info("[" + rewardIndex + "] The difference between expected member " + reward.getStakeAddress() + " reward and actual member reward is : " + reward.getAmount().longValue() + " Lovelace");
+                    log.info("[" + rewardIndex + "] The difference between expected member " + reward.getStakeAddress() + " reward and actual member reward is : " + difference.longValue() + " Lovelace");
                 }
             }
             rewardIndex++;

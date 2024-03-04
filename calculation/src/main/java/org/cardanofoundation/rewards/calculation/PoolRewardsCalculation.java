@@ -104,7 +104,7 @@ public class PoolRewardsCalculation {
             return poolReward;
         }
 
-        return add(new BigDecimal(poolCost).toBigInteger(), floor(multiply(subtract(poolReward, poolCost),
+        return add(poolCost, floor(multiply(subtract(poolReward, poolCost),
                 add(margin, multiply((1 - margin), divide(relativeOwnerStake, relativeStakeOfPool))))));
     }
 

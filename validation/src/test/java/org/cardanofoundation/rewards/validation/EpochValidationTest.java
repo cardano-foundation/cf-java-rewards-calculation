@@ -67,6 +67,18 @@ public class EpochValidationTest {
 
     @Test
     @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
+    public void testCalculateEpochRewardsForEpoch415() {
+        testCalculateEpochPots(415, dbSyncDataProvider, false);
+    }
+
+    @Test
+    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
+    public void testCalculateEpochRewardsForEpoch350() {
+        testCalculateEpochPots(350, dbSyncDataProvider, true);
+    }
+
+    @Test
+    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     public void testCalculateEpochRewardsForEpoch384() {
         testCalculateEpochPots(384, jsonDataProvider, false);
     }
