@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.2](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.6.1...v0.6.2) (2024-03-04)
+
+
+### Bug Fixes
+
+* get correct registration state in case of late re-registrations ([d5dc65e](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/d5dc65e23e27e86eb364746b5c0bbd981f5aebed))
+
 ## [0.6.1](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.6.0...v0.6.1) (2024-03-02)
 
 
