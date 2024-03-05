@@ -46,7 +46,7 @@ public class PoolRewardValidationTest {
 
         PoolRewardCalculationResult poolRewardCalculationResult =
                 PoolRewardValidation.computePoolRewardInEpoch(poolId, epoch, dataProvider);
-        Assertions.assertTrue(PoolRewardValidation.poolRewardIsValid(poolRewardCalculationResult, dataProvider));
+        Assertions.assertTrue(PoolRewardValidation.validatePoolRewardCalculation(poolRewardCalculationResult, dataProvider).isValid());
     }
 
     static Stream<String> testPoolIds() {

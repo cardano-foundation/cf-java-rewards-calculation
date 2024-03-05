@@ -5,6 +5,8 @@ import org.cardanofoundation.rewards.calculation.TreasuryCalculation;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.validation.domain.PoolReward;
+import org.cardanofoundation.rewards.validation.domain.PoolValidationResult;
+import org.cardanofoundation.rewards.validation.domain.RewardValidation;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -145,42 +147,51 @@ public class PoolRewardValidation {
                 accountDeregistrations, lateAccountDeregistrations, accountsRegisteredInThePast, sharedPoolRewardAddressesWithoutReward);
     }
 
-    public static boolean poolRewardIsValid(PoolRewardCalculationResult poolRewardCalculationResult, DataProvider dataProvider) {
+    public static PoolValidationResult validatePoolRewardCalculation(PoolRewardCalculationResult poolRewardCalculationResult, DataProvider dataProvider) {
         int epoch  = poolRewardCalculationResult.getEpoch();
         HashSet<Reward> memberRewardsInEpoch = dataProvider.getMemberRewardsInEpoch(epoch);
         HashSet<PoolReward> totalPoolRewards = dataProvider.getTotalPoolRewardsInEpoch(epoch);
-        return poolRewardIsValid(poolRewardCalculationResult, memberRewardsInEpoch, totalPoolRewards);
+        return validatePoolRewardCalculation(poolRewardCalculationResult, memberRewardsInEpoch, totalPoolRewards);
     }
 
-    public static boolean poolRewardIsValid(PoolRewardCalculationResult poolRewardCalculationResult, HashSet<Reward> memberRewardsInEpoch, HashSet<PoolReward> totalPoolRewards) {
+    public static PoolValidationResult validatePoolRewardCalculation(PoolRewardCalculationResult poolRewardCalculationResult, HashSet<Reward> memberRewardsInEpoch, HashSet<PoolReward> totalPoolRewards) {
         String poolId = poolRewardCalculationResult.getPoolId();
+        PoolValidationResult poolRewardValidationResult = PoolValidationResult.from(poolRewardCalculationResult, new HashSet<>());
 
         BigInteger actualPoolReward = totalPoolRewards.stream()
                 .filter(reward -> reward.getPoolId().equals(poolId))
                 .map(PoolReward::getAmount)
                 .reduce(BigInteger.ZERO, BigInteger::add);
-        List<Reward> actualPoolRewardsInEpoch = memberRewardsInEpoch.stream()
+        HashSet<Reward> actualPoolRewardsInEpoch = memberRewardsInEpoch.stream()
                 .filter(reward -> reward.getPoolId().equals(poolId))
-                .toList();
+                .collect(toCollection(HashSet::new));
 
         if (actualPoolReward.equals(BigInteger.ZERO)) {
-            log.info("Pool reward is zero for pool " + poolId + " but calculated pool reward is " + poolRewardCalculationResult.getPoolReward().longValue() + " Lovelace");
-            return poolRewardCalculationResult.getPoolReward().equals(BigInteger.ZERO);
+            log.debug("Pool reward is zero for pool " + poolId + " but calculated pool reward is " + poolRewardCalculationResult.getPoolReward().longValue() + " Lovelace");
+            return poolRewardValidationResult;
         }
 
         BigInteger totalDifference = BigInteger.ZERO;
         int rewardIndex = 0;
+        HashSet<RewardValidation> rewardValidations = poolRewardValidationResult.getRewardValidations();
         HashSet<Reward> delegatorStakeAddresses = new HashSet<>(poolRewardCalculationResult.getMemberRewards());
         for (Reward reward : actualPoolRewardsInEpoch) {
             Reward memberReward = delegatorStakeAddresses.stream()
                     .filter(member -> member.getStakeAddress().equals(reward.getStakeAddress()))
                     .findFirst()
                     .orElse(null);
+
+            RewardValidation rewardValidation = RewardValidation.builder()
+                    .stakeAddress(reward.getStakeAddress())
+                    .expectedReward(reward.getAmount())
+                    .calculatedReward(BigInteger.ZERO).build();
+
             if (memberReward == null) {
-                log.info("Member reward not found for stake address: " + reward.getStakeAddress());
-                log.info("[" + rewardIndex + "] The expected member " + reward.getStakeAddress() + " reward would be : " + reward.getAmount().longValue() + " Lovelace");
+                log.debug("Member reward not found for stake address: " + reward.getStakeAddress());
+                log.debug("[" + rewardIndex + "] The expected member " + reward.getStakeAddress() + " reward would be : " + reward.getAmount().longValue() + " Lovelace");
                 totalDifference = totalDifference.add(reward.getAmount());
             } else {
+                rewardValidation.setCalculatedReward(memberReward.getAmount());
                 BigInteger difference = reward.getAmount().subtract(memberReward.getAmount()).abs();
 
                 if (poolRewardCalculationResult.getPoolOwnerStakeAddresses().contains(reward.getStakeAddress())) {
@@ -190,20 +201,19 @@ public class PoolRewardValidation {
                 totalDifference = totalDifference.add(difference);
 
                 if (difference.compareTo(BigInteger.ZERO) > 0) {
-                    log.info("[" + rewardIndex + "] The difference between expected member " + reward.getStakeAddress() + " reward and actual member reward is : " + difference.longValue() + " Lovelace");
+                    log.debug("[" + rewardIndex + "] The difference between expected member " + reward.getStakeAddress() + " reward and actual member reward is : " + difference.longValue() + " Lovelace");
                 }
             }
+            rewardValidations.add(rewardValidation);
             rewardIndex++;
         }
 
         if (isHigher(totalDifference, BigInteger.ZERO)) {
-            log.info("Total difference: " + totalDifference.longValue() + " Lovelace");
+            log.debug("Total difference: " + totalDifference.longValue() + " Lovelace");
         }
 
         BigInteger totalNoReward = BigInteger.ZERO;
         BigInteger coOwnerReward = BigInteger.ZERO;
-        BigInteger calculatedMemberRewards = BigInteger.ZERO;
-
         HashSet<Reward> actualRewards = new HashSet<>(actualPoolRewardsInEpoch);
 
         if (poolRewardCalculationResult.getMemberRewards() != null) {
@@ -214,7 +224,11 @@ public class PoolRewardValidation {
                         .orElse(null);
                 if (actualReward == null && isHigher(memberReward.getAmount(), BigInteger.ZERO) && !poolRewardCalculationResult.getPoolOwnerStakeAddresses().contains(memberReward.getStakeAddress())) {
                     totalNoReward = totalNoReward.add(memberReward.getAmount());
-                    log.info("No reward! The difference between expected member " + memberReward.getStakeAddress() + " reward and actual member reward is : " + memberReward.getAmount().longValue() + " Lovelace");
+                    log.debug("No reward! The difference between expected member " + memberReward.getStakeAddress() + " reward and actual member reward is : " + memberReward.getAmount().longValue() + " Lovelace");
+                    rewardValidations.add(RewardValidation.builder()
+                            .stakeAddress(memberReward.getStakeAddress())
+                            .expectedReward(BigInteger.ZERO)
+                            .calculatedReward(memberReward.getAmount()).build());
                 }
 
                 // Co-owner reward is not included in the member rewards and would be added to the reward address of the pool
@@ -224,21 +238,14 @@ public class PoolRewardValidation {
             }
 
             if (isHigher(totalNoReward, BigInteger.ZERO)) {
-                log.info("Total no reward: " + totalNoReward.longValue() + " Lovelace");
+                log.debug("Total no reward: " + totalNoReward.longValue() + " Lovelace");
             }
-
-            calculatedMemberRewards = poolRewardCalculationResult.getMemberRewards().stream().map(Reward::getAmount).reduce(BigInteger.ZERO, BigInteger::add);
         }
 
-        boolean isValid = actualPoolReward
-                .subtract(calculatedMemberRewards.subtract(coOwnerReward)
-                        .add(poolRewardCalculationResult.getOperatorReward())).equals(BigInteger.ZERO) &&
-                actualPoolReward.subtract(poolRewardCalculationResult.getDistributedPoolReward()).equals(BigInteger.ZERO);
-
-        if (!isValid) {
-            log.info("The difference between expected pool reward and actual pool reward is : " + actualPoolReward.subtract(poolRewardCalculationResult.getDistributedPoolReward()).longValue() + " Lovelace");
+        if (!poolRewardValidationResult.isValid()) {
+            log.debug("The difference between expected pool reward and actual pool reward is : " + poolRewardValidationResult.getOffset().longValue() + " Lovelace");
         }
 
-        return isValid;
+        return poolRewardValidationResult;
     }
 }
