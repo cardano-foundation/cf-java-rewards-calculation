@@ -56,7 +56,7 @@ public class EpochValidationTest {
     @ParameterizedTest
     @MethodSource("dataProviderEpochRange")
     public void testCalculateEpochRewardsWithJsonDataProvider(int epoch) {
-        testCalculateEpochPots(epoch, jsonDataProvider, true);
+        testCalculateEpochPots(epoch, jsonDataProvider, false);
     }
 
     @Test
