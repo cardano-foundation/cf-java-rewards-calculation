@@ -4,13 +4,13 @@ import org.cardanofoundation.rewards.calculation.EpochCalculation;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.validation.domain.PoolReward;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
+import org.cardanofoundation.rewards.validation.domain.PoolValidationResult;
 
 import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
 
@@ -86,8 +86,8 @@ import static org.cardanofoundation.rewards.calculation.constants.RewardConstant
 <span class="fc" id="L86">        HashSet&lt;Reward&gt; memberRewardsInEpoch = new HashSet&lt;&gt;();</span>
 <span class="fc" id="L87">        HashSet&lt;PoolReward&gt; totalPoolRewards = new HashSet&lt;&gt;();</span>
 <span class="pc bpc" id="L88" title="1 of 2 branches missed.">        if (detailedValidation) {</span>
-<span class="fc" id="L89">            memberRewardsInEpoch = dataProvider.getMemberRewardsInEpoch(epoch - 2);</span>
-<span class="fc" id="L90">            totalPoolRewards = dataProvider.getTotalPoolRewardsInEpoch(epoch - 2);</span>
+<span class="nc" id="L89">            memberRewardsInEpoch = dataProvider.getMemberRewardsInEpoch(epoch - 2);</span>
+<span class="nc" id="L90">            totalPoolRewards = dataProvider.getTotalPoolRewardsInEpoch(epoch - 2);</span>
         }
 <span class="fc" id="L92">        long end = System.currentTimeMillis();</span>
 <span class="fc" id="L93">        log.debug(&quot;Obtaining the epoch data took &quot; + Math.round((end - start) / 1000.0) + &quot;s&quot;);</span>
@@ -102,23 +102,32 @@ import static org.cardanofoundation.rewards.calculation.constants.RewardConstant
 <span class="fc" id="L102">        log.debug(&quot;Epoch calculation took &quot; + Math.round((end - start) / 1000.0) + &quot;s&quot;);</span>
 
 <span class="pc bpc" id="L104" title="1 of 2 branches missed.">        if (detailedValidation) {</span>
-<span class="fc" id="L105">            log.debug(&quot;Start epoch validation&quot;);</span>
+<span class="nc" id="L105">            log.debug(&quot;Start epoch validation&quot;);</span>
 
-<span class="fc" id="L107">            start = System.currentTimeMillis();</span>
-<span class="fc bfc" id="L108" title="All 2 branches covered.">            for (PoolRewardCalculationResult poolRewardCalculationResult : epochCalculationResult.getPoolRewardCalculationResults()) {</span>
-<span class="fc bfc" id="L109" title="All 2 branches covered.">                if (!PoolRewardValidation.poolRewardIsValid(poolRewardCalculationResult, memberRewardsInEpoch, totalPoolRewards)) {</span>
-<span class="fc" id="L110">                    log.info(&quot;Pool reward is invalid. Please check the details for pool &quot; + poolRewardCalculationResult.getPoolId());</span>
+<span class="nc" id="L107">            long validationStart = System.currentTimeMillis();</span>
+<span class="nc" id="L108">            List&lt;PoolValidationResult&gt; poolValidationResults = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">            for (PoolRewardCalculationResult poolRewardCalculationResult : epochCalculationResult.getPoolRewardCalculationResults()) {</span>
+<span class="nc" id="L110">                start = System.currentTimeMillis();</span>
+<span class="nc" id="L111">                PoolValidationResult poolValidationResult = PoolRewardValidation.validatePoolRewardCalculation(poolRewardCalculationResult, memberRewardsInEpoch, totalPoolRewards);</span>
+<span class="nc" id="L112">                poolValidationResults.add(poolValidationResult);</span>
+
+<span class="nc bnc" id="L114" title="All 2 branches missed.">                if (!poolValidationResult.isValid()) {</span>
+<span class="nc" id="L115">                    log.debug(&quot;Pool reward is invalid. Please check the details for pool &quot; + poolRewardCalculationResult.getPoolId());</span>
                 }
-<span class="fc" id="L112">            }</span>
-<span class="fc" id="L113">            end = System.currentTimeMillis();</span>
-<span class="fc" id="L114">            log.debug(&quot;Epoch validation took &quot; + Math.round((end - start) / 1000.0) + &quot;s&quot;);</span>
+<span class="nc" id="L117">                end = System.currentTimeMillis();</span>
+<span class="nc" id="L118">                log.info(&quot;Validation of pool &quot; + poolRewardCalculationResult.getPoolId() + &quot; took &quot; + Math.round((end - start) / 1000.0) + &quot;s&quot;);</span>
+<span class="nc" id="L119">            }</span>
+<span class="nc" id="L120">            poolValidationResults.sort(Comparator.comparing(PoolValidationResult::getOffset).reversed());</span>
+<span class="nc" id="L121">            log.info(&quot;The pool with the largest offset is &quot; + poolValidationResults.get(0).getPoolId() + &quot; with an offset of &quot; + poolValidationResults.get(0).getOffset());</span>
+<span class="nc" id="L122">            long validationEnd = System.currentTimeMillis();</span>
+<span class="nc" id="L123">            log.debug(&quot;Epoch validation took &quot; + Math.round((validationEnd - validationStart) / 1000.0) + &quot;s&quot;);</span>
         }
 
-<span class="fc" id="L117">        long overallEnd = System.currentTimeMillis();</span>
-<span class="fc" id="L118">        log.info(&quot;Overall calculation and validation of epoch &quot; + epoch + &quot; took &quot; +</span>
-<span class="fc" id="L119">                Math.round((overallEnd - overallStart) / 1000.0)  + &quot; seconds in total.&quot;);</span>
+<span class="fc" id="L126">        long overallEnd = System.currentTimeMillis();</span>
+<span class="fc" id="L127">        log.info(&quot;Overall calculation and validation of epoch &quot; + epoch + &quot; took &quot; +</span>
+<span class="fc" id="L128">                Math.round((overallEnd - overallStart) / 1000.0)  + &quot; seconds in total.&quot;);</span>
 
-<span class="fc" id="L121">        return epochCalculationResult;</span>
+<span class="fc" id="L130">        return epochCalculationResult;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

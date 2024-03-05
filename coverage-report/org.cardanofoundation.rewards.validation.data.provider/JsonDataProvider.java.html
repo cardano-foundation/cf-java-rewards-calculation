@@ -231,7 +231,7 @@ import static org.cardanofoundation.rewards.validation.util.JsonConverter.readJs
 
     @Override
     public HashSet&lt;Reward&gt; getMemberRewardsInEpoch(int epoch) {
-<span class="fc bfc" id="L234" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new HashSet&lt;&gt;();</span>
+<span class="pc bpc" id="L234" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new HashSet&lt;&gt;();</span>
 
 <span class="fc" id="L236">        HashSet&lt;Reward&gt; rewards = getHashSetFromJson(MEMBER_REWARDS, epoch, Reward.class);</span>
 <span class="pc bpc" id="L237" title="1 of 2 branches missed.">        if (rewards == null) return new HashSet&lt;&gt;();</span>
@@ -254,7 +254,7 @@ import static org.cardanofoundation.rewards.validation.util.JsonConverter.readJs
 
     @Override
     public HashSet&lt;PoolReward&gt; getTotalPoolRewardsInEpoch(int epoch) {
-<span class="fc bfc" id="L257" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new HashSet&lt;&gt;();</span>
+<span class="pc bpc" id="L257" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new HashSet&lt;&gt;();</span>
 
 <span class="fc" id="L259">        HashSet&lt;PoolReward&gt; totalPoolRewards = getHashSetFromJson(REWARDS, epoch, PoolReward.class);</span>
 <span class="pc bpc" id="L260" title="1 of 2 branches missed.">        if (totalPoolRewards == null) return new HashSet&lt;&gt;();</span>
