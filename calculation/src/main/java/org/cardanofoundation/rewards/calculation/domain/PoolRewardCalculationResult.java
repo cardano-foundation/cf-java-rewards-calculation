@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.List;
 
 @Builder
@@ -16,7 +17,7 @@ public class PoolRewardCalculationResult {
     String poolId;
     String rewardAddress;
     BigInteger stakePoolRewardsPot;
-    List<Reward> memberRewards;
+    HashSet<Reward> memberRewards;
     BigInteger operatorReward;
     BigInteger optimalPoolReward;
     BigInteger poolReward;

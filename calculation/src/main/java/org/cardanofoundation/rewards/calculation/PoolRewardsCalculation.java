@@ -229,7 +229,7 @@ public class PoolRewardsCalculation {
 
         // Step 11: Calculate pool member reward
         BigInteger poolMemberRewards = BigInteger.ZERO;
-        final List<Reward> memberRewards = new ArrayList<>();
+        final HashSet<Reward> memberRewards = new HashSet<>();
         for (Delegator delegator : poolHistoryCurrentEpoch.getDelegators()) {
             final String stakeAddress = delegator.getStakeAddress();
 

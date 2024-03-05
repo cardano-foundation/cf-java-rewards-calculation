@@ -4,13 +4,13 @@ import org.cardanofoundation.rewards.calculation.EpochCalculation;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.validation.domain.PoolReward;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
+import org.cardanofoundation.rewards.validation.domain.PoolValidationResult;
 
 import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
 
@@ -104,14 +104,23 @@ public class EpochValidation {
         if (detailedValidation) {
             log.debug("Start epoch validation");
 
-            start = System.currentTimeMillis();
+            long validationStart = System.currentTimeMillis();
+            List<PoolValidationResult> poolValidationResults = new ArrayList<>();
             for (PoolRewardCalculationResult poolRewardCalculationResult : epochCalculationResult.getPoolRewardCalculationResults()) {
-                if (!PoolRewardValidation.poolRewardIsValid(poolRewardCalculationResult, memberRewardsInEpoch, totalPoolRewards)) {
-                    log.info("Pool reward is invalid. Please check the details for pool " + poolRewardCalculationResult.getPoolId());
+                start = System.currentTimeMillis();
+                PoolValidationResult poolValidationResult = PoolRewardValidation.validatePoolRewardCalculation(poolRewardCalculationResult, memberRewardsInEpoch, totalPoolRewards);
+                poolValidationResults.add(poolValidationResult);
+
+                if (!poolValidationResult.isValid()) {
+                    log.debug("Pool reward is invalid. Please check the details for pool " + poolRewardCalculationResult.getPoolId());
                 }
+                end = System.currentTimeMillis();
+                log.info("Validation of pool " + poolRewardCalculationResult.getPoolId() + " took " + Math.round((end - start) / 1000.0) + "s");
             }
-            end = System.currentTimeMillis();
-            log.debug("Epoch validation took " + Math.round((end - start) / 1000.0) + "s");
+            poolValidationResults.sort(Comparator.comparing(PoolValidationResult::getOffset).reversed());
+            log.info("The pool with the largest offset is " + poolValidationResults.get(0).getPoolId() + " with an offset of " + poolValidationResults.get(0).getOffset());
+            long validationEnd = System.currentTimeMillis();
+            log.debug("Epoch validation took " + Math.round((validationEnd - validationStart) / 1000.0) + "s");
         }
 
         long overallEnd = System.currentTimeMillis();

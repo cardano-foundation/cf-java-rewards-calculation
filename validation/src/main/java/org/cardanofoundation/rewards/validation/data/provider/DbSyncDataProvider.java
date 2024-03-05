@@ -75,9 +75,11 @@ public class DbSyncDataProvider implements DataProvider {
         }
 
         DbSyncEpoch dbSyncEpoch = dbSyncEpochRepository.findByNumber(epoch);
-        // We need to fetch the block count separately from the epoch
+        // We need to fetch the block count and fee separately from the epoch
         // because of https://github.com/IntersectMBO/cardano-db-sync/issues/1457
         Integer blockCount = dbSyncBlockRepository.countByEpochNo(epoch);
+        BigInteger fees = this.getSumOfFeesInEpoch(epoch);
+
         Epoch epochInfo = EpochMapper.fromDbSyncEpoch(dbSyncEpoch);
         epochInfo.setBlockCount(blockCount);
 
@@ -95,6 +97,7 @@ public class DbSyncDataProvider implements DataProvider {
         }
 
         BigInteger epochStake = dbSyncEpochStakeRepository.getEpochStakeByEpoch(epoch);
+        epochInfo.setFees(fees);
         epochInfo.setActiveStake(epochStake);
 
         return epochInfo;
