@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.7.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.6.2...v0.7.0) (2024-03-05)
+
+
+### Features
+
+* prepare workflow file to push the artifacts to maven central. Closes [#16](https://github.com/cardano-foundation/cf-java-rewards-calculation/issues/16) ([35e25a6](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/35e25a614b023cc824040936c8dd93b701306fc2))
+
+
+### Bug Fixes
+
+* add workaround to prevent wrong fees due to db sync issue 1457 ([31bdb5a](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/31bdb5ae826d88f95c324f41b71d2fa9d400f6d5))
+
 ## [0.6.2](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.6.1...v0.6.2) (2024-03-04)
 
 
