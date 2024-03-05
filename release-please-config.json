@@ -11,12 +11,12 @@
     {
       "type": "xml",
       "path": "calculation/pom.xml",
-      "xpath": "//project/version"
+      "xpath": "//project/parent/version"
     },
     {
       "type": "xml",
       "path": "validation/pom.xml",
-      "xpath": "//project/version"
+      "xpath": "//project/parent/version"
     }
   ],
   "packages": {

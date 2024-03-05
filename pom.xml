@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.cardanofoundation</groupId>
     <artifactId>cf-rewards</artifactId>
-    <version>0.6.3</version>
+    <version>0.7.0</version>
     <name>cardano-reward-calculation</name>
     <modules>
         <module>calculation</module>
