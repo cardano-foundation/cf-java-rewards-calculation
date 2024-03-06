@@ -25,8 +25,8 @@ cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSync
 cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSyncAccountDeregistration,15,0,0,0,5,0,5,0,5,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSyncBlock,18,0,0,0,6,0,6,0,6,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSyncSlotLeader,9,0,0,0,3,0,3,0,3,0
-cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSyncAccountRegistration,15,0,0,0,5,0,5,0,5,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSyncTransaction,15,0,0,0,5,0,5,0,5,0
+cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSyncAccountRegistration,15,0,0,0,5,0,5,0,5,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSyncPoolUpdate,27,0,0,0,9,0,9,0,9,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSyncReward,24,0,0,0,8,0,8,0,8,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSyncWithdrawal,12,0,0,0,4,0,4,0,4,0
