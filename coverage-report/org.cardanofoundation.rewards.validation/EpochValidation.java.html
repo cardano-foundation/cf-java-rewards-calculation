@@ -67,7 +67,7 @@ import static org.cardanofoundation.rewards.calculation.constants.RewardConstant
 
         HashSet&lt;String&gt; deregisteredAccounts;
 <span class="fc" id="L69">        HashSet&lt;String&gt; lateDeregisteredAccounts = new HashSet&lt;&gt;();</span>
-<span class="pc bpc" id="L70" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_VASIL_HARDFORK_EPOCH) {</span>
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">        if (epoch - 2 &lt; MAINNET_VASIL_HARDFORK_EPOCH) {</span>
 <span class="fc" id="L71">            deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);</span>
 <span class="fc" id="L72">            lateDeregisteredAccounts = dataProvider.getLateAccountDeregistrationsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);</span>
         } else {
@@ -112,10 +112,10 @@ import static org.cardanofoundation.rewards.calculation.constants.RewardConstant
 <span class="nc" id="L112">                poolValidationResults.add(poolValidationResult);</span>
 
 <span class="nc bnc" id="L114" title="All 2 branches missed.">                if (!poolValidationResult.isValid()) {</span>
-<span class="nc" id="L115">                    log.debug(&quot;Pool reward is invalid. Please check the details for pool &quot; + poolRewardCalculationResult.getPoolId());</span>
+<span class="nc" id="L115">                    log.info(&quot;Pool reward is invalid. Please check the details for pool &quot; + poolRewardCalculationResult.getPoolId());</span>
                 }
 <span class="nc" id="L117">                end = System.currentTimeMillis();</span>
-<span class="nc" id="L118">                log.info(&quot;Validation of pool &quot; + poolRewardCalculationResult.getPoolId() + &quot; took &quot; + Math.round((end - start) / 1000.0) + &quot;s&quot;);</span>
+<span class="nc" id="L118">                log.debug(&quot;Validation of pool &quot; + poolRewardCalculationResult.getPoolId() + &quot; took &quot; + Math.round((end - start) / 1000.0) + &quot;s&quot;);</span>
 <span class="nc" id="L119">            }</span>
 <span class="nc" id="L120">            poolValidationResults.sort(Comparator.comparing(PoolValidationResult::getOffset).reversed());</span>
 <span class="nc" id="L121">            log.info(&quot;The pool with the largest offset is &quot; + poolValidationResults.get(0).getPoolId() + &quot; with an offset of &quot; + poolValidationResults.get(0).getOffset());</span>

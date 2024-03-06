@@ -321,48 +321,49 @@ import static org.cardanofoundation.rewards.validation.util.JsonConverter.writeO
 <span class="nc" id="L321">    }</span>
 
     private void fetchLateAccountDeregistrationsInEpoch(int epoch, boolean override, boolean mainnet) {
-<span class="nc bnc" id="L324" title="All 4 branches missed.">        if (mainnet &amp;&amp; epoch &gt;= MAINNET_VASIL_HARDFORK_EPOCH) {</span>
-<span class="nc" id="L325">            return;</span>
+<span class="nc" id="L324">        int earnedEpoch = epoch - 2;</span>
+<span class="nc bnc" id="L325" title="All 4 branches missed.">        if (mainnet &amp;&amp; earnedEpoch &gt; MAINNET_VASIL_HARDFORK_EPOCH) {</span>
+<span class="nc" id="L326">            return;</span>
         }
 
-<span class="nc" id="L328">        String filePath = String.format(&quot;%s/%s/epoch%d.json&quot;, sourceFolder, LATE_DEREGISTRATIONS.resourceFolderName, epoch);</span>
-<span class="nc" id="L329">        File outputFile = new File(filePath);</span>
+<span class="nc" id="L329">        String filePath = String.format(&quot;%s/%s/epoch%d.json&quot;, sourceFolder, LATE_DEREGISTRATIONS.resourceFolderName, epoch);</span>
+<span class="nc" id="L330">        File outputFile = new File(filePath);</span>
 
-<span class="nc bnc" id="L331" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
-<span class="nc" id="L332">            logger.info(&quot;Skip to fetch LateAccountDeregistrations for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
-<span class="nc" id="L333">            return;</span>
+<span class="nc bnc" id="L332" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
+<span class="nc" id="L333">            logger.info(&quot;Skip to fetch LateAccountDeregistrations for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
+<span class="nc" id="L334">            return;</span>
         }
 
-<span class="nc" id="L336">        HashSet&lt;String&gt; lateDeregisteredAccounts = dbSyncDataProvider.getLateAccountDeregistrationsInEpoch(epoch, RANDOMNESS_STABILISATION_WINDOW);</span>
-<span class="nc bnc" id="L337" title="All 2 branches missed.">        if (lateDeregisteredAccounts == null) {</span>
-<span class="nc" id="L338">            logger.error(&quot;Failed to fetch LateAccountDeregistrations for epoch &quot; + epoch);</span>
-<span class="nc" id="L339">            return;</span>
+<span class="nc" id="L337">        HashSet&lt;String&gt; lateDeregisteredAccounts = dbSyncDataProvider.getLateAccountDeregistrationsInEpoch(epoch, RANDOMNESS_STABILISATION_WINDOW);</span>
+<span class="nc bnc" id="L338" title="All 2 branches missed.">        if (lateDeregisteredAccounts == null) {</span>
+<span class="nc" id="L339">            logger.error(&quot;Failed to fetch LateAccountDeregistrations for epoch &quot; + epoch);</span>
+<span class="nc" id="L340">            return;</span>
         }
 
         try {
-<span class="nc" id="L343">            writeObjectToJsonFile(lateDeregisteredAccounts, filePath);</span>
-<span class="nc" id="L344">        } catch (IOException e) {</span>
-<span class="nc" id="L345">            logger.error(&quot;Failed to write LateAccountDeregistrations to json file for epoch &quot; + epoch);</span>
-<span class="nc" id="L346">        }</span>
-<span class="nc" id="L347">    }</span>
+<span class="nc" id="L344">            writeObjectToJsonFile(lateDeregisteredAccounts, filePath);</span>
+<span class="nc" id="L345">        } catch (IOException e) {</span>
+<span class="nc" id="L346">            logger.error(&quot;Failed to write LateAccountDeregistrations to json file for epoch &quot; + epoch);</span>
+<span class="nc" id="L347">        }</span>
+<span class="nc" id="L348">    }</span>
 
     @Override
     public void fetch(int epoch, boolean override, boolean skipValidationData) {
-<span class="nc" id="L351">        fetchAdaPotsInEpoch(epoch, override);</span>
-<span class="nc" id="L352">        fetchEpochInfo(epoch, override);</span>
-<span class="nc" id="L353">        fetchProtocolParameters(epoch, override);</span>
-<span class="nc" id="L354">        fetchRetiredPoolsInEpoch(epoch, override);</span>
-<span class="nc" id="L355">        fetchHistoryOfAllPoolsInEpoch(epoch, override);</span>
-<span class="nc" id="L356">        fetchDeregisteredAccountsInEpoch(epoch, override, true);</span>
-<span class="nc" id="L357">        fetchLateAccountDeregistrationsInEpoch(epoch, override, true);</span>
-<span class="nc" id="L358">        fetchSharedPoolRewardAddressWithoutReward(epoch, override);</span>
-<span class="nc" id="L359">        fetchMirCertificatesInEpoch(epoch, override);</span>
-<span class="nc" id="L360">        fetchStakeAddressesWithRegistrationsUntilEpoch(epoch, override);</span>
+<span class="nc" id="L352">        fetchAdaPotsInEpoch(epoch, override);</span>
+<span class="nc" id="L353">        fetchEpochInfo(epoch, override);</span>
+<span class="nc" id="L354">        fetchProtocolParameters(epoch, override);</span>
+<span class="nc" id="L355">        fetchRetiredPoolsInEpoch(epoch, override);</span>
+<span class="nc" id="L356">        fetchHistoryOfAllPoolsInEpoch(epoch, override);</span>
+<span class="nc" id="L357">        fetchDeregisteredAccountsInEpoch(epoch, override, true);</span>
+<span class="nc" id="L358">        fetchLateAccountDeregistrationsInEpoch(epoch, override, true);</span>
+<span class="nc" id="L359">        fetchSharedPoolRewardAddressWithoutReward(epoch, override);</span>
+<span class="nc" id="L360">        fetchMirCertificatesInEpoch(epoch, override);</span>
+<span class="nc" id="L361">        fetchStakeAddressesWithRegistrationsUntilEpoch(epoch, override);</span>
 
-<span class="nc bnc" id="L362" title="All 2 branches missed.">        if (!skipValidationData) {</span>
-<span class="nc" id="L363">            fetchMemberRewardsInEpoch(epoch, override);</span>
-<span class="nc" id="L364">            fetchSumOfMemberAndLeaderRewardsInEpoch(epoch, override);</span>
+<span class="nc bnc" id="L363" title="All 2 branches missed.">        if (!skipValidationData) {</span>
+<span class="nc" id="L364">            fetchMemberRewardsInEpoch(epoch, override);</span>
+<span class="nc" id="L365">            fetchSumOfMemberAndLeaderRewardsInEpoch(epoch, override);</span>
         }
-<span class="nc" id="L366">    }</span>
+<span class="nc" id="L367">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

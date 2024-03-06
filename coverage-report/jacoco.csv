@@ -2,7 +2,7 @@ GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_
 cf-rewards-validation,org.cardanofoundation.rewards.validation.data.plotter,JsonDataPlotter,59,7,4,0,17,2,3,2,1,2
 cf-rewards-validation,org.cardanofoundation.rewards.validation.util,JsonConverter,67,35,10,0,20,7,7,2,2,2
 cf-rewards-validation,org.cardanofoundation.rewards.validation.data.fetcher,KoiosDataFetcher,546,7,54,0,123,2,35,2,8,2
-cf-rewards-validation,org.cardanofoundation.rewards.validation.data.fetcher,DbSyncDataFetcher,926,7,86,0,213,2,56,2,13,2
+cf-rewards-validation,org.cardanofoundation.rewards.validation.data.fetcher,DbSyncDataFetcher,930,7,86,0,214,2,56,2,13,2
 cf-rewards-validation,org.cardanofoundation.rewards.validation.mapper,ProtocolParametersMapper,58,0,4,0,17,0,5,0,3,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation.mapper,DelegatorMapper,12,0,0,0,5,0,2,0,2,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation.mapper,RewardMapper,33,0,4,0,12,0,5,0,3,0
@@ -25,8 +25,8 @@ cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSync
 cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSyncAccountDeregistration,15,0,0,0,5,0,5,0,5,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSyncBlock,18,0,0,0,6,0,6,0,6,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSyncSlotLeader,9,0,0,0,3,0,3,0,3,0
-cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSyncTransaction,15,0,0,0,5,0,5,0,5,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSyncAccountRegistration,15,0,0,0,5,0,5,0,5,0
+cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSyncTransaction,15,0,0,0,5,0,5,0,5,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSyncPoolUpdate,27,0,0,0,9,0,9,0,9,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSyncReward,24,0,0,0,8,0,8,0,8,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSyncWithdrawal,12,0,0,0,4,0,4,0,4,0
@@ -34,10 +34,10 @@ cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.jpa,DbSync
 cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.persistence,AggregationsInEpoch,40,0,0,0,7,0,9,0,9,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation.entity.persistence,AggregationsInEpoch.AggregationsInEpochBuilder,36,0,0,0,1,0,6,0,6,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation,TreasuryValidation,3,107,0,0,1,17,1,1,1,1
-cf-rewards-validation,org.cardanofoundation.rewards.validation,PoolRewardValidation,113,465,17,33,20,104,17,18,1,9
+cf-rewards-validation,org.cardanofoundation.rewards.validation,PoolRewardValidation,113,470,17,33,20,105,17,18,1,9
 cf-rewards-validation,org.cardanofoundation.rewards.validation,DepositsValidation,33,0,2,0,10,0,3,0,2,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation,UtxoValidation,59,0,6,0,14,0,6,0,3,0
-cf-rewards-validation,org.cardanofoundation.rewards.validation,EpochValidation,141,234,9,7,35,53,9,3,2,2
+cf-rewards-validation,org.cardanofoundation.rewards.validation,EpochValidation,141,236,9,7,35,53,9,3,2,2
 cf-rewards-validation,org.cardanofoundation.rewards.validation,FeeValidation,16,0,2,0,5,0,3,0,2,0
 cf-rewards-validation,org.cardanofoundation.rewards.validation.enums,DataType,0,144,0,0,0,23,0,2,0,2
 cf-rewards-validation,org.cardanofoundation.rewards.validation.enums,DbSyncRewardType,78,0,4,0,14,0,6,0,4,0
@@ -45,8 +45,8 @@ cf-rewards-validation,org.cardanofoundation.rewards.validation.enums,DataProvide
 cf-rewards-validation,org.cardanofoundation.rewards,RewardsApplication,110,37,13,5,22,10,12,3,3,3
 cf-rewards-validation,org.cardanofoundation.rewards.validation.domain,PoolReward,34,21,2,0,10,4,5,6,4,6
 cf-rewards-validation,org.cardanofoundation.rewards.validation.domain,TreasuryValidationResult.TreasuryValidationResultBuilder,19,44,0,0,0,1,2,7,2,7
-cf-rewards-validation,org.cardanofoundation.rewards.validation.domain,PoolValidationResult,27,64,0,0,8,12,8,4,8,4
+cf-rewards-validation,org.cardanofoundation.rewards.validation.domain,PoolValidationResult,30,61,0,0,9,11,9,3,9,3
 cf-rewards-validation,org.cardanofoundation.rewards.validation.domain,TreasuryValidationResult,37,55,1,1,6,13,11,6,10,6
 cf-rewards-validation,org.cardanofoundation.rewards.validation.domain,PoolReward.PoolRewardBuilder,36,0,0,0,1,0,6,0,6,0
-cf-rewards-validation,org.cardanofoundation.rewards.validation.domain,RewardValidation,27,23,0,0,5,3,8,3,8,3
+cf-rewards-validation,org.cardanofoundation.rewards.validation.domain,RewardValidation,21,29,0,0,3,5,6,5,6,5
 cf-rewards-validation,org.cardanofoundation.rewards.validation.domain,RewardValidation.RewardValidationBuilder,15,30,0,0,0,1,2,5,2,5

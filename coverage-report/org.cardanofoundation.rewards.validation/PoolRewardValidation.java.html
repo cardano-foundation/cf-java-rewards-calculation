@@ -167,13 +167,13 @@ import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 <span class="fc" id="L167">                .collect(toCollection(HashSet::new));</span>
 
 <span class="fc bfc" id="L169" title="All 2 branches covered.">        if (actualPoolReward.equals(BigInteger.ZERO)) {</span>
-<span class="fc" id="L170">            log.debug(&quot;Pool reward is zero for pool &quot; + poolId + &quot; but calculated pool reward is &quot; + poolRewardCalculationResult.getPoolReward().longValue() + &quot; Lovelace&quot;);</span>
+<span class="fc" id="L170">            log.info(&quot;Pool reward is zero for pool &quot; + poolId + &quot; but calculated pool reward is &quot; + poolRewardCalculationResult.getPoolReward().longValue() + &quot; Lovelace&quot;);</span>
 <span class="fc" id="L171">            return poolRewardValidationResult;</span>
         }
 
 <span class="fc" id="L174">        BigInteger totalDifference = BigInteger.ZERO;</span>
 <span class="fc" id="L175">        int rewardIndex = 0;</span>
-<span class="fc" id="L176">        HashSet&lt;RewardValidation&gt; rewardValidations = poolRewardValidationResult.getRewardValidations();</span>
+<span class="fc" id="L176">        HashSet&lt;RewardValidation&gt; rewardValidations = new HashSet&lt;&gt;();</span>
 <span class="fc" id="L177">        HashSet&lt;Reward&gt; delegatorStakeAddresses = new HashSet&lt;&gt;(poolRewardCalculationResult.getMemberRewards());</span>
 <span class="fc bfc" id="L178" title="All 2 branches covered.">        for (Reward reward : actualPoolRewardsInEpoch) {</span>
 <span class="fc" id="L179">            Reward memberReward = delegatorStakeAddresses.stream()</span>
@@ -187,8 +187,8 @@ import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 <span class="fc" id="L187">                    .calculatedReward(BigInteger.ZERO).build();</span>
 
 <span class="pc bpc" id="L189" title="1 of 2 branches missed.">            if (memberReward == null) {</span>
-<span class="nc" id="L190">                log.debug(&quot;Member reward not found for stake address: &quot; + reward.getStakeAddress());</span>
-<span class="nc" id="L191">                log.debug(&quot;[&quot; + rewardIndex + &quot;] The expected member &quot; + reward.getStakeAddress() + &quot; reward would be : &quot; + reward.getAmount().longValue() + &quot; Lovelace&quot;);</span>
+<span class="nc" id="L190">                log.info(&quot;Member reward not found for stake address: &quot; + reward.getStakeAddress());</span>
+<span class="nc" id="L191">                log.info(&quot;[&quot; + rewardIndex + &quot;] The expected member &quot; + reward.getStakeAddress() + &quot; reward would be : &quot; + reward.getAmount().longValue() + &quot; Lovelace&quot;);</span>
 <span class="nc" id="L192">                totalDifference = totalDifference.add(reward.getAmount());</span>
             } else {
 <span class="fc" id="L194">                rewardValidation.setCalculatedReward(memberReward.getAmount());</span>
@@ -201,7 +201,7 @@ import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 <span class="fc" id="L201">                totalDifference = totalDifference.add(difference);</span>
 
 <span class="pc bpc" id="L203" title="1 of 2 branches missed.">                if (difference.compareTo(BigInteger.ZERO) &gt; 0) {</span>
-<span class="nc" id="L204">                    log.debug(&quot;[&quot; + rewardIndex + &quot;] The difference between expected member &quot; + reward.getStakeAddress() + &quot; reward and actual member reward is : &quot; + difference.longValue() + &quot; Lovelace&quot;);</span>
+<span class="nc" id="L204">                    log.info(&quot;[&quot; + rewardIndex + &quot;] The difference between expected member &quot; + reward.getStakeAddress() + &quot; reward and actual member reward is : &quot; + difference.longValue() + &quot; Lovelace&quot;);</span>
                 }
             }
 <span class="fc" id="L207">            rewardValidations.add(rewardValidation);</span>
@@ -209,7 +209,7 @@ import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 <span class="fc" id="L209">        }</span>
 
 <span class="pc bpc" id="L211" title="1 of 2 branches missed.">        if (isHigher(totalDifference, BigInteger.ZERO)) {</span>
-<span class="nc" id="L212">            log.debug(&quot;Total difference: &quot; + totalDifference.longValue() + &quot; Lovelace&quot;);</span>
+<span class="nc" id="L212">            log.info(&quot;Total difference: &quot; + totalDifference.longValue() + &quot; Lovelace&quot;);</span>
         }
 
 <span class="fc" id="L215">        BigInteger totalNoReward = BigInteger.ZERO;</span>
@@ -224,7 +224,7 @@ import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 <span class="fc" id="L224">                        .orElse(null);</span>
 <span class="pc bpc" id="L225" title="3 of 6 branches missed.">                if (actualReward == null &amp;&amp; isHigher(memberReward.getAmount(), BigInteger.ZERO) &amp;&amp; !poolRewardCalculationResult.getPoolOwnerStakeAddresses().contains(memberReward.getStakeAddress())) {</span>
 <span class="nc" id="L226">                    totalNoReward = totalNoReward.add(memberReward.getAmount());</span>
-<span class="nc" id="L227">                    log.debug(&quot;No reward! The difference between expected member &quot; + memberReward.getStakeAddress() + &quot; reward and actual member reward is : &quot; + memberReward.getAmount().longValue() + &quot; Lovelace&quot;);</span>
+<span class="nc" id="L227">                    log.info(&quot;No reward! The difference between expected member &quot; + memberReward.getStakeAddress() + &quot; reward and actual member reward is : &quot; + memberReward.getAmount().longValue() + &quot; Lovelace&quot;);</span>
 <span class="nc" id="L228">                    rewardValidations.add(RewardValidation.builder()</span>
 <span class="nc" id="L229">                            .stakeAddress(memberReward.getStakeAddress())</span>
 <span class="nc" id="L230">                            .expectedReward(BigInteger.ZERO)</span>
@@ -238,15 +238,17 @@ import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 <span class="fc" id="L238">            }</span>
 
 <span class="pc bpc" id="L240" title="1 of 2 branches missed.">            if (isHigher(totalNoReward, BigInteger.ZERO)) {</span>
-<span class="nc" id="L241">                log.debug(&quot;Total no reward: &quot; + totalNoReward.longValue() + &quot; Lovelace&quot;);</span>
+<span class="nc" id="L241">                log.info(&quot;Total no reward: &quot; + totalNoReward.longValue() + &quot; Lovelace&quot;);</span>
             }
         }
 
-<span class="pc bpc" id="L245" title="1 of 2 branches missed.">        if (!poolRewardValidationResult.isValid()) {</span>
-<span class="nc" id="L246">            log.debug(&quot;The difference between expected pool reward and actual pool reward is : &quot; + poolRewardValidationResult.getOffset().longValue() + &quot; Lovelace&quot;);</span>
+<span class="fc" id="L245">        poolRewardValidationResult = PoolValidationResult.from(poolRewardCalculationResult, rewardValidations);</span>
+
+<span class="pc bpc" id="L247" title="1 of 2 branches missed.">        if (!poolRewardValidationResult.isValid()) {</span>
+<span class="nc" id="L248">            log.info(&quot;The difference between expected pool reward and actual pool reward is : &quot; + poolRewardValidationResult.getOffset().longValue() + &quot; Lovelace&quot;);</span>
         }
 
-<span class="fc" id="L249">        return poolRewardValidationResult;</span>
+<span class="fc" id="L251">        return poolRewardValidationResult;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
