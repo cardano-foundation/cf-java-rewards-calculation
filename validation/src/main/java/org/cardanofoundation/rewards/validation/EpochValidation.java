@@ -67,7 +67,7 @@ public class EpochValidation {
 
         HashSet<String> deregisteredAccounts;
         HashSet<String> lateDeregisteredAccounts = new HashSet<>();
-        if (epoch < MAINNET_VASIL_HARDFORK_EPOCH) {
+        if (epoch - 2 < MAINNET_VASIL_HARDFORK_EPOCH) {
             deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);
             lateDeregisteredAccounts = dataProvider.getLateAccountDeregistrationsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);
         } else {
@@ -112,10 +112,10 @@ public class EpochValidation {
                 poolValidationResults.add(poolValidationResult);
 
                 if (!poolValidationResult.isValid()) {
-                    log.debug("Pool reward is invalid. Please check the details for pool " + poolRewardCalculationResult.getPoolId());
+                    log.info("Pool reward is invalid. Please check the details for pool " + poolRewardCalculationResult.getPoolId());
                 }
                 end = System.currentTimeMillis();
-                log.info("Validation of pool " + poolRewardCalculationResult.getPoolId() + " took " + Math.round((end - start) / 1000.0) + "s");
+                log.debug("Validation of pool " + poolRewardCalculationResult.getPoolId() + " took " + Math.round((end - start) / 1000.0) + "s");
             }
             poolValidationResults.sort(Comparator.comparing(PoolValidationResult::getOffset).reversed());
             log.info("The pool with the largest offset is " + poolValidationResults.get(0).getPoolId() + " with an offset of " + poolValidationResults.get(0).getOffset());

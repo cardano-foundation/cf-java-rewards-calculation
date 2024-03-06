@@ -96,6 +96,13 @@ public class PoolRewardValidationTest {
     }
 
     @Test
+    void calculateEVE3PoolRewardInEpoch363() {
+        String poolId = "pool1kchver88u3kygsak8wgll7htr8uxn5v35lfrsyy842nkscrzyvj";
+        int epoch = 363;
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
+    }
+
+    @Test
     @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     void calculateSTKH1PoolRewardInEpoch363() {
         String poolId = "pool1kchver88u3kygsak8wgll7htr8uxn5v35lfrsyy842nkscrzyvj";
