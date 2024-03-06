@@ -6,6 +6,15 @@
     <artifactId>cf-rewards</artifactId>
     <version>0.7.0</version>
     <name>cardano-reward-calculation</name>
+    <url>https://github.com/cardano-foundation/cf-java-rewards-calculation.git</url>
+
+    <scm>
+        <connection>scm:git:git://github.com/cardano-foundation/cf-java-rewards-calculation.git</connection>
+        <url>https://github.com/cardano-foundation/cf-java-rewards-calculation</url>
+        <developerConnection>scm:git:git://github.com/cardano-foundation/cf-java-rewards-calculation.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
     <modules>
         <module>calculation</module>
         <module>validation</module>
