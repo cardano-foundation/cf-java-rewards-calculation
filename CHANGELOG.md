@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.7.0...v0.7.1) (2024-03-06)
+
+
+### Bug Fixes
+
+* correct epoch condition for applying babbage rules ([4206206](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/4206206029a1972aeaff33c8953d35266a5b439e))
+
 ## [0.7.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.6.2...v0.7.0) (2024-03-05)
 
 
