@@ -198,12 +198,12 @@ window.onload = () => {
     const highestDifferenceEpoch = relativeDifference.x[relativeDifference.y.indexOf(highestDifference)];
     fillCard('highest-difference-percentage', 'Highest relative difference', `${highestDifference}%`, `Epoch ${highestDifferenceEpoch}`);
 
-    const highestAbsolutDifference = Math.max(...difference.y);
+    const highestAbsolutDifference = difference.y.reduce((a, b) => Math.abs(a) > Math.abs(b) ? a : b);
     const highestAbsolutDifferenceEpoch = difference.x[difference.y.indexOf(highestAbsolutDifference)];
     fillCard('highest-absolut-difference', 'Highest absolut difference', `${highestAbsolutDifference.toLocaleString()}₳`, `Epoch ${highestAbsolutDifferenceEpoch}`);
 
-    const averageDifferenceMedian = relativeDifference.y.sort((a, b) => a - b)[Math.round(relativeDifference.y.length / 2)];
-    fillCard('average-difference-percentage', 'Average relative difference', `${averageDifferenceMedian}%`, 'Median');
+    const totalAbsoluteDifference = difference.y.reduce((a, b) => Math.abs(a) + Math.abs(b), 0);
+    fillCard('total-absolute-difference', 'Total absolute difference', `${totalAbsoluteDifference}₳`, 'Sum of all differences');
 
     const averageAbsolutDifferenceMedian = difference.y.sort((a, b) => a - b)[Math.round(difference.y.length / 2)]
     fillCard('average-absolut-difference', 'Average absolut difference', `${averageAbsolutDifferenceMedian.toLocaleString()}₳`, 'Median');

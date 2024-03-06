@@ -1,16 +1,12 @@
-name: 📊 Generate Report and 📦 Publish to Maven Central
+name: 📦 Publish to Maven Central
 
 on:
-  push:
-    branches:
-      - main
-
   workflow_dispatch:
 
 jobs:
   publish-to-maven-central:
     runs-on: ubuntu-latest
-    if: "github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, 'release-please--branches--main')"
+    if: "github.event_name == 'workflow_dispatch'"
     steps:
       - name: ⬇️ Checkout repository
         uses: actions/checkout@v3
@@ -32,57 +28,3 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.MAVEN_CENTRAL_OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MAVEN_CENTRAL_OSSRH_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_CENTRAL_GPG_PASSPHRASE }}
-  create-report:
-    runs-on: ubuntu-latest
-    if:  "github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, 'release-please--branches--main')"
-    steps:
-      - name: ⬇️ Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Setup JDK 18
-        uses: actions/setup-java@v3
-        with:
-          java-version: '18'
-          distribution: 'temurin'
-          cache: maven
-
-      - name: Setup dependencies
-        run: |
-          pip install yq
-
-      - name: JSON result to js file
-        run: |
-          echo -e "const treasuryCalculationResult = $(cat ./report/treasury_calculation_result.json)" > ./report/treasury_calculation_result.js
-
-      - name: 👀 Lookup metadata for report
-        run: |
-          echo "VERSION=$(xq -r .project.version pom.xml)" >> $GITHUB_ENV
-          echo "LATEST_COMMIT_HASH=$(git rev-parse "$GITHUB_SHA")" >> $GITHUB_ENV
-          echo "LATEST_COMMIT_HASH_SHORT=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_ENV
-          echo "UTC_DATE=$(date -uR|sed 's/.....$//')" >> $GITHUB_ENV
-
-      - name: 📂 Create report directory
-        run: |
-          mkdir -p report-v${{ env.VERSION }}
-
-      - name: 📄 Copy report files
-        run: |
-          cp -r report/* report-v${{ env.VERSION }}
-
-      - name: 📝 Add metadata to the report
-        run: |
-          sed -i 's|<footer></footer>|<footer><p>Created on ${{ env.UTC_DATE }} UTC as a result of modifications triggered by <a href="https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/${{ env.LATEST_COMMIT_HASH }}">${{ env.LATEST_COMMIT_HASH_SHORT }}</a></p></footer>|' report-v${{ env.VERSION }}/treasury_calculation.html
-
-      - name: 📅 Publish report to gh-pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          BRANCH: gh-pages
-          folder: report-v${{ env.VERSION }}
-          target-folder: report-latest/
-
-      - name: 📅 Publish report to gh-pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          BRANCH: gh-pages
-          folder: report-v${{ env.VERSION }}
-          target-folder: report-v${{ env.VERSION }}/

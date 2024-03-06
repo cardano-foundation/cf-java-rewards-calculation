@@ -321,7 +321,8 @@ public class DbSyncDataFetcher implements DataFetcher {
     }
 
     private void fetchLateAccountDeregistrationsInEpoch(int epoch, boolean override, boolean mainnet) {
-        if (mainnet && epoch >= MAINNET_VASIL_HARDFORK_EPOCH) {
+        int earnedEpoch = epoch - 2;
+        if (mainnet && earnedEpoch > MAINNET_VASIL_HARDFORK_EPOCH) {
             return;
         }
 
