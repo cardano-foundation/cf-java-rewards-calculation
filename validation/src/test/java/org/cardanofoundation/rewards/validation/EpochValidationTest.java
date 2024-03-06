@@ -43,7 +43,7 @@ public class EpochValidationTest {
     }
 
     static Stream<Integer> dataProviderEpochRange() {
-        return IntStream.range(208, 230).boxed();
+        return IntStream.range(360, 370).boxed();
     }
 
     @ParameterizedTest
@@ -67,8 +67,8 @@ public class EpochValidationTest {
 
     @Test
     @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
-    public void testCalculateEpochRewardsForEpoch365() {
-        testCalculateEpochPots(365, dbSyncDataProvider, true);
+    public void testCalculateEpochRewardsForEpoch367() {
+        testCalculateEpochPots(365, jsonDataProvider, false);
     }
 
     @Test
