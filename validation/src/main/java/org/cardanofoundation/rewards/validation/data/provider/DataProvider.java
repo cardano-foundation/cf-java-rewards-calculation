@@ -44,13 +44,13 @@ public interface DataProvider {
     public HashSet<Reward> getMemberRewardsInEpoch(int epoch);
 
     public List<PoolBlock> getBlocksMadeByPoolsInEpoch(int epoch);
-    public HashSet<AccountUpdate> getLatestStakeAccountUpdates(int epoch, HashSet<String> accounts);
+
     public HashSet<PoolReward> getTotalPoolRewardsInEpoch(int epoch);
 
     public HashSet<String> findSharedPoolRewardAddressWithoutReward(int epoch);
 
     public HashSet<String> getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow);
-    public HashSet<String> getLateAccountDeregistrationsInEpoch(int epoch, long stabilityWindow);
+
     public HashSet<String> getRegisteredAccountsUntilLastEpoch(Integer epoch, HashSet<String> stakeAddresses,
                                                                Long stabilityWindow);
 

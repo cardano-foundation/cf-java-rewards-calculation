@@ -66,12 +66,15 @@ public class EpochValidation {
         List<PoolHistory> poolHistories = dataProvider.getHistoryOfAllPoolsInEpoch(epoch - 2, blocksMadeByPoolsInEpoch);
 
         HashSet<String> deregisteredAccounts;
+        HashSet<String> deregisteredAccountsOnEpochBoundary;
         HashSet<String> lateDeregisteredAccounts = new HashSet<>();
         if (epoch - 2 < MAINNET_VASIL_HARDFORK_EPOCH) {
             deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);
-            lateDeregisteredAccounts = dataProvider.getLateAccountDeregistrationsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);
+            deregisteredAccountsOnEpochBoundary = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, EXPECTED_SLOTS_PER_EPOCH);
+            lateDeregisteredAccounts = deregisteredAccountsOnEpochBoundary.stream().filter(account -> !deregisteredAccounts.contains(account)).collect(Collectors.toCollection(HashSet::new));
         } else {
             deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, EXPECTED_SLOTS_PER_EPOCH);
+            deregisteredAccountsOnEpochBoundary = deregisteredAccounts;
         }
 
         HashSet<String> sharedPoolRewardAddressesWithoutReward = new HashSet<>();
@@ -80,8 +83,17 @@ public class EpochValidation {
         }
         HashSet<String> poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).collect(Collectors.toCollection(HashSet::new));
         poolRewardAddresses.addAll(retiredPools.stream().map(PoolDeregistration::getRewardAddress).collect(Collectors.toSet()));
-        HashSet<String> registeredAccountsSinceLastEpoch = dataProvider.getRegisteredAccountsUntilLastEpoch(epoch, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
-        HashSet<String> registeredAccountsUntilNow = dataProvider.getRegisteredAccountsUntilNow(epoch, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
+
+        long stabilityWindow = RANDOMNESS_STABILISATION_WINDOW;
+        // Since the Vasil hard fork, the unregistered accounts will not filter out before the
+        // rewards calculation starts (at the stability window). They will be filtered out on the
+        // epoch boundary when the reward update will be applied.
+        if (epoch - 2 >= MAINNET_VASIL_HARDFORK_EPOCH) {
+            stabilityWindow = EXPECTED_SLOTS_PER_EPOCH;
+        }
+
+        HashSet<String> registeredAccountsSinceLastEpoch = dataProvider.getRegisteredAccountsUntilLastEpoch(epoch, poolRewardAddresses, stabilityWindow);
+        HashSet<String> registeredAccountsUntilNow = dataProvider.getRegisteredAccountsUntilNow(epoch, poolRewardAddresses, stabilityWindow);
 
         HashSet<Reward> memberRewardsInEpoch = new HashSet<>();
         HashSet<PoolReward> totalPoolRewards = new HashSet<>();
@@ -97,7 +109,8 @@ public class EpochValidation {
         EpochCalculationResult epochCalculationResult = EpochCalculation.calculateEpochRewardPots(
                 epoch, adaPotsForPreviousEpoch, protocolParameters, epochInfo, retiredPools, deregisteredAccounts,
                 mirCertificates, poolIds, poolHistories, lateDeregisteredAccounts,
-                registeredAccountsSinceLastEpoch, registeredAccountsUntilNow, sharedPoolRewardAddressesWithoutReward);
+                registeredAccountsSinceLastEpoch, registeredAccountsUntilNow, sharedPoolRewardAddressesWithoutReward,
+                deregisteredAccountsOnEpochBoundary);
         end = System.currentTimeMillis();
         log.debug("Epoch calculation took " + Math.round((end - start) / 1000.0) + "s");
 
@@ -118,7 +131,9 @@ public class EpochValidation {
                 log.debug("Validation of pool " + poolRewardCalculationResult.getPoolId() + " took " + Math.round((end - start) / 1000.0) + "s");
             }
             poolValidationResults.sort(Comparator.comparing(PoolValidationResult::getOffset).reversed());
-            log.info("The pool with the largest offset is " + poolValidationResults.get(0).getPoolId() + " with an offset of " + poolValidationResults.get(0).getOffset());
+            if (poolValidationResults.get(0).getOffset().compareTo(BigInteger.ZERO) > 0) {
+                log.info("The pool with the largest offset is " + poolValidationResults.get(0).getPoolId() + " with an offset of " + poolValidationResults.get(0).getOffset());
+            }
             long validationEnd = System.currentTimeMillis();
             log.debug("Epoch validation took " + Math.round((validationEnd - validationStart) / 1000.0) + "s");
         }

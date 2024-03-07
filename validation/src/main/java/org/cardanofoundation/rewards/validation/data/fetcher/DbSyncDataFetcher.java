@@ -4,7 +4,6 @@ import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
 import org.cardanofoundation.rewards.validation.domain.PoolReward;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -144,7 +143,7 @@ public class DbSyncDataFetcher implements DataFetcher {
         }
     }
 
-    private void fetchStakeAddressesWithRegistrationsUntilEpoch(int epoch, boolean override) {
+    private void fetchStakeAddressesWithRegistrationsUntilEpoch(int epoch, boolean override, boolean mainnet) {
         String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, PAST_ACCOUNT_REGISTRATIONS_UNTIL_LAST_EPOCH.resourceFolderName, epoch);
         File outputFile = new File(filePath);
 
@@ -153,12 +152,17 @@ public class DbSyncDataFetcher implements DataFetcher {
             return;
         }
 
+        long stabilityWindow = EXPECTED_SLOTS_PER_EPOCH;
+        if (mainnet && (epoch - 2) < MAINNET_VASIL_HARDFORK_EPOCH) {
+            stabilityWindow = RANDOMNESS_STABILISATION_WINDOW;
+        }
+
         List<PoolHistory> poolHistories = jsonDataProvider.getHistoryOfAllPoolsInEpoch(epoch - 2, null);
         HashSet<String> poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).collect(Collectors.toCollection(HashSet::new));
         List<PoolDeregistration> retiredPools = jsonDataProvider.getRetiredPoolsInEpoch(epoch);
         poolRewardAddresses.addAll(retiredPools.stream().map(PoolDeregistration::getRewardAddress).collect(Collectors.toSet()));
 
-        HashSet<String> accountsRegisteredInThePast = dbSyncDataProvider.getRegisteredAccountsUntilLastEpoch(epoch, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
+        HashSet<String> accountsRegisteredInThePast = dbSyncDataProvider.getRegisteredAccountsUntilLastEpoch(epoch, poolRewardAddresses, stabilityWindow);
         if (accountsRegisteredInThePast == null) {
             logger.error("Failed to fetch StakeAddressesWithRegistrationsUntilEpoch for epoch " + epoch);
         }
@@ -169,7 +173,7 @@ public class DbSyncDataFetcher implements DataFetcher {
             logger.error("Failed to write accounts registered in the past to json file for epoch " + epoch);
         }
 
-        HashSet<String> accountsRegisteredUntilNow = dbSyncDataProvider.getRegisteredAccountsUntilNow(epoch, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
+        HashSet<String> accountsRegisteredUntilNow = dbSyncDataProvider.getRegisteredAccountsUntilNow(epoch, poolRewardAddresses, stabilityWindow);
         filePath = String.format("%s/%s/epoch%d.json", sourceFolder, PAST_ACCOUNT_REGISTRATIONS_UNTIL_NOW.resourceFolderName, epoch);
         outputFile = new File(filePath);
 
@@ -201,9 +205,6 @@ public class DbSyncDataFetcher implements DataFetcher {
             return;
         }
 
-        HashSet<String> poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).collect(Collectors.toCollection(HashSet::new));
-        HashSet<String> accountsRegisteredInThePast = dbSyncDataProvider.getRegisteredAccountsUntilLastEpoch(epoch + 1, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
-
         try {
             writeObjectToJsonFile(poolHistories, filePath);
         } catch (IOException e) {
@@ -217,14 +218,6 @@ public class DbSyncDataFetcher implements DataFetcher {
         } catch (IOException e) {
             logger.error("Failed to write blocks made by pools to json file for epoch " + epoch);
         }
-
-        filePath = String.format("%s/%s/epoch%d.json", sourceFolder, PAST_ACCOUNT_REGISTRATIONS.resourceFolderName, epoch);
-
-        try {
-            writeObjectToJsonFile(accountsRegisteredInThePast, filePath);
-        } catch (IOException e) {
-            logger.error("Failed to write past registered accounts to json file for epoch " + epoch);
-        }
     }
 
     private void fetchDeregisteredAccountsInEpoch(int epoch, boolean override, boolean mainnet) {
@@ -232,25 +225,41 @@ public class DbSyncDataFetcher implements DataFetcher {
         File outputFile = new File(filePath);
 
         if (outputFile.exists() && !override) {
-            logger.info("Skip to fetch deregistered accounts for epoch " + epoch + " because the json file already exists");
-            return;
+            logger.info("Skip to fetch deregistered accounts at epoch boundary for epoch " + epoch + " because the json file already exists");
+        } else {
+            HashSet<String> deregisteredAccountsInEpoch = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch, EXPECTED_SLOTS_PER_EPOCH);
+            if (deregisteredAccountsInEpoch == null) {
+                logger.error("Failed to fetch deregistered accounts at epoch boundary for epoch " + epoch);
+                return;
+            }
+
+            try {
+                writeObjectToJsonFile(deregisteredAccountsInEpoch, filePath);
+            } catch (IOException e) {
+                logger.error("Failed to write deregistered accounts in epoch to json file for epoch " + epoch);
+            }
         }
 
-        long stabilityWindow = RANDOMNESS_STABILISATION_WINDOW;
-        if (mainnet && epoch >= MAINNET_VASIL_HARDFORK_EPOCH) {
-            stabilityWindow = EXPECTED_SLOTS_PER_EPOCH;
-        }
+        if (mainnet && (epoch - 2) < MAINNET_VASIL_HARDFORK_EPOCH) {
+            filePath = String.format("%s/%s/epoch%d-stability-window.json", sourceFolder, ACCOUNT_DEREGISTRATION.resourceFolderName, epoch);
+            outputFile = new File(filePath);
 
-        HashSet<String> deregisteredAccountsInEpoch = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch, stabilityWindow);
-        if (deregisteredAccountsInEpoch == null) {
-            logger.error("Failed to fetch deregistered accounts for epoch " + epoch);
-            return;
-        }
+            if (outputFile.exists() && !override) {
+                logger.info("Skip to fetch deregistered accounts at epoch boundary for epoch " + epoch + " because the json file already exists");
+                return;
+            }
 
-        try {
-            writeObjectToJsonFile(deregisteredAccountsInEpoch, filePath);
-        } catch (IOException e) {
-            logger.error("Failed to write deregistered accounts in epoch to json file for epoch " + epoch);
+            HashSet<String> deregisteredAccountsInEpoch = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch, RANDOMNESS_STABILISATION_WINDOW);
+            if (deregisteredAccountsInEpoch == null) {
+                logger.error("Failed to fetch deregistered accounts at stabilisation window for epoch " + epoch);
+                return;
+            }
+
+            try {
+                writeObjectToJsonFile(deregisteredAccountsInEpoch, filePath);
+            } catch (IOException e) {
+                logger.error("Failed to write deregistered accounts in epoch at stabilisation window to json file for epoch " + epoch);
+            }
         }
     }
 
@@ -320,33 +329,6 @@ public class DbSyncDataFetcher implements DataFetcher {
         }
     }
 
-    private void fetchLateAccountDeregistrationsInEpoch(int epoch, boolean override, boolean mainnet) {
-        int earnedEpoch = epoch - 2;
-        if (mainnet && earnedEpoch > MAINNET_VASIL_HARDFORK_EPOCH) {
-            return;
-        }
-
-        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, LATE_DEREGISTRATIONS.resourceFolderName, epoch);
-        File outputFile = new File(filePath);
-
-        if (outputFile.exists() && !override) {
-            logger.info("Skip to fetch LateAccountDeregistrations for epoch " + epoch + " because the json file already exists");
-            return;
-        }
-
-        HashSet<String> lateDeregisteredAccounts = dbSyncDataProvider.getLateAccountDeregistrationsInEpoch(epoch, RANDOMNESS_STABILISATION_WINDOW);
-        if (lateDeregisteredAccounts == null) {
-            logger.error("Failed to fetch LateAccountDeregistrations for epoch " + epoch);
-            return;
-        }
-
-        try {
-            writeObjectToJsonFile(lateDeregisteredAccounts, filePath);
-        } catch (IOException e) {
-            logger.error("Failed to write LateAccountDeregistrations to json file for epoch " + epoch);
-        }
-    }
-
     @Override
     public void fetch(int epoch, boolean override, boolean skipValidationData) {
         fetchAdaPotsInEpoch(epoch, override);
@@ -355,10 +337,9 @@ public class DbSyncDataFetcher implements DataFetcher {
         fetchRetiredPoolsInEpoch(epoch, override);
         fetchHistoryOfAllPoolsInEpoch(epoch, override);
         fetchDeregisteredAccountsInEpoch(epoch, override, true);
-        fetchLateAccountDeregistrationsInEpoch(epoch, override, true);
         fetchSharedPoolRewardAddressWithoutReward(epoch, override);
         fetchMirCertificatesInEpoch(epoch, override);
-        fetchStakeAddressesWithRegistrationsUntilEpoch(epoch, override);
+        fetchStakeAddressesWithRegistrationsUntilEpoch(epoch, override, true);
 
         if (!skipValidationData) {
             fetchMemberRewardsInEpoch(epoch, override);

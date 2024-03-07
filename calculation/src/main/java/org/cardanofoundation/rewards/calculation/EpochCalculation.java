@@ -30,7 +30,8 @@ public class EpochCalculation {
                                                                   final HashSet<String> lateDeregisteredAccounts,
                                                                   final HashSet<String> registeredAccountsSinceLastEpoch,
                                                                   final HashSet<String> registeredAccountsUntilNow,
-                                                                  final HashSet<String> sharedPoolRewardAddressesWithoutReward) {
+                                                                  final HashSet<String> sharedPoolRewardAddressesWithoutReward,
+                                                                  final HashSet<String> deregisteredAccountsOnEpochBoundary) {
         final EpochCalculationResult epochCalculationResult = EpochCalculationResult.builder().epoch(epoch).build();
 
         if (epoch < MAINNET_SHELLEY_START_EPOCH) {
@@ -84,9 +85,7 @@ public class EpochCalculation {
         // treasury (see: Pool Reap Transition, p.53, figure 40, shelley-ledger.pdf)
         if (retiredPools.size() > 0) {
             List<String> rewardAddressesOfRetiredPools = retiredPools.stream().map(PoolDeregistration::getRewardAddress).toList();
-            List<String> deregisteredOwnerAccounts = deregisteredAccounts.stream()
-                    .filter(rewardAddressesOfRetiredPools::contains).toList();
-            List<String> lateDeregisteredOwnerAccounts = lateDeregisteredAccounts.stream()
+            List<String> deregisteredOwnerAccounts = deregisteredAccountsOnEpochBoundary.stream()
                     .filter(rewardAddressesOfRetiredPools::contains).toList();
             List<String> ownerAccountsRegisteredInThePast = registeredAccountsUntilNow.stream()
                     .filter(rewardAddressesOfRetiredPools::contains).toList();
@@ -97,7 +96,6 @@ public class EpochCalculation {
             for (PoolDeregistration retiredPool : retiredPools) {
                 String rewardAddress = retiredPool.getRewardAddress();
                 if (deregisteredOwnerAccounts.contains(rewardAddress) ||
-                        lateDeregisteredOwnerAccounts.contains(rewardAddress) ||
                         !ownerAccountsRegisteredInThePast.contains(rewardAddress)) {
                     // If the reward address has been unregistered, the deposit can not be returned
                     // and will be added to the treasury instead (Pool Reap see: shelley-ledger.pdf p.53)

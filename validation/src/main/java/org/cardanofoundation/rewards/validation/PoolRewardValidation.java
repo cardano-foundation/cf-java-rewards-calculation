@@ -13,6 +13,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toCollection;
 import static org.cardanofoundation.rewards.calculation.PoolRewardsCalculation.calculatePoolRewardInEpoch;
@@ -52,8 +53,6 @@ public class PoolRewardValidation {
         List<String> stakeAddresses = new ArrayList<>();
         stakeAddresses.add(poolHistoryCurrentEpoch.getRewardAddress());
         stakeAddresses.addAll(poolHistoryCurrentEpoch.getDelegators().stream().map(Delegator::getStakeAddress).toList());
-
-        //List<AccountUpdate> accountUpdates = dataProvider.getAccountUpdatesUntilEpoch(stakeAddresses, epoch - 1);
 
         HashSet<String> delegatorDeregistrations = accountDeregistrations.stream()
                 .filter(stakeAddresses::contains).collect(toCollection(HashSet::new));
@@ -129,19 +128,27 @@ public class PoolRewardValidation {
         HashSet<String> lateAccountDeregistrations = new HashSet<>();
         if (epoch < MAINNET_VASIL_HARDFORK_EPOCH) {
             accountDeregistrations = dataProvider.getDeregisteredAccountsInEpoch(epoch + 1, RANDOMNESS_STABILISATION_WINDOW);
-            lateAccountDeregistrations = dataProvider.getLateAccountDeregistrationsInEpoch(epoch + 1, RANDOMNESS_STABILISATION_WINDOW);
+            HashSet<String> deregisteredAccountsOnEpochBoundary = dataProvider.getDeregisteredAccountsInEpoch(epoch + 1, EXPECTED_SLOTS_PER_EPOCH);
+            lateAccountDeregistrations = deregisteredAccountsOnEpochBoundary.stream().filter(account -> !accountDeregistrations.contains(account)).collect(Collectors.toCollection(HashSet::new));
         } else {
             accountDeregistrations = dataProvider.getDeregisteredAccountsInEpoch(epoch + 1, EXPECTED_SLOTS_PER_EPOCH);
         }
 
         HashSet<String> sharedPoolRewardAddressesWithoutReward = dataProvider.findSharedPoolRewardAddressWithoutReward(epoch);
-
         HashSet<String> rewardAddresses = new HashSet<>();
         if (poolHistoryCurrentEpoch != null) {
             rewardAddresses = new HashSet<>(List.of(poolHistoryCurrentEpoch.getRewardAddress()));
         }
 
-        HashSet<String> accountsRegisteredInThePast = dataProvider.getRegisteredAccountsUntilLastEpoch(epoch + 2, rewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
+        long stabilityWindow = RANDOMNESS_STABILISATION_WINDOW;
+        // Since the Vasil hard fork, the unregistered accounts will not filter out before the
+        // rewards calculation starts (at the stability window). They will be filtered out on the
+        // epoch boundary when the reward update will be applied.
+        if (epoch >= MAINNET_VASIL_HARDFORK_EPOCH) {
+            stabilityWindow = EXPECTED_SLOTS_PER_EPOCH;
+        }
+
+        HashSet<String> accountsRegisteredInThePast = dataProvider.getRegisteredAccountsUntilLastEpoch(epoch + 2, rewardAddresses, stabilityWindow);
 
         return computePoolRewardInEpoch(poolId, epoch, protocolParameters, epochInfo, stakePoolRewardsPot, adaInCirculation, poolHistoryCurrentEpoch,
                 accountDeregistrations, lateAccountDeregistrations, accountsRegisteredInThePast, sharedPoolRewardAddressesWithoutReward);
@@ -167,7 +174,9 @@ public class PoolRewardValidation {
                 .collect(toCollection(HashSet::new));
 
         if (actualPoolReward.equals(BigInteger.ZERO)) {
-            log.info("Pool reward is zero for pool " + poolId + " but calculated pool reward is " + poolRewardCalculationResult.getPoolReward().longValue() + " Lovelace");
+            if (!poolRewardCalculationResult.getPoolReward().equals(BigInteger.ZERO)) {
+                log.info("Pool reward is zero for pool " + poolId + " but calculated pool reward is " + poolRewardCalculationResult.getPoolReward().longValue() + " Lovelace");
+            }
             return poolRewardValidationResult;
         }
 

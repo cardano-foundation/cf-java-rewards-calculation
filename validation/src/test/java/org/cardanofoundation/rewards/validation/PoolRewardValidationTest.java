@@ -125,6 +125,23 @@ public class PoolRewardValidationTest {
         int epoch = 241;
         Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
     }
+
+    @Test
+    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
+    void calculateRRCPoolRewardInEpoch348() {
+        String poolId = "pool1kcvaxe4q4npwt28qlr3h84htjf4qrqglqk3cr2484ptycr0ldut";
+        int epoch = 348;
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.JSON);
+    }
+
+    @Test
+    @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
+    void calculateTABPoolRewardInEpoch423() {
+        String poolId = "pool16xwm8el8knrmxee7d79wjt9lgm45cyuf055rv0s0ms05g592l2c";
+        int epoch = 423;
+        Test_calculatePoolReward(poolId, epoch, DataProviderType.DB_SYNC);
+    }
+
     @Test
     void calculateXYZPoolRewardInEpoch213() {
         String poolId = "pool18hkq2t8ss45h4fkr92f52flhc4mpzedx5mcz4xhnpj0dzp76028";

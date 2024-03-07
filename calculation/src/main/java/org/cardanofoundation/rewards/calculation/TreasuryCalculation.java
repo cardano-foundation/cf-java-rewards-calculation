@@ -20,7 +20,6 @@ public class TreasuryCalculation {
                                                                    List<PoolDeregistration> retiredPools,
                                                                    List<MirCertificate> mirCertificates,
                                                                    final HashSet<String> deregisteredAccounts,
-                                                                   final HashSet<String> lateDeregisteredAccounts,
                                                                    final HashSet<String> registeredAccountsUntilNow,
                                                                    BigInteger unspendableEarnedRewards) {
     // The Shelley era and the ada pot system started on mainnet in epoch 208.
@@ -63,8 +62,6 @@ public class TreasuryCalculation {
       List<String> rewardAddressesOfRetiredPools = retiredPools.stream().map(PoolDeregistration::getRewardAddress).toList();
       HashSet<String> deregisteredRewardAccounts = deregisteredAccounts.stream()
               .filter(rewardAddressesOfRetiredPools::contains).collect(Collectors.toCollection(HashSet::new));
-      deregisteredRewardAccounts.addAll(lateDeregisteredAccounts.stream()
-              .filter(rewardAddressesOfRetiredPools::contains).collect(Collectors.toSet()));
       List<String> ownerAccountsRegisteredInThePast = registeredAccountsUntilNow.stream()
               .filter(rewardAddressesOfRetiredPools::contains).toList();
 

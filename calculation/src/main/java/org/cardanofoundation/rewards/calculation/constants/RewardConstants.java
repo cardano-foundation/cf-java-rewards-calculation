@@ -7,7 +7,7 @@ public class RewardConstants {
   public static final BigInteger TOTAL_LOVELACE = new BigInteger("45000000000000000");
   public static final BigInteger POOL_DEPOSIT_IN_LOVELACE = BigInteger.valueOf(500000000);
   // https://developers.cardano.org/docs/operate-a-stake-pool/introduction-to-cardano/#slots-and-epochs
-  public static final int EXPECTED_SLOTS_PER_EPOCH = 432000;
+  public static final long EXPECTED_SLOTS_PER_EPOCH = 432000;
   public static final BigInteger MAINNET_SHELLEY_INITIAL_RESERVES = new BigInteger("13888022852926644");
   public static final BigInteger MAINNET_SHELLEY_INITIAL_TREASURY = new BigInteger("0");
   public static final BigInteger MAINNET_SHELLEY_INITIAL_UTXO = TOTAL_LOVELACE.subtract(MAINNET_SHELLEY_INITIAL_RESERVES);

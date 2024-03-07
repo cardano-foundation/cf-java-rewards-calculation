@@ -17,7 +17,8 @@
       "type": "xml",
       "path": "validation/pom.xml",
       "xpath": "//project/parent/version"
-    }
+    },
+    "README.md"
   ],
   "packages": {
     ".":{}
