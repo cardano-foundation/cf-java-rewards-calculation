@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.7.1...v0.8.0) (2024-03-07)
+
+
+### Features
+
+* rewards calculation is now 100% matching the db sync ada pots and rewards table ([ac90b0f](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/ac90b0f792576ebb1ae0b1db94cb2bf67d62d9aa))
+
 ## [0.7.1](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.7.0...v0.7.1) (2024-03-06)
 
 
