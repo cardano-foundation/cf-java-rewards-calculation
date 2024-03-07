@@ -1,11 +1,14 @@
 # Cardano Rewards Calculation 🧮
 
 <p align="left">
-<img alt="Tests" src="https://github.com/cardano-foundation/cf-java-rewards-calculation/actions/workflows/tests.yaml/badge.svg?branch=main" />
-<img alt="Coverage" src="https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/gh-pages/badges/jacoco.svg?raw=true" />
+<a href="https://cardano-foundation.github.io/cf-java-rewards-calculation/coverage-report/"><img alt="Tests" src="https://github.com/cardano-foundation/cf-java-rewards-calculation/actions/workflows/tests.yaml/badge.svg?branch=main" /></a>
+<a href="https://cardano-foundation.github.io/cf-java-rewards-calculation/coverage-report/"><img alt="Coverage" src="https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/gh-pages/badges/jacoco.svg?raw=true" /></a>
 <img alt="Release" src="https://github.com/cardano-foundation/cf-java-rewards-calculation/actions/workflows/release.yaml/badge.svg?branch=main" />
+<a href="https://central.sonatype.com/artifact/org.cardanofoundation/cf-rewards-calculation"><img alt="Publish" src="https://github.com/cardano-foundation/cf-java-rewards-calculation/actions/workflows/publish.yaml/badge.svg?branch=main" /></a>
+<a href="https://cardano-foundation.github.io/cf-java-rewards-calculation/report-latest/treasury_calculation.html"><img alt="Report" src="https://github.com/cardano-foundation/cf-java-rewards-calculation/actions/workflows/report.yaml/badge.svg?branch=main" /></a>
 <a href="https://conventionalcommits.org"><img alt="conventionalcommits" src="https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits" /></a>
 <a href="https://opensource.org/licenses/MIT"><img alt="License" src="https://img.shields.io/badge/License-MIT-green.svg" /></a>
+<a href="https://discord.gg/4WVNHgQ7bP"><img alt="Discord" src="https://img.shields.io/discord/1022471509173882950?label=Discord"></a>
 </p>
 
 This project is aims to target *multiple goals*. First of all, it tries to *re-implement the cardano ledger rules* for calculating 
@@ -13,8 +16,6 @@ the [ADA pots](https://cexplorer.io/pot) (Treasury, Reserves, Rewards, Deposits,
 The second goal is to use this implementation to *[validate the rewards calculation](https://cardano-foundation.github.io/cf-java-rewards-calculation/report-latest/treasury_calculation.html)* of the Cardano blockchain by providing a *different implementation of the [ledger specification](https://github.com/IntersectMBO/cardano-ledger?tab=readme-ov-file#cardano-ledger)*.
 The third goal is to *provide a library* that can be used in other project (such as [yaci-store](https://github.com/bloxbean/yaci-store)) to serve the rewards data *independently of [DB Sync](https://github.com/IntersectMBO/cardano-db-sync)*. 
 Last but not least, this project could also be used to *understand the influence of protocol parameters* and the flow of ADA through an interactive report.
-
-🚧️ The calculation is currently correct until the beginning of the Babbage era. 🚧️
 
 ## 🧪 Test Reports
 
@@ -87,6 +88,19 @@ While the flowchart above shows the calculation of the Ada pots in general, ther
 
 ## 🚀 Getting Started
 
+You can use this project as a library in your own project. The library is available through maven central,
+or you can clone the repository and run the tests or build the library yourself.
+
+#### Maven
+
+```xml
+<dependency>
+    <groupId>org.cardanofoundation</groupId>
+    <artifactId>cf-rewards-calculation</artifactId>
+    <version>0.7.2</version>
+</dependency>
+```
+
 Make sure to have Java 17 installed and run the following commands:
 
 ```
@@ -154,7 +168,8 @@ POSTGRES_DB=cexplorer
 
 JSON_DATA_SOURCE_FOLDER=/path/to/your/rewards-calculation-test-data
 ```
-`⚠️ The actual rewards data will also be fetched when setting DATA_FETCHER_SKIP_VALIDATION_DATA=false, but it is only used from the validator and not within the calculation itself.`
+> [!NOTE]
+>️ The actual rewards data will also be fetched when setting DATA_FETCHER_SKIP_VALIDATION_DATA=false, but it is only used from the validator and not within the calculation itself.`
   
 #### Data Plotter
 
@@ -171,10 +186,10 @@ JSON_DATA_SOURCE_FOLDER=/path/to/your/rewards-calculation-test-data
 ```
 
 ## 🫡 Roadmap
- - [ ] Provide a library through maven central to use the calculation in other projects
  - [ ] Enhance reporting and add values for the other pots as well. Display the flow of Ada within an epoch
- - [ ] Find out the root cause of the difference between the actual rewards and the calculated rewards beginning with epoch 350
  - [ ] Add a `/docs` folder containing parsable Markdown files to explain MIR certificates and edge cases
+ - [X] Provide a library through maven central to use the calculation in other projects
+ - [X] Find out the root cause of the difference between the actual rewards and the calculated rewards beginning with epoch 350
  - [X] Include MIR certificates
  - [X] Calculate member and operator rewards
  - [X] Add deposits and utxo pot

@@ -24,13 +24,13 @@ public class TreasuryValidation {
     List<MirCertificate> mirCertificates = dataProvider.getMirCertificatesInEpoch(epoch - 1);
     List<PoolBlock> blocksMadeByPoolsInEpoch = dataProvider.getBlocksMadeByPoolsInEpoch(epoch - 2);
     List<PoolHistory> poolHistories = dataProvider.getHistoryOfAllPoolsInEpoch(epoch - 2, blocksMadeByPoolsInEpoch);
-    HashSet<String> deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);
-    HashSet<String> lateDeregisteredAccounts = dataProvider.getLateAccountDeregistrationsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);
+    HashSet<String> deregisteredAccountsOnEpochBoundary = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, EXPECTED_SLOTS_PER_EPOCH);
+
     HashSet<String> poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).collect(Collectors.toCollection(HashSet::new));
     poolRewardAddresses.addAll(retiredPools.stream().map(PoolDeregistration::getRewardAddress).collect(Collectors.toSet()));
     HashSet<String> registeredAccountsUntilNow = dataProvider.getRegisteredAccountsUntilNow(epoch, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);
 
-    TreasuryCalculationResult treasuryCalculationResult = TreasuryCalculation.calculateTreasuryInEpoch(epoch, protocolParameters, adaPotsForPreviousEpoch, epochInfo, retiredPools, mirCertificates, deregisteredAccounts, lateDeregisteredAccounts, registeredAccountsUntilNow, BigInteger.ZERO);
+    TreasuryCalculationResult treasuryCalculationResult = TreasuryCalculation.calculateTreasuryInEpoch(epoch, protocolParameters, adaPotsForPreviousEpoch, epochInfo, retiredPools, mirCertificates, deregisteredAccountsOnEpochBoundary, registeredAccountsUntilNow, BigInteger.ZERO);
 
     TreasuryValidationResult treasuryValidationResult = TreasuryValidationResult.fromTreasuryCalculationResult(treasuryCalculationResult);
     AdaPots adaPotsForCurrentEpoch = dataProvider.getAdaPotsForEpoch(epoch);

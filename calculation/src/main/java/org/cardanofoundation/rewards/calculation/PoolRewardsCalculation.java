@@ -211,13 +211,16 @@ public class PoolRewardsCalculation {
         String rewardAddress = poolRewardCalculationResult.getRewardAddress();
 
         if (!accountsRegisteredInThePast.contains(rewardAddress)) {
-            log.debug(poolRewardCalculationResult.getRewardAddress() + " has never been registered. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
+            log.info(poolRewardCalculationResult.getRewardAddress() + " has never been registered. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
+            if (earnedEpoch >= MAINNET_VASIL_HARDFORK_EPOCH) {
+                unspendableEarnedRewards = poolOperatorReward;
+            }
             poolOperatorReward = BigInteger.ZERO;
         } else if (deregisteredAccounts.contains(rewardAddress)) {
-            log.debug(poolRewardCalculationResult.getRewardAddress() + " has been deregistered. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
+            log.info(poolRewardCalculationResult.getRewardAddress() + " has been deregistered. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
             poolOperatorReward = BigInteger.ZERO;
         } else if (lateDeregisteredAccounts.contains(rewardAddress)) {
-            log.debug("[unregRU]: " + poolRewardCalculationResult.getRewardAddress() + " has been deregistered lately. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
+            log.info("[unregRU]: " + poolRewardCalculationResult.getRewardAddress() + " has been deregistered lately. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
             unspendableEarnedRewards = poolOperatorReward;
             poolOperatorReward = BigInteger.ZERO;
         }

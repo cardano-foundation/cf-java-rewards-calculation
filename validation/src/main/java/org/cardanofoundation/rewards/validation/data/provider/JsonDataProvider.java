@@ -2,8 +2,6 @@ package org.cardanofoundation.rewards.validation.data.provider;
 
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.domain.PoolReward;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.PoolBlocks;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 import org.cardanofoundation.rewards.validation.enums.DataType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -12,8 +10,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
 import static org.cardanofoundation.rewards.validation.enums.DataType.*;
@@ -36,10 +32,8 @@ public class JsonDataProvider implements DataProvider {
             return String.join(File.separator, sourceFolder, REWARDS_OUTLIER.resourceFolderName, "epoch" + epoch + ".json");
         } else if (dataType.equals(ACCOUNT_DEREGISTRATION)) {
             return String.join(File.separator, sourceFolder, ACCOUNT_DEREGISTRATION.resourceFolderName, "epoch" + epoch + ".json");
-        } else if (dataType.equals(LATE_DEREGISTRATIONS)) {
-            return String.join(File.separator, sourceFolder, LATE_DEREGISTRATIONS.resourceFolderName, "epoch" + epoch + ".json");
-        } else if (dataType.equals(PAST_ACCOUNT_REGISTRATIONS)) {
-            return String.join(File.separator, sourceFolder, PAST_ACCOUNT_REGISTRATIONS.resourceFolderName, "epoch" + epoch + ".json");
+        } else if (dataType.equals(DEREGISTRATIONS_ON_STABILITY_WINDOW)) {
+            return String.join(File.separator, sourceFolder, ACCOUNT_DEREGISTRATION.resourceFolderName, "epoch" + epoch + "-stability-window.json");
         } else if (dataType.equals(POOL_BLOCKS)) {
             return String.join(File.separator, sourceFolder, POOL_BLOCKS.resourceFolderName, "epoch" + epoch + ".json");
         } else if (dataType.equals(ADA_POTS)) {
@@ -248,11 +242,6 @@ public class JsonDataProvider implements DataProvider {
     }
 
     @Override
-    public HashSet<AccountUpdate> getLatestStakeAccountUpdates(int epoch, HashSet<String> accounts) {
-        return null;
-    }
-
-    @Override
     public HashSet<PoolReward> getTotalPoolRewardsInEpoch(int epoch) {
         if (epoch < MAINNET_SHELLEY_START_EPOCH) return new HashSet<>();
 
@@ -272,16 +261,15 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public HashSet<String> getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow) {
-        HashSet<String> deregisteredAccounts = getHashSetFromJson(ACCOUNT_DEREGISTRATION, epoch, String.class);
+        HashSet<String> deregisteredAccounts;
+        if (stabilityWindow == RANDOMNESS_STABILISATION_WINDOW) {
+            deregisteredAccounts = getHashSetFromJson(DEREGISTRATIONS_ON_STABILITY_WINDOW, epoch, String.class);
+        } else {
+            deregisteredAccounts = getHashSetFromJson(ACCOUNT_DEREGISTRATION, epoch, String.class);
+        }
+
         if (deregisteredAccounts == null) return new HashSet<>();
         return deregisteredAccounts;
-    }
-
-    @Override
-    public HashSet<String> getLateAccountDeregistrationsInEpoch(int epoch, long stabilityWindow) {
-        HashSet<String> lateDeregisteredAccounts = getHashSetFromJson(LATE_DEREGISTRATIONS, epoch, String.class);
-        if (lateDeregisteredAccounts == null) return new HashSet<>();
-        return lateDeregisteredAccounts;
     }
 
     @Override

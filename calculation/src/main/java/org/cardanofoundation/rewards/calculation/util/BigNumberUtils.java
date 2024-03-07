@@ -7,6 +7,8 @@ import java.math.RoundingMode;
 
 public class BigNumberUtils {
 
+    public final static MathContext mathContext = new MathContext(20);
+
     public static BigInteger add(BigInteger a, BigInteger b) {
         return a.add(b);
     }
@@ -20,18 +22,8 @@ public class BigNumberUtils {
         return new BigDecimal(a).multiply(b).multiply(c).round(new MathContext(0, RoundingMode.FLOOR)).toBigInteger();
     }
 
-    public static BigInteger multiplyAndFloor(BigInteger a, double b, double c) {
-        return new BigDecimal(a).multiply(BigDecimal.valueOf(b).multiply(BigDecimal.valueOf(c)))
-                .round(new MathContext(0, RoundingMode.FLOOR)).toBigInteger();
-    }
-
     public static BigInteger multiplyAndFloor(BigInteger a, BigDecimal b) {
         return new BigDecimal(a).multiply(b)
-                .round(new MathContext(0, RoundingMode.FLOOR)).toBigInteger();
-    }
-
-    public static BigInteger multiplyAndFloor(BigInteger a, double b) {
-        return new BigDecimal(a).multiply(BigDecimal.valueOf(b))
                 .round(new MathContext(0, RoundingMode.FLOOR)).toBigInteger();
     }
 
@@ -136,43 +128,43 @@ public class BigNumberUtils {
     }
 
     public static BigDecimal divide(BigDecimal a, BigDecimal b) {
-        return a.divide(b, new MathContext(32));
+        return a.divide(b, mathContext);
     }
 
     public static BigDecimal divide(BigInteger a, BigDecimal b) {
-        return new BigDecimal(a).divide(b, new MathContext(32));
+        return new BigDecimal(a).divide(b, mathContext);
     }
 
     public static BigDecimal divide(double a, BigInteger b) {
-        return BigDecimal.valueOf(a).divide(new BigDecimal(b), new MathContext(32));
+        return BigDecimal.valueOf(a).divide(new BigDecimal(b), mathContext);
     }
 
     public static BigDecimal divide(BigInteger a, BigInteger b) {
-        return new BigDecimal(a).divide(new BigDecimal(b), new MathContext(32));
+        return new BigDecimal(a).divide(new BigDecimal(b), mathContext);
     }
 
     public static BigDecimal divide(double a, BigDecimal b) {
-        return BigDecimal.valueOf(a).divide(b, new MathContext(32));
+        return BigDecimal.valueOf(a).divide(b, mathContext);
     }
 
     public static BigDecimal divide(BigDecimal a, double b) {
-        return a.divide(BigDecimal.valueOf(b), new MathContext(32));
+        return a.divide(BigDecimal.valueOf(b), mathContext);
     }
 
     public static BigDecimal divide(double a, double b) {
-        return BigDecimal.valueOf(a).divide(BigDecimal.valueOf(b), new MathContext(32));
+        return BigDecimal.valueOf(a).divide(BigDecimal.valueOf(b), mathContext);
     }
 
     public static BigDecimal divide(long a, double b) {
-        return BigDecimal.valueOf(a).divide(BigDecimal.valueOf(b), new MathContext(32));
+        return BigDecimal.valueOf(a).divide(BigDecimal.valueOf(b), mathContext);
     }
 
     public static BigDecimal divide(long a, long b) {
-        return BigDecimal.valueOf(a).divide(BigDecimal.valueOf(b), new MathContext(32));
+        return BigDecimal.valueOf(a).divide(BigDecimal.valueOf(b), mathContext);
     }
 
     public static BigDecimal divide(double a, long b) {
-        return BigDecimal.valueOf(a).divide(BigDecimal.valueOf(b), new MathContext(32));
+        return BigDecimal.valueOf(a).divide(BigDecimal.valueOf(b), mathContext);
     }
 
     public static BigDecimal min(BigDecimal a, BigDecimal b) {

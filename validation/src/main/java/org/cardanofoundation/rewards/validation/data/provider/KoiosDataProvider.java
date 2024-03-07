@@ -282,11 +282,6 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
-    public HashSet<AccountUpdate> getLatestStakeAccountUpdates(int epoch, HashSet<String> accounts) {
-        return null;
-    }
-
-    @Override
     public HashSet<PoolReward> getTotalPoolRewardsInEpoch(int epoch) {
         return null;
     }
@@ -298,11 +293,6 @@ public class KoiosDataProvider implements DataProvider {
 
     @Override
     public HashSet<String> getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow) {
-        return null;
-    }
-
-    @Override
-    public HashSet<String> getLateAccountDeregistrationsInEpoch(int epoch, long stabilityWindow) {
         return null;
     }
 

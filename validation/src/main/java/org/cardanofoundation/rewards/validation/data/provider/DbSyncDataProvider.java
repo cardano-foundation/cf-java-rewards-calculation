@@ -446,12 +446,6 @@ public class DbSyncDataProvider implements DataProvider {
     }
 
     @Override
-    public HashSet<AccountUpdate> getLatestStakeAccountUpdates(int epoch, HashSet<String> accounts) {
-        HashSet<LatestStakeAccountUpdate> latestStakeAccountUpdates = dbSyncStakeDeregistrationRepository.getLatestStakeAccountUpdates(epoch, accounts);
-        return latestStakeAccountUpdates.stream().map(AccountUpdateMapper::fromLatestStakeAccountUpdate).collect(Collectors.toCollection(HashSet::new));
-    }
-
-    @Override
     public HashSet<String> findSharedPoolRewardAddressWithoutReward(int epoch) {
         return dbSyncPoolUpdateRepository.findSharedPoolRewardAddressWithoutReward(epoch);
     }
@@ -459,11 +453,6 @@ public class DbSyncDataProvider implements DataProvider {
     @Override
     public HashSet<String> getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow) {
         return dbSyncStakeDeregistrationRepository.getAccountDeregistrationsInEpoch(epoch, stabilityWindow);
-    }
-
-    @Override
-    public HashSet<String> getLateAccountDeregistrationsInEpoch(int epoch, long stabilityWindow) {
-        return dbSyncStakeDeregistrationRepository.getLateAccountDeregistrationsInEpoch(epoch,  stabilityWindow);
     }
 
     @Override

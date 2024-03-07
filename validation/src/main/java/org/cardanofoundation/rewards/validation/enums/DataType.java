@@ -15,8 +15,7 @@ public enum DataType {
     REWARDS("rewards"),
     REWARDS_OUTLIER("rewardsOutlier"),
     POOL_BLOCKS("poolBlocks"),
-    PAST_ACCOUNT_REGISTRATIONS("pastAccountRegistrations"),
-    LATE_DEREGISTRATIONS("lateDeregistrations"),
+    DEREGISTRATIONS_ON_STABILITY_WINDOW("deregistrationsOnStabilityWindow"),
     ACCOUNT_DEREGISTRATION("accountDeregistrations"),
     PAST_ACCOUNT_REGISTRATIONS_UNTIL_LAST_EPOCH("pastAccountRegistrationsUntilLastEpoch"),
     PAST_ACCOUNT_REGISTRATIONS_UNTIL_NOW("pastAccountRegistrationsUntilNow");
