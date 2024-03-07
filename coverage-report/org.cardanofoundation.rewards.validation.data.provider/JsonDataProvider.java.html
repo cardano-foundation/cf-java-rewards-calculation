@@ -2,8 +2,6 @@
 
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.domain.PoolReward;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.PoolBlocks;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 import org.cardanofoundation.rewards.validation.enums.DataType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -12,290 +10,280 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
 import static org.cardanofoundation.rewards.validation.enums.DataType.*;
 import static org.cardanofoundation.rewards.validation.util.JsonConverter.convertFileJsonToArrayList;
 import static org.cardanofoundation.rewards.validation.util.JsonConverter.readJsonFile;
 @Service
-<span class="fc" id="L23">public class JsonDataProvider implements DataProvider {</span>
+<span class="fc" id="L19">public class JsonDataProvider implements DataProvider {</span>
 
     @Value(&quot;${json.data-provider.source}&quot;)
     private String sourceFolder;
 
     private String getResourceFolder(DataType dataType, Integer epoch, String poolId) {
-<span class="pc bpc" id="L29" title="1 of 2 branches missed.">        if (sourceFolder == null) throw new RuntimeException(&quot;Invalid source folder for JSON data provider. Please check the JSON_DATA_SOURCE_FOLDER environment variable that you have provided.&quot;);</span>
+<span class="pc bpc" id="L25" title="1 of 2 branches missed.">        if (sourceFolder == null) throw new RuntimeException(&quot;Invalid source folder for JSON data provider. Please check the JSON_DATA_SOURCE_FOLDER environment variable that you have provided.&quot;);</span>
 
-<span class="pc bpc" id="L31" title="1 of 2 branches missed.">        if (dataType.equals(POOL_DEREGISTRATIONS)) {</span>
-<span class="nc" id="L32">            return String.join(File.separator, sourceFolder, POOL_DEREGISTRATIONS.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="pc bpc" id="L33" title="1 of 2 branches missed.">        } else if (dataType.equals(ACCOUNT_UPDATES)) {</span>
-<span class="nc" id="L34">            return String.join(File.separator, sourceFolder, ACCOUNT_UPDATES.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="fc bfc" id="L35" title="All 2 branches covered.">        } else if (dataType.equals(REWARDS_OUTLIER)) {</span>
-<span class="fc" id="L36">            return String.join(File.separator, sourceFolder, REWARDS_OUTLIER.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="fc bfc" id="L37" title="All 2 branches covered.">        } else if (dataType.equals(ACCOUNT_DEREGISTRATION)) {</span>
-<span class="fc" id="L38">            return String.join(File.separator, sourceFolder, ACCOUNT_DEREGISTRATION.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="fc bfc" id="L39" title="All 2 branches covered.">        } else if (dataType.equals(LATE_DEREGISTRATIONS)) {</span>
-<span class="fc" id="L40">            return String.join(File.separator, sourceFolder, LATE_DEREGISTRATIONS.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="pc bpc" id="L41" title="1 of 2 branches missed.">        } else if (dataType.equals(PAST_ACCOUNT_REGISTRATIONS)) {</span>
-<span class="nc" id="L42">            return String.join(File.separator, sourceFolder, PAST_ACCOUNT_REGISTRATIONS.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="fc bfc" id="L43" title="All 2 branches covered.">        } else if (dataType.equals(POOL_BLOCKS)) {</span>
-<span class="fc" id="L44">            return String.join(File.separator, sourceFolder, POOL_BLOCKS.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="fc bfc" id="L45" title="All 2 branches covered.">        } else if (dataType.equals(ADA_POTS)) {</span>
-<span class="fc" id="L46">            return String.join(File.separator, sourceFolder, ADA_POTS.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="fc bfc" id="L47" title="All 2 branches covered.">        } else if (dataType.equals(EPOCH_INFO)) {</span>
-<span class="fc" id="L48">            return String.join(File.separator, sourceFolder, EPOCH_INFO.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="fc bfc" id="L49" title="All 2 branches covered.">        } else if (dataType.equals(PROTOCOL_PARAMETERS)) {</span>
-<span class="fc" id="L50">            return String.join(File.separator, sourceFolder, PROTOCOL_PARAMETERS.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="pc bpc" id="L51" title="1 of 2 branches missed.">        } else if (dataType.equals(POOL_PARAMETERS)) {</span>
-<span class="nc" id="L52">            return String.join(File.separator, sourceFolder, POOL_PARAMETERS.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="fc bfc" id="L53" title="All 2 branches covered.">        } else if (dataType.equals(POOL_HISTORY)) {</span>
-<span class="fc" id="L54">            return String.join(File.separator, sourceFolder, POOL_HISTORY.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="pc bpc" id="L55" title="1 of 2 branches missed.">        } else if (dataType.equals(POOL_OWNER_HISTORY)) {</span>
-<span class="nc" id="L56">            return String.join(File.separator, sourceFolder, &quot;pools&quot;, poolId, &quot;owner_account_history_epoch_&quot; + epoch + &quot;.json&quot;);</span>
-<span class="fc bfc" id="L57" title="All 2 branches covered.">        } else if (dataType.equals(MIR_CERTIFICATE)) {</span>
-<span class="fc" id="L58">            return String.join(File.separator, sourceFolder, MIR_CERTIFICATE.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
+<span class="pc bpc" id="L27" title="1 of 2 branches missed.">        if (dataType.equals(POOL_DEREGISTRATIONS)) {</span>
+<span class="nc" id="L28">            return String.join(File.separator, sourceFolder, POOL_DEREGISTRATIONS.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
+<span class="pc bpc" id="L29" title="1 of 2 branches missed.">        } else if (dataType.equals(ACCOUNT_UPDATES)) {</span>
+<span class="nc" id="L30">            return String.join(File.separator, sourceFolder, ACCOUNT_UPDATES.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
+<span class="fc bfc" id="L31" title="All 2 branches covered.">        } else if (dataType.equals(REWARDS_OUTLIER)) {</span>
+<span class="fc" id="L32">            return String.join(File.separator, sourceFolder, REWARDS_OUTLIER.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">        } else if (dataType.equals(ACCOUNT_DEREGISTRATION)) {</span>
+<span class="fc" id="L34">            return String.join(File.separator, sourceFolder, ACCOUNT_DEREGISTRATION.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
+<span class="fc bfc" id="L35" title="All 2 branches covered.">        } else if (dataType.equals(DEREGISTRATIONS_ON_STABILITY_WINDOW)) {</span>
+<span class="fc" id="L36">            return String.join(File.separator, sourceFolder, ACCOUNT_DEREGISTRATION.resourceFolderName, &quot;epoch&quot; + epoch + &quot;-stability-window.json&quot;);</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        } else if (dataType.equals(POOL_BLOCKS)) {</span>
+<span class="fc" id="L38">            return String.join(File.separator, sourceFolder, POOL_BLOCKS.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        } else if (dataType.equals(ADA_POTS)) {</span>
+<span class="fc" id="L40">            return String.join(File.separator, sourceFolder, ADA_POTS.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">        } else if (dataType.equals(EPOCH_INFO)) {</span>
+<span class="fc" id="L42">            return String.join(File.separator, sourceFolder, EPOCH_INFO.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        } else if (dataType.equals(PROTOCOL_PARAMETERS)) {</span>
+<span class="fc" id="L44">            return String.join(File.separator, sourceFolder, PROTOCOL_PARAMETERS.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        } else if (dataType.equals(POOL_PARAMETERS)) {</span>
+<span class="nc" id="L46">            return String.join(File.separator, sourceFolder, POOL_PARAMETERS.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        } else if (dataType.equals(POOL_HISTORY)) {</span>
+<span class="fc" id="L48">            return String.join(File.separator, sourceFolder, POOL_HISTORY.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
+<span class="pc bpc" id="L49" title="1 of 2 branches missed.">        } else if (dataType.equals(POOL_OWNER_HISTORY)) {</span>
+<span class="nc" id="L50">            return String.join(File.separator, sourceFolder, &quot;pools&quot;, poolId, &quot;owner_account_history_epoch_&quot; + epoch + &quot;.json&quot;);</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        } else if (dataType.equals(MIR_CERTIFICATE)) {</span>
+<span class="fc" id="L52">            return String.join(File.separator, sourceFolder, MIR_CERTIFICATE.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
         } else {
-<span class="fc" id="L60">            return String.join(File.separator, sourceFolder, dataType.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
+<span class="fc" id="L54">            return String.join(File.separator, sourceFolder, dataType.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
         }
     }
 
     private &lt;T&gt; T getDataFromJson(DataType dataType, int epoch, Class&lt;T&gt; objectClass, String poolId) {
-<span class="fc" id="L65">        String filePath = getResourceFolder(dataType, epoch, poolId);</span>
+<span class="fc" id="L59">        String filePath = getResourceFolder(dataType, epoch, poolId);</span>
 
         try {
-<span class="fc" id="L68">            return readJsonFile(filePath, objectClass);</span>
-<span class="nc" id="L69">        } catch (Exception e) {</span>
-<span class="nc" id="L70">            e.printStackTrace();</span>
+<span class="fc" id="L62">            return readJsonFile(filePath, objectClass);</span>
+<span class="nc" id="L63">        } catch (Exception e) {</span>
+<span class="nc" id="L64">            e.printStackTrace();</span>
         }
-<span class="nc" id="L72">        return null;</span>
+<span class="nc" id="L66">        return null;</span>
     }
 
     private &lt;T&gt; T getDataFromJson(DataType dataType, int epoch, Class&lt;T&gt; objectClass) {
-<span class="fc" id="L76">        return getDataFromJson(dataType, epoch, objectClass, null);</span>
+<span class="fc" id="L70">        return getDataFromJson(dataType, epoch, objectClass, null);</span>
     }
 
     private &lt;T&gt; List&lt;T&gt; getListFromJson(DataType dataType, Integer epoch, Class&lt;T&gt; objectClass, String poolId) {
-<span class="fc" id="L80">        String filePath = getResourceFolder(dataType, epoch, poolId);</span>
+<span class="fc" id="L74">        String filePath = getResourceFolder(dataType, epoch, poolId);</span>
 
         try {
-<span class="fc" id="L83">            return convertFileJsonToArrayList(filePath, objectClass);</span>
-<span class="nc" id="L84">        } catch (Exception e) {</span>
-<span class="nc" id="L85">            e.printStackTrace();</span>
+<span class="fc" id="L77">            return convertFileJsonToArrayList(filePath, objectClass);</span>
+<span class="nc" id="L78">        } catch (Exception e) {</span>
+<span class="nc" id="L79">            e.printStackTrace();</span>
         }
-<span class="nc" id="L87">        return null;</span>
+<span class="nc" id="L81">        return null;</span>
     }
 
     private &lt;T&gt; HashSet&lt;T&gt; getHashSetFromJson(DataType dataType, Integer epoch, Class&lt;T&gt; objectClass) {
-<span class="fc" id="L91">        String filePath = getResourceFolder(dataType, epoch, null);</span>
+<span class="fc" id="L85">        String filePath = getResourceFolder(dataType, epoch, null);</span>
 
         try {
-<span class="fc" id="L94">            ArrayList&lt;T&gt; objectList = convertFileJsonToArrayList(filePath, objectClass);</span>
-<span class="pc bpc" id="L95" title="1 of 2 branches missed.">            if (objectList == null) return null;</span>
-<span class="fc" id="L96">            return new HashSet&lt;&gt;(objectList);</span>
-<span class="nc" id="L97">        } catch (Exception e) {</span>
-<span class="nc" id="L98">            e.printStackTrace();</span>
+<span class="fc" id="L88">            ArrayList&lt;T&gt; objectList = convertFileJsonToArrayList(filePath, objectClass);</span>
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">            if (objectList == null) return null;</span>
+<span class="fc" id="L90">            return new HashSet&lt;&gt;(objectList);</span>
+<span class="nc" id="L91">        } catch (Exception e) {</span>
+<span class="nc" id="L92">            e.printStackTrace();</span>
         }
-<span class="nc" id="L100">        return null;</span>
+<span class="nc" id="L94">        return null;</span>
     }
 
     private &lt;T&gt; List&lt;T&gt; getListFromJson(DataType dataType, Integer epoch, Class&lt;T&gt; objectClass) {
-<span class="fc" id="L104">        return getListFromJson(dataType, epoch, objectClass, null);</span>
+<span class="fc" id="L98">        return getListFromJson(dataType, epoch, objectClass, null);</span>
     }
 
     @Override
     public AdaPots getAdaPotsForEpoch(int epoch) {
-<span class="pc bpc" id="L109" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) {</span>
-<span class="nc" id="L110">            return AdaPots.builder()</span>
-<span class="nc" id="L111">                    .treasury(BigInteger.ZERO)</span>
-<span class="nc" id="L112">                    .reserves(BigInteger.ZERO)</span>
-<span class="nc" id="L113">                    .rewards(BigInteger.ZERO)</span>
-<span class="nc" id="L114">                    .epoch(epoch)</span>
-<span class="nc" id="L115">                    .build();</span>
-<span class="fc bfc" id="L116" title="All 2 branches covered.">        } else if (epoch == MAINNET_SHELLEY_START_EPOCH) {</span>
-<span class="fc" id="L117">            return AdaPots.builder()</span>
-<span class="fc" id="L118">                    .treasury(MAINNET_SHELLEY_INITIAL_TREASURY)</span>
-<span class="fc" id="L119">                    .reserves(MAINNET_SHELLEY_INITIAL_RESERVES)</span>
-<span class="fc" id="L120">                    .rewards(BigInteger.ZERO)</span>
-<span class="fc" id="L121">                    .epoch(epoch)</span>
-<span class="fc" id="L122">                    .build();</span>
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) {</span>
+<span class="nc" id="L104">            return AdaPots.builder()</span>
+<span class="nc" id="L105">                    .treasury(BigInteger.ZERO)</span>
+<span class="nc" id="L106">                    .reserves(BigInteger.ZERO)</span>
+<span class="nc" id="L107">                    .rewards(BigInteger.ZERO)</span>
+<span class="nc" id="L108">                    .epoch(epoch)</span>
+<span class="nc" id="L109">                    .build();</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">        } else if (epoch == MAINNET_SHELLEY_START_EPOCH) {</span>
+<span class="fc" id="L111">            return AdaPots.builder()</span>
+<span class="fc" id="L112">                    .treasury(MAINNET_SHELLEY_INITIAL_TREASURY)</span>
+<span class="fc" id="L113">                    .reserves(MAINNET_SHELLEY_INITIAL_RESERVES)</span>
+<span class="fc" id="L114">                    .rewards(BigInteger.ZERO)</span>
+<span class="fc" id="L115">                    .epoch(epoch)</span>
+<span class="fc" id="L116">                    .build();</span>
         }
 
-<span class="fc" id="L125">        return getDataFromJson(ADA_POTS, epoch, AdaPots.class);</span>
+<span class="fc" id="L119">        return getDataFromJson(ADA_POTS, epoch, AdaPots.class);</span>
     }
 
     @Override
     public Epoch getEpochInfo(int epoch) {
-<span class="fc bfc" id="L130" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return null;</span>
+<span class="fc bfc" id="L124" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return null;</span>
 
-<span class="fc" id="L132">        return getDataFromJson(EPOCH_INFO, epoch, Epoch.class);</span>
+<span class="fc" id="L126">        return getDataFromJson(EPOCH_INFO, epoch, Epoch.class);</span>
     }
 
     @Override
     public ProtocolParameters getProtocolParametersForEpoch(int epoch) {
-<span class="fc bfc" id="L137" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new ProtocolParameters();</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new ProtocolParameters();</span>
 
-<span class="fc" id="L139">        return getDataFromJson(PROTOCOL_PARAMETERS, epoch, ProtocolParameters.class);</span>
+<span class="fc" id="L133">        return getDataFromJson(PROTOCOL_PARAMETERS, epoch, ProtocolParameters.class);</span>
     }
 
     @Override
     public List&lt;PoolHistory&gt; getHistoryOfAllPoolsInEpoch(int epoch, List&lt;PoolBlock&gt; blocksMadeByPoolsInEpoch) {
-<span class="fc bfc" id="L144" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return List.of();</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return List.of();</span>
 
-<span class="fc" id="L146">        List&lt;PoolHistory&gt; histories = getListFromJson(POOL_HISTORY, epoch, PoolHistory.class);</span>
-<span class="pc bpc" id="L147" title="1 of 2 branches missed.">        if (histories == null) return List.of();</span>
-<span class="fc" id="L148">        return histories;</span>
+<span class="fc" id="L140">        List&lt;PoolHistory&gt; histories = getListFromJson(POOL_HISTORY, epoch, PoolHistory.class);</span>
+<span class="pc bpc" id="L141" title="1 of 2 branches missed.">        if (histories == null) return List.of();</span>
+<span class="fc" id="L142">        return histories;</span>
     }
 
     @Override
     public PoolHistory getPoolHistory(String poolId, int epoch) {
-<span class="fc" id="L153">        List&lt;PoolHistory&gt; poolHistories = getHistoryOfAllPoolsInEpoch(epoch, null);</span>
-<span class="fc" id="L154">        return poolHistories.stream().filter(history -&gt; history.getPoolId().equals(poolId)).findFirst().orElse(null);</span>
+<span class="fc" id="L147">        List&lt;PoolHistory&gt; poolHistories = getHistoryOfAllPoolsInEpoch(epoch, null);</span>
+<span class="fc" id="L148">        return poolHistories.stream().filter(history -&gt; history.getPoolId().equals(poolId)).findFirst().orElse(null);</span>
     }
 
     @Override
     public BigInteger getPoolPledgeInEpoch(String poolId, int epoch) {
-<span class="nc" id="L159">        PoolParameters poolParameters = getDataFromJson(POOL_PARAMETERS, epoch, PoolParameters.class, poolId);</span>
+<span class="nc" id="L153">        PoolParameters poolParameters = getDataFromJson(POOL_PARAMETERS, epoch, PoolParameters.class, poolId);</span>
 
-<span class="nc bnc" id="L161" title="All 2 branches missed.">        if (poolParameters == null) return null;</span>
+<span class="nc bnc" id="L155" title="All 2 branches missed.">        if (poolParameters == null) return null;</span>
 
-<span class="nc" id="L163">        return BigInteger.valueOf(poolParameters.getPledge().longValue());</span>
+<span class="nc" id="L157">        return BigInteger.valueOf(poolParameters.getPledge().longValue());</span>
     }
 
     @Override
     public PoolOwnerHistory getHistoryOfPoolOwnersInEpoch(String poolId, int epoch) {
-<span class="nc" id="L168">        return getDataFromJson(POOL_OWNER_HISTORY, epoch, PoolOwnerHistory.class, poolId);</span>
+<span class="nc" id="L162">        return getDataFromJson(POOL_OWNER_HISTORY, epoch, PoolOwnerHistory.class, poolId);</span>
     }
 
     public List&lt;String&gt; getStakeAddressesOfAllPoolsEverRetired() {
-<span class="nc" id="L172">        List&lt;PoolDeregistration&gt; poolDeregistrations = getListFromJson(POOL_DEREGISTRATIONS, null, PoolDeregistration.class);</span>
+<span class="nc" id="L166">        List&lt;PoolDeregistration&gt; poolDeregistrations = getListFromJson(POOL_DEREGISTRATIONS, null, PoolDeregistration.class);</span>
 
-<span class="nc bnc" id="L174" title="All 2 branches missed.">        if (poolDeregistrations == null) return List.of();</span>
+<span class="nc bnc" id="L168" title="All 2 branches missed.">        if (poolDeregistrations == null) return List.of();</span>
 
-<span class="nc" id="L176">        return poolDeregistrations.stream()</span>
-<span class="nc" id="L177">                .map(PoolDeregistration::getRewardAddress)</span>
-<span class="nc" id="L178">                .toList();</span>
+<span class="nc" id="L170">        return poolDeregistrations.stream()</span>
+<span class="nc" id="L171">                .map(PoolDeregistration::getRewardAddress)</span>
+<span class="nc" id="L172">                .toList();</span>
     }
 
     @Override
     public List&lt;PoolDeregistration&gt; getRetiredPoolsInEpoch(int epoch) {
-<span class="fc" id="L183">        List&lt;PoolDeregistration&gt; poolDeregistrations = getListFromJson(RETIRED_POOLS, epoch, PoolDeregistration.class);</span>
-<span class="pc bpc" id="L184" title="1 of 2 branches missed.">        if (poolDeregistrations == null) return List.of();</span>
-<span class="fc" id="L185">        return poolDeregistrations;</span>
+<span class="fc" id="L177">        List&lt;PoolDeregistration&gt; poolDeregistrations = getListFromJson(RETIRED_POOLS, epoch, PoolDeregistration.class);</span>
+<span class="pc bpc" id="L178" title="1 of 2 branches missed.">        if (poolDeregistrations == null) return List.of();</span>
+<span class="fc" id="L179">        return poolDeregistrations;</span>
     }
 
     @Override
     public List&lt;AccountUpdate&gt; getAccountUpdatesUntilEpoch(List&lt;String&gt; stakeAddresses, int epoch) {
-<span class="nc" id="L190">        List&lt;AccountUpdate&gt; accountUpdates = getListFromJson(ACCOUNT_UPDATES, epoch, AccountUpdate.class);</span>
-<span class="nc bnc" id="L191" title="All 2 branches missed.">        if (accountUpdates == null) return List.of();</span>
-<span class="nc" id="L192">        return accountUpdates.stream().filter(accountUpdate -&gt; stakeAddresses.contains(accountUpdate.getStakeAddress())).toList();</span>
+<span class="nc" id="L184">        List&lt;AccountUpdate&gt; accountUpdates = getListFromJson(ACCOUNT_UPDATES, epoch, AccountUpdate.class);</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">        if (accountUpdates == null) return List.of();</span>
+<span class="nc" id="L186">        return accountUpdates.stream().filter(accountUpdate -&gt; stakeAddresses.contains(accountUpdate.getStakeAddress())).toList();</span>
     }
 
     @Override
     public List&lt;MirCertificate&gt; getMirCertificatesInEpoch(int epoch) {
-<span class="fc" id="L197">        List&lt;MirCertificate&gt; mirCertificates = getListFromJson(MIR_CERTIFICATE, epoch, MirCertificate.class);</span>
-<span class="pc bpc" id="L198" title="1 of 2 branches missed.">        if (mirCertificates == null) return List.of();</span>
-<span class="fc" id="L199">        return mirCertificates;</span>
+<span class="fc" id="L191">        List&lt;MirCertificate&gt; mirCertificates = getListFromJson(MIR_CERTIFICATE, epoch, MirCertificate.class);</span>
+<span class="pc bpc" id="L192" title="1 of 2 branches missed.">        if (mirCertificates == null) return List.of();</span>
+<span class="fc" id="L193">        return mirCertificates;</span>
     }
 
     @Override
     public int getPoolRegistrationsInEpoch(int epoch) {
-<span class="nc" id="L204">        return 0;</span>
+<span class="nc" id="L198">        return 0;</span>
     }
 
     @Override
     public List&lt;PoolUpdate&gt; getPoolUpdateAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch) {
-<span class="nc" id="L209">        return null;</span>
+<span class="nc" id="L203">        return null;</span>
     }
 
     @Override
     public PoolDeregistration latestPoolRetirementUntilEpoch(String poolId, int epoch) {
-<span class="nc" id="L214">        return null;</span>
+<span class="nc" id="L208">        return null;</span>
     }
 
     @Override
     public BigInteger getTransactionDepositsInEpoch(int epoch) {
-<span class="nc" id="L219">        return null;</span>
+<span class="nc" id="L213">        return null;</span>
     }
 
     @Override
     public BigInteger getSumOfFeesInEpoch(int epoch) {
-<span class="nc" id="L224">        return null;</span>
+<span class="nc" id="L218">        return null;</span>
     }
 
     @Override
     public BigInteger getSumOfWithdrawalsInEpoch(int epoch) {
-<span class="nc" id="L229">        return null;</span>
+<span class="nc" id="L223">        return null;</span>
     }
 
     @Override
     public HashSet&lt;Reward&gt; getMemberRewardsInEpoch(int epoch) {
-<span class="pc bpc" id="L234" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new HashSet&lt;&gt;();</span>
+<span class="pc bpc" id="L228" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new HashSet&lt;&gt;();</span>
 
-<span class="fc" id="L236">        HashSet&lt;Reward&gt; rewards = getHashSetFromJson(MEMBER_REWARDS, epoch, Reward.class);</span>
-<span class="pc bpc" id="L237" title="1 of 2 branches missed.">        if (rewards == null) return new HashSet&lt;&gt;();</span>
-<span class="fc" id="L238">        return rewards;</span>
+<span class="fc" id="L230">        HashSet&lt;Reward&gt; rewards = getHashSetFromJson(MEMBER_REWARDS, epoch, Reward.class);</span>
+<span class="pc bpc" id="L231" title="1 of 2 branches missed.">        if (rewards == null) return new HashSet&lt;&gt;();</span>
+<span class="fc" id="L232">        return rewards;</span>
     }
 
     @Override
     public List&lt;PoolBlock&gt; getBlocksMadeByPoolsInEpoch(int epoch) {
-<span class="fc bfc" id="L243" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return List.of();</span>
+<span class="fc bfc" id="L237" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return List.of();</span>
 
-<span class="fc" id="L245">        List&lt;PoolBlock&gt; poolBlocks = getListFromJson(POOL_BLOCKS, epoch, PoolBlock.class);</span>
-<span class="pc bpc" id="L246" title="1 of 2 branches missed.">        if (poolBlocks == null) return List.of();</span>
-<span class="fc" id="L247">        return poolBlocks;</span>
-    }
-
-    @Override
-    public HashSet&lt;AccountUpdate&gt; getLatestStakeAccountUpdates(int epoch, HashSet&lt;String&gt; accounts) {
-<span class="nc" id="L252">        return null;</span>
+<span class="fc" id="L239">        List&lt;PoolBlock&gt; poolBlocks = getListFromJson(POOL_BLOCKS, epoch, PoolBlock.class);</span>
+<span class="pc bpc" id="L240" title="1 of 2 branches missed.">        if (poolBlocks == null) return List.of();</span>
+<span class="fc" id="L241">        return poolBlocks;</span>
     }
 
     @Override
     public HashSet&lt;PoolReward&gt; getTotalPoolRewardsInEpoch(int epoch) {
-<span class="pc bpc" id="L257" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new HashSet&lt;&gt;();</span>
+<span class="pc bpc" id="L246" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new HashSet&lt;&gt;();</span>
 
-<span class="fc" id="L259">        HashSet&lt;PoolReward&gt; totalPoolRewards = getHashSetFromJson(REWARDS, epoch, PoolReward.class);</span>
-<span class="pc bpc" id="L260" title="1 of 2 branches missed.">        if (totalPoolRewards == null) return new HashSet&lt;&gt;();</span>
-<span class="fc" id="L261">        return totalPoolRewards;</span>
+<span class="fc" id="L248">        HashSet&lt;PoolReward&gt; totalPoolRewards = getHashSetFromJson(REWARDS, epoch, PoolReward.class);</span>
+<span class="pc bpc" id="L249" title="1 of 2 branches missed.">        if (totalPoolRewards == null) return new HashSet&lt;&gt;();</span>
+<span class="fc" id="L250">        return totalPoolRewards;</span>
     }
 
     @Override
     public HashSet&lt;String&gt; findSharedPoolRewardAddressWithoutReward(int epoch) {
-<span class="fc bfc" id="L266" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L255" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new HashSet&lt;&gt;();</span>
 
-<span class="fc" id="L268">        HashSet&lt;String&gt; sharedPoolRewardAddressesWithoutReward = getHashSetFromJson(REWARDS_OUTLIER, epoch, String.class);</span>
-<span class="pc bpc" id="L269" title="1 of 2 branches missed.">        if (sharedPoolRewardAddressesWithoutReward == null) return new HashSet&lt;&gt;();</span>
-<span class="fc" id="L270">        return sharedPoolRewardAddressesWithoutReward;</span>
+<span class="fc" id="L257">        HashSet&lt;String&gt; sharedPoolRewardAddressesWithoutReward = getHashSetFromJson(REWARDS_OUTLIER, epoch, String.class);</span>
+<span class="pc bpc" id="L258" title="1 of 2 branches missed.">        if (sharedPoolRewardAddressesWithoutReward == null) return new HashSet&lt;&gt;();</span>
+<span class="fc" id="L259">        return sharedPoolRewardAddressesWithoutReward;</span>
     }
 
     @Override
     public HashSet&lt;String&gt; getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow) {
-<span class="fc" id="L275">        HashSet&lt;String&gt; deregisteredAccounts = getHashSetFromJson(ACCOUNT_DEREGISTRATION, epoch, String.class);</span>
-<span class="pc bpc" id="L276" title="1 of 2 branches missed.">        if (deregisteredAccounts == null) return new HashSet&lt;&gt;();</span>
-<span class="fc" id="L277">        return deregisteredAccounts;</span>
-    }
+        HashSet&lt;String&gt; deregisteredAccounts;
+<span class="fc bfc" id="L265" title="All 2 branches covered.">        if (stabilityWindow == RANDOMNESS_STABILISATION_WINDOW) {</span>
+<span class="fc" id="L266">            deregisteredAccounts = getHashSetFromJson(DEREGISTRATIONS_ON_STABILITY_WINDOW, epoch, String.class);</span>
+        } else {
+<span class="fc" id="L268">            deregisteredAccounts = getHashSetFromJson(ACCOUNT_DEREGISTRATION, epoch, String.class);</span>
+        }
 
-    @Override
-    public HashSet&lt;String&gt; getLateAccountDeregistrationsInEpoch(int epoch, long stabilityWindow) {
-<span class="fc" id="L282">        HashSet&lt;String&gt; lateDeregisteredAccounts = getHashSetFromJson(LATE_DEREGISTRATIONS, epoch, String.class);</span>
-<span class="pc bpc" id="L283" title="1 of 2 branches missed.">        if (lateDeregisteredAccounts == null) return new HashSet&lt;&gt;();</span>
-<span class="fc" id="L284">        return lateDeregisteredAccounts;</span>
+<span class="pc bpc" id="L271" title="1 of 2 branches missed.">        if (deregisteredAccounts == null) return new HashSet&lt;&gt;();</span>
+<span class="fc" id="L272">        return deregisteredAccounts;</span>
     }
 
     @Override
     public HashSet&lt;String&gt; getRegisteredAccountsUntilLastEpoch(Integer epoch, HashSet&lt;String&gt; stakeAddresses, Long stabilityWindow) {
-<span class="fc" id="L289">        HashSet&lt;String&gt; accountsRegisteredInThePast = getHashSetFromJson(PAST_ACCOUNT_REGISTRATIONS_UNTIL_LAST_EPOCH, epoch, String.class);</span>
-<span class="pc bpc" id="L290" title="1 of 2 branches missed.">        if (accountsRegisteredInThePast == null) return new HashSet&lt;&gt;();</span>
-<span class="fc" id="L291">        return accountsRegisteredInThePast;</span>
+<span class="fc" id="L277">        HashSet&lt;String&gt; accountsRegisteredInThePast = getHashSetFromJson(PAST_ACCOUNT_REGISTRATIONS_UNTIL_LAST_EPOCH, epoch, String.class);</span>
+<span class="pc bpc" id="L278" title="1 of 2 branches missed.">        if (accountsRegisteredInThePast == null) return new HashSet&lt;&gt;();</span>
+<span class="fc" id="L279">        return accountsRegisteredInThePast;</span>
     }
 
     @Override
     public HashSet&lt;String&gt; getRegisteredAccountsUntilNow(Integer epoch, HashSet&lt;String&gt; stakeAddresses, Long stabilityWindow) {
-<span class="fc" id="L296">        HashSet&lt;String&gt; accountsRegisteredInThePast = getHashSetFromJson(PAST_ACCOUNT_REGISTRATIONS_UNTIL_NOW, epoch, String.class);</span>
-<span class="pc bpc" id="L297" title="1 of 2 branches missed.">        if (accountsRegisteredInThePast == null) return new HashSet&lt;&gt;();</span>
-<span class="fc" id="L298">        return accountsRegisteredInThePast;</span>
+<span class="fc" id="L284">        HashSet&lt;String&gt; accountsRegisteredInThePast = getHashSetFromJson(PAST_ACCOUNT_REGISTRATIONS_UNTIL_NOW, epoch, String.class);</span>
+<span class="pc bpc" id="L285" title="1 of 2 branches missed.">        if (accountsRegisteredInThePast == null) return new HashSet&lt;&gt;();</span>
+<span class="fc" id="L286">        return accountsRegisteredInThePast;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

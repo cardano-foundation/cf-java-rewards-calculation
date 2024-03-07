@@ -282,55 +282,45 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
-    public HashSet&lt;AccountUpdate&gt; getLatestStakeAccountUpdates(int epoch, HashSet&lt;String&gt; accounts) {
+    public HashSet&lt;PoolReward&gt; getTotalPoolRewardsInEpoch(int epoch) {
 <span class="nc" id="L286">        return null;</span>
     }
 
     @Override
-    public HashSet&lt;PoolReward&gt; getTotalPoolRewardsInEpoch(int epoch) {
+    public HashSet&lt;String&gt; findSharedPoolRewardAddressWithoutReward(int epoch) {
 <span class="nc" id="L291">        return null;</span>
     }
 
     @Override
-    public HashSet&lt;String&gt; findSharedPoolRewardAddressWithoutReward(int epoch) {
+    public HashSet&lt;String&gt; getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow) {
 <span class="nc" id="L296">        return null;</span>
     }
 
     @Override
-    public HashSet&lt;String&gt; getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow) {
+    public HashSet&lt;String&gt; getRegisteredAccountsUntilLastEpoch(Integer epoch, HashSet&lt;String&gt; stakeAddresses, Long stabilityWindow) {
 <span class="nc" id="L301">        return null;</span>
     }
 
     @Override
-    public HashSet&lt;String&gt; getLateAccountDeregistrationsInEpoch(int epoch, long stabilityWindow) {
+    public HashSet&lt;String&gt; getRegisteredAccountsUntilNow(Integer epoch, HashSet&lt;String&gt; stakeAddresses, Long stabilityWindow) {
 <span class="nc" id="L306">        return null;</span>
     }
 
-    @Override
-    public HashSet&lt;String&gt; getRegisteredAccountsUntilLastEpoch(Integer epoch, HashSet&lt;String&gt; stakeAddresses, Long stabilityWindow) {
-<span class="nc" id="L311">        return null;</span>
-    }
-
-    @Override
-    public HashSet&lt;String&gt; getRegisteredAccountsUntilNow(Integer epoch, HashSet&lt;String&gt; stakeAddresses, Long stabilityWindow) {
-<span class="nc" id="L316">        return null;</span>
-    }
-
     private HashSet&lt;Delegator&gt; getPoolMemberInEpoch(String poolId, int epoch) {
-<span class="nc" id="L320">        HashSet&lt;Delegator&gt; delegators = new HashSet&lt;&gt;();</span>
+<span class="nc" id="L310">        HashSet&lt;Delegator&gt; delegators = new HashSet&lt;&gt;();</span>
         try {
-<span class="nc" id="L322">            List&lt;PoolDelegatorHistory&gt; poolDelegatorsHistory = koiosBackendService</span>
-<span class="nc" id="L323">                    .getPoolService().getPoolDelegatorsHistory(poolId, epoch, Options.EMPTY).getValue();</span>
-<span class="nc bnc" id="L324" title="All 2 branches missed.">            for (PoolDelegatorHistory poolDelegator : poolDelegatorsHistory) {</span>
-<span class="nc" id="L325">                delegators.add(Delegator.builder()</span>
-<span class="nc" id="L326">                        .activeStake(new BigInteger(poolDelegator.getAmount()))</span>
-<span class="nc" id="L327">                        .stakeAddress(poolDelegator.getStakeAddress())</span>
-<span class="nc" id="L328">                        .build());</span>
-<span class="nc" id="L329">            }</span>
-<span class="nc" id="L330">        } catch (ApiException e) {</span>
-<span class="nc" id="L331">            e.printStackTrace();</span>
-<span class="nc" id="L332">        }</span>
-<span class="nc" id="L333">        return delegators;</span>
+<span class="nc" id="L312">            List&lt;PoolDelegatorHistory&gt; poolDelegatorsHistory = koiosBackendService</span>
+<span class="nc" id="L313">                    .getPoolService().getPoolDelegatorsHistory(poolId, epoch, Options.EMPTY).getValue();</span>
+<span class="nc bnc" id="L314" title="All 2 branches missed.">            for (PoolDelegatorHistory poolDelegator : poolDelegatorsHistory) {</span>
+<span class="nc" id="L315">                delegators.add(Delegator.builder()</span>
+<span class="nc" id="L316">                        .activeStake(new BigInteger(poolDelegator.getAmount()))</span>
+<span class="nc" id="L317">                        .stakeAddress(poolDelegator.getStakeAddress())</span>
+<span class="nc" id="L318">                        .build());</span>
+<span class="nc" id="L319">            }</span>
+<span class="nc" id="L320">        } catch (ApiException e) {</span>
+<span class="nc" id="L321">            e.printStackTrace();</span>
+<span class="nc" id="L322">        }</span>
+<span class="nc" id="L323">        return delegators;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

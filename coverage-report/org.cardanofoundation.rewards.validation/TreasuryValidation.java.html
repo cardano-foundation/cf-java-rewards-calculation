@@ -24,13 +24,13 @@ import static org.cardanofoundation.rewards.calculation.constants.RewardConstant
 <span class="fc" id="L24">    List&lt;MirCertificate&gt; mirCertificates = dataProvider.getMirCertificatesInEpoch(epoch - 1);</span>
 <span class="fc" id="L25">    List&lt;PoolBlock&gt; blocksMadeByPoolsInEpoch = dataProvider.getBlocksMadeByPoolsInEpoch(epoch - 2);</span>
 <span class="fc" id="L26">    List&lt;PoolHistory&gt; poolHistories = dataProvider.getHistoryOfAllPoolsInEpoch(epoch - 2, blocksMadeByPoolsInEpoch);</span>
-<span class="fc" id="L27">    HashSet&lt;String&gt; deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);</span>
-<span class="fc" id="L28">    HashSet&lt;String&gt; lateDeregisteredAccounts = dataProvider.getLateAccountDeregistrationsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);</span>
+<span class="fc" id="L27">    HashSet&lt;String&gt; deregisteredAccountsOnEpochBoundary = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, EXPECTED_SLOTS_PER_EPOCH);</span>
+
 <span class="fc" id="L29">    HashSet&lt;String&gt; poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).collect(Collectors.toCollection(HashSet::new));</span>
 <span class="fc" id="L30">    poolRewardAddresses.addAll(retiredPools.stream().map(PoolDeregistration::getRewardAddress).collect(Collectors.toSet()));</span>
 <span class="fc" id="L31">    HashSet&lt;String&gt; registeredAccountsUntilNow = dataProvider.getRegisteredAccountsUntilNow(epoch, poolRewardAddresses, RANDOMNESS_STABILISATION_WINDOW);</span>
 
-<span class="fc" id="L33">    TreasuryCalculationResult treasuryCalculationResult = TreasuryCalculation.calculateTreasuryInEpoch(epoch, protocolParameters, adaPotsForPreviousEpoch, epochInfo, retiredPools, mirCertificates, deregisteredAccounts, lateDeregisteredAccounts, registeredAccountsUntilNow, BigInteger.ZERO);</span>
+<span class="fc" id="L33">    TreasuryCalculationResult treasuryCalculationResult = TreasuryCalculation.calculateTreasuryInEpoch(epoch, protocolParameters, adaPotsForPreviousEpoch, epochInfo, retiredPools, mirCertificates, deregisteredAccountsOnEpochBoundary, registeredAccountsUntilNow, BigInteger.ZERO);</span>
 
 <span class="fc" id="L35">    TreasuryValidationResult treasuryValidationResult = TreasuryValidationResult.fromTreasuryCalculationResult(treasuryCalculationResult);</span>
 <span class="fc" id="L36">    AdaPots adaPotsForCurrentEpoch = dataProvider.getAdaPotsForEpoch(epoch);</span>

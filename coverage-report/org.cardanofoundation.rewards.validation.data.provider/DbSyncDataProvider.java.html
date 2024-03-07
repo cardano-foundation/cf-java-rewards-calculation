@@ -446,34 +446,23 @@ import static org.cardanofoundation.rewards.calculation.constants.RewardConstant
     }
 
     @Override
-    public HashSet&lt;AccountUpdate&gt; getLatestStakeAccountUpdates(int epoch, HashSet&lt;String&gt; accounts) {
-<span class="nc" id="L450">        HashSet&lt;LatestStakeAccountUpdate&gt; latestStakeAccountUpdates = dbSyncStakeDeregistrationRepository.getLatestStakeAccountUpdates(epoch, accounts);</span>
-<span class="nc" id="L451">        return latestStakeAccountUpdates.stream().map(AccountUpdateMapper::fromLatestStakeAccountUpdate).collect(Collectors.toCollection(HashSet::new));</span>
-    }
-
-    @Override
     public HashSet&lt;String&gt; findSharedPoolRewardAddressWithoutReward(int epoch) {
-<span class="nc" id="L456">        return dbSyncPoolUpdateRepository.findSharedPoolRewardAddressWithoutReward(epoch);</span>
+<span class="nc" id="L450">        return dbSyncPoolUpdateRepository.findSharedPoolRewardAddressWithoutReward(epoch);</span>
     }
 
     @Override
     public HashSet&lt;String&gt; getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow) {
-<span class="nc" id="L461">        return dbSyncStakeDeregistrationRepository.getAccountDeregistrationsInEpoch(epoch, stabilityWindow);</span>
-    }
-
-    @Override
-    public HashSet&lt;String&gt; getLateAccountDeregistrationsInEpoch(int epoch, long stabilityWindow) {
-<span class="nc" id="L466">        return dbSyncStakeDeregistrationRepository.getLateAccountDeregistrationsInEpoch(epoch,  stabilityWindow);</span>
+<span class="nc" id="L455">        return dbSyncStakeDeregistrationRepository.getAccountDeregistrationsInEpoch(epoch, stabilityWindow);</span>
     }
 
     @Override
     public HashSet&lt;String&gt; getRegisteredAccountsUntilLastEpoch(Integer epoch, HashSet&lt;String&gt; stakeAddresses, Long stabilityWindow) {
-<span class="nc" id="L471">        return dbSyncStakeRegistrationRepository.getStakeAddressesWithRegistrationsUntilEpoch(epoch - 1, stakeAddresses, stabilityWindow);</span>
+<span class="nc" id="L460">        return dbSyncStakeRegistrationRepository.getStakeAddressesWithRegistrationsUntilEpoch(epoch - 1, stakeAddresses, stabilityWindow);</span>
     }
 
     @Override
     public HashSet&lt;String&gt; getRegisteredAccountsUntilNow(Integer epoch, HashSet&lt;String&gt; stakeAddresses, Long stabilisationWindow) {
-<span class="nc" id="L476">        return dbSyncStakeRegistrationRepository.getStakeAddressesWithRegistrationsUntilEpoch(epoch, stakeAddresses, stabilisationWindow);</span>
+<span class="nc" id="L465">        return dbSyncStakeRegistrationRepository.getStakeAddressesWithRegistrationsUntilEpoch(epoch, stakeAddresses, stabilisationWindow);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
