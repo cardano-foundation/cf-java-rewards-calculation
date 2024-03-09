@@ -11,13 +11,12 @@ import java.math.BigInteger;
 
 <span class="nc" id="L12">        return PoolHistory.builder()</span>
 <span class="nc" id="L13">            .activeStake(new BigInteger(poolHistory.getActiveStake()))</span>
-<span class="nc" id="L14">            .delegatorRewards(new BigInteger(poolHistory.getDelegRewards()))</span>
-<span class="nc" id="L15">            .poolFees(new BigInteger(poolHistory.getPoolFees()))</span>
-<span class="nc" id="L16">            .margin(Double.parseDouble(String.valueOf(poolHistory.getMargin())))</span>
-<span class="nc" id="L17">            .fixedCost(new BigInteger(String.valueOf(poolHistory.getFixedCost())))</span>
-<span class="nc" id="L18">            .blockCount(poolHistory.getBlockCnt())</span>
-<span class="nc" id="L19">            .epoch(poolHistory.getEpochNo())</span>
-<span class="nc" id="L20">            .build();</span>
+<span class="nc" id="L14">            .poolFees(new BigInteger(poolHistory.getPoolFees()))</span>
+<span class="nc" id="L15">            .margin(Double.parseDouble(String.valueOf(poolHistory.getMargin())))</span>
+<span class="nc" id="L16">            .fixedCost(new BigInteger(String.valueOf(poolHistory.getFixedCost())))</span>
+<span class="nc" id="L17">            .blockCount(poolHistory.getBlockCnt())</span>
+<span class="nc" id="L18">            .epoch(poolHistory.getEpochNo())</span>
+<span class="nc" id="L19">            .build();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

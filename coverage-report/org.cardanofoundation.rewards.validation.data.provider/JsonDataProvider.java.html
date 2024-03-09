@@ -149,141 +149,105 @@ import static org.cardanofoundation.rewards.validation.util.JsonConverter.readJs
     }
 
     @Override
-    public BigInteger getPoolPledgeInEpoch(String poolId, int epoch) {
-<span class="nc" id="L153">        PoolParameters poolParameters = getDataFromJson(POOL_PARAMETERS, epoch, PoolParameters.class, poolId);</span>
-
-<span class="nc bnc" id="L155" title="All 2 branches missed.">        if (poolParameters == null) return null;</span>
-
-<span class="nc" id="L157">        return BigInteger.valueOf(poolParameters.getPledge().longValue());</span>
-    }
-
-    @Override
-    public PoolOwnerHistory getHistoryOfPoolOwnersInEpoch(String poolId, int epoch) {
-<span class="nc" id="L162">        return getDataFromJson(POOL_OWNER_HISTORY, epoch, PoolOwnerHistory.class, poolId);</span>
-    }
-
-    public List&lt;String&gt; getStakeAddressesOfAllPoolsEverRetired() {
-<span class="nc" id="L166">        List&lt;PoolDeregistration&gt; poolDeregistrations = getListFromJson(POOL_DEREGISTRATIONS, null, PoolDeregistration.class);</span>
-
-<span class="nc bnc" id="L168" title="All 2 branches missed.">        if (poolDeregistrations == null) return List.of();</span>
-
-<span class="nc" id="L170">        return poolDeregistrations.stream()</span>
-<span class="nc" id="L171">                .map(PoolDeregistration::getRewardAddress)</span>
-<span class="nc" id="L172">                .toList();</span>
-    }
-
-    @Override
-    public List&lt;PoolDeregistration&gt; getRetiredPoolsInEpoch(int epoch) {
-<span class="fc" id="L177">        List&lt;PoolDeregistration&gt; poolDeregistrations = getListFromJson(RETIRED_POOLS, epoch, PoolDeregistration.class);</span>
-<span class="pc bpc" id="L178" title="1 of 2 branches missed.">        if (poolDeregistrations == null) return List.of();</span>
-<span class="fc" id="L179">        return poolDeregistrations;</span>
-    }
-
-    @Override
-    public List&lt;AccountUpdate&gt; getAccountUpdatesUntilEpoch(List&lt;String&gt; stakeAddresses, int epoch) {
-<span class="nc" id="L184">        List&lt;AccountUpdate&gt; accountUpdates = getListFromJson(ACCOUNT_UPDATES, epoch, AccountUpdate.class);</span>
-<span class="nc bnc" id="L185" title="All 2 branches missed.">        if (accountUpdates == null) return List.of();</span>
-<span class="nc" id="L186">        return accountUpdates.stream().filter(accountUpdate -&gt; stakeAddresses.contains(accountUpdate.getStakeAddress())).toList();</span>
+    public HashSet&lt;String&gt; getRewardAddressesOfRetiredPoolsInEpoch(int epoch) {
+<span class="fc" id="L153">        HashSet&lt;String&gt; poolDeregistrations = getHashSetFromJson(REWARD_ADDRESSES_OF_RETIRED_POOLS, epoch, String.class);</span>
+<span class="pc bpc" id="L154" title="1 of 2 branches missed.">        if (poolDeregistrations == null) return new HashSet&lt;&gt;();</span>
+<span class="fc" id="L155">        return poolDeregistrations;</span>
     }
 
     @Override
     public List&lt;MirCertificate&gt; getMirCertificatesInEpoch(int epoch) {
-<span class="fc" id="L191">        List&lt;MirCertificate&gt; mirCertificates = getListFromJson(MIR_CERTIFICATE, epoch, MirCertificate.class);</span>
-<span class="pc bpc" id="L192" title="1 of 2 branches missed.">        if (mirCertificates == null) return List.of();</span>
-<span class="fc" id="L193">        return mirCertificates;</span>
+<span class="fc" id="L160">        List&lt;MirCertificate&gt; mirCertificates = getListFromJson(MIR_CERTIFICATE, epoch, MirCertificate.class);</span>
+<span class="pc bpc" id="L161" title="1 of 2 branches missed.">        if (mirCertificates == null) return List.of();</span>
+<span class="fc" id="L162">        return mirCertificates;</span>
     }
 
     @Override
     public int getPoolRegistrationsInEpoch(int epoch) {
-<span class="nc" id="L198">        return 0;</span>
+<span class="nc" id="L167">        return 0;</span>
     }
 
     @Override
     public List&lt;PoolUpdate&gt; getPoolUpdateAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch) {
-<span class="nc" id="L203">        return null;</span>
-    }
-
-    @Override
-    public PoolDeregistration latestPoolRetirementUntilEpoch(String poolId, int epoch) {
-<span class="nc" id="L208">        return null;</span>
+<span class="nc" id="L172">        return null;</span>
     }
 
     @Override
     public BigInteger getTransactionDepositsInEpoch(int epoch) {
-<span class="nc" id="L213">        return null;</span>
+<span class="nc" id="L177">        return null;</span>
     }
 
     @Override
     public BigInteger getSumOfFeesInEpoch(int epoch) {
-<span class="nc" id="L218">        return null;</span>
+<span class="nc" id="L182">        return null;</span>
     }
 
     @Override
     public BigInteger getSumOfWithdrawalsInEpoch(int epoch) {
-<span class="nc" id="L223">        return null;</span>
+<span class="nc" id="L187">        return null;</span>
     }
 
     @Override
     public HashSet&lt;Reward&gt; getMemberRewardsInEpoch(int epoch) {
-<span class="pc bpc" id="L228" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new HashSet&lt;&gt;();</span>
+<span class="pc bpc" id="L192" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new HashSet&lt;&gt;();</span>
 
-<span class="fc" id="L230">        HashSet&lt;Reward&gt; rewards = getHashSetFromJson(MEMBER_REWARDS, epoch, Reward.class);</span>
-<span class="pc bpc" id="L231" title="1 of 2 branches missed.">        if (rewards == null) return new HashSet&lt;&gt;();</span>
-<span class="fc" id="L232">        return rewards;</span>
+<span class="fc" id="L194">        HashSet&lt;Reward&gt; rewards = getHashSetFromJson(MEMBER_REWARDS, epoch, Reward.class);</span>
+<span class="pc bpc" id="L195" title="1 of 2 branches missed.">        if (rewards == null) return new HashSet&lt;&gt;();</span>
+<span class="fc" id="L196">        return rewards;</span>
     }
 
     @Override
     public List&lt;PoolBlock&gt; getBlocksMadeByPoolsInEpoch(int epoch) {
-<span class="fc bfc" id="L237" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return List.of();</span>
+<span class="fc bfc" id="L201" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return List.of();</span>
 
-<span class="fc" id="L239">        List&lt;PoolBlock&gt; poolBlocks = getListFromJson(POOL_BLOCKS, epoch, PoolBlock.class);</span>
-<span class="pc bpc" id="L240" title="1 of 2 branches missed.">        if (poolBlocks == null) return List.of();</span>
-<span class="fc" id="L241">        return poolBlocks;</span>
+<span class="fc" id="L203">        List&lt;PoolBlock&gt; poolBlocks = getListFromJson(POOL_BLOCKS, epoch, PoolBlock.class);</span>
+<span class="pc bpc" id="L204" title="1 of 2 branches missed.">        if (poolBlocks == null) return List.of();</span>
+<span class="fc" id="L205">        return poolBlocks;</span>
     }
 
     @Override
     public HashSet&lt;PoolReward&gt; getTotalPoolRewardsInEpoch(int epoch) {
-<span class="pc bpc" id="L246" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new HashSet&lt;&gt;();</span>
+<span class="pc bpc" id="L210" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new HashSet&lt;&gt;();</span>
 
-<span class="fc" id="L248">        HashSet&lt;PoolReward&gt; totalPoolRewards = getHashSetFromJson(REWARDS, epoch, PoolReward.class);</span>
-<span class="pc bpc" id="L249" title="1 of 2 branches missed.">        if (totalPoolRewards == null) return new HashSet&lt;&gt;();</span>
-<span class="fc" id="L250">        return totalPoolRewards;</span>
+<span class="fc" id="L212">        HashSet&lt;PoolReward&gt; totalPoolRewards = getHashSetFromJson(REWARDS, epoch, PoolReward.class);</span>
+<span class="pc bpc" id="L213" title="1 of 2 branches missed.">        if (totalPoolRewards == null) return new HashSet&lt;&gt;();</span>
+<span class="fc" id="L214">        return totalPoolRewards;</span>
     }
 
     @Override
     public HashSet&lt;String&gt; findSharedPoolRewardAddressWithoutReward(int epoch) {
-<span class="fc bfc" id="L255" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L219" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new HashSet&lt;&gt;();</span>
 
-<span class="fc" id="L257">        HashSet&lt;String&gt; sharedPoolRewardAddressesWithoutReward = getHashSetFromJson(REWARDS_OUTLIER, epoch, String.class);</span>
-<span class="pc bpc" id="L258" title="1 of 2 branches missed.">        if (sharedPoolRewardAddressesWithoutReward == null) return new HashSet&lt;&gt;();</span>
-<span class="fc" id="L259">        return sharedPoolRewardAddressesWithoutReward;</span>
+<span class="fc" id="L221">        HashSet&lt;String&gt; sharedPoolRewardAddressesWithoutReward = getHashSetFromJson(REWARDS_OUTLIER, epoch, String.class);</span>
+<span class="pc bpc" id="L222" title="1 of 2 branches missed.">        if (sharedPoolRewardAddressesWithoutReward == null) return new HashSet&lt;&gt;();</span>
+<span class="fc" id="L223">        return sharedPoolRewardAddressesWithoutReward;</span>
     }
 
     @Override
     public HashSet&lt;String&gt; getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow) {
         HashSet&lt;String&gt; deregisteredAccounts;
-<span class="fc bfc" id="L265" title="All 2 branches covered.">        if (stabilityWindow == RANDOMNESS_STABILISATION_WINDOW) {</span>
-<span class="fc" id="L266">            deregisteredAccounts = getHashSetFromJson(DEREGISTRATIONS_ON_STABILITY_WINDOW, epoch, String.class);</span>
+<span class="fc bfc" id="L229" title="All 2 branches covered.">        if (stabilityWindow == RANDOMNESS_STABILISATION_WINDOW) {</span>
+<span class="fc" id="L230">            deregisteredAccounts = getHashSetFromJson(DEREGISTRATIONS_ON_STABILITY_WINDOW, epoch, String.class);</span>
         } else {
-<span class="fc" id="L268">            deregisteredAccounts = getHashSetFromJson(ACCOUNT_DEREGISTRATION, epoch, String.class);</span>
+<span class="fc" id="L232">            deregisteredAccounts = getHashSetFromJson(ACCOUNT_DEREGISTRATION, epoch, String.class);</span>
         }
 
-<span class="pc bpc" id="L271" title="1 of 2 branches missed.">        if (deregisteredAccounts == null) return new HashSet&lt;&gt;();</span>
-<span class="fc" id="L272">        return deregisteredAccounts;</span>
+<span class="pc bpc" id="L235" title="1 of 2 branches missed.">        if (deregisteredAccounts == null) return new HashSet&lt;&gt;();</span>
+<span class="fc" id="L236">        return deregisteredAccounts;</span>
     }
 
     @Override
     public HashSet&lt;String&gt; getRegisteredAccountsUntilLastEpoch(Integer epoch, HashSet&lt;String&gt; stakeAddresses, Long stabilityWindow) {
-<span class="fc" id="L277">        HashSet&lt;String&gt; accountsRegisteredInThePast = getHashSetFromJson(PAST_ACCOUNT_REGISTRATIONS_UNTIL_LAST_EPOCH, epoch, String.class);</span>
-<span class="pc bpc" id="L278" title="1 of 2 branches missed.">        if (accountsRegisteredInThePast == null) return new HashSet&lt;&gt;();</span>
-<span class="fc" id="L279">        return accountsRegisteredInThePast;</span>
+<span class="fc" id="L241">        HashSet&lt;String&gt; accountsRegisteredInThePast = getHashSetFromJson(PAST_ACCOUNT_REGISTRATIONS_UNTIL_LAST_EPOCH, epoch, String.class);</span>
+<span class="pc bpc" id="L242" title="1 of 2 branches missed.">        if (accountsRegisteredInThePast == null) return new HashSet&lt;&gt;();</span>
+<span class="fc" id="L243">        return accountsRegisteredInThePast;</span>
     }
 
     @Override
     public HashSet&lt;String&gt; getRegisteredAccountsUntilNow(Integer epoch, HashSet&lt;String&gt; stakeAddresses, Long stabilityWindow) {
-<span class="fc" id="L284">        HashSet&lt;String&gt; accountsRegisteredInThePast = getHashSetFromJson(PAST_ACCOUNT_REGISTRATIONS_UNTIL_NOW, epoch, String.class);</span>
-<span class="pc bpc" id="L285" title="1 of 2 branches missed.">        if (accountsRegisteredInThePast == null) return new HashSet&lt;&gt;();</span>
-<span class="fc" id="L286">        return accountsRegisteredInThePast;</span>
+<span class="fc" id="L248">        HashSet&lt;String&gt; accountsRegisteredInThePast = getHashSetFromJson(PAST_ACCOUNT_REGISTRATIONS_UNTIL_NOW, epoch, String.class);</span>
+<span class="pc bpc" id="L249" title="1 of 2 branches missed.">        if (accountsRegisteredInThePast == null) return new HashSet&lt;&gt;();</span>
+<span class="fc" id="L250">        return accountsRegisteredInThePast;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

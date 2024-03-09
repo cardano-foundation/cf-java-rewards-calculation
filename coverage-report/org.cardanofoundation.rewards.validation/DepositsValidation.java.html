@@ -2,28 +2,26 @@
 
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.calculation.domain.AdaPots;
-import org.cardanofoundation.rewards.calculation.domain.PoolDeregistration;
-
 import java.math.BigInteger;
-import java.util.List;
+import java.util.HashSet;
 
 import static org.cardanofoundation.rewards.calculation.DepositsCalculation.calculateDepositsInEpoch;
 
-<span class="nc" id="L12">public class DepositsValidation {</span>
+<span class="nc" id="L10">public class DepositsValidation {</span>
 
     public static BigInteger computeDepositsInEpoch(int epoch, DataProvider dataProvider) {
-<span class="nc" id="L15">        AdaPots adaPots = dataProvider.getAdaPotsForEpoch(epoch);</span>
-<span class="nc" id="L16">        BigInteger depositsInPreviousEpoch = adaPots.getDeposits();</span>
-<span class="nc" id="L17">        BigInteger transactionDepositsInEpoch = BigInteger.ZERO;</span>
-<span class="nc" id="L18">        List&lt;PoolDeregistration&gt; retiredPoolsInEpoch = List.of();</span>
+<span class="nc" id="L13">        AdaPots adaPots = dataProvider.getAdaPotsForEpoch(epoch);</span>
+<span class="nc" id="L14">        BigInteger depositsInPreviousEpoch = adaPots.getDeposits();</span>
+<span class="nc" id="L15">        BigInteger transactionDepositsInEpoch = BigInteger.ZERO;</span>
+<span class="nc" id="L16">        HashSet&lt;String&gt; retiredPoolsInEpoch = new HashSet&lt;&gt;();</span>
 
-<span class="nc bnc" id="L20" title="All 2 branches missed.">        if (epoch &gt; 207) {</span>
-<span class="nc" id="L21">            transactionDepositsInEpoch = dataProvider.getTransactionDepositsInEpoch(epoch);</span>
-<span class="nc" id="L22">            retiredPoolsInEpoch = dataProvider.getRetiredPoolsInEpoch(epoch + 1);</span>
+<span class="nc bnc" id="L18" title="All 2 branches missed.">        if (epoch &gt; 207) {</span>
+<span class="nc" id="L19">            transactionDepositsInEpoch = dataProvider.getTransactionDepositsInEpoch(epoch);</span>
+<span class="nc" id="L20">            retiredPoolsInEpoch = dataProvider.getRewardAddressesOfRetiredPoolsInEpoch(epoch + 1);</span>
         }
 
-<span class="nc" id="L25">        return calculateDepositsInEpoch(depositsInPreviousEpoch,</span>
-<span class="nc" id="L26">                transactionDepositsInEpoch, retiredPoolsInEpoch.size());</span>
+<span class="nc" id="L23">        return calculateDepositsInEpoch(depositsInPreviousEpoch,</span>
+<span class="nc" id="L24">                transactionDepositsInEpoch, retiredPoolsInEpoch.size());</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

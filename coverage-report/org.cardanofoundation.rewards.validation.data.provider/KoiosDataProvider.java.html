@@ -52,7 +52,7 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     public Epoch getEpochInfo(int epoch) {
-<span class="fc" id="L55">        Epoch epochEntity = null;</span>
+        Epoch epochEntity;
 
         try {
 <span class="fc" id="L58">            EpochInfo epochInfo = koiosBackendService.getEpochService()</span>
@@ -66,261 +66,163 @@ public class KoiosDataProvider implements DataProvider {
 <span class="fc" id="L66">                        .option(Offset.of(offset))</span>
 <span class="fc" id="L67">                        .build()).getValue());</span>
             }
-<span class="fc" id="L69">            epochEntity.setPoolsMadeBlocks(blocks.stream().map(Block::getPool).filter(Objects::nonNull).distinct().toList());</span>
-<span class="fc bfc" id="L70" title="All 2 branches covered.">            if (epoch &lt; 211) {</span>
-<span class="fc" id="L71">                epochEntity.setOBFTBlockCount(epochEntity.getBlockCount());</span>
-<span class="fc" id="L72">                epochEntity.setNonOBFTBlockCount(0);</span>
-<span class="fc bfc" id="L73" title="All 2 branches covered.">            } else if (epoch &gt; 256) {</span>
-<span class="fc" id="L74">                epochEntity.setOBFTBlockCount(0);</span>
-<span class="fc" id="L75">                epochEntity.setNonOBFTBlockCount(epochEntity.getBlockCount());</span>
-            } else {
-<span class="fc bfc" id="L77" title="All 2 branches covered.">                epochEntity.setOBFTBlockCount((int) blocks.stream().filter(block -&gt; block.getPool() == null).count());</span>
-<span class="fc bfc" id="L78" title="All 2 branches covered.">                epochEntity.setNonOBFTBlockCount((int) blocks.stream().filter(block -&gt; block.getPool() != null).count());</span>
-            }
-<span class="nc" id="L80">        } catch (ApiException e) {</span>
-<span class="nc" id="L81">            e.printStackTrace();</span>
-<span class="nc" id="L82">            epochEntity = null;</span>
-<span class="fc" id="L83">        }</span>
 
-<span class="fc" id="L85">        return epochEntity;</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">            if (epoch &lt; 211) {</span>
+<span class="fc" id="L71">                epochEntity.setNonOBFTBlockCount(0);</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">            } else if (epoch &gt; 256) {</span>
+<span class="fc" id="L73">                epochEntity.setNonOBFTBlockCount(epochEntity.getBlockCount());</span>
+            } else {
+<span class="fc bfc" id="L75" title="All 2 branches covered.">                epochEntity.setNonOBFTBlockCount((int) blocks.stream().filter(block -&gt; block.getPool() != null).count());</span>
+            }
+<span class="nc" id="L77">        } catch (ApiException e) {</span>
+<span class="nc" id="L78">            e.printStackTrace();</span>
+<span class="nc" id="L79">            return null;</span>
+<span class="fc" id="L80">        }</span>
+
+<span class="fc" id="L82">        return epochEntity;</span>
     }
 
     public ProtocolParameters getProtocolParametersForEpoch(int epoch) {
-<span class="nc" id="L89">        EpochParams epochParams = null;</span>
+<span class="nc" id="L86">        EpochParams epochParams = null;</span>
 
         try {
-<span class="nc" id="L92">            epochParams = koiosBackendService.getEpochService()</span>
-<span class="nc" id="L93">                    .getEpochParametersByEpoch(epoch).getValue();</span>
-<span class="nc" id="L94">        } catch (ApiException e) {</span>
-<span class="nc" id="L95">            e.printStackTrace();</span>
-<span class="nc" id="L96">        }</span>
+<span class="nc" id="L89">            epochParams = koiosBackendService.getEpochService()</span>
+<span class="nc" id="L90">                    .getEpochParametersByEpoch(epoch).getValue();</span>
+<span class="nc" id="L91">        } catch (ApiException e) {</span>
+<span class="nc" id="L92">            e.printStackTrace();</span>
+<span class="nc" id="L93">        }</span>
 
-<span class="nc bnc" id="L98" title="All 2 branches missed.">        if (epochParams == null) return new ProtocolParameters();</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">        if (epochParams == null) return new ProtocolParameters();</span>
 
-<span class="nc" id="L100">        return ProtocolParametersMapper.fromKoiosEpochParams(epochParams);</span>
+<span class="nc" id="L97">        return ProtocolParametersMapper.fromKoiosEpochParams(epochParams);</span>
     }
 
     @Override
     public List&lt;PoolHistory&gt; getHistoryOfAllPoolsInEpoch(int epoch, List&lt;PoolBlock&gt; blocksMadeByPoolsInEpoch) {
-<span class="nc" id="L105">        return null;</span>
+<span class="nc" id="L102">        return null;</span>
     }
 
     public PoolHistory getPoolHistory(String poolId, int epoch) {
-<span class="nc" id="L109">        rest.koios.client.backend.api.pool.model.PoolHistory poolHistory = null;</span>
+<span class="nc" id="L106">        rest.koios.client.backend.api.pool.model.PoolHistory poolHistory = null;</span>
 
         try {
-<span class="nc" id="L112">            poolHistory = koiosBackendService.getPoolService()</span>
-<span class="nc" id="L113">                    .getPoolHistoryByEpoch(poolId, epoch, Options.EMPTY).getValue();</span>
-<span class="nc" id="L114">        } catch (ApiException e) {</span>
-<span class="nc" id="L115">            e.printStackTrace();</span>
-<span class="nc" id="L116">        }</span>
+<span class="nc" id="L109">            poolHistory = koiosBackendService.getPoolService()</span>
+<span class="nc" id="L110">                    .getPoolHistoryByEpoch(poolId, epoch, Options.EMPTY).getValue();</span>
+<span class="nc" id="L111">        } catch (ApiException e) {</span>
+<span class="nc" id="L112">            e.printStackTrace();</span>
+<span class="nc" id="L113">        }</span>
 
-<span class="nc" id="L118">        PoolHistory history = PoolHistoryMapper.fromKoiosPoolHistory(poolHistory);</span>
+<span class="nc" id="L115">        PoolHistory history = PoolHistoryMapper.fromKoiosPoolHistory(poolHistory);</span>
 
-<span class="nc bnc" id="L120" title="All 2 branches missed.">        if (history == null) return null;</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">        if (history == null) return null;</span>
 
-<span class="nc" id="L122">        HashSet&lt;Delegator&gt; poolMemberInEpoch = getPoolMemberInEpoch(poolId, epoch);</span>
-<span class="nc" id="L123">        history.setDelegators(poolMemberInEpoch);</span>
-<span class="nc" id="L124">        return history;</span>
+<span class="nc" id="L119">        HashSet&lt;Delegator&gt; poolMemberInEpoch = getPoolMemberInEpoch(poolId, epoch);</span>
+<span class="nc" id="L120">        history.setDelegators(poolMemberInEpoch);</span>
+<span class="nc" id="L121">        return history;</span>
     }
 
     @Override
-    public BigInteger getPoolPledgeInEpoch(String poolId, int epoch) {
-<span class="nc" id="L129">        List&lt;PoolUpdate&gt; poolUpdates = new ArrayList&lt;&gt;();</span>
-        try {
-<span class="nc" id="L131">            poolUpdates = koiosBackendService.getPoolService().getPoolUpdatesByPoolBech32(poolId, Options.builder()</span>
-<span class="nc" id="L132">                    .option(Filter.of(&quot;active_epoch_no&quot;, FilterType.LTE, String.valueOf(epoch)))</span>
-<span class="nc" id="L133">                    .option(Order.by(&quot;block_time&quot;, SortType.DESC))</span>
-<span class="nc" id="L134">                    .option(Limit.of(1))</span>
-<span class="nc" id="L135">                    .build()).getValue();</span>
-<span class="nc" id="L136">        } catch (ApiException e) {</span>
-<span class="nc" id="L137">            e.printStackTrace();</span>
-<span class="nc" id="L138">        }</span>
-
-<span class="nc bnc" id="L140" title="All 2 branches missed.">        if (poolUpdates.isEmpty()) {</span>
-<span class="nc" id="L141">            return null;</span>
-        } else {
-<span class="nc" id="L143">            return new BigInteger(poolUpdates.get(0).getPledge());</span>
-        }
-    }
-
-    @Override
-    public PoolOwnerHistory getHistoryOfPoolOwnersInEpoch(String poolId, int epoch) {
-<span class="nc" id="L149">        List&lt;String&gt; poolOwnerAddresses = new ArrayList&lt;&gt;();</span>
-
-        try {
-<span class="nc" id="L152">            List&lt;PoolUpdate&gt; poolUpdates = koiosBackendService.getPoolService()</span>
-<span class="nc" id="L153">                    .getPoolUpdatesByPoolBech32(poolId, Options.builder()</span>
-<span class="nc" id="L154">                            .option(Filter.of(&quot;active_epoch_no&quot;, FilterType.LTE, String.valueOf(epoch)))</span>
-<span class="nc" id="L155">                            .option(Order.by(&quot;block_time&quot;, SortType.DESC))</span>
-<span class="nc" id="L156">                            .option(Limit.of(1))</span>
-<span class="nc" id="L157">                            .build()).getValue();</span>
-
-<span class="nc bnc" id="L159" title="All 4 branches missed.">            if (poolUpdates == null || poolUpdates.isEmpty()) return null;</span>
-<span class="nc" id="L160">            poolOwnerAddresses = poolUpdates.get(0).getOwners();</span>
-<span class="nc" id="L161">        } catch (ApiException e) {</span>
-<span class="nc" id="L162">            e.printStackTrace();</span>
-<span class="nc" id="L163">        }</span>
-
-<span class="nc bnc" id="L165" title="All 2 branches missed.">        if (poolOwnerAddresses.isEmpty()) return null;</span>
-<span class="nc" id="L166">        PoolOwnerHistory poolOwnerHistory = null;</span>
-
-        try {
-<span class="nc" id="L169">            List&lt;AccountHistory&gt; accountHistories = koiosBackendService.getAccountService()</span>
-<span class="nc" id="L170">                    .getAccountHistory(poolOwnerAddresses, epoch, Options.EMPTY)</span>
-<span class="nc" id="L171">                    .getValue();</span>
-
-<span class="nc bnc" id="L173" title="All 4 branches missed.">            if (accountHistories == null || accountHistories.isEmpty()) return null;</span>
-
-<span class="nc" id="L175">            BigInteger totalActiveStake = accountHistories.stream()</span>
-<span class="nc" id="L176">                    .map(AccountHistory::getHistory)</span>
-<span class="nc" id="L177">                    .flatMap(List::stream)</span>
-<span class="nc" id="L178">                    .map(AccountHistoryInner::getActiveStake)</span>
-<span class="nc" id="L179">                    .map(BigInteger::new)</span>
-<span class="nc" id="L180">                    .reduce(BigInteger.ZERO, BigInteger::add);</span>
-
-<span class="nc" id="L182">            poolOwnerHistory = PoolOwnerHistory.builder()</span>
-<span class="nc" id="L183">                    .activeStake(totalActiveStake)</span>
-<span class="nc" id="L184">                    .epoch(epoch)</span>
-<span class="nc" id="L185">                    .stakeAddresses(poolOwnerAddresses)</span>
-<span class="nc" id="L186">                    .build();</span>
-
-<span class="nc" id="L188">        } catch (ApiException e) {</span>
-<span class="nc" id="L189">            e.printStackTrace();</span>
-<span class="nc" id="L190">        }</span>
-
-<span class="nc" id="L192">        return poolOwnerHistory;</span>
-    }
-
-    @Override
-    public List&lt;PoolDeregistration&gt; getRetiredPoolsInEpoch(int epoch) {
-<span class="nc" id="L197">        List&lt;PoolDeregistration&gt; retiredPools = new ArrayList&lt;&gt;();</span>
+    public HashSet&lt;String&gt; getRewardAddressesOfRetiredPoolsInEpoch(int epoch) {
+<span class="nc" id="L126">        HashSet&lt;String&gt; rewardAddressesOfRetiredPools = new HashSet&lt;&gt;();</span>
 
         // TODO: It seems as this is not a sufficient method to get the retired pools
         try {
-<span class="nc" id="L201">            List&lt;PoolUpdate&gt; poolUpdateList = koiosBackendService.getPoolService().getPoolUpdates(Options.builder()</span>
-<span class="nc" id="L202">                .option(Filter.of(&quot;active_epoch_no&quot;, FilterType.EQ, String.valueOf(epoch)))</span>
-<span class="nc" id="L203">                .option(Filter.of(&quot;retiring_epoch&quot;, FilterType.GT, String.valueOf(epoch - 1)))</span>
-<span class="nc" id="L204">                .option(Filter.of(&quot;retiring_epoch&quot;, FilterType.LTE, String.valueOf(epoch)))</span>
-<span class="nc" id="L205">                .build()).getValue();</span>
+<span class="nc" id="L130">            List&lt;PoolUpdate&gt; poolUpdateList = koiosBackendService.getPoolService().getPoolUpdates(Options.builder()</span>
+<span class="nc" id="L131">                .option(Filter.of(&quot;active_epoch_no&quot;, FilterType.EQ, String.valueOf(epoch)))</span>
+<span class="nc" id="L132">                .option(Filter.of(&quot;retiring_epoch&quot;, FilterType.GT, String.valueOf(epoch - 1)))</span>
+<span class="nc" id="L133">                .option(Filter.of(&quot;retiring_epoch&quot;, FilterType.LTE, String.valueOf(epoch)))</span>
+<span class="nc" id="L134">                .build()).getValue();</span>
 
-<span class="nc bnc" id="L207" title="All 2 branches missed.">            if (poolUpdateList == null) return List.of();</span>
+<span class="nc bnc" id="L136" title="All 2 branches missed.">            if (poolUpdateList == null) return new HashSet&lt;&gt;();</span>
 
-<span class="nc" id="L209">            retiredPools.addAll(poolUpdateList.stream()</span>
-<span class="nc" id="L210">                    .map(PoolDeregistrationMapper::fromKoiosPoolUpdate).toList());</span>
+<span class="nc" id="L138">            rewardAddressesOfRetiredPools.addAll(poolUpdateList.stream().map(PoolUpdate::getRewardAddr).toList());</span>
+<span class="nc" id="L139">        } catch (ApiException e) {</span>
+<span class="nc" id="L140">            e.printStackTrace();</span>
+<span class="nc" id="L141">        }</span>
 
-<span class="nc" id="L212">        } catch (ApiException e) {</span>
-<span class="nc" id="L213">            e.printStackTrace();</span>
-<span class="nc" id="L214">        }</span>
-
-<span class="nc" id="L216">        return retiredPools;</span>
-    }
-
-    @Override
-    public List&lt;AccountUpdate&gt; getAccountUpdatesUntilEpoch(List&lt;String&gt; stakeAddresses, int epoch) {
-<span class="nc" id="L221">        List&lt;AccountUpdate&gt; accountUpdates = new ArrayList&lt;&gt;();</span>
-
-        try {
-<span class="nc" id="L224">            Result&lt;List&lt;AccountUpdates&gt;&gt; updates = koiosBackendService.getAccountService().getAccountUpdates(stakeAddresses, Options.EMPTY);</span>
-<span class="nc" id="L225">            List&lt;AccountUpdates&gt; accountUpdatesList = updates.getValue();</span>
-<span class="nc bnc" id="L226" title="All 2 branches missed.">            if (accountUpdatesList != null) {</span>
-<span class="nc" id="L227">                accountUpdates.addAll(AccountUpdateMapper.fromKoiosAccountUpdates(accountUpdatesList));</span>
-<span class="nc" id="L228">                accountUpdates = accountUpdates.stream().filter(</span>
-<span class="nc bnc" id="L229" title="All 2 branches missed.">                        accountUpdate -&gt; accountUpdate.getEpoch() &lt;= epoch)</span>
-<span class="nc" id="L230">                        .toList();</span>
-            }
-<span class="nc" id="L232">        } catch (ApiException e) {</span>
-<span class="nc" id="L233">            e.printStackTrace();</span>
-<span class="nc" id="L234">        }</span>
-
-<span class="nc" id="L236">        return accountUpdates;</span>
+<span class="nc" id="L143">        return rewardAddressesOfRetiredPools;</span>
     }
 
     @Override
     public List&lt;MirCertificate&gt; getMirCertificatesInEpoch(int epoch) {
-<span class="nc" id="L241">        return null;</span>
+<span class="nc" id="L148">        return null;</span>
     }
 
     @Override
     public int getPoolRegistrationsInEpoch(int epoch) {
-<span class="nc" id="L246">        return 0;</span>
+<span class="nc" id="L153">        return 0;</span>
     }
 
     @Override
     public List&lt;org.cardanofoundation.rewards.calculation.domain.PoolUpdate&gt; getPoolUpdateAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch) {
-<span class="nc" id="L251">        return null;</span>
-    }
-
-    @Override
-    public PoolDeregistration latestPoolRetirementUntilEpoch(String poolId, int epoch) {
-<span class="nc" id="L256">        return null;</span>
+<span class="nc" id="L158">        return null;</span>
     }
 
     @Override
     public BigInteger getTransactionDepositsInEpoch(int epoch) {
-<span class="nc" id="L261">        return null;</span>
+<span class="nc" id="L163">        return null;</span>
     }
 
     @Override
     public BigInteger getSumOfFeesInEpoch(int epoch) {
-<span class="nc" id="L266">        return null;</span>
+<span class="nc" id="L168">        return null;</span>
     }
 
     @Override
     public BigInteger getSumOfWithdrawalsInEpoch(int epoch) {
-<span class="nc" id="L271">        return null;</span>
+<span class="nc" id="L173">        return null;</span>
     }
 
     @Override
     public HashSet&lt;Reward&gt; getMemberRewardsInEpoch(int epoch) {
-<span class="nc" id="L276">        return null;</span>
+<span class="nc" id="L178">        return null;</span>
     }
 
     @Override
     public List&lt;PoolBlock&gt; getBlocksMadeByPoolsInEpoch(int epoch) {
-<span class="nc" id="L281">        return null;</span>
+<span class="nc" id="L183">        return null;</span>
     }
 
     @Override
     public HashSet&lt;PoolReward&gt; getTotalPoolRewardsInEpoch(int epoch) {
-<span class="nc" id="L286">        return null;</span>
+<span class="nc" id="L188">        return null;</span>
     }
 
     @Override
     public HashSet&lt;String&gt; findSharedPoolRewardAddressWithoutReward(int epoch) {
-<span class="nc" id="L291">        return null;</span>
+<span class="nc" id="L193">        return null;</span>
     }
 
     @Override
     public HashSet&lt;String&gt; getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow) {
-<span class="nc" id="L296">        return null;</span>
+<span class="nc" id="L198">        return null;</span>
     }
 
     @Override
     public HashSet&lt;String&gt; getRegisteredAccountsUntilLastEpoch(Integer epoch, HashSet&lt;String&gt; stakeAddresses, Long stabilityWindow) {
-<span class="nc" id="L301">        return null;</span>
+<span class="nc" id="L203">        return null;</span>
     }
 
     @Override
     public HashSet&lt;String&gt; getRegisteredAccountsUntilNow(Integer epoch, HashSet&lt;String&gt; stakeAddresses, Long stabilityWindow) {
-<span class="nc" id="L306">        return null;</span>
+<span class="nc" id="L208">        return null;</span>
     }
 
     private HashSet&lt;Delegator&gt; getPoolMemberInEpoch(String poolId, int epoch) {
-<span class="nc" id="L310">        HashSet&lt;Delegator&gt; delegators = new HashSet&lt;&gt;();</span>
+<span class="nc" id="L212">        HashSet&lt;Delegator&gt; delegators = new HashSet&lt;&gt;();</span>
         try {
-<span class="nc" id="L312">            List&lt;PoolDelegatorHistory&gt; poolDelegatorsHistory = koiosBackendService</span>
-<span class="nc" id="L313">                    .getPoolService().getPoolDelegatorsHistory(poolId, epoch, Options.EMPTY).getValue();</span>
-<span class="nc bnc" id="L314" title="All 2 branches missed.">            for (PoolDelegatorHistory poolDelegator : poolDelegatorsHistory) {</span>
-<span class="nc" id="L315">                delegators.add(Delegator.builder()</span>
-<span class="nc" id="L316">                        .activeStake(new BigInteger(poolDelegator.getAmount()))</span>
-<span class="nc" id="L317">                        .stakeAddress(poolDelegator.getStakeAddress())</span>
-<span class="nc" id="L318">                        .build());</span>
-<span class="nc" id="L319">            }</span>
-<span class="nc" id="L320">        } catch (ApiException e) {</span>
-<span class="nc" id="L321">            e.printStackTrace();</span>
-<span class="nc" id="L322">        }</span>
-<span class="nc" id="L323">        return delegators;</span>
+<span class="nc" id="L214">            List&lt;PoolDelegatorHistory&gt; poolDelegatorsHistory = koiosBackendService</span>
+<span class="nc" id="L215">                    .getPoolService().getPoolDelegatorsHistory(poolId, epoch, Options.EMPTY).getValue();</span>
+<span class="nc bnc" id="L216" title="All 2 branches missed.">            for (PoolDelegatorHistory poolDelegator : poolDelegatorsHistory) {</span>
+<span class="nc" id="L217">                delegators.add(Delegator.builder()</span>
+<span class="nc" id="L218">                        .activeStake(new BigInteger(poolDelegator.getAmount()))</span>
+<span class="nc" id="L219">                        .stakeAddress(poolDelegator.getStakeAddress())</span>
+<span class="nc" id="L220">                        .build());</span>
+<span class="nc" id="L221">            }</span>
+<span class="nc" id="L222">        } catch (ApiException e) {</span>
+<span class="nc" id="L223">            e.printStackTrace();</span>
+<span class="nc" id="L224">        }</span>
+<span class="nc" id="L225">        return delegators;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

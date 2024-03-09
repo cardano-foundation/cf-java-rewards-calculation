@@ -122,7 +122,7 @@ import static org.cardanofoundation.rewards.validation.util.JsonConverter.writeO
 <span class="nc" id="L122">    }</span>
 
     private void fetchRetiredPoolsInEpoch(int epoch, boolean override) {
-<span class="nc" id="L125">        String filePath = String.format(&quot;%s/%s/epoch%d.json&quot;, sourceFolder, RETIRED_POOLS.resourceFolderName, epoch);</span>
+<span class="nc" id="L125">        String filePath = String.format(&quot;%s/%s/epoch%d.json&quot;, sourceFolder, REWARD_ADDRESSES_OF_RETIRED_POOLS.resourceFolderName, epoch);</span>
 <span class="nc" id="L126">        File outputFile = new File(filePath);</span>
 
 <span class="nc bnc" id="L128" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
@@ -130,16 +130,16 @@ import static org.cardanofoundation.rewards.validation.util.JsonConverter.writeO
 <span class="nc" id="L130">            return;</span>
         }
 
-<span class="nc" id="L133">        List&lt;PoolDeregistration&gt; retiredPools = dbSyncDataProvider.getRetiredPoolsInEpoch(epoch);</span>
-<span class="nc bnc" id="L134" title="All 2 branches missed.">        if (retiredPools == null) {</span>
-<span class="nc" id="L135">            logger.error(&quot;Failed to fetch RetiredPools for epoch &quot; + epoch);</span>
+<span class="nc" id="L133">        HashSet&lt;String&gt; rewardAddressesOfRetiredPoolsInEpoch = dbSyncDataProvider.getRewardAddressesOfRetiredPoolsInEpoch(epoch);</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">        if (rewardAddressesOfRetiredPoolsInEpoch == null) {</span>
+<span class="nc" id="L135">            logger.error(&quot;Failed to fetch reward addresses of retired pools for epoch &quot; + epoch);</span>
 <span class="nc" id="L136">            return;</span>
         }
 
         try {
-<span class="nc" id="L140">            writeObjectToJsonFile(retiredPools, filePath);</span>
+<span class="nc" id="L140">            writeObjectToJsonFile(rewardAddressesOfRetiredPoolsInEpoch, filePath);</span>
 <span class="nc" id="L141">        } catch (IOException e) {</span>
-<span class="nc" id="L142">            logger.error(&quot;Failed to write RetiredPools to json file for epoch &quot; + epoch);</span>
+<span class="nc" id="L142">            logger.error(&quot;Failed to fetch reward addresses of retired pools to json file for epoch &quot; + epoch);</span>
 <span class="nc" id="L143">        }</span>
 <span class="nc" id="L144">    }</span>
 
@@ -159,8 +159,8 @@ import static org.cardanofoundation.rewards.validation.util.JsonConverter.writeO
 
 <span class="nc" id="L160">        List&lt;PoolHistory&gt; poolHistories = jsonDataProvider.getHistoryOfAllPoolsInEpoch(epoch - 2, null);</span>
 <span class="nc" id="L161">        HashSet&lt;String&gt; poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).collect(Collectors.toCollection(HashSet::new));</span>
-<span class="nc" id="L162">        List&lt;PoolDeregistration&gt; retiredPools = jsonDataProvider.getRetiredPoolsInEpoch(epoch);</span>
-<span class="nc" id="L163">        poolRewardAddresses.addAll(retiredPools.stream().map(PoolDeregistration::getRewardAddress).collect(Collectors.toSet()));</span>
+<span class="nc" id="L162">        HashSet&lt;String&gt; rewardAddressesOfRetiredPools = jsonDataProvider.getRewardAddressesOfRetiredPoolsInEpoch(epoch);</span>
+<span class="nc" id="L163">        poolRewardAddresses.addAll(rewardAddressesOfRetiredPools);</span>
 
 <span class="nc" id="L165">        HashSet&lt;String&gt; accountsRegisteredInThePast = dbSyncDataProvider.getRegisteredAccountsUntilLastEpoch(epoch, poolRewardAddresses, stabilityWindow);</span>
 <span class="nc bnc" id="L166" title="All 2 branches missed.">        if (accountsRegisteredInThePast == null) {</span>
