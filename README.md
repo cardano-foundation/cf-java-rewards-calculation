@@ -97,7 +97,7 @@ or you can clone the repository and run the tests or build the library yourself.
 <dependency>
     <groupId>org.cardanofoundation</groupId>
     <artifactId>cf-rewards-calculation</artifactId>
-    <version>0.8.0</version>
+    <version>0.9.0</version>
 </dependency>
 ```
 
