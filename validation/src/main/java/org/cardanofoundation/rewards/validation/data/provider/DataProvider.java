@@ -2,7 +2,6 @@ package org.cardanofoundation.rewards.validation.data.provider;
 
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.domain.PoolReward;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
 
 import java.math.BigInteger;
 import java.util.HashSet;
@@ -19,21 +18,13 @@ public interface DataProvider {
     public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch, List<PoolBlock> blocksMadeByPoolsInEpoch);
     public PoolHistory getPoolHistory(String poolId, int epoch);
 
-    public BigInteger getPoolPledgeInEpoch(String poolId, int epoch);
-
-    public PoolOwnerHistory getHistoryOfPoolOwnersInEpoch(String poolId, int epoch);
-
-    public List<PoolDeregistration> getRetiredPoolsInEpoch(int epoch);
-
-    public List<AccountUpdate> getAccountUpdatesUntilEpoch(List<String> stakeAddresses, int epoch);
+    public HashSet<String> getRewardAddressesOfRetiredPoolsInEpoch(int epoch);
 
     public List<MirCertificate> getMirCertificatesInEpoch(int epoch);
 
     public int getPoolRegistrationsInEpoch(int epoch);
 
     public List<PoolUpdate> getPoolUpdateAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch);
-
-    public PoolDeregistration latestPoolRetirementUntilEpoch(String poolId, int epoch);
 
     public BigInteger getTransactionDepositsInEpoch(int epoch);
 

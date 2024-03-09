@@ -13,11 +13,6 @@ public class BigNumberUtils {
         return a.add(b);
     }
 
-    public static BigInteger multiplyAndFloor(BigInteger a, double b, BigDecimal c) {
-        return new BigDecimal(a).multiply(BigDecimal.valueOf(b).multiply(c))
-                .round(new MathContext(0, RoundingMode.FLOOR)).toBigInteger();
-    }
-
     public static BigInteger multiplyAndFloor(BigInteger a, BigDecimal b, BigDecimal c) {
         return new BigDecimal(a).multiply(b).multiply(c).round(new MathContext(0, RoundingMode.FLOOR)).toBigInteger();
     }

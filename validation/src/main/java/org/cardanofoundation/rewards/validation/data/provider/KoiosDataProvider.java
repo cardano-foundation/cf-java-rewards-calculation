@@ -52,7 +52,7 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     public Epoch getEpochInfo(int epoch) {
-        Epoch epochEntity = null;
+        Epoch epochEntity;
 
         try {
             EpochInfo epochInfo = koiosBackendService.getEpochService()
@@ -66,20 +66,17 @@ public class KoiosDataProvider implements DataProvider {
                         .option(Offset.of(offset))
                         .build()).getValue());
             }
-            epochEntity.setPoolsMadeBlocks(blocks.stream().map(Block::getPool).filter(Objects::nonNull).distinct().toList());
+
             if (epoch < 211) {
-                epochEntity.setOBFTBlockCount(epochEntity.getBlockCount());
                 epochEntity.setNonOBFTBlockCount(0);
             } else if (epoch > 256) {
-                epochEntity.setOBFTBlockCount(0);
                 epochEntity.setNonOBFTBlockCount(epochEntity.getBlockCount());
             } else {
-                epochEntity.setOBFTBlockCount((int) blocks.stream().filter(block -> block.getPool() == null).count());
                 epochEntity.setNonOBFTBlockCount((int) blocks.stream().filter(block -> block.getPool() != null).count());
             }
         } catch (ApiException e) {
             e.printStackTrace();
-            epochEntity = null;
+            return null;
         }
 
         return epochEntity;
@@ -125,76 +122,8 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
-    public BigInteger getPoolPledgeInEpoch(String poolId, int epoch) {
-        List<PoolUpdate> poolUpdates = new ArrayList<>();
-        try {
-            poolUpdates = koiosBackendService.getPoolService().getPoolUpdatesByPoolBech32(poolId, Options.builder()
-                    .option(Filter.of("active_epoch_no", FilterType.LTE, String.valueOf(epoch)))
-                    .option(Order.by("block_time", SortType.DESC))
-                    .option(Limit.of(1))
-                    .build()).getValue();
-        } catch (ApiException e) {
-            e.printStackTrace();
-        }
-
-        if (poolUpdates.isEmpty()) {
-            return null;
-        } else {
-            return new BigInteger(poolUpdates.get(0).getPledge());
-        }
-    }
-
-    @Override
-    public PoolOwnerHistory getHistoryOfPoolOwnersInEpoch(String poolId, int epoch) {
-        List<String> poolOwnerAddresses = new ArrayList<>();
-
-        try {
-            List<PoolUpdate> poolUpdates = koiosBackendService.getPoolService()
-                    .getPoolUpdatesByPoolBech32(poolId, Options.builder()
-                            .option(Filter.of("active_epoch_no", FilterType.LTE, String.valueOf(epoch)))
-                            .option(Order.by("block_time", SortType.DESC))
-                            .option(Limit.of(1))
-                            .build()).getValue();
-
-            if (poolUpdates == null || poolUpdates.isEmpty()) return null;
-            poolOwnerAddresses = poolUpdates.get(0).getOwners();
-        } catch (ApiException e) {
-            e.printStackTrace();
-        }
-
-        if (poolOwnerAddresses.isEmpty()) return null;
-        PoolOwnerHistory poolOwnerHistory = null;
-
-        try {
-            List<AccountHistory> accountHistories = koiosBackendService.getAccountService()
-                    .getAccountHistory(poolOwnerAddresses, epoch, Options.EMPTY)
-                    .getValue();
-
-            if (accountHistories == null || accountHistories.isEmpty()) return null;
-
-            BigInteger totalActiveStake = accountHistories.stream()
-                    .map(AccountHistory::getHistory)
-                    .flatMap(List::stream)
-                    .map(AccountHistoryInner::getActiveStake)
-                    .map(BigInteger::new)
-                    .reduce(BigInteger.ZERO, BigInteger::add);
-
-            poolOwnerHistory = PoolOwnerHistory.builder()
-                    .activeStake(totalActiveStake)
-                    .epoch(epoch)
-                    .stakeAddresses(poolOwnerAddresses)
-                    .build();
-
-        } catch (ApiException e) {
-            e.printStackTrace();
-        }
-
-        return poolOwnerHistory;
-    }
-
-    @Override
-    public List<PoolDeregistration> getRetiredPoolsInEpoch(int epoch) {
-        List<PoolDeregistration> retiredPools = new ArrayList<>();
+    public HashSet<String> getRewardAddressesOfRetiredPoolsInEpoch(int epoch) {
+        HashSet<String> rewardAddressesOfRetiredPools = new HashSet<>();
 
         // TODO: It seems as this is not a sufficient method to get the retired pools
         try {
@@ -204,36 +133,14 @@ public class KoiosDataProvider implements DataProvider {
                 .option(Filter.of("retiring_epoch", FilterType.LTE, String.valueOf(epoch)))
                 .build()).getValue();
 
-            if (poolUpdateList == null) return List.of();
+            if (poolUpdateList == null) return new HashSet<>();
 
-            retiredPools.addAll(poolUpdateList.stream()
-                    .map(PoolDeregistrationMapper::fromKoiosPoolUpdate).toList());
-
+            rewardAddressesOfRetiredPools.addAll(poolUpdateList.stream().map(PoolUpdate::getRewardAddr).toList());
         } catch (ApiException e) {
             e.printStackTrace();
         }
 
-        return retiredPools;
-    }
-
-    @Override
-    public List<AccountUpdate> getAccountUpdatesUntilEpoch(List<String> stakeAddresses, int epoch) {
-        List<AccountUpdate> accountUpdates = new ArrayList<>();
-
-        try {
-            Result<List<AccountUpdates>> updates = koiosBackendService.getAccountService().getAccountUpdates(stakeAddresses, Options.EMPTY);
-            List<AccountUpdates> accountUpdatesList = updates.getValue();
-            if (accountUpdatesList != null) {
-                accountUpdates.addAll(AccountUpdateMapper.fromKoiosAccountUpdates(accountUpdatesList));
-                accountUpdates = accountUpdates.stream().filter(
-                        accountUpdate -> accountUpdate.getEpoch() <= epoch)
-                        .toList();
-            }
-        } catch (ApiException e) {
-            e.printStackTrace();
-        }
-
-        return accountUpdates;
+        return rewardAddressesOfRetiredPools;
     }
 
     @Override
@@ -248,11 +155,6 @@ public class KoiosDataProvider implements DataProvider {
 
     @Override
     public List<org.cardanofoundation.rewards.calculation.domain.PoolUpdate> getPoolUpdateAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch) {
-        return null;
-    }
-
-    @Override
-    public PoolDeregistration latestPoolRetirementUntilEpoch(String poolId, int epoch) {
         return null;
     }
 

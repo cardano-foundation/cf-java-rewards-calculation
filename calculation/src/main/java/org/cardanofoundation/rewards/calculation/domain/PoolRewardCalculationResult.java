@@ -26,6 +26,6 @@ public class PoolRewardCalculationResult {
     BigInteger distributedPoolReward;
     Double poolMargin;
     BigInteger poolCost;
-    List<String> poolOwnerStakeAddresses;
+    HashSet<String> poolOwnerStakeAddresses;
     BigInteger unspendableEarnedRewards;
 }

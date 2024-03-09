@@ -3,6 +3,7 @@ package org.cardanofoundation.rewards.calculation.domain;
 import lombok.*;
 
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.List;
 
 @Getter
@@ -19,5 +20,5 @@ public class PoolUpdate {
     private BigInteger fixedCost;
     private BigInteger pledge;
     private String rewardAddress;
-    private List<String> owners;
+    private HashSet<String> owners;
 }

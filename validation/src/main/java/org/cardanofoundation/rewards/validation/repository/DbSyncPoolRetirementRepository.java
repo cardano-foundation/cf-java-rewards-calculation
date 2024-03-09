@@ -1,6 +1,6 @@
 package org.cardanofoundation.rewards.validation.repository;
 
-import org.cardanofoundation.rewards.validation.entity.jpa.DbSyncPoolRetirement;
+import org.cardanofoundation.rewards.validation.entity.dbsync.DbSyncPoolRetirement;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

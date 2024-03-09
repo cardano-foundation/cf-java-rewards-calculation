@@ -11,7 +11,6 @@ public class PoolHistoryMapper {
 
         return PoolHistory.builder()
             .activeStake(new BigInteger(poolHistory.getActiveStake()))
-            .delegatorRewards(new BigInteger(poolHistory.getDelegRewards()))
             .poolFees(new BigInteger(poolHistory.getPoolFees()))
             .margin(Double.parseDouble(String.valueOf(poolHistory.getMargin())))
             .fixedCost(new BigInteger(String.valueOf(poolHistory.getFixedCost())))

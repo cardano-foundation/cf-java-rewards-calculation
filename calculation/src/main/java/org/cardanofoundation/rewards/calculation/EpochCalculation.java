@@ -12,9 +12,7 @@ import java.util.stream.Collectors;
 
 import static org.cardanofoundation.rewards.calculation.PoolRewardsCalculation.calculatePoolRewardInEpoch;
 import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.MAINNET_BOOTSTRAP_ADDRESS_AMOUNT;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
-import static org.cardanofoundation.rewards.calculation.util.CurrencyConverter.lovelaceToAda;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -22,7 +20,7 @@ public class EpochCalculation {
 
     public static EpochCalculationResult calculateEpochRewardPots(final int epoch, final AdaPots adaPotsForPreviousEpoch,
                                                                   final ProtocolParameters protocolParameters, final Epoch epochInfo,
-                                                                  final List<PoolDeregistration> retiredPools,
+                                                                  final HashSet<String> rewardAddressesOfRetiredPools,
                                                                   final HashSet<String> deregisteredAccounts,
                                                                   final List<MirCertificate> mirCertificates,
                                                                   final List<String> poolsThatProducedBlocksInEpoch,
@@ -83,8 +81,7 @@ public class EpochCalculation {
 
         // The sum of all the refunds attached to unregistered reward accounts are added to the
         // treasury (see: Pool Reap Transition, p.53, figure 40, shelley-ledger.pdf)
-        if (retiredPools.size() > 0) {
-            List<String> rewardAddressesOfRetiredPools = retiredPools.stream().map(PoolDeregistration::getRewardAddress).toList();
+        if (rewardAddressesOfRetiredPools.size() > 0) {
             List<String> deregisteredOwnerAccounts = deregisteredAccountsOnEpochBoundary.stream()
                     .filter(rewardAddressesOfRetiredPools::contains).toList();
             List<String> ownerAccountsRegisteredInThePast = registeredAccountsUntilNow.stream()
@@ -93,8 +90,7 @@ public class EpochCalculation {
             /* Check if the reward address of the retired pool has been unregistered before
                or if the reward address has been unregistered after the randomness stabilization window
                or if the reward address has not been registered at all */
-            for (PoolDeregistration retiredPool : retiredPools) {
-                String rewardAddress = retiredPool.getRewardAddress();
+            for (String rewardAddress : rewardAddressesOfRetiredPools) {
                 if (deregisteredOwnerAccounts.contains(rewardAddress) ||
                         !ownerAccountsRegisteredInThePast.contains(rewardAddress)) {
                     // If the reward address has been unregistered, the deposit can not be returned
@@ -181,7 +177,7 @@ public class EpochCalculation {
             calculatedReserve = calculatedReserve.add(MAINNET_BOOTSTRAP_ADDRESS_AMOUNT);
         }
 
-        log.debug("Unspendable earned rewards: " + lovelaceToAda(unspendableEarnedRewards.longValue()) + " ADA");
+        log.debug("Unspendable earned rewards: " + unspendableEarnedRewards.longValue() + " Lovelace");
         treasuryForCurrentEpoch = add(treasuryForCurrentEpoch, unspendableEarnedRewards);
 
         TreasuryCalculationResult treasuryCalculationResult = TreasuryCalculationResult.builder()

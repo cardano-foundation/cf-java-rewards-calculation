@@ -4,10 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.calculation.domain.PoolBlock;
 import org.cardanofoundation.rewards.validation.domain.PoolReward;
-import org.cardanofoundation.rewards.validation.entity.jpa.*;
-import org.cardanofoundation.rewards.calculation.enums.AccountUpdateAction;
 import org.cardanofoundation.rewards.calculation.enums.MirPot;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.*;
+import org.cardanofoundation.rewards.validation.entity.dbsync.*;
+import org.cardanofoundation.rewards.validation.entity.projection.*;
 import org.cardanofoundation.rewards.validation.mapper.*;
 import org.cardanofoundation.rewards.validation.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +26,6 @@ import static org.cardanofoundation.rewards.calculation.constants.RewardConstant
 @Profile("db-sync")
 public class DbSyncDataProvider implements DataProvider {
 
-    @Autowired
-    DbSyncEpochRepository dbSyncEpochRepository;
     @Autowired
     DbSyncAdaPotsRepository dbSyncAdaPotsRepository;
     @Autowired
@@ -74,25 +71,25 @@ public class DbSyncDataProvider implements DataProvider {
             return null;
         }
 
-        DbSyncEpoch dbSyncEpoch = dbSyncEpochRepository.findByNumber(epoch);
-        // We need to fetch the block count and fee separately from the epoch
-        // because of https://github.com/IntersectMBO/cardano-db-sync/issues/1457
+        // We need to fetch the block count and fees in this way
+        // and not using the aggregations from the epoch table, to
+        // avoid running in https://github.com/IntersectMBO/cardano-db-sync/issues/1457
+        // for old instances.
         Integer blockCount = dbSyncBlockRepository.countByEpochNo(epoch);
         BigInteger fees = this.getSumOfFeesInEpoch(epoch);
 
-        Epoch epochInfo = EpochMapper.fromDbSyncEpoch(dbSyncEpoch);
-        epochInfo.setBlockCount(blockCount);
+        Epoch epochInfo = Epoch.builder()
+                .number(epoch)
+                .fees(fees)
+                .blockCount(blockCount)
+                .build();
 
         if (epoch < 211) {
-            epochInfo.setOBFTBlockCount(epochInfo.getBlockCount());
             epochInfo.setNonOBFTBlockCount(0);
         } else if (epoch > 256) {
-            epochInfo.setOBFTBlockCount(0);
             epochInfo.setNonOBFTBlockCount(epochInfo.getBlockCount());
         } else {
             Integer nonObftBlocks = dbSyncBlockRepository.getNonOBFTBlocksInEpoch(epoch);
-            Integer obftBlocks = dbSyncBlockRepository.getOBFTBlocksInEpoch(epoch);
-            epochInfo.setOBFTBlockCount(obftBlocks);
             epochInfo.setNonOBFTBlockCount(nonObftBlocks);
         }
 
@@ -167,7 +164,7 @@ public class DbSyncDataProvider implements DataProvider {
                             .orElse(null);
 
                     if (latestUpdate == null) {
-                        System.out.println("No update for pool " + poolId + " in epoch " + epoch);
+                        log.info("No update for pool " + poolId + " in epoch " + epoch);
                         continue;
                     }
 
@@ -179,8 +176,8 @@ public class DbSyncDataProvider implements DataProvider {
                     poolHistory.setPoolId(poolId);
 
 
-                    List<String> poolOwnerStakeAddresses = owners.stream()
-                            .filter(owner -> owner.getPoolId().equals(poolId)).map(PoolOwner::getStakeAddress).toList();
+                    HashSet<String> poolOwnerStakeAddresses = owners.stream()
+                            .filter(owner -> owner.getPoolId().equals(poolId)).map(PoolOwner::getStakeAddress).collect(Collectors.toCollection(HashSet::new));
 
                     BigInteger poolOwnerActiveStake = BigInteger.ZERO;
                     for (Delegator delegator : delegators) {
@@ -241,8 +238,8 @@ public class DbSyncDataProvider implements DataProvider {
 
         List<PoolOwner> owners = dbSyncPoolOwnerRepository.getOwnersByPoolUpdateIds(List.of(dbSyncPoolUpdate.getId()));
         BigInteger activeStakes = BigInteger.ZERO;
-        List<String> stakeAddresses = owners.stream()
-                .filter(owner -> owner.getPoolId().equals(poolId)).map(PoolOwner::getStakeAddress).toList();
+        HashSet<String> stakeAddresses = owners.stream()
+                .filter(owner -> owner.getPoolId().equals(poolId)).map(PoolOwner::getStakeAddress).collect(Collectors.toCollection(HashSet::new));
 
         for (PoolEpochStake poolEpochStake : poolEpochStakes) {
             if (stakeAddresses.contains(poolEpochStake.getStakeAddress())) {
@@ -257,57 +254,14 @@ public class DbSyncDataProvider implements DataProvider {
     }
 
     @Override
-    public BigInteger getPoolPledgeInEpoch(String poolId, int epoch) {
-        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestActiveUpdateInEpoch(poolId, epoch);
+    public HashSet<String> getRewardAddressesOfRetiredPoolsInEpoch(int epoch) {
+        List<DbSyncPoolRetirement> poolDeregistrations = dbSyncPoolRetirementRepository.getPoolRetirementsByEpoch(epoch);
+        HashSet<String> rewardAddressesOfRetiredPools = new HashSet<>();
 
-        if (dbSyncPoolUpdate == null) {
-            return null;
-        }
-
-        return dbSyncPoolUpdate.getPledge();
-    }
-
-    @Override
-    public PoolOwnerHistory getHistoryOfPoolOwnersInEpoch(String poolId, int epoch) {
-        PoolOwnerHistory poolOwnerHistory = new PoolOwnerHistory();
-        poolOwnerHistory.setEpoch(epoch);
-
-        List<PoolEpochStake> poolEpochStakes = dbSyncEpochStakeRepository.getPoolActiveStakeInEpoch(poolId, epoch);
-        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestActiveUpdateInEpoch(poolId, epoch);
-
-        if (dbSyncPoolUpdate == null) {
-            return null;
-        }
-
-        List<DbSyncPoolOwner> owners = dbSyncPoolOwnerRepository.getByPoolUpdateId(dbSyncPoolUpdate.getId());
-
-        List<String> stakeAddresses = owners.stream()
-                .map(DbSyncPoolOwner::getStakeAddress)
-                .map(DbSyncStakeAddress::getView)
-                .toList();
-
-        BigInteger activeStakes = BigInteger.ZERO;
-
-        for (PoolEpochStake poolEpochStake : poolEpochStakes) {
-            if (stakeAddresses.contains(poolEpochStake.getStakeAddress())) {
-                activeStakes = activeStakes.add(poolEpochStake.getAmount());
-            }
-        }
-        poolOwnerHistory.setStakeAddresses(stakeAddresses);
-        poolOwnerHistory.setActiveStake(activeStakes);
-        return poolOwnerHistory;
-    }
-
-    @Override
-    public List<PoolDeregistration> getRetiredPoolsInEpoch(int epoch) {
-        List<DbSyncPoolRetirement> dbSyncPoolRetirements = dbSyncPoolRetirementRepository.getPoolRetirementsByEpoch(epoch);
-        List<PoolDeregistration> poolDeregistrations = dbSyncPoolRetirements.stream().map(PoolDeregistrationMapper::fromDbSyncPoolRetirement).toList();
-        List<PoolDeregistration> retiredPools = new ArrayList<>();
-
-        for (PoolDeregistration poolDeregistration : poolDeregistrations) {
+        for (DbSyncPoolRetirement poolDeregistration : poolDeregistrations) {
             boolean poolDeregistrationLaterInEpoch = poolDeregistrations.stream().anyMatch(
-                    deregistration -> deregistration.getPoolId().equals(poolDeregistration.getPoolId()) &&
-                            deregistration.getAnnouncedTransactionId() > poolDeregistration.getAnnouncedTransactionId()
+                    deregistration -> deregistration.getPool().getBech32PoolId().equals(poolDeregistration.getPool().getBech32PoolId()) &&
+                            deregistration.getAnnouncedTransaction().getId() > poolDeregistration.getAnnouncedTransaction().getId()
             );
 
             // To prevent double counting, we only count the pool deregistration if there is no other deregistration
@@ -316,55 +270,24 @@ public class DbSyncDataProvider implements DataProvider {
                 continue;
             }
 
-            List<PoolUpdate> poolUpdates = this.getPoolUpdateAfterTransactionIdInEpoch(poolDeregistration.getPoolId(),
-                    poolDeregistration.getAnnouncedTransactionId(), epoch - 1);
+            List<PoolUpdate> poolUpdates = this.getPoolUpdateAfterTransactionIdInEpoch(poolDeregistration.getPool().getBech32PoolId(),
+                    poolDeregistration.getAnnouncedTransaction().getId(), epoch - 1);
 
             // There is an update after the deregistration, so the pool has not been retired
             if (poolUpdates.size() == 0) {
-                PoolDeregistration latestPoolRetirementUntilEpoch = this.latestPoolRetirementUntilEpoch(poolDeregistration.getPoolId(), epoch - 1);
+                DbSyncPoolRetirement latestPoolRetirementUntilEpoch = dbSyncPoolRetirementRepository.latestPoolRetirementUntilEpoch(poolDeregistration.getPool().getBech32PoolId(), epoch - 1);
                 if (latestPoolRetirementUntilEpoch != null && latestPoolRetirementUntilEpoch.getRetiringEpoch() != epoch) {
                     // The pool was retired in a previous epoch for the next epoch, but another deregistration was announced and changed the
                     // retirement epoch to something else. This means the pool was not retired in this epoch.
                     continue;
                 }
 
-                DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLatestUpdateInEpoch(poolDeregistration.getPoolId(), epoch);
-                poolDeregistration.setRewardAddress(dbSyncPoolUpdate.getStakeAddress().getView());
-                retiredPools.add(poolDeregistration);
+                DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLatestUpdateInEpoch(poolDeregistration.getPool().getBech32PoolId(), epoch);
+                rewardAddressesOfRetiredPools.add(dbSyncPoolUpdate.getStakeAddress().getView());
             }
         }
 
-        return retiredPools;
-    }
-
-    @Override
-    public List<AccountUpdate> getAccountUpdatesUntilEpoch(List<String> stakeAddresses, int epoch) {
-        List<AccountUpdate> accountUpdates = new ArrayList<>();
-
-        List<DbSyncAccountDeregistration> stakeDeregistrationsInEpoch =
-                dbSyncStakeDeregistrationRepository.getLatestAccountDeregistrationsUntilEpochForAddresses(stakeAddresses, epoch);
-        List<DbSyncAccountRegistration> stakeRegistrationsInEpoch =
-                dbSyncStakeRegistrationRepository.getLatestAccountRegistrationsUntilEpochForAddresses(stakeAddresses, epoch);
-
-        for (DbSyncAccountDeregistration deregistration : stakeDeregistrationsInEpoch) {
-            accountUpdates.add(AccountUpdate.builder()
-                    .epoch(deregistration.getEpoch())
-                    .action(AccountUpdateAction.DEREGISTRATION)
-                    .stakeAddress(deregistration.getAddress().getView())
-                    .unixBlockTime(deregistration.getTransaction().getBlock().getTime().getTime())
-                    .build());
-        }
-
-        for (DbSyncAccountRegistration registration : stakeRegistrationsInEpoch) {
-            accountUpdates.add(AccountUpdate.builder()
-                    .epoch(registration.getEpoch())
-                    .action(AccountUpdateAction.REGISTRATION)
-                    .stakeAddress(registration.getAddress().getView())
-                    .unixBlockTime(registration.getTransaction().getBlock().getTime().getTime())
-                    .build());
-        }
-
-        return  accountUpdates;
+        return rewardAddressesOfRetiredPools;
     }
 
     @Override
@@ -391,12 +314,6 @@ public class DbSyncDataProvider implements DataProvider {
     public List<PoolUpdate> getPoolUpdateAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch) {
         return dbSyncPoolUpdateRepository.findByBech32PoolIdAfterTransactionIdInEpoch(poolId, transactionId, epoch).stream()
                 .map(PoolUpdateMapper::fromDbSyncPoolUpdate).toList();
-    }
-
-    @Override
-    public PoolDeregistration latestPoolRetirementUntilEpoch(String poolId, int epoch) {
-        DbSyncPoolRetirement dbSyncPoolRetirement = dbSyncPoolRetirementRepository.latestPoolRetirementUntilEpoch(poolId, epoch);
-        return PoolDeregistrationMapper.fromDbSyncPoolRetirement(dbSyncPoolRetirement);
     }
 
     @Override
@@ -457,11 +374,11 @@ public class DbSyncDataProvider implements DataProvider {
 
     @Override
     public HashSet<String> getRegisteredAccountsUntilLastEpoch(Integer epoch, HashSet<String> stakeAddresses, Long stabilityWindow) {
-        return dbSyncStakeRegistrationRepository.getStakeAddressesWithRegistrationsUntilEpoch(epoch - 1, stakeAddresses, stabilityWindow);
+        return dbSyncStakeRegistrationRepository.getStakeAddressRegistrationsUntilEpoch(epoch - 1, stakeAddresses, stabilityWindow);
     }
 
     @Override
     public HashSet<String> getRegisteredAccountsUntilNow(Integer epoch, HashSet<String> stakeAddresses, Long stabilisationWindow) {
-        return dbSyncStakeRegistrationRepository.getStakeAddressesWithRegistrationsUntilEpoch(epoch, stakeAddresses, stabilisationWindow);
+        return dbSyncStakeRegistrationRepository.getStakeAddressRegistrationsUntilEpoch(epoch, stakeAddresses, stabilisationWindow);
     }
 }

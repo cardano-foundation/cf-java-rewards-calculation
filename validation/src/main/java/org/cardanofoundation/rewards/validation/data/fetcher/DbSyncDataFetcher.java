@@ -122,7 +122,7 @@ public class DbSyncDataFetcher implements DataFetcher {
     }
 
     private void fetchRetiredPoolsInEpoch(int epoch, boolean override) {
-        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, RETIRED_POOLS.resourceFolderName, epoch);
+        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, REWARD_ADDRESSES_OF_RETIRED_POOLS.resourceFolderName, epoch);
         File outputFile = new File(filePath);
 
         if (outputFile.exists() && !override) {
@@ -130,16 +130,16 @@ public class DbSyncDataFetcher implements DataFetcher {
             return;
         }
 
-        List<PoolDeregistration> retiredPools = dbSyncDataProvider.getRetiredPoolsInEpoch(epoch);
-        if (retiredPools == null) {
-            logger.error("Failed to fetch RetiredPools for epoch " + epoch);
+        HashSet<String> rewardAddressesOfRetiredPoolsInEpoch = dbSyncDataProvider.getRewardAddressesOfRetiredPoolsInEpoch(epoch);
+        if (rewardAddressesOfRetiredPoolsInEpoch == null) {
+            logger.error("Failed to fetch reward addresses of retired pools for epoch " + epoch);
             return;
         }
 
         try {
-            writeObjectToJsonFile(retiredPools, filePath);
+            writeObjectToJsonFile(rewardAddressesOfRetiredPoolsInEpoch, filePath);
         } catch (IOException e) {
-            logger.error("Failed to write RetiredPools to json file for epoch " + epoch);
+            logger.error("Failed to fetch reward addresses of retired pools to json file for epoch " + epoch);
         }
     }
 
@@ -159,8 +159,8 @@ public class DbSyncDataFetcher implements DataFetcher {
 
         List<PoolHistory> poolHistories = jsonDataProvider.getHistoryOfAllPoolsInEpoch(epoch - 2, null);
         HashSet<String> poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).collect(Collectors.toCollection(HashSet::new));
-        List<PoolDeregistration> retiredPools = jsonDataProvider.getRetiredPoolsInEpoch(epoch);
-        poolRewardAddresses.addAll(retiredPools.stream().map(PoolDeregistration::getRewardAddress).collect(Collectors.toSet()));
+        HashSet<String> rewardAddressesOfRetiredPools = jsonDataProvider.getRewardAddressesOfRetiredPoolsInEpoch(epoch);
+        poolRewardAddresses.addAll(rewardAddressesOfRetiredPools);
 
         HashSet<String> accountsRegisteredInThePast = dbSyncDataProvider.getRegisteredAccountsUntilLastEpoch(epoch, poolRewardAddresses, stabilityWindow);
         if (accountsRegisteredInThePast == null) {

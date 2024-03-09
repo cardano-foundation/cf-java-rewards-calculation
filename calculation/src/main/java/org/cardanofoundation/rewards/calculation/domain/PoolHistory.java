@@ -14,9 +14,8 @@ import java.util.List;
 public class PoolHistory {
     private String poolId;
     private BigInteger activeStake;
-    private BigInteger delegatorRewards;
     private String rewardAddress;
-    private List<String> owners;
+    private HashSet<String> owners;
     private BigInteger ownerActiveStake;
     private BigInteger poolFees;
     private Double margin;

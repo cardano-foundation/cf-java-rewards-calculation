@@ -1,15 +1,14 @@
 package org.cardanofoundation.rewards.validation.repository;
 
-import org.cardanofoundation.rewards.validation.entity.jpa.DbSyncReward;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.MemberReward;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.MirTransition;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
+import org.cardanofoundation.rewards.validation.entity.dbsync.DbSyncReward;
+import org.cardanofoundation.rewards.validation.entity.projection.MemberReward;
+import org.cardanofoundation.rewards.validation.entity.projection.MirTransition;
+import org.cardanofoundation.rewards.validation.entity.projection.TotalPoolRewards;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
 
@@ -38,12 +37,4 @@ public interface DbSyncRewardRepository extends ReadOnlyRepository<DbSyncReward,
             WHERE earned_epoch=:epoch AND pool_id IS NOT NULL AND (type='member' OR type='leader') GROUP BY pool_id, pool_hash.view
             """)
     HashSet<TotalPoolRewards> getSumOfMemberAndLeaderRewardsInEpoch(@Param("epoch") Integer epoch);
-
-    @Query("""
-           SELECT reward from DbSyncReward AS reward
-             	WHERE reward.stakeAddress.view IN :addresses
-             	AND reward.earnedEpoch = :epoch
-            """)
-    List<DbSyncReward> getRewardsForAddressesInEpoch(@Param("addresses") List<String> addresses,
-                                                     @Param("epoch") Integer epoch);
 }

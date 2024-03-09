@@ -1,7 +1,7 @@
 package org.cardanofoundation.rewards.validation.repository;
 
-import org.cardanofoundation.rewards.validation.entity.jpa.DbSyncBlock;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.PoolBlocks;
+import org.cardanofoundation.rewards.validation.entity.dbsync.DbSyncBlock;
+import org.cardanofoundation.rewards.validation.entity.projection.PoolBlocks;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -35,21 +35,7 @@ public interface DbSyncBlockRepository extends ReadOnlyRepository<DbSyncBlock, L
                     where block.epochNo = :epoch
                     and block.slotLeader.pool is NOT NULL
            """)
-    Integer getNonOBFTBlocksInEpoch(@Param("epoch") Integer epoch);
+   Integer getNonOBFTBlocksInEpoch(@Param("epoch") Integer epoch);
 
-    @Query("""
-              select count(*) from DbSyncBlock AS block
-                    where block.epochNo = :epoch
-                    and block.slotLeader.pool is NULL
-           """)
-    Integer getOBFTBlocksInEpoch(@Param("epoch") Integer epoch);
-
-    Integer countByEpochNo(Integer epochNo);
-
-    @Query("""
-            select distinct block.slotLeader.pool.bech32PoolId from DbSyncBlock AS block
-                where block.epochNo = :epoch
-                and block.slotLeader.pool is not NULL
-           """)
-    List<String> getPoolsThatProducedBlocksInEpoch(@Param("epoch") Integer epoch);
+   Integer countByEpochNo(Integer epochNo);
 }

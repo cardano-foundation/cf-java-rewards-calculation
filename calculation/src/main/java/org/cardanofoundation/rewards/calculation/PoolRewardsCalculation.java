@@ -129,7 +129,7 @@ public class PoolRewardsCalculation {
     public static PoolRewardCalculationResult calculatePoolRewardInEpoch(final String poolId, final PoolHistory poolHistoryCurrentEpoch,
                                                                          final int totalBlocksInEpoch, final ProtocolParameters protocolParameters,
                                                                          final BigInteger adaInCirculation, final BigInteger activeStakeInEpoch, BigInteger stakePoolRewardsPot,
-                                                                         final BigInteger totalActiveStakeOfOwners, final List<String> poolOwnerStakeAddresses,
+                                                                         final BigInteger totalActiveStakeOfOwners, final HashSet<String> poolOwnerStakeAddresses,
                                                                          final HashSet<String> deregisteredAccounts, final boolean ignoreLeaderReward,
                                                                          final HashSet<String> lateDeregisteredAccounts,
                                                                          final HashSet<String> accountsRegisteredInThePast) {

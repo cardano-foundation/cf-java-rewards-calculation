@@ -1,4 +1,4 @@
-package org.cardanofoundation.rewards.validation.entity.jpa.projection;
+package org.cardanofoundation.rewards.validation.entity.projection;
 
 import java.math.BigInteger;
 

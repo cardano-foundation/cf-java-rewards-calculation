@@ -1,4 +1,4 @@
-package org.cardanofoundation.rewards.validation.entity.jpa;
+package org.cardanofoundation.rewards.validation.entity.dbsync;
 
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
@@ -6,21 +6,17 @@ import lombok.Getter;
 import org.hibernate.annotations.Immutable;
 import org.springframework.context.annotation.Profile;
 
+import java.math.BigInteger;
+
 @Entity
 @Immutable
 @Getter
 @Profile("db-sync")
-@Table(name = "stake_deregistration")
-public class DbSyncAccountDeregistration {
+@Table(name = "withdrawal")
+public class DbSyncWithdrawal {
     @Id
     private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "addr_id")
-    private DbSyncStakeAddress address;
-
-    @Column(name = "epoch_no")
-    private Integer epoch;
+    private BigInteger amount;
 
     @ManyToOne
     @JoinColumn(name = "tx_id", nullable = false,

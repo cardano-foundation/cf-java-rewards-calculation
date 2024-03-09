@@ -1,4 +1,4 @@
-package org.cardanofoundation.rewards.validation.entity.jpa;
+package org.cardanofoundation.rewards.validation.entity.dbsync;
 
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
@@ -12,19 +12,10 @@ import java.math.BigInteger;
 @Immutable
 @Getter
 @Profile("db-sync")
-@Table(name = "epoch_stake")
-public class DbSyncEpochStake {
+@Table(name = "reward")
+public class DbSyncReward {
     @Id
     private Long id;
-
-    @Column(name = "amount")
-    private BigInteger amount;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "addr_id", nullable = false,
-            foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "none"))
-    @EqualsAndHashCode.Exclude
-    private DbSyncStakeAddress stakeAddress;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "pool_id", nullable = false,
@@ -32,6 +23,17 @@ public class DbSyncEpochStake {
     @EqualsAndHashCode.Exclude
     private DbSyncPoolHash pool;
 
-    @Column(name = "epoch_no")
-    private Integer epoch;
+    private BigInteger amount;
+    private String type;
+
+    @ManyToOne
+    @JoinColumn(name = "addr_id", nullable = false,
+            foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "none"))
+    @EqualsAndHashCode.Exclude
+    private DbSyncStakeAddress stakeAddress;
+
+    @Column(name = "earned_epoch")
+    private Long earnedEpoch;
+    @Column(name = "spendable_epoch")
+    private Long spendableEpoch;
 }

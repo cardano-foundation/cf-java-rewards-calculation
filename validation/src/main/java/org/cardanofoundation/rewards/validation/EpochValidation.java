@@ -59,7 +59,7 @@ public class EpochValidation {
         AdaPots adaPotsForPreviousEpoch = dataProvider.getAdaPotsForEpoch(epoch - 1);
         ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch - 2);
         Epoch epochInfo = dataProvider.getEpochInfo(epoch - 2);
-        List<PoolDeregistration> retiredPools = dataProvider.getRetiredPoolsInEpoch(epoch);
+        HashSet<String> rewardAddressesOfRetiredPoolsInEpoch = dataProvider.getRewardAddressesOfRetiredPoolsInEpoch(epoch);
         List<MirCertificate> mirCertificates = dataProvider.getMirCertificatesInEpoch(epoch - 1);
         List<PoolBlock> blocksMadeByPoolsInEpoch = dataProvider.getBlocksMadeByPoolsInEpoch(epoch - 2);
         List<String> poolIds = blocksMadeByPoolsInEpoch.stream().map(PoolBlock::getPoolId).distinct().toList();
@@ -82,7 +82,7 @@ public class EpochValidation {
             sharedPoolRewardAddressesWithoutReward = dataProvider.findSharedPoolRewardAddressWithoutReward(epoch - 2);
         }
         HashSet<String> poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).collect(Collectors.toCollection(HashSet::new));
-        poolRewardAddresses.addAll(retiredPools.stream().map(PoolDeregistration::getRewardAddress).collect(Collectors.toSet()));
+        poolRewardAddresses.addAll(rewardAddressesOfRetiredPoolsInEpoch);
 
         long stabilityWindow = RANDOMNESS_STABILISATION_WINDOW;
         // Since the Vasil hard fork, the unregistered accounts will not filter out before the
@@ -107,7 +107,7 @@ public class EpochValidation {
 
         start = System.currentTimeMillis();
         EpochCalculationResult epochCalculationResult = EpochCalculation.calculateEpochRewardPots(
-                epoch, adaPotsForPreviousEpoch, protocolParameters, epochInfo, retiredPools, deregisteredAccounts,
+                epoch, adaPotsForPreviousEpoch, protocolParameters, epochInfo, rewardAddressesOfRetiredPoolsInEpoch, deregisteredAccounts,
                 mirCertificates, poolIds, poolHistories, lateDeregisteredAccounts,
                 registeredAccountsSinceLastEpoch, registeredAccountsUntilNow, sharedPoolRewardAddressesWithoutReward,
                 deregisteredAccountsOnEpochBoundary);

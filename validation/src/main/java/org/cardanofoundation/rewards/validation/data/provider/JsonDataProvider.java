@@ -149,41 +149,10 @@ public class JsonDataProvider implements DataProvider {
     }
 
     @Override
-    public BigInteger getPoolPledgeInEpoch(String poolId, int epoch) {
-        PoolParameters poolParameters = getDataFromJson(POOL_PARAMETERS, epoch, PoolParameters.class, poolId);
-
-        if (poolParameters == null) return null;
-
-        return BigInteger.valueOf(poolParameters.getPledge().longValue());
-    }
-
-    @Override
-    public PoolOwnerHistory getHistoryOfPoolOwnersInEpoch(String poolId, int epoch) {
-        return getDataFromJson(POOL_OWNER_HISTORY, epoch, PoolOwnerHistory.class, poolId);
-    }
-
-    public List<String> getStakeAddressesOfAllPoolsEverRetired() {
-        List<PoolDeregistration> poolDeregistrations = getListFromJson(POOL_DEREGISTRATIONS, null, PoolDeregistration.class);
-
-        if (poolDeregistrations == null) return List.of();
-
-        return poolDeregistrations.stream()
-                .map(PoolDeregistration::getRewardAddress)
-                .toList();
-    }
-
-    @Override
-    public List<PoolDeregistration> getRetiredPoolsInEpoch(int epoch) {
-        List<PoolDeregistration> poolDeregistrations = getListFromJson(RETIRED_POOLS, epoch, PoolDeregistration.class);
-        if (poolDeregistrations == null) return List.of();
+    public HashSet<String> getRewardAddressesOfRetiredPoolsInEpoch(int epoch) {
+        HashSet<String> poolDeregistrations = getHashSetFromJson(REWARD_ADDRESSES_OF_RETIRED_POOLS, epoch, String.class);
+        if (poolDeregistrations == null) return new HashSet<>();
         return poolDeregistrations;
-    }
-
-    @Override
-    public List<AccountUpdate> getAccountUpdatesUntilEpoch(List<String> stakeAddresses, int epoch) {
-        List<AccountUpdate> accountUpdates = getListFromJson(ACCOUNT_UPDATES, epoch, AccountUpdate.class);
-        if (accountUpdates == null) return List.of();
-        return accountUpdates.stream().filter(accountUpdate -> stakeAddresses.contains(accountUpdate.getStakeAddress())).toList();
     }
 
     @Override
@@ -200,11 +169,6 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public List<PoolUpdate> getPoolUpdateAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch) {
-        return null;
-    }
-
-    @Override
-    public PoolDeregistration latestPoolRetirementUntilEpoch(String poolId, int epoch) {
         return null;
     }
 

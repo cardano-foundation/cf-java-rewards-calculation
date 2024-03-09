@@ -1,7 +1,7 @@
 package org.cardanofoundation.rewards.validation.repository;
 
-import org.cardanofoundation.rewards.validation.entity.jpa.DbSyncPoolOwner;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.PoolOwner;
+import org.cardanofoundation.rewards.validation.entity.dbsync.DbSyncPoolOwner;
+import org.cardanofoundation.rewards.validation.entity.projection.PoolOwner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,11 +12,6 @@ import java.util.List;
 @Repository
 @Profile("db-sync")
 public interface DbSyncPoolOwnerRepository extends ReadOnlyRepository<DbSyncPoolOwner, Long> {
-
-    @Query("""
-            SELECT owner FROM DbSyncPoolOwner AS owner
-                WHERE owner.poolUpdateId = :poolUpdateId""")
-    List<DbSyncPoolOwner> getByPoolUpdateId(@Param("poolUpdateId") Long poolUpdateId);
 
     @Query(nativeQuery = true, value= """
             SELECT stake_address.view AS stakeAddress, pool_hash.view AS poolId FROM pool_owner

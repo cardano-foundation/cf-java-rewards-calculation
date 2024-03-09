@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.validation.enums.DataType.*;
@@ -96,93 +95,6 @@ public class KoiosDataFetcher implements DataFetcher {
         }
     }
 
-    private void fetchAccountUpdates(int epoch, boolean override) {
-        String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, ACCOUNT_UPDATES.resourceFolderName, epoch);
-        File outputFile = new File(filePath);
-
-        if (outputFile.exists() && !override) {
-            logger.info("Skip to fetch AccountUpdates for epoch " + epoch + " because the json file already exists");
-            return;
-        }
-
-        List<String> stakeAddresses = jsonDataProvider.getStakeAddressesOfAllPoolsEverRetired();
-
-        List<AccountUpdate> accountUpdates = koiosDataProvider.getAccountUpdatesUntilEpoch(stakeAddresses, epoch);
-        if (accountUpdates == null) {
-            logger.error("Failed to fetch AccountUpdates for epoch " + epoch);
-            return;
-        }
-
-        if (accountUpdates.isEmpty()) {
-            logger.info("Skip to write AccountUpdates to json file for epoch " + epoch + " because the accountUpdates are empty");
-            return;
-        }
-
-        try {
-            writeObjectToJsonFile(accountUpdates, filePath);
-        } catch (IOException e) {
-            logger.error("Failed to write AccountUpdates to json file for epoch " + epoch);
-        }
-    }
-
-    private void fetchPoolPledgeInEpoch (String poolId, int epoch, boolean override) {
-        String filePath = String.format("%s/pools/%s/parameters_epoch_%d.json", sourceFolder, poolId, epoch);
-        File outputFile = new File(filePath);
-
-        if (outputFile.exists() && !override) {
-            logger.info("Skip to fetch PoolPledge for pool " + poolId + " in epoch " + epoch + " because the json file already exists");
-            return;
-        }
-
-        File poolIdFolder = new File(String.format("%s/pools/%s", sourceFolder, poolId));
-        if (!poolIdFolder.exists()) {
-            if(!poolIdFolder.mkdir()) {
-                logger.error("Failed to create folder for pool " + poolId);
-                return;
-            }
-        }
-
-        BigInteger poolPledge = koiosDataProvider.getPoolPledgeInEpoch(poolId, epoch);
-        PoolParameters poolParameters = PoolParameters.builder().epoch(epoch).pledge(poolPledge).build();
-
-        try {
-            writeObjectToJsonFile(poolParameters, filePath);
-        } catch (IOException e) {
-            logger.error("Failed to write pool params (pledge) to json file for epoch " + epoch);
-        }
-    }
-
-    private void fetchPoolOwnersStakeInEpoch(String poolId, int epoch, boolean override) {
-        String filePath = String.format("%s/pools/%s/owner_account_history_epoch_%d.json", sourceFolder, poolId, epoch);
-        File outputFile = new File(filePath);
-
-        if (outputFile.exists() && !override) {
-            logger.info("Skip to fetch PoolOwnerStake for pool " + poolId + " in epoch " + epoch + " because the json file already exists");
-            return;
-        }
-
-        File poolIdFolder = new File(String.format("%s/pools/%s", sourceFolder, poolId));
-        if (!poolIdFolder.exists()) {
-            if(!poolIdFolder.mkdir()) {
-                logger.error("Failed to create folder for pool " + poolId);
-                return;
-            }
-        }
-
-        PoolOwnerHistory poolOwnersHistory = koiosDataProvider.getHistoryOfPoolOwnersInEpoch(poolId, epoch);
-
-        if (poolOwnersHistory == null) {
-            logger.info("Pool owners history for pool " + poolId + " in epoch " + epoch + " is null");
-            return;
-        }
-
-        try {
-            writeObjectToJsonFile(poolOwnersHistory, filePath);
-        } catch (IOException e) {
-            logger.error("Failed to write pool owner stake to json file for epoch " + epoch);
-        }
-    }
-
     private void fetchPoolHistoryByEpoch(String poolId, int epoch, boolean override) {
         String filePath = String.format("%s/pools/%s/history_epoch_%d.json", sourceFolder, poolId, epoch);
         File outputFile = new File(filePath);
@@ -214,7 +126,6 @@ public class KoiosDataFetcher implements DataFetcher {
         fetchAdaPots(epoch, override);
         fetchEpochInfo(epoch, override);
         fetchProtocolParameters(epoch, override);
-        fetchAccountUpdates(epoch, override);
 
         List<String> poolIds = List.of(
             "pool1xxhs2zw5xa4g54d5p62j46nlqzwp8jklqvuv2agjlapwjx9qkg9",
@@ -228,9 +139,7 @@ public class KoiosDataFetcher implements DataFetcher {
         );
 
         for (String poolId : poolIds) {
-            fetchPoolPledgeInEpoch(poolId, epoch, override);
             fetchPoolHistoryByEpoch(poolId, epoch, override);
-            fetchPoolOwnersStakeInEpoch(poolId, epoch, override);
         }
     }
 }

@@ -1,4 +1,4 @@
-package org.cardanofoundation.rewards.validation.entity.jpa;
+package org.cardanofoundation.rewards.validation.entity.dbsync;
 
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;

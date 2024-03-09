@@ -11,8 +11,6 @@ import java.math.BigInteger;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MirCertificate {
-    private long blockTime;
     private MirPot pot;
-    private int totalStakeKeys;
     private BigInteger totalRewards;
 }

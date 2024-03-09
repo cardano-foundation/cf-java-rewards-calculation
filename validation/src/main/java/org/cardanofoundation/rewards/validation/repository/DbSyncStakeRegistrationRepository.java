@@ -1,23 +1,16 @@
 package org.cardanofoundation.rewards.validation.repository;
 
-import org.cardanofoundation.rewards.validation.entity.jpa.DbSyncAccountRegistration;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.StakeAccountUpdate;
+import org.cardanofoundation.rewards.validation.entity.dbsync.DbSyncAccountRegistration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashSet;
-import java.util.List;
 
 @Repository
 @Profile("db-sync")
 public interface DbSyncStakeRegistrationRepository extends ReadOnlyRepository<DbSyncAccountRegistration, Long>{
-    @Query("SELECT registration FROM DbSyncAccountRegistration registration WHERE " +
-            "registration.address.view IN :addresses AND registration.epoch <= :epoch " +
-            "ORDER BY registration.transaction.id DESC")
-    List<DbSyncAccountRegistration> getLatestAccountRegistrationsUntilEpochForAddresses(
-            @Param("addresses") List<String> addresses, @Param("epoch") Integer epoch);
 
     @Query(nativeQuery = true, value = """
             SELECT
@@ -34,7 +27,7 @@ public interface DbSyncStakeRegistrationRepository extends ReadOnlyRepository<Db
             WHERE
                 sr.epoch_no <= :epoch AND
                 sa.view IN :stakeAddresses""")
-    HashSet<String> getStakeAddressesWithRegistrationsUntilEpoch(@Param("epoch") Integer epoch,
-                                                                 @Param("stakeAddresses") HashSet<String> stakeAddresses,
-                                                                 @Param("stabilityWindow") Long stabilityWindow);
+    HashSet<String> getStakeAddressRegistrationsUntilEpoch(@Param("epoch") Integer epoch,
+                                                           @Param("stakeAddresses") HashSet<String> stakeAddresses,
+                                                           @Param("stabilityWindow") Long stabilityWindow);
 }

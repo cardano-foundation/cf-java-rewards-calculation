@@ -1,7 +1,7 @@
 package org.cardanofoundation.rewards.validation.domain;
 
 import lombok.*;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.TotalPoolRewards;
+import org.cardanofoundation.rewards.validation.entity.projection.TotalPoolRewards;
 
 import java.math.BigInteger;
 

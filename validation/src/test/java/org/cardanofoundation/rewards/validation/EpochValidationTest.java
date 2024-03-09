@@ -1,5 +1,6 @@
 package org.cardanofoundation.rewards.validation;
 
+import lombok.extern.slf4j.Slf4j;
 import org.cardanofoundation.rewards.calculation.domain.AdaPots;
 import org.cardanofoundation.rewards.calculation.domain.EpochCalculationResult;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
@@ -16,13 +17,9 @@ import org.springframework.test.context.junit.jupiter.EnabledIf;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static org.cardanofoundation.rewards.calculation.util.CurrencyConverter.lovelaceToAda;
-
-/*
- * This class is used to test the calculation of all ada pots for a given epoch.
- */
 @SpringBootTest
 @ComponentScan
+@Slf4j
 public class EpochValidationTest {
     @Autowired(required = false)
     DbSyncDataProvider dbSyncDataProvider;
@@ -34,8 +31,8 @@ public class EpochValidationTest {
         EpochCalculationResult epochCalculationResult = EpochValidation.calculateEpochRewardPots(epoch, dataProvider, detailedValidation);
         AdaPots adaPotsForCurrentEpoch = dataProvider.getAdaPotsForEpoch(epoch);
 
-        System.out.println("Treasury difference: " + lovelaceToAda(adaPotsForCurrentEpoch.getTreasury().subtract(epochCalculationResult.getTreasury()).longValue()));
-        System.out.println("Reserves difference: " + lovelaceToAda(adaPotsForCurrentEpoch.getReserves().subtract(epochCalculationResult.getReserves()).longValue()));
+        log.info("Treasury difference: " + adaPotsForCurrentEpoch.getTreasury().subtract(epochCalculationResult.getTreasury()).longValue() + " Lovelace");
+        log.info("Reserves difference: " + adaPotsForCurrentEpoch.getReserves().subtract(epochCalculationResult.getReserves()).longValue() + " Lovelace");
 
         Assertions.assertEquals(epoch, epochCalculationResult.getEpoch());
         Assertions.assertEquals(adaPotsForCurrentEpoch.getTreasury(), epochCalculationResult.getTreasury());

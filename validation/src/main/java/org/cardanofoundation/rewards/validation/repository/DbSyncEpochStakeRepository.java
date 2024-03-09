@@ -1,7 +1,7 @@
 package org.cardanofoundation.rewards.validation.repository;
 
-import org.cardanofoundation.rewards.validation.entity.jpa.DbSyncEpochStake;
-import org.cardanofoundation.rewards.validation.entity.jpa.projection.PoolEpochStake;
+import org.cardanofoundation.rewards.validation.entity.dbsync.DbSyncEpochStake;
+import org.cardanofoundation.rewards.validation.entity.projection.PoolEpochStake;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 

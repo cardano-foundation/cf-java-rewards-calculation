@@ -10,7 +10,7 @@ public enum DataType {
     ACCOUNT_UPDATES ("accountUpdates"),
     POOL_OWNER_HISTORY("accountHistory"),
     MIR_CERTIFICATE("mirCertificates"),
-    RETIRED_POOLS("retiredPools"),
+    REWARD_ADDRESSES_OF_RETIRED_POOLS("rewardAddressesOfRetiredPools"),
     MEMBER_REWARDS("memberRewards"),
     REWARDS("rewards"),
     REWARDS_OUTLIER("rewardsOutlier"),

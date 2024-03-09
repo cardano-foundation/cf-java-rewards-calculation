@@ -1,7 +1,7 @@
 package org.cardanofoundation.rewards.validation.mapper;
 
 import org.cardanofoundation.rewards.calculation.domain.ProtocolParameters;
-import org.cardanofoundation.rewards.validation.entity.jpa.DbSyncProtocolParameters;
+import org.cardanofoundation.rewards.validation.entity.dbsync.DbSyncProtocolParameters;
 import rest.koios.client.backend.api.epoch.model.EpochParams;
 
 import java.math.BigDecimal;
