@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.8.0...v0.9.0) (2024-03-09)
+
+
+### Features
+
+* removing overhead and unused methods. clean up and refactoring ([da1379c](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/da1379c21134e4f1b7c673e5b19337bed93c1042))
+
 ## [0.8.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.7.1...v0.8.0) (2024-03-07)
 
 
