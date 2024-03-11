@@ -61,7 +61,7 @@ flowchart
     style ADA_POTS fill:#f6f9ff,stroke:#f6f9ff
 ```
 
-## 🤓 Interesting Findings
+## 🤓 Interesting Facts
 
 While the flowchart above shows the calculation of the Ada pots in general, there are some more aspects that need to be considered:
 
