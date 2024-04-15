@@ -106,8 +106,8 @@ import static org.cardanofoundation.rewards.calculation.constants.RewardConstant
 <span class="nc" id="L106">        return ProtocolParametersMapper.fromDbSyncProtocolParameters(dbSyncProtocolParameters);</span>
     }
 
-    public List&lt;PoolHistory&gt; fetchPoolHistoryInBatches(Integer epoch, int batchSize, List&lt;PoolBlock&gt; blocksMadeByPoolsInEpoch) {
-<span class="nc" id="L110">        List&lt;PoolHistory&gt; poolHistories = new ArrayList&lt;&gt;();</span>
+    public List&lt;PoolState&gt; fetchPoolHistoryInBatches(Integer epoch, int batchSize, List&lt;PoolBlock&gt; blocksMadeByPoolsInEpoch) {
+<span class="nc" id="L110">        List&lt;PoolState&gt; poolHistories = new ArrayList&lt;&gt;();</span>
 <span class="nc" id="L111">        List&lt;String&gt; poolIds = blocksMadeByPoolsInEpoch.stream()</span>
 <span class="nc" id="L112">                .map(PoolBlock::getPoolId)</span>
 <span class="nc" id="L113">                .distinct()</span>
@@ -135,7 +135,7 @@ import static org.cardanofoundation.rewards.calculation.constants.RewardConstant
 <span class="nc" id="L135">            HashSet&lt;PoolEpochStake&gt; poolEpochStakes = dbSyncEpochStakeRepository.getAllPoolsActiveStakesInEpoch(epoch, poolIdBatch);</span>
 
 <span class="nc bnc" id="L137" title="All 2 branches missed.">            for (String poolId : poolIdBatch) {</span>
-<span class="nc" id="L138">                PoolHistory poolHistory = new PoolHistory();</span>
+<span class="nc" id="L138">                PoolState poolState = new PoolState();</span>
 
 <span class="nc" id="L140">                HashSet&lt;Delegator&gt; delegators = poolEpochStakes.stream()</span>
 <span class="nc" id="L141">                        .filter(epochStake -&gt; epochStake.getPoolId().equals(poolId))</span>
@@ -148,15 +148,15 @@ import static org.cardanofoundation.rewards.calculation.constants.RewardConstant
 <span class="nc" id="L148">                            .reduce(BigInteger::add)</span>
 <span class="nc" id="L149">                            .orElse(BigInteger.ZERO);</span>
 
-<span class="nc" id="L151">                    poolHistory.setActiveStake(activeStake);</span>
-<span class="nc" id="L152">                    poolHistory.setDelegators(delegators);</span>
+<span class="nc" id="L151">                    poolState.setActiveStake(activeStake);</span>
+<span class="nc" id="L152">                    poolState.setDelegators(delegators);</span>
 
 <span class="nc" id="L154">                    Integer blockCount = blocksMadeByPoolsInEpoch.stream()</span>
 <span class="nc" id="L155">                            .filter(poolBlocks -&gt; poolBlocks.getPoolId().equals(poolId))</span>
 <span class="nc" id="L156">                            .map(PoolBlock::getBlockCount)</span>
 <span class="nc" id="L157">                            .findFirst()</span>
 <span class="nc" id="L158">                            .orElse(0);</span>
-<span class="nc" id="L159">                    poolHistory.setBlockCount(blockCount);</span>
+<span class="nc" id="L159">                    poolState.setBlockCount(blockCount);</span>
 
 <span class="nc" id="L161">                    LatestPoolUpdate latestUpdate = latestUpdates.stream()</span>
 <span class="nc" id="L162">                            .filter(update -&gt; update.getPoolId().equals(poolId))</span>
@@ -168,12 +168,12 @@ import static org.cardanofoundation.rewards.calculation.constants.RewardConstant
 <span class="nc" id="L168">                        continue;</span>
                     }
 
-<span class="nc" id="L171">                    poolHistory.setFixedCost(latestUpdate.getFixedCost());</span>
-<span class="nc" id="L172">                    poolHistory.setMargin(latestUpdate.getMargin());</span>
-<span class="nc" id="L173">                    poolHistory.setRewardAddress(latestUpdate.getRewardAddress());</span>
-<span class="nc" id="L174">                    poolHistory.setPledge(latestUpdate.getPledge());</span>
-<span class="nc" id="L175">                    poolHistory.setEpoch(epoch);</span>
-<span class="nc" id="L176">                    poolHistory.setPoolId(poolId);</span>
+<span class="nc" id="L171">                    poolState.setFixedCost(latestUpdate.getFixedCost());</span>
+<span class="nc" id="L172">                    poolState.setMargin(latestUpdate.getMargin());</span>
+<span class="nc" id="L173">                    poolState.setRewardAddress(latestUpdate.getRewardAddress());</span>
+<span class="nc" id="L174">                    poolState.setPledge(latestUpdate.getPledge());</span>
+<span class="nc" id="L175">                    poolState.setEpoch(epoch);</span>
+<span class="nc" id="L176">                    poolState.setPoolId(poolId);</span>
 
 
 <span class="nc" id="L179">                    HashSet&lt;String&gt; poolOwnerStakeAddresses = owners.stream()</span>
@@ -186,10 +186,10 @@ import static org.cardanofoundation.rewards.calculation.constants.RewardConstant
                         }
 <span class="nc" id="L187">                    }</span>
 
-<span class="nc" id="L189">                    poolHistory.setOwners(poolOwnerStakeAddresses);</span>
-<span class="nc" id="L190">                    poolHistory.setOwnerActiveStake(poolOwnerActiveStake);</span>
+<span class="nc" id="L189">                    poolState.setOwners(poolOwnerStakeAddresses);</span>
+<span class="nc" id="L190">                    poolState.setOwnerActiveStake(poolOwnerActiveStake);</span>
 
-<span class="nc" id="L192">                    poolHistories.add(poolHistory);</span>
+<span class="nc" id="L192">                    poolHistories.add(poolState);</span>
                 }
 <span class="nc" id="L194">            }</span>
 <span class="nc" id="L195">            i++;</span>
@@ -199,13 +199,13 @@ import static org.cardanofoundation.rewards.calculation.constants.RewardConstant
     }
 
     @Override
-    public List&lt;PoolHistory&gt; getHistoryOfAllPoolsInEpoch(int epoch, List&lt;PoolBlock&gt; blocksMadeByPoolsInEpoch) {
+    public List&lt;PoolState&gt; getHistoryOfAllPoolsInEpoch(int epoch, List&lt;PoolBlock&gt; blocksMadeByPoolsInEpoch) {
 <span class="nc" id="L203">        return fetchPoolHistoryInBatches(epoch, 20, blocksMadeByPoolsInEpoch);</span>
     }
 
     @Override
-    public PoolHistory getPoolHistory(String poolId, int epoch) {
-<span class="nc" id="L208">        PoolHistory poolHistory = new PoolHistory();</span>
+    public PoolState getPoolHistory(String poolId, int epoch) {
+<span class="nc" id="L208">        PoolState poolState = new PoolState();</span>
 <span class="nc" id="L209">        List&lt;PoolEpochStake&gt; poolEpochStakes = dbSyncEpochStakeRepository.getPoolActiveStakeInEpoch(poolId, epoch);</span>
 <span class="nc" id="L210">        BigInteger activeStake = BigInteger.ZERO;</span>
 <span class="nc" id="L211">        HashSet&lt;Delegator&gt; delegators = new HashSet&lt;&gt;();</span>
@@ -222,19 +222,19 @@ import static org.cardanofoundation.rewards.calculation.constants.RewardConstant
 <span class="nc" id="L222">            return null;</span>
         }
 
-<span class="nc" id="L225">        poolHistory.setActiveStake(activeStake);</span>
-<span class="nc" id="L226">        poolHistory.setDelegators(delegators);</span>
+<span class="nc" id="L225">        poolState.setActiveStake(activeStake);</span>
+<span class="nc" id="L226">        poolState.setDelegators(delegators);</span>
 
 <span class="nc" id="L228">        Integer blockCount = dbSyncBlockRepository.getBlocksMadeByPoolInEpoch(poolId, epoch);</span>
-<span class="nc" id="L229">        poolHistory.setBlockCount(blockCount);</span>
+<span class="nc" id="L229">        poolState.setBlockCount(blockCount);</span>
 
 <span class="nc" id="L231">        DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLastestActiveUpdateInEpoch(poolId, epoch);</span>
-<span class="nc" id="L232">        poolHistory.setFixedCost(dbSyncPoolUpdate.getFixedCost());</span>
-<span class="nc" id="L233">        poolHistory.setMargin(dbSyncPoolUpdate.getMargin());</span>
-<span class="nc" id="L234">        poolHistory.setPledge(dbSyncPoolUpdate.getPledge());</span>
-<span class="nc" id="L235">        poolHistory.setEpoch(epoch);</span>
-<span class="nc" id="L236">        poolHistory.setPoolId(poolId);</span>
-<span class="nc" id="L237">        poolHistory.setRewardAddress(dbSyncPoolUpdate.getStakeAddress().getView());</span>
+<span class="nc" id="L232">        poolState.setFixedCost(dbSyncPoolUpdate.getFixedCost());</span>
+<span class="nc" id="L233">        poolState.setMargin(dbSyncPoolUpdate.getMargin());</span>
+<span class="nc" id="L234">        poolState.setPledge(dbSyncPoolUpdate.getPledge());</span>
+<span class="nc" id="L235">        poolState.setEpoch(epoch);</span>
+<span class="nc" id="L236">        poolState.setPoolId(poolId);</span>
+<span class="nc" id="L237">        poolState.setRewardAddress(dbSyncPoolUpdate.getStakeAddress().getView());</span>
 
 <span class="nc" id="L239">        List&lt;PoolOwner&gt; owners = dbSyncPoolOwnerRepository.getOwnersByPoolUpdateIds(List.of(dbSyncPoolUpdate.getId()));</span>
 <span class="nc" id="L240">        BigInteger activeStakes = BigInteger.ZERO;</span>
@@ -247,10 +247,10 @@ import static org.cardanofoundation.rewards.calculation.constants.RewardConstant
             }
 <span class="nc" id="L248">        }</span>
 
-<span class="nc" id="L250">        poolHistory.setOwners(stakeAddresses);</span>
-<span class="nc" id="L251">        poolHistory.setOwnerActiveStake(activeStakes);</span>
+<span class="nc" id="L250">        poolState.setOwners(stakeAddresses);</span>
+<span class="nc" id="L251">        poolState.setOwnerActiveStake(activeStakes);</span>
 
-<span class="nc" id="L253">        return poolHistory;</span>
+<span class="nc" id="L253">        return poolState;</span>
     }
 
     @Override
@@ -305,81 +305,75 @@ import static org.cardanofoundation.rewards.calculation.constants.RewardConstant
 <span class="nc" id="L305">        return mirCertificates;</span>
     }
 
-    @Override
-    public int getPoolRegistrationsInEpoch(int epoch) {
-<span class="nc" id="L310">        return dbSyncPoolUpdateRepository.countPoolRegistrationsInEpoch(epoch);</span>
-    }
-
-    @Override
     public List&lt;PoolUpdate&gt; getPoolUpdateAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch) {
-<span class="nc" id="L315">        return dbSyncPoolUpdateRepository.findByBech32PoolIdAfterTransactionIdInEpoch(poolId, transactionId, epoch).stream()</span>
-<span class="nc" id="L316">                .map(PoolUpdateMapper::fromDbSyncPoolUpdate).toList();</span>
+<span class="nc" id="L309">        return dbSyncPoolUpdateRepository.findByBech32PoolIdAfterTransactionIdInEpoch(poolId, transactionId, epoch).stream()</span>
+<span class="nc" id="L310">                .map(PoolUpdateMapper::fromDbSyncPoolUpdate).toList();</span>
     }
 
     @Override
     public BigInteger getTransactionDepositsInEpoch(int epoch) {
-<span class="nc" id="L321">        return dbSyncTransactionRepository.getSumOfDepositsInEpoch(epoch);</span>
+<span class="nc" id="L315">        return dbSyncTransactionRepository.getSumOfDepositsInEpoch(epoch);</span>
     }
 
     @Override
     public BigInteger getSumOfFeesInEpoch(int epoch) {
-<span class="nc" id="L326">        return dbSyncTransactionRepository.getSumOfFeesInEpoch(epoch);</span>
+<span class="nc" id="L320">        return dbSyncTransactionRepository.getSumOfFeesInEpoch(epoch);</span>
     }
 
     @Override
     public BigInteger getSumOfWithdrawalsInEpoch(int epoch) {
-<span class="nc" id="L331">        return dbSyncWithdrawalRepository.getSumOfWithdrawalsInEpoch(epoch);</span>
+<span class="nc" id="L325">        return dbSyncWithdrawalRepository.getSumOfWithdrawalsInEpoch(epoch);</span>
     }
 
     @Override
     public HashSet&lt;Reward&gt; getMemberRewardsInEpoch(int epoch) {
-<span class="nc" id="L336">        HashSet&lt;MemberReward&gt; poolRewards = dbSyncRewardRepository.getMemberRewardsInEpoch(epoch);</span>
+<span class="nc" id="L330">        HashSet&lt;MemberReward&gt; poolRewards = dbSyncRewardRepository.getMemberRewardsInEpoch(epoch);</span>
 
-<span class="nc bnc" id="L338" title="All 2 branches missed.">        if (poolRewards.isEmpty()) {</span>
-<span class="nc" id="L339">            return new HashSet&lt;&gt;();</span>
+<span class="nc bnc" id="L332" title="All 2 branches missed.">        if (poolRewards.isEmpty()) {</span>
+<span class="nc" id="L333">            return new HashSet&lt;&gt;();</span>
         }
 
-<span class="nc" id="L342">        return poolRewards.stream().map(RewardMapper::fromMemberReward).collect(Collectors.toCollection(HashSet::new));</span>
+<span class="nc" id="L336">        return poolRewards.stream().map(RewardMapper::fromMemberReward).collect(Collectors.toCollection(HashSet::new));</span>
     }
 
     @Override
     public HashSet&lt;PoolReward&gt; getTotalPoolRewardsInEpoch(int epoch) {
-<span class="nc" id="L347">        HashSet&lt;TotalPoolRewards&gt; totalPoolRewards = dbSyncRewardRepository.getSumOfMemberAndLeaderRewardsInEpoch(epoch);</span>
+<span class="nc" id="L341">        HashSet&lt;TotalPoolRewards&gt; totalPoolRewards = dbSyncRewardRepository.getSumOfMemberAndLeaderRewardsInEpoch(epoch);</span>
 
-<span class="nc bnc" id="L349" title="All 2 branches missed.">        if (totalPoolRewards.isEmpty()) {</span>
-<span class="nc" id="L350">            return new HashSet&lt;&gt;();</span>
+<span class="nc bnc" id="L343" title="All 2 branches missed.">        if (totalPoolRewards.isEmpty()) {</span>
+<span class="nc" id="L344">            return new HashSet&lt;&gt;();</span>
         } else {
-<span class="nc" id="L352">            return totalPoolRewards.stream().map(totalPoolReward -&gt; PoolReward.fromTotalPoolRewards(totalPoolReward, epoch)).collect(Collectors.toCollection(HashSet::new));</span>
+<span class="nc" id="L346">            return totalPoolRewards.stream().map(totalPoolReward -&gt; PoolReward.fromTotalPoolRewards(totalPoolReward, epoch)).collect(Collectors.toCollection(HashSet::new));</span>
         }
     }
 
     public List&lt;PoolBlock&gt; getBlocksMadeByPoolsInEpoch(int epoch) {
-<span class="nc" id="L357">        return dbSyncBlockRepository.getAllBlocksMadeByPoolsInEpoch(epoch).stream().map(block -&gt; {</span>
-<span class="nc" id="L358">            PoolBlock poolBlock = new PoolBlock();</span>
-<span class="nc" id="L359">            poolBlock.setPoolId(block.getPoolId());</span>
-<span class="nc" id="L360">            poolBlock.setBlockCount(block.getBlockCount());</span>
-<span class="nc" id="L361">            return poolBlock;</span>
-<span class="nc" id="L362">        }).toList();</span>
+<span class="nc" id="L351">        return dbSyncBlockRepository.getAllBlocksMadeByPoolsInEpoch(epoch).stream().map(block -&gt; {</span>
+<span class="nc" id="L352">            PoolBlock poolBlock = new PoolBlock();</span>
+<span class="nc" id="L353">            poolBlock.setPoolId(block.getPoolId());</span>
+<span class="nc" id="L354">            poolBlock.setBlockCount(block.getBlockCount());</span>
+<span class="nc" id="L355">            return poolBlock;</span>
+<span class="nc" id="L356">        }).toList();</span>
     }
 
     @Override
     public HashSet&lt;String&gt; findSharedPoolRewardAddressWithoutReward(int epoch) {
-<span class="nc" id="L367">        return dbSyncPoolUpdateRepository.findSharedPoolRewardAddressWithoutReward(epoch);</span>
+<span class="nc" id="L361">        return dbSyncPoolUpdateRepository.findSharedPoolRewardAddressWithoutReward(epoch);</span>
     }
 
     @Override
     public HashSet&lt;String&gt; getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow) {
-<span class="nc" id="L372">        return dbSyncStakeDeregistrationRepository.getAccountDeregistrationsInEpoch(epoch, stabilityWindow);</span>
+<span class="nc" id="L366">        return dbSyncStakeDeregistrationRepository.getAccountDeregistrationsInEpoch(epoch, stabilityWindow);</span>
     }
 
     @Override
     public HashSet&lt;String&gt; getRegisteredAccountsUntilLastEpoch(Integer epoch, HashSet&lt;String&gt; stakeAddresses, Long stabilityWindow) {
-<span class="nc" id="L377">        return dbSyncStakeRegistrationRepository.getStakeAddressRegistrationsUntilEpoch(epoch - 1, stakeAddresses, stabilityWindow);</span>
+<span class="nc" id="L371">        return dbSyncStakeRegistrationRepository.getStakeAddressRegistrationsUntilEpoch(epoch - 1, stakeAddresses, stabilityWindow);</span>
     }
 
     @Override
     public HashSet&lt;String&gt; getRegisteredAccountsUntilNow(Integer epoch, HashSet&lt;String&gt; stakeAddresses, Long stabilisationWindow) {
-<span class="nc" id="L382">        return dbSyncStakeRegistrationRepository.getStakeAddressRegistrationsUntilEpoch(epoch, stakeAddresses, stabilisationWindow);</span>
+<span class="nc" id="L376">        return dbSyncStakeRegistrationRepository.getStakeAddressRegistrationsUntilEpoch(epoch, stakeAddresses, stabilisationWindow);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

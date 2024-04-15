@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PoolRewardValidation.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cf-rewards-validation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.validation</a> &gt; <span class="el_source">PoolRewardValidation.java</span></div><h1>PoolRewardValidation.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.validation;
 
 import lombok.extern.slf4j.Slf4j;
+import org.cardanofoundation.rewards.calculation.PoolRewardsCalculation;
 import org.cardanofoundation.rewards.calculation.TreasuryCalculation;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
+import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
+import org.cardanofoundation.rewards.validation.domain.EpochValidationInput;
 import org.cardanofoundation.rewards.validation.domain.PoolReward;
 import org.cardanofoundation.rewards.validation.domain.PoolValidationResult;
 import org.cardanofoundation.rewards.validation.domain.RewardValidation;
@@ -20,61 +23,61 @@ import static org.cardanofoundation.rewards.calculation.PoolRewardsCalculation.c
 import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 
-<span class="fc" id="L23">@Slf4j</span>
-<span class="nc" id="L24">public class PoolRewardValidation {</span>
+<span class="fc" id="L26">@Slf4j</span>
+<span class="nc" id="L27">public class PoolRewardValidation {</span>
 
     public static PoolRewardCalculationResult computePoolRewardInEpoch(String poolId, int epoch, ProtocolParameters protocolParameters,
                                                                        Epoch epochInfo, BigInteger stakePoolRewardsPot,
-                                                                       BigInteger adaInCirculation, PoolHistory poolHistoryCurrentEpoch,
+                                                                       BigInteger adaInCirculation, PoolState poolStateCurrentEpoch,
                                                                        HashSet&lt;String&gt; accountDeregistrations, HashSet&lt;String&gt; lateAccountDeregistrations,
                                                                        HashSet&lt;String&gt; accountsRegisteredInThePast,
                                                                        HashSet&lt;String&gt; poolIdsWithSharedRewardAddresses) {
         // Step 1: Get Pool information of current epoch
         // Example: https://api.koios.rest/api/v0/pool_history?_pool_bech32=pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt&amp;_epoch_no=210
 
-<span class="fc bfc" id="L35" title="All 2 branches covered.">        if(poolHistoryCurrentEpoch == null) {</span>
-<span class="fc" id="L36">            return PoolRewardCalculationResult.builder().poolId(poolId).epoch(epoch).poolReward(BigInteger.ZERO).build();</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">        if(poolStateCurrentEpoch == null) {</span>
+<span class="fc" id="L39">            return PoolRewardCalculationResult.builder().poolId(poolId).epoch(epoch).poolReward(BigInteger.ZERO).build();</span>
         }
 
-<span class="fc" id="L39">        BigInteger activeStakeInEpoch = BigInteger.ZERO;</span>
-<span class="pc bpc" id="L40" title="1 of 2 branches missed.">        if (epochInfo.getActiveStake() != null) {</span>
-<span class="fc" id="L41">            activeStakeInEpoch = epochInfo.getActiveStake();</span>
+<span class="fc" id="L42">        BigInteger activeStakeInEpoch = BigInteger.ZERO;</span>
+<span class="pc bpc" id="L43" title="1 of 2 branches missed.">        if (epochInfo.getActiveStake() != null) {</span>
+<span class="fc" id="L44">            activeStakeInEpoch = epochInfo.getActiveStake();</span>
         }
 
-<span class="fc" id="L44">        int totalBlocksInEpoch = epochInfo.getBlockCount();</span>
+<span class="fc" id="L47">        int totalBlocksInEpoch = epochInfo.getBlockCount();</span>
 
-<span class="fc" id="L46">        BigDecimal decentralizationParameter = protocolParameters.getDecentralisation();</span>
-<span class="fc" id="L47">        BigDecimal decentralizationThreshold = BigDecimal.valueOf(0.8);</span>
-<span class="pc bpc" id="L48" title="1 of 4 branches missed.">        if (isLower(decentralizationParameter, decentralizationThreshold) &amp;&amp; isHigher(decentralizationParameter, BigDecimal.ZERO)) {</span>
-<span class="fc" id="L49">            totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();</span>
+<span class="fc" id="L49">        BigDecimal decentralizationParameter = protocolParameters.getDecentralisation();</span>
+<span class="fc" id="L50">        BigDecimal decentralizationThreshold = BigDecimal.valueOf(0.8);</span>
+<span class="pc bpc" id="L51" title="1 of 4 branches missed.">        if (isLower(decentralizationParameter, decentralizationThreshold) &amp;&amp; isHigher(decentralizationParameter, BigDecimal.ZERO)) {</span>
+<span class="fc" id="L52">            totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();</span>
         }
 
         // Step 10 a: Check if pool reward address or member stake addresses have been unregistered before
-<span class="fc" id="L53">        List&lt;String&gt; stakeAddresses = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L54">        stakeAddresses.add(poolHistoryCurrentEpoch.getRewardAddress());</span>
-<span class="fc" id="L55">        stakeAddresses.addAll(poolHistoryCurrentEpoch.getDelegators().stream().map(Delegator::getStakeAddress).toList());</span>
+<span class="fc" id="L56">        List&lt;String&gt; stakeAddresses = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L57">        stakeAddresses.add(poolStateCurrentEpoch.getRewardAddress());</span>
+<span class="fc" id="L58">        stakeAddresses.addAll(poolStateCurrentEpoch.getDelegators().stream().map(Delegator::getStakeAddress).toList());</span>
 
-<span class="fc" id="L57">        HashSet&lt;String&gt; delegatorDeregistrations = accountDeregistrations.stream()</span>
-<span class="fc" id="L58">                .filter(stakeAddresses::contains).collect(toCollection(HashSet::new));</span>
+<span class="fc" id="L60">        HashSet&lt;String&gt; delegatorDeregistrations = accountDeregistrations.stream()</span>
+<span class="fc" id="L61">                .filter(stakeAddresses::contains).collect(toCollection(HashSet::new));</span>
 
         // There was a different behavior in the previous version of the node
         // If a pool reward address had been used for multiple pools,
         // the stake account only received the reward for one of those pools
         // This is not the case anymore and the stake account receives the reward for all pools
         // Until the Allegra hard fork, this method will be used to emulate the old behavior
-<span class="fc" id="L65">        boolean ignoreLeaderReward = false;</span>
+<span class="fc" id="L68">        boolean ignoreLeaderReward = false;</span>
 
-<span class="pc bpc" id="L67" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_ALLEGRA_HARDFORK_EPOCH) {</span>
-<span class="fc" id="L68">            ignoreLeaderReward = poolIdsWithSharedRewardAddresses.contains(poolId);</span>
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_ALLEGRA_HARDFORK_EPOCH) {</span>
+<span class="fc" id="L71">            ignoreLeaderReward = poolIdsWithSharedRewardAddresses.contains(poolId);</span>
         }
 
         // shelley-delegation.pdf 5.5.3
         //      &quot;[...]the relative stake of the pool owner(s) (the amount of ada
         //      pledged during pool registration)&quot;
-<span class="fc" id="L74">        return calculatePoolRewardInEpoch(poolId, poolHistoryCurrentEpoch,</span>
+<span class="fc" id="L77">        return calculatePoolRewardInEpoch(poolId, poolStateCurrentEpoch,</span>
                 totalBlocksInEpoch, protocolParameters,
                 adaInCirculation, activeStakeInEpoch, stakePoolRewardsPot,
-<span class="fc" id="L77">                poolHistoryCurrentEpoch.getOwnerActiveStake(), poolHistoryCurrentEpoch.getOwners(),</span>
+<span class="fc" id="L80">                poolStateCurrentEpoch.getOwnerActiveStake(), poolStateCurrentEpoch.getOwners(),</span>
                 delegatorDeregistrations, ignoreLeaderReward, lateAccountDeregistrations,
                 accountsRegisteredInThePast);
 
@@ -83,181 +86,244 @@ import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
     public static PoolRewardCalculationResult computePoolRewardInEpoch(String poolId, int epoch, DataProvider dataProvider) {
         // The Shelley era and the ada pot system started on mainnet in epoch 208.
         // Fee and treasury values are 0 for epoch 208.
-<span class="pc bpc" id="L86" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) {</span>
-<span class="nc" id="L87">            log.warn(&quot;Epoch &quot; + epoch + &quot; is before the start of the Shelley era. No rewards were calculated in this epoch.&quot;);</span>
-<span class="nc" id="L88">            return PoolRewardCalculationResult.builder().poolId(poolId).epoch(epoch).poolReward(BigInteger.ZERO).build();</span>
-<span class="fc bfc" id="L89" title="All 2 branches covered.">        } else if (epoch == MAINNET_SHELLEY_START_EPOCH) {</span>
-<span class="fc" id="L90">            return PoolRewardCalculationResult.builder().poolId(poolId).epoch(epoch).poolReward(BigInteger.ZERO).build();</span>
+
+<span class="fc" id="L90">        PoolRewardCalculationResult poolRewardsCalculationResult = PoolRewardCalculationResult.builder()</span>
+<span class="fc" id="L91">                .poolId(poolId).epoch(epoch).poolReward(BigInteger.ZERO).build();</span>
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) {</span>
+<span class="nc" id="L93">            log.warn(&quot;Epoch &quot; + epoch + &quot; is before the start of the Shelley era. No rewards were calculated in this epoch.&quot;);</span>
+<span class="nc" id="L94">            return poolRewardsCalculationResult;</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">        } else if (epoch == MAINNET_SHELLEY_START_EPOCH) {</span>
+<span class="fc" id="L96">            return poolRewardsCalculationResult;</span>
         }
 
-        // Get Epoch information of current epoch
-        // Source: https://api.koios.rest/api/v0/epoch_info?_epoch_no=211
-<span class="fc" id="L95">        Epoch epochInfo = dataProvider.getEpochInfo(epoch);</span>
-<span class="fc" id="L96">        BigInteger totalFeesForCurrentEpoch = epochInfo.getFees();</span>
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">        if (dataProvider instanceof JsonDataProvider) {</span>
+<span class="fc" id="L100">            EpochValidationInput epochValidationInput = ((JsonDataProvider) dataProvider).getEpochValidationInput(epoch + 2);</span>
 
-<span class="fc" id="L98">        int totalBlocksInEpoch = epochInfo.getBlockCount();</span>
+<span class="fc" id="L102">            ProtocolParameters protocolParameters = ProtocolParameters.builder()</span>
+<span class="fc" id="L103">                    .decentralisation(epochValidationInput.getDecentralisation())</span>
+<span class="fc" id="L104">                    .monetaryExpandRate(epochValidationInput.getMonetaryExpandRate())</span>
+<span class="fc" id="L105">                    .treasuryGrowRate(epochValidationInput.getTreasuryGrowRate())</span>
+<span class="fc" id="L106">                    .optimalPoolCount(epochValidationInput.getOptimalPoolCount())</span>
+<span class="fc" id="L107">                    .poolOwnerInfluence(epochValidationInput.getPoolOwnerInfluence())</span>
+<span class="fc" id="L108">                    .build();</span>
 
-        // Get the ada reserves for the next epoch because it was already updated (int the previous step)
-<span class="fc" id="L101">        AdaPots adaPotsForNextEpoch = dataProvider.getAdaPotsForEpoch(epoch + 1);</span>
-<span class="fc" id="L102">        BigInteger reserves = adaPotsForNextEpoch.getReserves();</span>
+<span class="fc" id="L110">            Epoch epochInfo = null;</span>
 
-        // Get total ada in circulation
-<span class="fc" id="L105">        BigInteger adaInCirculation = TOTAL_LOVELACE.subtract(reserves);</span>
+<span class="pc bpc" id="L112" title="1 of 2 branches missed.">            if (epochValidationInput.getBlockCount() &gt; 0) {</span>
+<span class="fc" id="L113">                epochInfo = Epoch.builder()</span>
+<span class="fc" id="L114">                        .number(epoch)</span>
+<span class="fc" id="L115">                        .blockCount(epochValidationInput.getBlockCount())</span>
+<span class="fc" id="L116">                        .fees(epochValidationInput.getFees())</span>
+<span class="fc" id="L117">                        .activeStake(epochValidationInput.getActiveStake())</span>
+<span class="fc" id="L118">                        .nonOBFTBlockCount(epochValidationInput.getNonOBFTBlockCount())</span>
+<span class="fc" id="L119">                        .build();</span>
+            }
 
-        // Get protocol parameters for current epoch
-<span class="fc" id="L108">        ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch);</span>
+            // Calculate total available reward for pools (total reward pot after treasury cut)
+<span class="fc" id="L123">            BigDecimal decentralizationParameter = protocolParameters.getDecentralisation();</span>
+<span class="fc" id="L124">            BigDecimal monetaryExpandRate = protocolParameters.getMonetaryExpandRate();</span>
+<span class="fc" id="L125">            BigDecimal treasuryGrowRate = protocolParameters.getTreasuryGrowRate();</span>
 
-        // Calculate total available reward for pools (total reward pot after treasury cut)
-<span class="fc" id="L111">        BigDecimal decentralizationParameter = protocolParameters.getDecentralisation();</span>
-<span class="fc" id="L112">        BigDecimal monetaryExpandRate = protocolParameters.getMonetaryExpandRate();</span>
-<span class="fc" id="L113">        BigDecimal treasuryGrowRate = protocolParameters.getTreasuryGrowRate();</span>
+<span class="fc" id="L127">            BigInteger adaInCirculation = TOTAL_LOVELACE.subtract(epochValidationInput.getReservesOfPreviousEpoch());</span>
 
-<span class="fc" id="L115">        BigDecimal decentralizationThreshold = BigDecimal.valueOf(0.8);</span>
-<span class="pc bpc" id="L116" title="1 of 4 branches missed.">        if (isLower(decentralizationParameter, decentralizationThreshold) &amp;&amp; isHigher(decentralizationParameter, BigDecimal.ZERO)) {</span>
-<span class="fc" id="L117">            totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();</span>
+<span class="fc" id="L129">            BigInteger totalFeesForCurrentEpoch = BigInteger.ZERO;</span>
+<span class="fc" id="L130">            int totalBlocksInEpoch = 0;</span>
+
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">            if (epochInfo != null) {</span>
+<span class="fc" id="L133">                totalFeesForCurrentEpoch = epochInfo.getFees();</span>
+<span class="fc" id="L134">                totalBlocksInEpoch = epochInfo.getBlockCount();</span>
+<span class="pc bpc" id="L135" title="1 of 4 branches missed.">                if (isLower(decentralizationParameter, BigDecimal.valueOf(0.8)) &amp;&amp; isHigher(decentralizationParameter, BigDecimal.ZERO)) {</span>
+<span class="fc" id="L136">                    totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();</span>
+                }
+            }
+
+<span class="fc" id="L140">            final int blocksInEpoch = totalBlocksInEpoch;</span>
+
+
+<span class="fc" id="L143">            BigInteger totalRewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(</span>
+<span class="fc" id="L144">                    monetaryExpandRate, blocksInEpoch, decentralizationParameter, epochValidationInput.getReservesOfPreviousEpoch(), totalFeesForCurrentEpoch);</span>
+
+<span class="fc" id="L146">            BigInteger stakePoolRewardsPot = totalRewardPot.subtract(floor(multiply(totalRewardPot, treasuryGrowRate)));</span>
+
+<span class="fc" id="L148">            poolRewardsCalculationResult = computePoolRewardInEpoch(poolId, epoch, protocolParameters, epochInfo, stakePoolRewardsPot, adaInCirculation,</span>
+<span class="fc" id="L149">                    epochValidationInput.getPoolStates().stream().filter(poolState -&gt; poolState.getPoolId().equals(poolId)).findFirst().orElse(null),</span>
+<span class="fc" id="L150">                    epochValidationInput.getDeregisteredAccounts(), epochValidationInput.getLateDeregisteredAccounts(),</span>
+<span class="fc" id="L151">                    epochValidationInput.getRegisteredAccountsUntilNow(), epochValidationInput.getSharedPoolRewardAddressesWithoutReward());</span>
+<span class="fc" id="L152">        } else {</span>
+            // Get Epoch information of current epoch
+            // Source: https://api.koios.rest/api/v0/epoch_info?_epoch_no=211
+<span class="nc" id="L155">            Epoch epochInfo = dataProvider.getEpochInfo(epoch);</span>
+<span class="nc" id="L156">            BigInteger totalFeesForCurrentEpoch = epochInfo.getFees();</span>
+
+<span class="nc" id="L158">            int totalBlocksInEpoch = epochInfo.getBlockCount();</span>
+
+            // Get the ada reserves for the next epoch because it was already updated (int the previous step)
+<span class="nc" id="L161">            AdaPots adaPotsForNextEpoch = dataProvider.getAdaPotsForEpoch(epoch + 1);</span>
+<span class="nc" id="L162">            BigInteger reserves = adaPotsForNextEpoch.getReserves();</span>
+
+            // Get total ada in circulation
+<span class="nc" id="L165">            BigInteger adaInCirculation = TOTAL_LOVELACE.subtract(reserves);</span>
+
+            // Get protocol parameters for current epoch
+<span class="nc" id="L168">            ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch);</span>
+
+            // Calculate total available reward for pools (total reward pot after treasury cut)
+<span class="nc" id="L171">            BigDecimal decentralizationParameter = protocolParameters.getDecentralisation();</span>
+<span class="nc" id="L172">            BigDecimal monetaryExpandRate = protocolParameters.getMonetaryExpandRate();</span>
+<span class="nc" id="L173">            BigDecimal treasuryGrowRate = protocolParameters.getTreasuryGrowRate();</span>
+
+<span class="nc" id="L175">            BigDecimal decentralizationThreshold = BigDecimal.valueOf(0.8);</span>
+<span class="nc bnc" id="L176" title="All 4 branches missed.">            if (isLower(decentralizationParameter, decentralizationThreshold) &amp;&amp; isHigher(decentralizationParameter, BigDecimal.ZERO)) {</span>
+<span class="nc" id="L177">                totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();</span>
+            }
+
+<span class="nc" id="L180">            BigInteger totalRewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(</span>
+                    monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserves, totalFeesForCurrentEpoch);
+
+<span class="nc" id="L183">            BigInteger stakePoolRewardsPot = totalRewardPot.subtract(floor(multiply(totalRewardPot, treasuryGrowRate)));</span>
+
+<span class="nc" id="L185">            PoolState poolStateCurrentEpoch = dataProvider.getPoolHistory(poolId, epoch);</span>
+
+            HashSet&lt;String&gt; accountDeregistrations;
+<span class="nc" id="L188">            HashSet&lt;String&gt; lateAccountDeregistrations = new HashSet&lt;&gt;();</span>
+<span class="nc bnc" id="L189" title="All 2 branches missed.">            if (epoch &lt; MAINNET_VASIL_HARDFORK_EPOCH) {</span>
+<span class="nc" id="L190">                accountDeregistrations = dataProvider.getDeregisteredAccountsInEpoch(epoch + 1, RANDOMNESS_STABILISATION_WINDOW);</span>
+<span class="nc" id="L191">                HashSet&lt;String&gt; deregisteredAccountsOnEpochBoundary = dataProvider.getDeregisteredAccountsInEpoch(epoch + 1, EXPECTED_SLOTS_PER_EPOCH);</span>
+<span class="nc bnc" id="L192" title="All 2 branches missed.">                lateAccountDeregistrations = deregisteredAccountsOnEpochBoundary.stream().filter(account -&gt; !accountDeregistrations.contains(account)).collect(Collectors.toCollection(HashSet::new));</span>
+<span class="nc" id="L193">            } else {</span>
+<span class="nc" id="L194">                accountDeregistrations = dataProvider.getDeregisteredAccountsInEpoch(epoch + 1, EXPECTED_SLOTS_PER_EPOCH);</span>
+            }
+
+<span class="nc" id="L197">            HashSet&lt;String&gt; sharedPoolRewardAddressesWithoutReward = dataProvider.findSharedPoolRewardAddressWithoutReward(epoch);</span>
+<span class="nc" id="L198">            HashSet&lt;String&gt; rewardAddresses = new HashSet&lt;&gt;();</span>
+<span class="nc bnc" id="L199" title="All 2 branches missed.">            if (poolStateCurrentEpoch != null) {</span>
+<span class="nc" id="L200">                rewardAddresses = new HashSet&lt;&gt;(List.of(poolStateCurrentEpoch.getRewardAddress()));</span>
+            }
+
+<span class="nc" id="L203">            long stabilityWindow = RANDOMNESS_STABILISATION_WINDOW;</span>
+            // Since the Vasil hard fork, the unregistered accounts will not filter out before the
+            // rewards calculation starts (at the stability window). They will be filtered out on the
+            // epoch boundary when the reward update will be applied.
+<span class="nc bnc" id="L207" title="All 2 branches missed.">            if (epoch &gt;= MAINNET_VASIL_HARDFORK_EPOCH) {</span>
+<span class="nc" id="L208">                stabilityWindow = EXPECTED_SLOTS_PER_EPOCH;</span>
+            }
+
+<span class="nc" id="L211">            HashSet&lt;String&gt; accountsRegisteredInThePast = dataProvider.getRegisteredAccountsUntilLastEpoch(epoch + 2, rewardAddresses, stabilityWindow);</span>
+<span class="nc" id="L212">            poolRewardsCalculationResult = computePoolRewardInEpoch(poolId, epoch, protocolParameters, epochInfo, stakePoolRewardsPot, adaInCirculation, poolStateCurrentEpoch,</span>
+                    accountDeregistrations, lateAccountDeregistrations, accountsRegisteredInThePast, sharedPoolRewardAddressesWithoutReward);
         }
-
-<span class="fc" id="L120">        BigInteger totalRewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(</span>
-                monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserves, totalFeesForCurrentEpoch);
-
-<span class="fc" id="L123">        BigInteger stakePoolRewardsPot = totalRewardPot.subtract(floor(multiply(totalRewardPot, treasuryGrowRate)));</span>
-
-<span class="fc" id="L125">        PoolHistory poolHistoryCurrentEpoch = dataProvider.getPoolHistory(poolId, epoch);</span>
-
-        HashSet&lt;String&gt; accountDeregistrations;
-<span class="fc" id="L128">        HashSet&lt;String&gt; lateAccountDeregistrations = new HashSet&lt;&gt;();</span>
-<span class="pc bpc" id="L129" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_VASIL_HARDFORK_EPOCH) {</span>
-<span class="fc" id="L130">            accountDeregistrations = dataProvider.getDeregisteredAccountsInEpoch(epoch + 1, RANDOMNESS_STABILISATION_WINDOW);</span>
-<span class="fc" id="L131">            HashSet&lt;String&gt; deregisteredAccountsOnEpochBoundary = dataProvider.getDeregisteredAccountsInEpoch(epoch + 1, EXPECTED_SLOTS_PER_EPOCH);</span>
-<span class="fc bfc" id="L132" title="All 2 branches covered.">            lateAccountDeregistrations = deregisteredAccountsOnEpochBoundary.stream().filter(account -&gt; !accountDeregistrations.contains(account)).collect(Collectors.toCollection(HashSet::new));</span>
-<span class="fc" id="L133">        } else {</span>
-<span class="nc" id="L134">            accountDeregistrations = dataProvider.getDeregisteredAccountsInEpoch(epoch + 1, EXPECTED_SLOTS_PER_EPOCH);</span>
-        }
-
-<span class="fc" id="L137">        HashSet&lt;String&gt; sharedPoolRewardAddressesWithoutReward = dataProvider.findSharedPoolRewardAddressWithoutReward(epoch);</span>
-<span class="fc" id="L138">        HashSet&lt;String&gt; rewardAddresses = new HashSet&lt;&gt;();</span>
-<span class="fc bfc" id="L139" title="All 2 branches covered.">        if (poolHistoryCurrentEpoch != null) {</span>
-<span class="fc" id="L140">            rewardAddresses = new HashSet&lt;&gt;(List.of(poolHistoryCurrentEpoch.getRewardAddress()));</span>
-        }
-
-<span class="fc" id="L143">        long stabilityWindow = RANDOMNESS_STABILISATION_WINDOW;</span>
-        // Since the Vasil hard fork, the unregistered accounts will not filter out before the
-        // rewards calculation starts (at the stability window). They will be filtered out on the
-        // epoch boundary when the reward update will be applied.
-<span class="pc bpc" id="L147" title="1 of 2 branches missed.">        if (epoch &gt;= MAINNET_VASIL_HARDFORK_EPOCH) {</span>
-<span class="nc" id="L148">            stabilityWindow = EXPECTED_SLOTS_PER_EPOCH;</span>
-        }
-
-<span class="fc" id="L151">        HashSet&lt;String&gt; accountsRegisteredInThePast = dataProvider.getRegisteredAccountsUntilLastEpoch(epoch + 2, rewardAddresses, stabilityWindow);</span>
-
-<span class="fc" id="L153">        return computePoolRewardInEpoch(poolId, epoch, protocolParameters, epochInfo, stakePoolRewardsPot, adaInCirculation, poolHistoryCurrentEpoch,</span>
-                accountDeregistrations, lateAccountDeregistrations, accountsRegisteredInThePast, sharedPoolRewardAddressesWithoutReward);
+<span class="fc" id="L215">        return poolRewardsCalculationResult;</span>
     }
 
     public static PoolValidationResult validatePoolRewardCalculation(PoolRewardCalculationResult poolRewardCalculationResult, DataProvider dataProvider) {
-<span class="fc" id="L158">        int epoch  = poolRewardCalculationResult.getEpoch();</span>
-<span class="fc" id="L159">        HashSet&lt;Reward&gt; memberRewardsInEpoch = dataProvider.getMemberRewardsInEpoch(epoch);</span>
-<span class="fc" id="L160">        HashSet&lt;PoolReward&gt; totalPoolRewards = dataProvider.getTotalPoolRewardsInEpoch(epoch);</span>
-<span class="fc" id="L161">        return validatePoolRewardCalculation(poolRewardCalculationResult, memberRewardsInEpoch, totalPoolRewards);</span>
+<span class="fc" id="L219">        int epoch  = poolRewardCalculationResult.getEpoch();</span>
+
+<span class="pc bpc" id="L221" title="1 of 2 branches missed.">        if (dataProvider instanceof JsonDataProvider) {</span>
+<span class="fc" id="L222">            epoch += 2;</span>
+        }
+
+<span class="fc" id="L225">        HashSet&lt;Reward&gt; memberRewardsInEpoch = dataProvider.getMemberRewardsInEpoch(epoch);</span>
+<span class="fc" id="L226">        HashSet&lt;PoolReward&gt; totalPoolRewards = dataProvider.getTotalPoolRewardsInEpoch(epoch);</span>
+<span class="fc" id="L227">        return validatePoolRewardCalculation(poolRewardCalculationResult, memberRewardsInEpoch, totalPoolRewards);</span>
     }
 
     public static PoolValidationResult validatePoolRewardCalculation(PoolRewardCalculationResult poolRewardCalculationResult, HashSet&lt;Reward&gt; memberRewardsInEpoch, HashSet&lt;PoolReward&gt; totalPoolRewards) {
-<span class="fc" id="L165">        String poolId = poolRewardCalculationResult.getPoolId();</span>
-<span class="fc" id="L166">        PoolValidationResult poolRewardValidationResult = PoolValidationResult.from(poolRewardCalculationResult, new HashSet&lt;&gt;());</span>
+<span class="fc" id="L231">        String poolId = poolRewardCalculationResult.getPoolId();</span>
+<span class="fc" id="L232">        PoolValidationResult poolRewardValidationResult = PoolValidationResult.from(poolRewardCalculationResult, new HashSet&lt;&gt;());</span>
 
-<span class="fc" id="L168">        BigInteger actualPoolReward = totalPoolRewards.stream()</span>
-<span class="fc" id="L169">                .filter(reward -&gt; reward.getPoolId().equals(poolId))</span>
-<span class="fc" id="L170">                .map(PoolReward::getAmount)</span>
-<span class="fc" id="L171">                .reduce(BigInteger.ZERO, BigInteger::add);</span>
-<span class="fc" id="L172">        HashSet&lt;Reward&gt; actualPoolRewardsInEpoch = memberRewardsInEpoch.stream()</span>
-<span class="fc" id="L173">                .filter(reward -&gt; reward.getPoolId().equals(poolId))</span>
-<span class="fc" id="L174">                .collect(toCollection(HashSet::new));</span>
+<span class="fc" id="L234">        BigInteger actualPoolReward = totalPoolRewards.stream()</span>
+<span class="fc" id="L235">                .filter(reward -&gt; reward.getPoolId().equals(poolId))</span>
+<span class="fc" id="L236">                .map(PoolReward::getAmount)</span>
+<span class="fc" id="L237">                .reduce(BigInteger.ZERO, BigInteger::add);</span>
+<span class="fc" id="L238">        HashSet&lt;Reward&gt; actualPoolRewardsInEpoch = memberRewardsInEpoch.stream()</span>
+<span class="fc" id="L239">                .filter(reward -&gt; reward.getPoolId().equals(poolId))</span>
+<span class="fc" id="L240">                .collect(toCollection(HashSet::new));</span>
 
-<span class="fc bfc" id="L176" title="All 2 branches covered.">        if (actualPoolReward.equals(BigInteger.ZERO)) {</span>
-<span class="pc bpc" id="L177" title="1 of 2 branches missed.">            if (!poolRewardCalculationResult.getPoolReward().equals(BigInteger.ZERO)) {</span>
-<span class="nc" id="L178">                log.info(&quot;Pool reward is zero for pool &quot; + poolId + &quot; but calculated pool reward is &quot; + poolRewardCalculationResult.getPoolReward().longValue() + &quot; Lovelace&quot;);</span>
+<span class="fc bfc" id="L242" title="All 2 branches covered.">        if (actualPoolReward.equals(BigInteger.ZERO)) {</span>
+<span class="pc bpc" id="L243" title="1 of 2 branches missed.">            if (!poolRewardCalculationResult.getPoolReward().equals(BigInteger.ZERO)) {</span>
+<span class="nc" id="L244">                log.info(&quot;Pool reward is zero for pool &quot; + poolId + &quot; but calculated pool reward is &quot; + poolRewardCalculationResult.getPoolReward().longValue() + &quot; Lovelace&quot;);</span>
             }
-<span class="fc" id="L180">            return poolRewardValidationResult;</span>
+<span class="fc" id="L246">            return poolRewardValidationResult;</span>
         }
 
-<span class="fc" id="L183">        BigInteger totalDifference = BigInteger.ZERO;</span>
-<span class="fc" id="L184">        int rewardIndex = 0;</span>
-<span class="fc" id="L185">        HashSet&lt;RewardValidation&gt; rewardValidations = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L186">        HashSet&lt;Reward&gt; delegatorStakeAddresses = new HashSet&lt;&gt;(poolRewardCalculationResult.getMemberRewards());</span>
-<span class="fc bfc" id="L187" title="All 2 branches covered.">        for (Reward reward : actualPoolRewardsInEpoch) {</span>
-<span class="fc" id="L188">            Reward memberReward = delegatorStakeAddresses.stream()</span>
-<span class="fc" id="L189">                    .filter(member -&gt; member.getStakeAddress().equals(reward.getStakeAddress()))</span>
-<span class="fc" id="L190">                    .findFirst()</span>
-<span class="fc" id="L191">                    .orElse(null);</span>
+<span class="fc" id="L249">        BigInteger totalDifference = BigInteger.ZERO;</span>
+<span class="fc" id="L250">        int rewardIndex = 0;</span>
+<span class="fc" id="L251">        HashSet&lt;RewardValidation&gt; rewardValidations = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L252">        HashSet&lt;Reward&gt; delegatorStakeAddresses = new HashSet&lt;&gt;(poolRewardCalculationResult.getMemberRewards());</span>
+<span class="fc bfc" id="L253" title="All 2 branches covered.">        for (Reward reward : actualPoolRewardsInEpoch) {</span>
+<span class="fc" id="L254">            Reward memberReward = delegatorStakeAddresses.stream()</span>
+<span class="fc" id="L255">                    .filter(member -&gt; member.getStakeAddress().equals(reward.getStakeAddress()))</span>
+<span class="fc" id="L256">                    .findFirst()</span>
+<span class="fc" id="L257">                    .orElse(null);</span>
 
-<span class="fc" id="L193">            RewardValidation rewardValidation = RewardValidation.builder()</span>
-<span class="fc" id="L194">                    .stakeAddress(reward.getStakeAddress())</span>
-<span class="fc" id="L195">                    .expectedReward(reward.getAmount())</span>
-<span class="fc" id="L196">                    .calculatedReward(BigInteger.ZERO).build();</span>
+<span class="fc" id="L259">            RewardValidation rewardValidation = RewardValidation.builder()</span>
+<span class="fc" id="L260">                    .stakeAddress(reward.getStakeAddress())</span>
+<span class="fc" id="L261">                    .expectedReward(reward.getAmount())</span>
+<span class="fc" id="L262">                    .calculatedReward(BigInteger.ZERO).build();</span>
 
-<span class="pc bpc" id="L198" title="1 of 2 branches missed.">            if (memberReward == null) {</span>
-<span class="nc" id="L199">                log.info(&quot;Member reward not found for stake address: &quot; + reward.getStakeAddress());</span>
-<span class="nc" id="L200">                log.info(&quot;[&quot; + rewardIndex + &quot;] The expected member &quot; + reward.getStakeAddress() + &quot; reward would be : &quot; + reward.getAmount().longValue() + &quot; Lovelace&quot;);</span>
-<span class="nc" id="L201">                totalDifference = totalDifference.add(reward.getAmount());</span>
+<span class="pc bpc" id="L264" title="1 of 2 branches missed.">            if (memberReward == null) {</span>
+<span class="nc" id="L265">                log.info(&quot;Member reward not found for stake address: &quot; + reward.getStakeAddress());</span>
+<span class="nc" id="L266">                log.info(&quot;[&quot; + rewardIndex + &quot;] The expected member &quot; + reward.getStakeAddress() + &quot; reward would be : &quot; + reward.getAmount().longValue() + &quot; Lovelace&quot;);</span>
+<span class="nc" id="L267">                totalDifference = totalDifference.add(reward.getAmount());</span>
             } else {
-<span class="fc" id="L203">                rewardValidation.setCalculatedReward(memberReward.getAmount());</span>
-<span class="fc" id="L204">                BigInteger difference = reward.getAmount().subtract(memberReward.getAmount()).abs();</span>
+<span class="fc" id="L269">                rewardValidation.setCalculatedReward(memberReward.getAmount());</span>
+<span class="fc" id="L270">                BigInteger difference = reward.getAmount().subtract(memberReward.getAmount()).abs();</span>
 
-<span class="pc bpc" id="L206" title="1 of 2 branches missed.">                if (poolRewardCalculationResult.getPoolOwnerStakeAddresses().contains(reward.getStakeAddress())) {</span>
-<span class="nc" id="L207">                    BigInteger poolOwnerReward = poolRewardCalculationResult.getOperatorReward();</span>
-<span class="nc" id="L208">                    difference = reward.getAmount().subtract(poolOwnerReward).abs();</span>
+<span class="pc bpc" id="L272" title="1 of 2 branches missed.">                if (poolRewardCalculationResult.getPoolOwnerStakeAddresses().contains(reward.getStakeAddress())) {</span>
+<span class="nc" id="L273">                    BigInteger poolOwnerReward = poolRewardCalculationResult.getOperatorReward();</span>
+<span class="nc" id="L274">                    difference = reward.getAmount().subtract(poolOwnerReward).abs();</span>
                 }
-<span class="fc" id="L210">                totalDifference = totalDifference.add(difference);</span>
+<span class="fc" id="L276">                totalDifference = totalDifference.add(difference);</span>
 
-<span class="pc bpc" id="L212" title="1 of 2 branches missed.">                if (difference.compareTo(BigInteger.ZERO) &gt; 0) {</span>
-<span class="nc" id="L213">                    log.info(&quot;[&quot; + rewardIndex + &quot;] The difference between expected member &quot; + reward.getStakeAddress() + &quot; reward and actual member reward is : &quot; + difference.longValue() + &quot; Lovelace&quot;);</span>
+<span class="pc bpc" id="L278" title="1 of 2 branches missed.">                if (difference.compareTo(BigInteger.ZERO) &gt; 0) {</span>
+<span class="nc" id="L279">                    log.info(&quot;[&quot; + rewardIndex + &quot;] The difference between expected member &quot; + reward.getStakeAddress() + &quot; reward and actual member reward is : &quot; + difference.longValue() + &quot; Lovelace&quot;);</span>
                 }
             }
-<span class="fc" id="L216">            rewardValidations.add(rewardValidation);</span>
-<span class="fc" id="L217">            rewardIndex++;</span>
-<span class="fc" id="L218">        }</span>
+<span class="fc" id="L282">            rewardValidations.add(rewardValidation);</span>
+<span class="fc" id="L283">            rewardIndex++;</span>
+<span class="fc" id="L284">        }</span>
 
-<span class="pc bpc" id="L220" title="1 of 2 branches missed.">        if (isHigher(totalDifference, BigInteger.ZERO)) {</span>
-<span class="nc" id="L221">            log.info(&quot;Total difference: &quot; + totalDifference.longValue() + &quot; Lovelace&quot;);</span>
+<span class="pc bpc" id="L286" title="1 of 2 branches missed.">        if (isHigher(totalDifference, BigInteger.ZERO)) {</span>
+<span class="nc" id="L287">            log.info(&quot;Total difference: &quot; + totalDifference.longValue() + &quot; Lovelace&quot;);</span>
         }
 
-<span class="fc" id="L224">        BigInteger totalNoReward = BigInteger.ZERO;</span>
-<span class="fc" id="L225">        BigInteger coOwnerReward = BigInteger.ZERO;</span>
-<span class="fc" id="L226">        HashSet&lt;Reward&gt; actualRewards = new HashSet&lt;&gt;(actualPoolRewardsInEpoch);</span>
+<span class="fc" id="L290">        BigInteger totalNoReward = BigInteger.ZERO;</span>
+<span class="fc" id="L291">        BigInteger coOwnerReward = BigInteger.ZERO;</span>
+<span class="fc" id="L292">        HashSet&lt;Reward&gt; actualRewards = new HashSet&lt;&gt;(actualPoolRewardsInEpoch);</span>
 
-<span class="pc bpc" id="L228" title="1 of 2 branches missed.">        if (poolRewardCalculationResult.getMemberRewards() != null) {</span>
-<span class="fc bfc" id="L229" title="All 2 branches covered.">            for (Reward memberReward : poolRewardCalculationResult.getMemberRewards()) {</span>
-<span class="fc" id="L230">                Reward actualReward = actualRewards.stream()</span>
-<span class="fc" id="L231">                        .filter(reward -&gt; reward.getStakeAddress().equals(memberReward.getStakeAddress()))</span>
-<span class="fc" id="L232">                        .findFirst()</span>
-<span class="fc" id="L233">                        .orElse(null);</span>
-<span class="pc bpc" id="L234" title="3 of 6 branches missed.">                if (actualReward == null &amp;&amp; isHigher(memberReward.getAmount(), BigInteger.ZERO) &amp;&amp; !poolRewardCalculationResult.getPoolOwnerStakeAddresses().contains(memberReward.getStakeAddress())) {</span>
-<span class="nc" id="L235">                    totalNoReward = totalNoReward.add(memberReward.getAmount());</span>
-<span class="nc" id="L236">                    log.info(&quot;No reward! The difference between expected member &quot; + memberReward.getStakeAddress() + &quot; reward and actual member reward is : &quot; + memberReward.getAmount().longValue() + &quot; Lovelace&quot;);</span>
-<span class="nc" id="L237">                    rewardValidations.add(RewardValidation.builder()</span>
-<span class="nc" id="L238">                            .stakeAddress(memberReward.getStakeAddress())</span>
-<span class="nc" id="L239">                            .expectedReward(BigInteger.ZERO)</span>
-<span class="nc" id="L240">                            .calculatedReward(memberReward.getAmount()).build());</span>
+<span class="pc bpc" id="L294" title="1 of 2 branches missed.">        if (poolRewardCalculationResult.getMemberRewards() != null) {</span>
+<span class="fc bfc" id="L295" title="All 2 branches covered.">            for (Reward memberReward : poolRewardCalculationResult.getMemberRewards()) {</span>
+<span class="fc" id="L296">                Reward actualReward = actualRewards.stream()</span>
+<span class="fc" id="L297">                        .filter(reward -&gt; reward.getStakeAddress().equals(memberReward.getStakeAddress()))</span>
+<span class="fc" id="L298">                        .findFirst()</span>
+<span class="fc" id="L299">                        .orElse(null);</span>
+<span class="pc bpc" id="L300" title="3 of 6 branches missed.">                if (actualReward == null &amp;&amp; isHigher(memberReward.getAmount(), BigInteger.ZERO) &amp;&amp; !poolRewardCalculationResult.getPoolOwnerStakeAddresses().contains(memberReward.getStakeAddress())) {</span>
+<span class="nc" id="L301">                    totalNoReward = totalNoReward.add(memberReward.getAmount());</span>
+<span class="nc" id="L302">                    log.info(&quot;No reward! The difference between expected member &quot; + memberReward.getStakeAddress() + &quot; reward and actual member reward is : &quot; + memberReward.getAmount().longValue() + &quot; Lovelace&quot;);</span>
+<span class="nc" id="L303">                    rewardValidations.add(RewardValidation.builder()</span>
+<span class="nc" id="L304">                            .stakeAddress(memberReward.getStakeAddress())</span>
+<span class="nc" id="L305">                            .expectedReward(BigInteger.ZERO)</span>
+<span class="nc" id="L306">                            .calculatedReward(memberReward.getAmount()).build());</span>
                 }
 
                 // Co-owner reward is not included in the member rewards and would be added to the reward address of the pool
-<span class="pc bpc" id="L244" title="1 of 2 branches missed.">                if (poolRewardCalculationResult.getPoolOwnerStakeAddresses().contains(memberReward.getStakeAddress())) {</span>
-<span class="nc" id="L245">                    coOwnerReward = coOwnerReward.add(memberReward.getAmount());</span>
+<span class="pc bpc" id="L310" title="1 of 2 branches missed.">                if (poolRewardCalculationResult.getPoolOwnerStakeAddresses().contains(memberReward.getStakeAddress())) {</span>
+<span class="nc" id="L311">                    coOwnerReward = coOwnerReward.add(memberReward.getAmount());</span>
                 }
-<span class="fc" id="L247">            }</span>
+<span class="fc" id="L313">            }</span>
 
-<span class="pc bpc" id="L249" title="1 of 2 branches missed.">            if (isHigher(totalNoReward, BigInteger.ZERO)) {</span>
-<span class="nc" id="L250">                log.info(&quot;Total no reward: &quot; + totalNoReward.longValue() + &quot; Lovelace&quot;);</span>
+<span class="pc bpc" id="L315" title="1 of 2 branches missed.">            if (isHigher(totalNoReward, BigInteger.ZERO)) {</span>
+<span class="nc" id="L316">                log.info(&quot;Total no reward: &quot; + totalNoReward.longValue() + &quot; Lovelace&quot;);</span>
             }
         }
 
-<span class="fc" id="L254">        poolRewardValidationResult = PoolValidationResult.from(poolRewardCalculationResult, rewardValidations);</span>
+<span class="fc" id="L320">        poolRewardValidationResult = PoolValidationResult.from(poolRewardCalculationResult, rewardValidations);</span>
 
-<span class="pc bpc" id="L256" title="1 of 2 branches missed.">        if (!poolRewardValidationResult.isValid()) {</span>
-<span class="nc" id="L257">            log.info(&quot;The difference between expected pool reward and actual pool reward is : &quot; + poolRewardValidationResult.getOffset().longValue() + &quot; Lovelace&quot;);</span>
+<span class="pc bpc" id="L322" title="1 of 2 branches missed.">        if (!poolRewardValidationResult.isValid()) {</span>
+<span class="nc" id="L323">            log.info(&quot;The difference between expected pool reward and actual pool reward is : &quot; + poolRewardValidationResult.getOffset().longValue() + &quot; Lovelace&quot;);</span>
         }
 
-<span class="fc" id="L260">        return poolRewardValidationResult;</span>
+<span class="fc" id="L326">        return poolRewardValidationResult;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

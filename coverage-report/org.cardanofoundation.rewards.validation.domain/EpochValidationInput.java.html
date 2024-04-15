@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EpochValidationInput.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cf-rewards-validation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.validation.domain</a> &gt; <span class="el_source">EpochValidationInput.java</span></div><h1>EpochValidationInput.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.validation.domain;
+
+import lombok.*;
+import org.cardanofoundation.rewards.calculation.domain.MirCertificate;
+import org.cardanofoundation.rewards.calculation.domain.PoolState;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.HashSet;
+
+@Getter
+<span class="fc" id="L12">@Setter</span>
+<span class="nc" id="L13">@Builder</span>
+<span class="fc" id="L14">@NoArgsConstructor</span>
+<span class="nc" id="L15">@AllArgsConstructor</span>
+public class EpochValidationInput {
+<span class="nc" id="L17">    private int epoch;</span>
+
+<span class="fc" id="L19">    private BigInteger treasuryOfPreviousEpoch;</span>
+<span class="fc" id="L20">    private BigInteger reservesOfPreviousEpoch;</span>
+
+<span class="fc" id="L22">    private BigDecimal decentralisation;</span>
+<span class="fc" id="L23">    private BigDecimal treasuryGrowRate;</span>
+<span class="fc" id="L24">    private BigDecimal monetaryExpandRate;</span>
+<span class="fc" id="L25">    private Integer optimalPoolCount;</span>
+<span class="fc" id="L26">    private BigDecimal poolOwnerInfluence;</span>
+
+<span class="fc" id="L28">    private BigInteger fees;</span>
+<span class="fc" id="L29">    private int blockCount;</span>
+<span class="fc" id="L30">    private BigInteger activeStake;</span>
+<span class="fc" id="L31">    private int nonOBFTBlockCount;</span>
+
+<span class="fc" id="L33">    private HashSet&lt;String&gt; rewardAddressesOfRetiredPoolsInEpoch;</span>
+<span class="fc" id="L34">    private HashSet&lt;String&gt; deregisteredAccounts;</span>
+<span class="fc" id="L35">    private HashSet&lt;String&gt; lateDeregisteredAccounts;</span>
+<span class="fc" id="L36">    private HashSet&lt;String&gt; registeredAccountsSinceLastEpoch;</span>
+<span class="fc" id="L37">    private HashSet&lt;String&gt; registeredAccountsUntilNow;</span>
+<span class="fc" id="L38">    private HashSet&lt;String&gt; sharedPoolRewardAddressesWithoutReward;</span>
+<span class="fc" id="L39">    private HashSet&lt;String&gt; deregisteredAccountsOnEpochBoundary;</span>
+
+<span class="fc" id="L41">    private HashSet&lt;PoolState&gt; poolStates;</span>
+<span class="fc" id="L42">    private HashSet&lt;MirCertificate&gt; mirCertificates;</span>
+
+<span class="fc" id="L44">    private HashSet&lt;EpochValidationPoolReward&gt; poolRewards;</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

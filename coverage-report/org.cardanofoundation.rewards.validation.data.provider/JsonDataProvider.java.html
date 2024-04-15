@@ -1,253 +1,188 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonDataProvider.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">cf-rewards-validation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.validation.data.provider</a> &gt; <span class="el_source">JsonDataProvider.java</span></div><h1>JsonDataProvider.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.validation.data.provider;
 
+import lombok.extern.slf4j.Slf4j;
 import org.cardanofoundation.rewards.calculation.domain.*;
+import org.cardanofoundation.rewards.validation.domain.EpochValidationInput;
 import org.cardanofoundation.rewards.validation.domain.PoolReward;
-import org.cardanofoundation.rewards.validation.enums.DataType;
+import org.cardanofoundation.rewards.validation.util.JsonConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import java.io.File;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
-import static org.cardanofoundation.rewards.validation.enums.DataType.*;
-import static org.cardanofoundation.rewards.validation.util.JsonConverter.convertFileJsonToArrayList;
-import static org.cardanofoundation.rewards.validation.util.JsonConverter.readJsonFile;
 @Service
-<span class="fc" id="L19">public class JsonDataProvider implements DataProvider {</span>
+<span class="fc" id="L16">@Slf4j</span>
+<span class="fc" id="L17">public class JsonDataProvider implements DataProvider {</span>
 
     @Value(&quot;${json.data-provider.source}&quot;)
     private String sourceFolder;
 
-    private String getResourceFolder(DataType dataType, Integer epoch, String poolId) {
-<span class="pc bpc" id="L25" title="1 of 2 branches missed.">        if (sourceFolder == null) throw new RuntimeException(&quot;Invalid source folder for JSON data provider. Please check the JSON_DATA_SOURCE_FOLDER environment variable that you have provided.&quot;);</span>
+    private int epoch;
 
-<span class="pc bpc" id="L27" title="1 of 2 branches missed.">        if (dataType.equals(POOL_DEREGISTRATIONS)) {</span>
-<span class="nc" id="L28">            return String.join(File.separator, sourceFolder, POOL_DEREGISTRATIONS.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="pc bpc" id="L29" title="1 of 2 branches missed.">        } else if (dataType.equals(ACCOUNT_UPDATES)) {</span>
-<span class="nc" id="L30">            return String.join(File.separator, sourceFolder, ACCOUNT_UPDATES.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="fc bfc" id="L31" title="All 2 branches covered.">        } else if (dataType.equals(REWARDS_OUTLIER)) {</span>
-<span class="fc" id="L32">            return String.join(File.separator, sourceFolder, REWARDS_OUTLIER.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="fc bfc" id="L33" title="All 2 branches covered.">        } else if (dataType.equals(ACCOUNT_DEREGISTRATION)) {</span>
-<span class="fc" id="L34">            return String.join(File.separator, sourceFolder, ACCOUNT_DEREGISTRATION.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="fc bfc" id="L35" title="All 2 branches covered.">        } else if (dataType.equals(DEREGISTRATIONS_ON_STABILITY_WINDOW)) {</span>
-<span class="fc" id="L36">            return String.join(File.separator, sourceFolder, ACCOUNT_DEREGISTRATION.resourceFolderName, &quot;epoch&quot; + epoch + &quot;-stability-window.json&quot;);</span>
-<span class="fc bfc" id="L37" title="All 2 branches covered.">        } else if (dataType.equals(POOL_BLOCKS)) {</span>
-<span class="fc" id="L38">            return String.join(File.separator, sourceFolder, POOL_BLOCKS.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="fc bfc" id="L39" title="All 2 branches covered.">        } else if (dataType.equals(ADA_POTS)) {</span>
-<span class="fc" id="L40">            return String.join(File.separator, sourceFolder, ADA_POTS.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="fc bfc" id="L41" title="All 2 branches covered.">        } else if (dataType.equals(EPOCH_INFO)) {</span>
-<span class="fc" id="L42">            return String.join(File.separator, sourceFolder, EPOCH_INFO.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="fc bfc" id="L43" title="All 2 branches covered.">        } else if (dataType.equals(PROTOCOL_PARAMETERS)) {</span>
-<span class="fc" id="L44">            return String.join(File.separator, sourceFolder, PROTOCOL_PARAMETERS.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        } else if (dataType.equals(POOL_PARAMETERS)) {</span>
-<span class="nc" id="L46">            return String.join(File.separator, sourceFolder, POOL_PARAMETERS.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="fc bfc" id="L47" title="All 2 branches covered.">        } else if (dataType.equals(POOL_HISTORY)) {</span>
-<span class="fc" id="L48">            return String.join(File.separator, sourceFolder, POOL_HISTORY.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-<span class="pc bpc" id="L49" title="1 of 2 branches missed.">        } else if (dataType.equals(POOL_OWNER_HISTORY)) {</span>
-<span class="nc" id="L50">            return String.join(File.separator, sourceFolder, &quot;pools&quot;, poolId, &quot;owner_account_history_epoch_&quot; + epoch + &quot;.json&quot;);</span>
-<span class="fc bfc" id="L51" title="All 2 branches covered.">        } else if (dataType.equals(MIR_CERTIFICATE)) {</span>
-<span class="fc" id="L52">            return String.join(File.separator, sourceFolder, MIR_CERTIFICATE.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
-        } else {
-<span class="fc" id="L54">            return String.join(File.separator, sourceFolder, dataType.resourceFolderName, &quot;epoch&quot; + epoch + &quot;.json&quot;);</span>
+    private EpochValidationInput epochValidationInput;
+
+    private void loadEpochValidationInput(int epoch) {
+<span class="fc bfc" id="L27" title="All 2 branches covered.">        if (epoch != this.epoch) {</span>
+<span class="fc" id="L28">            log.info(&quot;Loading epoch validation input for epoch &quot; + epoch + &quot; into memory&quot;);</span>
+
+<span class="fc" id="L30">            String filePath = String.format(&quot;%s/epoch-validation-input-%d.json.gz&quot;, sourceFolder, epoch);</span>
+            try {
+<span class="fc" id="L32">                this.epochValidationInput = JsonConverter.readJsonFile(filePath, EpochValidationInput.class);</span>
+<span class="fc" id="L33">                this.epoch = epoch;</span>
+<span class="nc" id="L34">            } catch (Exception e) {</span>
+<span class="nc" id="L35">                e.printStackTrace();</span>
+<span class="fc" id="L36">            }</span>
         }
-    }
-
-    private &lt;T&gt; T getDataFromJson(DataType dataType, int epoch, Class&lt;T&gt; objectClass, String poolId) {
-<span class="fc" id="L59">        String filePath = getResourceFolder(dataType, epoch, poolId);</span>
-
-        try {
-<span class="fc" id="L62">            return readJsonFile(filePath, objectClass);</span>
-<span class="nc" id="L63">        } catch (Exception e) {</span>
-<span class="nc" id="L64">            e.printStackTrace();</span>
-        }
-<span class="nc" id="L66">        return null;</span>
-    }
-
-    private &lt;T&gt; T getDataFromJson(DataType dataType, int epoch, Class&lt;T&gt; objectClass) {
-<span class="fc" id="L70">        return getDataFromJson(dataType, epoch, objectClass, null);</span>
-    }
-
-    private &lt;T&gt; List&lt;T&gt; getListFromJson(DataType dataType, Integer epoch, Class&lt;T&gt; objectClass, String poolId) {
-<span class="fc" id="L74">        String filePath = getResourceFolder(dataType, epoch, poolId);</span>
-
-        try {
-<span class="fc" id="L77">            return convertFileJsonToArrayList(filePath, objectClass);</span>
-<span class="nc" id="L78">        } catch (Exception e) {</span>
-<span class="nc" id="L79">            e.printStackTrace();</span>
-        }
-<span class="nc" id="L81">        return null;</span>
-    }
-
-    private &lt;T&gt; HashSet&lt;T&gt; getHashSetFromJson(DataType dataType, Integer epoch, Class&lt;T&gt; objectClass) {
-<span class="fc" id="L85">        String filePath = getResourceFolder(dataType, epoch, null);</span>
-
-        try {
-<span class="fc" id="L88">            ArrayList&lt;T&gt; objectList = convertFileJsonToArrayList(filePath, objectClass);</span>
-<span class="pc bpc" id="L89" title="1 of 2 branches missed.">            if (objectList == null) return null;</span>
-<span class="fc" id="L90">            return new HashSet&lt;&gt;(objectList);</span>
-<span class="nc" id="L91">        } catch (Exception e) {</span>
-<span class="nc" id="L92">            e.printStackTrace();</span>
-        }
-<span class="nc" id="L94">        return null;</span>
-    }
-
-    private &lt;T&gt; List&lt;T&gt; getListFromJson(DataType dataType, Integer epoch, Class&lt;T&gt; objectClass) {
-<span class="fc" id="L98">        return getListFromJson(dataType, epoch, objectClass, null);</span>
-    }
-
+<span class="fc" id="L38">    }</span>
     @Override
     public AdaPots getAdaPotsForEpoch(int epoch) {
-<span class="pc bpc" id="L103" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) {</span>
-<span class="nc" id="L104">            return AdaPots.builder()</span>
-<span class="nc" id="L105">                    .treasury(BigInteger.ZERO)</span>
-<span class="nc" id="L106">                    .reserves(BigInteger.ZERO)</span>
-<span class="nc" id="L107">                    .rewards(BigInteger.ZERO)</span>
-<span class="nc" id="L108">                    .epoch(epoch)</span>
-<span class="nc" id="L109">                    .build();</span>
-<span class="fc bfc" id="L110" title="All 2 branches covered.">        } else if (epoch == MAINNET_SHELLEY_START_EPOCH) {</span>
-<span class="fc" id="L111">            return AdaPots.builder()</span>
-<span class="fc" id="L112">                    .treasury(MAINNET_SHELLEY_INITIAL_TREASURY)</span>
-<span class="fc" id="L113">                    .reserves(MAINNET_SHELLEY_INITIAL_RESERVES)</span>
-<span class="fc" id="L114">                    .rewards(BigInteger.ZERO)</span>
-<span class="fc" id="L115">                    .epoch(epoch)</span>
-<span class="fc" id="L116">                    .build();</span>
-        }
-
-<span class="fc" id="L119">        return getDataFromJson(ADA_POTS, epoch, AdaPots.class);</span>
+<span class="fc" id="L41">        loadEpochValidationInput(epoch + 1);</span>
+<span class="fc" id="L42">        return AdaPots.builder()</span>
+<span class="fc" id="L43">                .treasury(epochValidationInput.getTreasuryOfPreviousEpoch())</span>
+<span class="fc" id="L44">                .reserves(epochValidationInput.getReservesOfPreviousEpoch())</span>
+<span class="fc" id="L45">                .rewards(BigInteger.ZERO)</span>
+<span class="fc" id="L46">                .adaInCirculation(BigInteger.ZERO)</span>
+<span class="fc" id="L47">                .epoch(epoch)</span>
+<span class="fc" id="L48">                .build();</span>
     }
 
     @Override
     public Epoch getEpochInfo(int epoch) {
-<span class="fc bfc" id="L124" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return null;</span>
+<span class="nc" id="L53">        loadEpochValidationInput(epoch);</span>
 
-<span class="fc" id="L126">        return getDataFromJson(EPOCH_INFO, epoch, Epoch.class);</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">        if (epochValidationInput.getBlockCount() == 0) {</span>
+<span class="nc" id="L56">            return null;</span>
+        }
+
+<span class="nc" id="L59">        return Epoch.builder()</span>
+<span class="nc" id="L60">                .blockCount(epochValidationInput.getBlockCount())</span>
+<span class="nc" id="L61">                .fees(epochValidationInput.getFees())</span>
+<span class="nc" id="L62">                .number(epoch)</span>
+<span class="nc" id="L63">                .nonOBFTBlockCount(epochValidationInput.getNonOBFTBlockCount())</span>
+<span class="nc" id="L64">                .activeStake(epochValidationInput.getActiveStake())</span>
+<span class="nc" id="L65">                .build();</span>
     }
 
     @Override
     public ProtocolParameters getProtocolParametersForEpoch(int epoch) {
-<span class="fc bfc" id="L131" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new ProtocolParameters();</span>
-
-<span class="fc" id="L133">        return getDataFromJson(PROTOCOL_PARAMETERS, epoch, ProtocolParameters.class);</span>
+<span class="nc" id="L70">        loadEpochValidationInput(epoch);</span>
+<span class="nc" id="L71">        return ProtocolParameters.builder()</span>
+<span class="nc" id="L72">                .decentralisation(epochValidationInput.getDecentralisation())</span>
+<span class="nc" id="L73">                .treasuryGrowRate(epochValidationInput.getTreasuryGrowRate())</span>
+<span class="nc" id="L74">                .monetaryExpandRate(epochValidationInput.getMonetaryExpandRate())</span>
+<span class="nc" id="L75">                .optimalPoolCount(epochValidationInput.getOptimalPoolCount())</span>
+<span class="nc" id="L76">                .poolOwnerInfluence(epochValidationInput.getPoolOwnerInfluence())</span>
+<span class="nc" id="L77">                .build();</span>
     }
 
     @Override
-    public List&lt;PoolHistory&gt; getHistoryOfAllPoolsInEpoch(int epoch, List&lt;PoolBlock&gt; blocksMadeByPoolsInEpoch) {
-<span class="fc bfc" id="L138" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return List.of();</span>
-
-<span class="fc" id="L140">        List&lt;PoolHistory&gt; histories = getListFromJson(POOL_HISTORY, epoch, PoolHistory.class);</span>
-<span class="pc bpc" id="L141" title="1 of 2 branches missed.">        if (histories == null) return List.of();</span>
-<span class="fc" id="L142">        return histories;</span>
+    public List&lt;PoolState&gt; getHistoryOfAllPoolsInEpoch(int epoch, List&lt;PoolBlock&gt; blocksMadeByPoolsInEpoch) {
+<span class="nc" id="L82">        loadEpochValidationInput(epoch);</span>
+<span class="nc" id="L83">        return epochValidationInput.getPoolStates().stream().toList();</span>
     }
 
     @Override
-    public PoolHistory getPoolHistory(String poolId, int epoch) {
-<span class="fc" id="L147">        List&lt;PoolHistory&gt; poolHistories = getHistoryOfAllPoolsInEpoch(epoch, null);</span>
-<span class="fc" id="L148">        return poolHistories.stream().filter(history -&gt; history.getPoolId().equals(poolId)).findFirst().orElse(null);</span>
+    public PoolState getPoolHistory(String poolId, int epoch) {
+<span class="nc" id="L88">        loadEpochValidationInput(epoch);</span>
+<span class="nc" id="L89">        return epochValidationInput.getPoolStates().stream()</span>
+<span class="nc" id="L90">                .filter(poolState -&gt; poolState.getPoolId().equals(poolId))</span>
+<span class="nc" id="L91">                .findFirst()</span>
+<span class="nc" id="L92">                .orElse(null);</span>
     }
 
     @Override
     public HashSet&lt;String&gt; getRewardAddressesOfRetiredPoolsInEpoch(int epoch) {
-<span class="fc" id="L153">        HashSet&lt;String&gt; poolDeregistrations = getHashSetFromJson(REWARD_ADDRESSES_OF_RETIRED_POOLS, epoch, String.class);</span>
-<span class="pc bpc" id="L154" title="1 of 2 branches missed.">        if (poolDeregistrations == null) return new HashSet&lt;&gt;();</span>
-<span class="fc" id="L155">        return poolDeregistrations;</span>
+<span class="nc" id="L97">        loadEpochValidationInput(epoch);</span>
+<span class="nc" id="L98">        return epochValidationInput.getRewardAddressesOfRetiredPoolsInEpoch();</span>
     }
 
     @Override
     public List&lt;MirCertificate&gt; getMirCertificatesInEpoch(int epoch) {
-<span class="fc" id="L160">        List&lt;MirCertificate&gt; mirCertificates = getListFromJson(MIR_CERTIFICATE, epoch, MirCertificate.class);</span>
-<span class="pc bpc" id="L161" title="1 of 2 branches missed.">        if (mirCertificates == null) return List.of();</span>
-<span class="fc" id="L162">        return mirCertificates;</span>
-    }
-
-    @Override
-    public int getPoolRegistrationsInEpoch(int epoch) {
-<span class="nc" id="L167">        return 0;</span>
-    }
-
-    @Override
-    public List&lt;PoolUpdate&gt; getPoolUpdateAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch) {
-<span class="nc" id="L172">        return null;</span>
+<span class="nc" id="L103">        loadEpochValidationInput(epoch);</span>
+<span class="nc" id="L104">        return epochValidationInput.getMirCertificates().stream().toList();</span>
     }
 
     @Override
     public BigInteger getTransactionDepositsInEpoch(int epoch) {
-<span class="nc" id="L177">        return null;</span>
+<span class="nc" id="L109">        return null;</span>
     }
 
     @Override
     public BigInteger getSumOfFeesInEpoch(int epoch) {
-<span class="nc" id="L182">        return null;</span>
+<span class="nc" id="L114">        return null;</span>
     }
 
     @Override
     public BigInteger getSumOfWithdrawalsInEpoch(int epoch) {
-<span class="nc" id="L187">        return null;</span>
+<span class="nc" id="L119">        return null;</span>
     }
 
     @Override
     public HashSet&lt;Reward&gt; getMemberRewardsInEpoch(int epoch) {
-<span class="pc bpc" id="L192" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new HashSet&lt;&gt;();</span>
-
-<span class="fc" id="L194">        HashSet&lt;Reward&gt; rewards = getHashSetFromJson(MEMBER_REWARDS, epoch, Reward.class);</span>
-<span class="pc bpc" id="L195" title="1 of 2 branches missed.">        if (rewards == null) return new HashSet&lt;&gt;();</span>
-<span class="fc" id="L196">        return rewards;</span>
+<span class="fc" id="L124">        loadEpochValidationInput(epoch);</span>
+<span class="fc" id="L125">        return epochValidationInput.getPoolRewards().stream()</span>
+<span class="fc" id="L126">                .flatMap(reward -&gt; reward.getDelegatorRewards().stream().map(</span>
+<span class="fc" id="L127">                        delegatorReward -&gt; Reward.builder()</span>
+<span class="fc" id="L128">                                .poolId(reward.getPoolId())</span>
+<span class="fc" id="L129">                                .stakeAddress(delegatorReward.getStakeAddress())</span>
+<span class="fc" id="L130">                                .amount(delegatorReward.getReward())</span>
+<span class="fc" id="L131">                                .build())</span>
+                )
+<span class="fc" id="L133">                .collect(Collectors.toCollection(HashSet::new));</span>
     }
 
     @Override
     public List&lt;PoolBlock&gt; getBlocksMadeByPoolsInEpoch(int epoch) {
-<span class="fc bfc" id="L201" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return List.of();</span>
-
-<span class="fc" id="L203">        List&lt;PoolBlock&gt; poolBlocks = getListFromJson(POOL_BLOCKS, epoch, PoolBlock.class);</span>
-<span class="pc bpc" id="L204" title="1 of 2 branches missed.">        if (poolBlocks == null) return List.of();</span>
-<span class="fc" id="L205">        return poolBlocks;</span>
+<span class="nc" id="L138">        loadEpochValidationInput(epoch);</span>
+<span class="nc" id="L139">        return epochValidationInput.getPoolStates().stream()</span>
+<span class="nc" id="L140">                .map(poolState -&gt; PoolBlock.builder()</span>
+<span class="nc" id="L141">                        .poolId(poolState.getPoolId())</span>
+<span class="nc" id="L142">                        .blockCount(poolState.getBlockCount())</span>
+<span class="nc" id="L143">                        .build())</span>
+<span class="nc" id="L144">                .toList();</span>
     }
 
     @Override
     public HashSet&lt;PoolReward&gt; getTotalPoolRewardsInEpoch(int epoch) {
-<span class="pc bpc" id="L210" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new HashSet&lt;&gt;();</span>
-
-<span class="fc" id="L212">        HashSet&lt;PoolReward&gt; totalPoolRewards = getHashSetFromJson(REWARDS, epoch, PoolReward.class);</span>
-<span class="pc bpc" id="L213" title="1 of 2 branches missed.">        if (totalPoolRewards == null) return new HashSet&lt;&gt;();</span>
-<span class="fc" id="L214">        return totalPoolRewards;</span>
+<span class="fc" id="L149">        loadEpochValidationInput(epoch);</span>
+<span class="fc" id="L150">        return epochValidationInput.getPoolRewards().stream()</span>
+<span class="fc" id="L151">                .map(reward -&gt; PoolReward.builder()</span>
+<span class="fc" id="L152">                        .poolId(reward.getPoolId())</span>
+<span class="fc" id="L153">                        .epoch(epoch)</span>
+<span class="fc" id="L154">                        .amount(reward.getTotalPoolReward())</span>
+<span class="fc" id="L155">                        .build())</span>
+<span class="fc" id="L156">                .collect(Collectors.toCollection(HashSet::new));</span>
     }
 
     @Override
     public HashSet&lt;String&gt; findSharedPoolRewardAddressWithoutReward(int epoch) {
-<span class="fc bfc" id="L219" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) return new HashSet&lt;&gt;();</span>
-
-<span class="fc" id="L221">        HashSet&lt;String&gt; sharedPoolRewardAddressesWithoutReward = getHashSetFromJson(REWARDS_OUTLIER, epoch, String.class);</span>
-<span class="pc bpc" id="L222" title="1 of 2 branches missed.">        if (sharedPoolRewardAddressesWithoutReward == null) return new HashSet&lt;&gt;();</span>
-<span class="fc" id="L223">        return sharedPoolRewardAddressesWithoutReward;</span>
+<span class="nc" id="L161">        loadEpochValidationInput(epoch);</span>
+<span class="nc" id="L162">        return epochValidationInput.getSharedPoolRewardAddressesWithoutReward();</span>
     }
 
     @Override
     public HashSet&lt;String&gt; getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow) {
-        HashSet&lt;String&gt; deregisteredAccounts;
-<span class="fc bfc" id="L229" title="All 2 branches covered.">        if (stabilityWindow == RANDOMNESS_STABILISATION_WINDOW) {</span>
-<span class="fc" id="L230">            deregisteredAccounts = getHashSetFromJson(DEREGISTRATIONS_ON_STABILITY_WINDOW, epoch, String.class);</span>
-        } else {
-<span class="fc" id="L232">            deregisteredAccounts = getHashSetFromJson(ACCOUNT_DEREGISTRATION, epoch, String.class);</span>
-        }
-
-<span class="pc bpc" id="L235" title="1 of 2 branches missed.">        if (deregisteredAccounts == null) return new HashSet&lt;&gt;();</span>
-<span class="fc" id="L236">        return deregisteredAccounts;</span>
+<span class="nc" id="L167">        loadEpochValidationInput(epoch);</span>
+<span class="nc" id="L168">        return epochValidationInput.getDeregisteredAccounts();</span>
     }
 
     @Override
     public HashSet&lt;String&gt; getRegisteredAccountsUntilLastEpoch(Integer epoch, HashSet&lt;String&gt; stakeAddresses, Long stabilityWindow) {
-<span class="fc" id="L241">        HashSet&lt;String&gt; accountsRegisteredInThePast = getHashSetFromJson(PAST_ACCOUNT_REGISTRATIONS_UNTIL_LAST_EPOCH, epoch, String.class);</span>
-<span class="pc bpc" id="L242" title="1 of 2 branches missed.">        if (accountsRegisteredInThePast == null) return new HashSet&lt;&gt;();</span>
-<span class="fc" id="L243">        return accountsRegisteredInThePast;</span>
+<span class="nc" id="L173">        loadEpochValidationInput(epoch);</span>
+<span class="nc" id="L174">        return epochValidationInput.getRegisteredAccountsSinceLastEpoch();</span>
     }
 
     @Override
     public HashSet&lt;String&gt; getRegisteredAccountsUntilNow(Integer epoch, HashSet&lt;String&gt; stakeAddresses, Long stabilityWindow) {
-<span class="fc" id="L248">        HashSet&lt;String&gt; accountsRegisteredInThePast = getHashSetFromJson(PAST_ACCOUNT_REGISTRATIONS_UNTIL_NOW, epoch, String.class);</span>
-<span class="pc bpc" id="L249" title="1 of 2 branches missed.">        if (accountsRegisteredInThePast == null) return new HashSet&lt;&gt;();</span>
-<span class="fc" id="L250">        return accountsRegisteredInThePast;</span>
+<span class="nc" id="L179">        loadEpochValidationInput(epoch);</span>
+<span class="nc" id="L180">        return epochValidationInput.getRegisteredAccountsUntilNow();</span>
+    }
+
+    public EpochValidationInput getEpochValidationInput(int epoch) {
+<span class="fc" id="L184">        loadEpochValidationInput(epoch);</span>
+<span class="fc" id="L185">        return epochValidationInput;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

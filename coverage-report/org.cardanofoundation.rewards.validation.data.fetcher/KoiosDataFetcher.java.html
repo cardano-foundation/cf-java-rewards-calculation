@@ -108,14 +108,14 @@ import static org.cardanofoundation.rewards.validation.util.JsonConverter.writeO
         }
 
 <span class="nc bnc" id="L110" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
-<span class="nc" id="L111">            logger.info(&quot;Skip to fetch PoolHistory for pool &quot; + poolId + &quot; in epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
+<span class="nc" id="L111">            logger.info(&quot;Skip to fetch PoolState for pool &quot; + poolId + &quot; in epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
 <span class="nc" id="L112">            return;</span>
         }
 
-<span class="nc" id="L115">        PoolHistory poolHistory = koiosDataProvider.getPoolHistory(poolId, epoch);</span>
+<span class="nc" id="L115">        PoolState poolState = koiosDataProvider.getPoolHistory(poolId, epoch);</span>
 
         try {
-<span class="nc" id="L118">            writeObjectToJsonFile(poolHistory, filePath);</span>
+<span class="nc" id="L118">            writeObjectToJsonFile(poolState, filePath);</span>
 <span class="nc" id="L119">        } catch (IOException e) {</span>
 <span class="nc" id="L120">            logger.error(&quot;Failed to write pool history to json file for epoch &quot; + epoch);</span>
 <span class="nc" id="L121">        }</span>

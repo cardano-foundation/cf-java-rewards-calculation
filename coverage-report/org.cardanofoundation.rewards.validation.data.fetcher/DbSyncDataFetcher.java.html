@@ -3,7 +3,11 @@
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
+import org.cardanofoundation.rewards.validation.domain.EpochValidationDelegatorReward;
+import org.cardanofoundation.rewards.validation.domain.EpochValidationInput;
+import org.cardanofoundation.rewards.validation.domain.EpochValidationPoolReward;
 import org.cardanofoundation.rewards.validation.domain.PoolReward;
+import org.cardanofoundation.rewards.validation.util.JsonConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,339 +16,152 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
-import static org.cardanofoundation.rewards.validation.enums.DataType.*;
-import static org.cardanofoundation.rewards.validation.util.JsonConverter.writeObjectToJsonFile;
 
 @Service
-<span class="fc" id="L24">public class DbSyncDataFetcher implements DataFetcher {</span>
+<span class="fc" id="L28">public class DbSyncDataFetcher implements DataFetcher {</span>
 
-<span class="fc" id="L26">    private static final Logger logger = LoggerFactory.getLogger(DbSyncDataFetcher.class);</span>
+<span class="fc" id="L30">    private static final Logger logger = LoggerFactory.getLogger(DbSyncDataFetcher.class);</span>
     @Autowired(required = false)
     private DbSyncDataProvider dbSyncDataProvider;
 
     @Autowired(required = false)
     private JsonDataProvider jsonDataProvider;
 
+    @Value(&quot;${spring.profiles.active:Unknown}&quot;)
+    private String activeProfiles;
+
     @Value(&quot;${json.data-provider.source}&quot;)
     private String sourceFolder;
 
-    public void fetchAdaPotsInEpoch(int epoch, boolean override) {
-<span class="nc" id="L37">        String filePath = String.format(&quot;%s/%s/epoch%d.json&quot;, sourceFolder, ADA_POTS.resourceFolderName, epoch);</span>
-<span class="nc" id="L38">        File outputFile = new File(filePath);</span>
-
-<span class="nc bnc" id="L40" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
-<span class="nc" id="L41">            logger.info(&quot;Skip to fetch AdaPots for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
-<span class="nc" id="L42">            return;</span>
-        }
-
-<span class="nc" id="L45">        AdaPots adaPots = dbSyncDataProvider.getAdaPotsForEpoch(epoch);</span>
-<span class="nc bnc" id="L46" title="All 2 branches missed.">        if (adaPots == null) {</span>
-<span class="nc" id="L47">            logger.error(&quot;Failed to fetch AdaPots for epoch &quot; + epoch);</span>
-<span class="nc" id="L48">            return;</span>
-        }
-
-        try {
-<span class="nc" id="L52">            writeObjectToJsonFile(adaPots, filePath);</span>
-<span class="nc" id="L53">        } catch (IOException e) {</span>
-<span class="nc" id="L54">            logger.error(&quot;Failed to write AdaPots to json file for epoch &quot; + epoch);</span>
-<span class="nc" id="L55">        }</span>
-<span class="nc" id="L56">    }</span>
-
-    private void fetchProtocolParameters(int epoch, boolean override) {
-<span class="nc" id="L59">        String filePath = String.format(&quot;%s/%s/epoch%d.json&quot;, sourceFolder, PROTOCOL_PARAMETERS.resourceFolderName, epoch);</span>
-<span class="nc" id="L60">        File outputFile = new File(filePath);</span>
-
-<span class="nc bnc" id="L62" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
-<span class="nc" id="L63">            logger.info(&quot;Skip to fetch ProtocolParameters for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
-<span class="nc" id="L64">            return;</span>
-        }
-
-<span class="nc" id="L67">        ProtocolParameters protocolParameters = dbSyncDataProvider.getProtocolParametersForEpoch(epoch);</span>
-<span class="nc bnc" id="L68" title="All 2 branches missed.">        if (protocolParameters == null) {</span>
-<span class="nc" id="L69">            logger.error(&quot;Failed to fetch ProtocolParameters for epoch &quot; + epoch);</span>
-<span class="nc" id="L70">            return;</span>
-        }
-
-        try {
-<span class="nc" id="L74">            writeObjectToJsonFile(protocolParameters, filePath);</span>
-<span class="nc" id="L75">        } catch (IOException e) {</span>
-<span class="nc" id="L76">            logger.error(&quot;Failed to write ProtocolParameters to json file for epoch &quot; + epoch);</span>
-<span class="nc" id="L77">        }</span>
-<span class="nc" id="L78">    }</span>
-
-    private void fetchEpochInfo(int epoch, boolean override) {
-<span class="nc" id="L81">        String filePath = String.format(&quot;%s/%s/epoch%d.json&quot;, sourceFolder, EPOCH_INFO.resourceFolderName, epoch);</span>
-<span class="nc" id="L82">        File outputFile = new File(filePath);</span>
-
-<span class="nc bnc" id="L84" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
-<span class="nc" id="L85">            logger.info(&quot;Skip to fetch EpochInfo for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
-<span class="nc" id="L86">            return;</span>
-        }
-
-<span class="nc" id="L89">        Epoch epochInfo = dbSyncDataProvider.getEpochInfo(epoch);</span>
-<span class="nc bnc" id="L90" title="All 2 branches missed.">        if (epochInfo == null) {</span>
-<span class="nc" id="L91">            logger.error(&quot;Failed to fetch EpochInfo for epoch &quot; + epoch);</span>
-<span class="nc" id="L92">            return;</span>
-        }
-
-        try {
-<span class="nc" id="L96">            writeObjectToJsonFile(epochInfo, filePath);</span>
-<span class="nc" id="L97">        } catch (IOException e) {</span>
-<span class="nc" id="L98">            logger.error(&quot;Failed to write EpochInfo to json file for epoch &quot; + epoch);</span>
-<span class="nc" id="L99">        }</span>
-<span class="nc" id="L100">    }</span>
-
-    private void fetchMirCertificatesInEpoch(int epoch, boolean override) {
-<span class="nc" id="L103">        String filePath = String.format(&quot;%s/%s/epoch%d.json&quot;, sourceFolder, MIR_CERTIFICATE.resourceFolderName, epoch);</span>
-<span class="nc" id="L104">        File outputFile = new File(filePath);</span>
-
-<span class="nc bnc" id="L106" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
-<span class="nc" id="L107">            logger.info(&quot;Skip to fetch MirCertificates for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
-<span class="nc" id="L108">            return;</span>
-        }
-
-<span class="nc" id="L111">        List&lt;MirCertificate&gt; mirCertificates = dbSyncDataProvider.getMirCertificatesInEpoch(epoch);</span>
-<span class="nc bnc" id="L112" title="All 2 branches missed.">        if (mirCertificates == null) {</span>
-<span class="nc" id="L113">            logger.error(&quot;Failed to fetch MirCertificates for epoch &quot; + epoch);</span>
-<span class="nc" id="L114">            return;</span>
-        }
-
-        try {
-<span class="nc" id="L118">            writeObjectToJsonFile(mirCertificates, filePath);</span>
-<span class="nc" id="L119">        } catch (IOException e) {</span>
-<span class="nc" id="L120">            logger.error(&quot;Failed to write MirCertificates to json file for epoch &quot; + epoch);</span>
-<span class="nc" id="L121">        }</span>
-<span class="nc" id="L122">    }</span>
-
-    private void fetchRetiredPoolsInEpoch(int epoch, boolean override) {
-<span class="nc" id="L125">        String filePath = String.format(&quot;%s/%s/epoch%d.json&quot;, sourceFolder, REWARD_ADDRESSES_OF_RETIRED_POOLS.resourceFolderName, epoch);</span>
-<span class="nc" id="L126">        File outputFile = new File(filePath);</span>
-
-<span class="nc bnc" id="L128" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
-<span class="nc" id="L129">            logger.info(&quot;Skip to fetch RetiredPools for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
-<span class="nc" id="L130">            return;</span>
-        }
-
-<span class="nc" id="L133">        HashSet&lt;String&gt; rewardAddressesOfRetiredPoolsInEpoch = dbSyncDataProvider.getRewardAddressesOfRetiredPoolsInEpoch(epoch);</span>
-<span class="nc bnc" id="L134" title="All 2 branches missed.">        if (rewardAddressesOfRetiredPoolsInEpoch == null) {</span>
-<span class="nc" id="L135">            logger.error(&quot;Failed to fetch reward addresses of retired pools for epoch &quot; + epoch);</span>
-<span class="nc" id="L136">            return;</span>
-        }
-
-        try {
-<span class="nc" id="L140">            writeObjectToJsonFile(rewardAddressesOfRetiredPoolsInEpoch, filePath);</span>
-<span class="nc" id="L141">        } catch (IOException e) {</span>
-<span class="nc" id="L142">            logger.error(&quot;Failed to fetch reward addresses of retired pools to json file for epoch &quot; + epoch);</span>
-<span class="nc" id="L143">        }</span>
-<span class="nc" id="L144">    }</span>
-
-    private void fetchStakeAddressesWithRegistrationsUntilEpoch(int epoch, boolean override, boolean mainnet) {
-<span class="nc" id="L147">        String filePath = String.format(&quot;%s/%s/epoch%d.json&quot;, sourceFolder, PAST_ACCOUNT_REGISTRATIONS_UNTIL_LAST_EPOCH.resourceFolderName, epoch);</span>
-<span class="nc" id="L148">        File outputFile = new File(filePath);</span>
-
-<span class="nc bnc" id="L150" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
-<span class="nc" id="L151">            logger.info(&quot;Skip to fetch StakeAddressesWithRegistrationsUntilEpoch for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
-<span class="nc" id="L152">            return;</span>
-        }
-
-<span class="nc" id="L155">        long stabilityWindow = EXPECTED_SLOTS_PER_EPOCH;</span>
-<span class="nc bnc" id="L156" title="All 4 branches missed.">        if (mainnet &amp;&amp; (epoch - 2) &lt; MAINNET_VASIL_HARDFORK_EPOCH) {</span>
-<span class="nc" id="L157">            stabilityWindow = RANDOMNESS_STABILISATION_WINDOW;</span>
-        }
-
-<span class="nc" id="L160">        List&lt;PoolHistory&gt; poolHistories = jsonDataProvider.getHistoryOfAllPoolsInEpoch(epoch - 2, null);</span>
-<span class="nc" id="L161">        HashSet&lt;String&gt; poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).collect(Collectors.toCollection(HashSet::new));</span>
-<span class="nc" id="L162">        HashSet&lt;String&gt; rewardAddressesOfRetiredPools = jsonDataProvider.getRewardAddressesOfRetiredPoolsInEpoch(epoch);</span>
-<span class="nc" id="L163">        poolRewardAddresses.addAll(rewardAddressesOfRetiredPools);</span>
-
-<span class="nc" id="L165">        HashSet&lt;String&gt; accountsRegisteredInThePast = dbSyncDataProvider.getRegisteredAccountsUntilLastEpoch(epoch, poolRewardAddresses, stabilityWindow);</span>
-<span class="nc bnc" id="L166" title="All 2 branches missed.">        if (accountsRegisteredInThePast == null) {</span>
-<span class="nc" id="L167">            logger.error(&quot;Failed to fetch StakeAddressesWithRegistrationsUntilEpoch for epoch &quot; + epoch);</span>
-        }
-
-        try {
-<span class="nc" id="L171">            writeObjectToJsonFile(accountsRegisteredInThePast, filePath);</span>
-<span class="nc" id="L172">        } catch (IOException e) {</span>
-<span class="nc" id="L173">            logger.error(&quot;Failed to write accounts registered in the past to json file for epoch &quot; + epoch);</span>
-<span class="nc" id="L174">        }</span>
-
-<span class="nc" id="L176">        HashSet&lt;String&gt; accountsRegisteredUntilNow = dbSyncDataProvider.getRegisteredAccountsUntilNow(epoch, poolRewardAddresses, stabilityWindow);</span>
-<span class="nc" id="L177">        filePath = String.format(&quot;%s/%s/epoch%d.json&quot;, sourceFolder, PAST_ACCOUNT_REGISTRATIONS_UNTIL_NOW.resourceFolderName, epoch);</span>
-<span class="nc" id="L178">        outputFile = new File(filePath);</span>
-
-<span class="nc bnc" id="L180" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
-<span class="nc" id="L181">            logger.info(&quot;Skip to fetch accountsRegisteredUntilNow for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
-<span class="nc" id="L182">            return;</span>
-        }
-
-        try {
-<span class="nc" id="L186">            writeObjectToJsonFile(accountsRegisteredUntilNow, filePath);</span>
-<span class="nc" id="L187">        } catch (IOException e) {</span>
-<span class="nc" id="L188">            logger.error(&quot;Failed to write accounts registered until now to json file for epoch &quot; + epoch);</span>
-<span class="nc" id="L189">        }</span>
-<span class="nc" id="L190">    }</span>
-
-    private void fetchHistoryOfAllPoolsInEpoch(int epoch, boolean override) {
-<span class="nc" id="L193">        String filePath = String.format(&quot;%s/%s/epoch%d.json&quot;, sourceFolder, POOL_HISTORY.resourceFolderName, epoch);</span>
-<span class="nc" id="L194">        File outputFile = new File(filePath);</span>
-
-<span class="nc bnc" id="L196" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
-<span class="nc" id="L197">            logger.info(&quot;Skip to fetch HistoryOfAllPools for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
-<span class="nc" id="L198">            return;</span>
-        }
-
-<span class="nc" id="L201">        List&lt;PoolBlock&gt; blocksMadeByPoolsInEpoch = dbSyncDataProvider.getBlocksMadeByPoolsInEpoch(epoch);</span>
-<span class="nc" id="L202">        List&lt;PoolHistory&gt; poolHistories = dbSyncDataProvider.getHistoryOfAllPoolsInEpoch(epoch, blocksMadeByPoolsInEpoch);</span>
-<span class="nc bnc" id="L203" title="All 2 branches missed.">        if (poolHistories == null) {</span>
-<span class="nc" id="L204">            logger.error(&quot;Failed to fetch HistoryOfAllPools for epoch &quot; + epoch);</span>
-<span class="nc" id="L205">            return;</span>
-        }
-
-        try {
-<span class="nc" id="L209">            writeObjectToJsonFile(poolHistories, filePath);</span>
-<span class="nc" id="L210">        } catch (IOException e) {</span>
-<span class="nc" id="L211">            logger.error(&quot;Failed to write HistoryOfAllPools to json file for epoch &quot; + epoch);</span>
-<span class="nc" id="L212">        }</span>
-
-<span class="nc" id="L214">        filePath = String.format(&quot;%s/%s/epoch%d.json&quot;, sourceFolder, POOL_BLOCKS.resourceFolderName, epoch);</span>
-
-        try {
-<span class="nc" id="L217">            writeObjectToJsonFile(blocksMadeByPoolsInEpoch, filePath);</span>
-<span class="nc" id="L218">        } catch (IOException e) {</span>
-<span class="nc" id="L219">            logger.error(&quot;Failed to write blocks made by pools to json file for epoch &quot; + epoch);</span>
-<span class="nc" id="L220">        }</span>
-<span class="nc" id="L221">    }</span>
-
-    private void fetchDeregisteredAccountsInEpoch(int epoch, boolean override, boolean mainnet) {
-<span class="nc" id="L224">        String filePath = String.format(&quot;%s/%s/epoch%d.json&quot;, sourceFolder, ACCOUNT_DEREGISTRATION.resourceFolderName, epoch);</span>
-<span class="nc" id="L225">        File outputFile = new File(filePath);</span>
-
-<span class="nc bnc" id="L227" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
-<span class="nc" id="L228">            logger.info(&quot;Skip to fetch deregistered accounts at epoch boundary for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
-        } else {
-<span class="nc" id="L230">            HashSet&lt;String&gt; deregisteredAccountsInEpoch = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch, EXPECTED_SLOTS_PER_EPOCH);</span>
-<span class="nc bnc" id="L231" title="All 2 branches missed.">            if (deregisteredAccountsInEpoch == null) {</span>
-<span class="nc" id="L232">                logger.error(&quot;Failed to fetch deregistered accounts at epoch boundary for epoch &quot; + epoch);</span>
-<span class="nc" id="L233">                return;</span>
-            }
-
-            try {
-<span class="nc" id="L237">                writeObjectToJsonFile(deregisteredAccountsInEpoch, filePath);</span>
-<span class="nc" id="L238">            } catch (IOException e) {</span>
-<span class="nc" id="L239">                logger.error(&quot;Failed to write deregistered accounts in epoch to json file for epoch &quot; + epoch);</span>
-<span class="nc" id="L240">            }</span>
-        }
-
-<span class="nc bnc" id="L243" title="All 4 branches missed.">        if (mainnet &amp;&amp; (epoch - 2) &lt; MAINNET_VASIL_HARDFORK_EPOCH) {</span>
-<span class="nc" id="L244">            filePath = String.format(&quot;%s/%s/epoch%d-stability-window.json&quot;, sourceFolder, ACCOUNT_DEREGISTRATION.resourceFolderName, epoch);</span>
-<span class="nc" id="L245">            outputFile = new File(filePath);</span>
-
-<span class="nc bnc" id="L247" title="All 4 branches missed.">            if (outputFile.exists() &amp;&amp; !override) {</span>
-<span class="nc" id="L248">                logger.info(&quot;Skip to fetch deregistered accounts at epoch boundary for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
-<span class="nc" id="L249">                return;</span>
-            }
-
-<span class="nc" id="L252">            HashSet&lt;String&gt; deregisteredAccountsInEpoch = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch, RANDOMNESS_STABILISATION_WINDOW);</span>
-<span class="nc bnc" id="L253" title="All 2 branches missed.">            if (deregisteredAccountsInEpoch == null) {</span>
-<span class="nc" id="L254">                logger.error(&quot;Failed to fetch deregistered accounts at stabilisation window for epoch &quot; + epoch);</span>
-<span class="nc" id="L255">                return;</span>
-            }
-
-            try {
-<span class="nc" id="L259">                writeObjectToJsonFile(deregisteredAccountsInEpoch, filePath);</span>
-<span class="nc" id="L260">            } catch (IOException e) {</span>
-<span class="nc" id="L261">                logger.error(&quot;Failed to write deregistered accounts in epoch at stabilisation window to json file for epoch &quot; + epoch);</span>
-<span class="nc" id="L262">            }</span>
-        }
-<span class="nc" id="L264">    }</span>
-
-    private void fetchMemberRewardsInEpoch(int epoch, boolean override) {
-<span class="nc" id="L267">        String filePath = String.format(&quot;%s/%s/epoch%d.json&quot;, sourceFolder, MEMBER_REWARDS.resourceFolderName, epoch);</span>
-<span class="nc" id="L268">        File outputFile = new File(filePath);</span>
-
-<span class="nc bnc" id="L270" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
-<span class="nc" id="L271">            logger.info(&quot;Skip to fetch MemberRewards for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
-<span class="nc" id="L272">            return;</span>
-        }
-
-<span class="nc" id="L275">        HashSet&lt;Reward&gt; memberRewards = dbSyncDataProvider.getMemberRewardsInEpoch(epoch);</span>
-<span class="nc bnc" id="L276" title="All 2 branches missed.">        if (memberRewards == null) {</span>
-<span class="nc" id="L277">            logger.error(&quot;Failed to fetch MemberRewards for epoch &quot; + epoch);</span>
-<span class="nc" id="L278">            return;</span>
-        }
-
-        try {
-<span class="nc" id="L282">            writeObjectToJsonFile(memberRewards, filePath);</span>
-<span class="nc" id="L283">        } catch (IOException e) {</span>
-<span class="nc" id="L284">            logger.error(&quot;Failed to write MemberRewards to json file for epoch &quot; + epoch);</span>
-<span class="nc" id="L285">        }</span>
-<span class="nc" id="L286">    }</span>
-
-    private void fetchSumOfMemberAndLeaderRewardsInEpoch(int epoch, boolean override) {
-<span class="nc" id="L289">        String filePath = String.format(&quot;%s/%s/epoch%d.json&quot;, sourceFolder, REWARDS.resourceFolderName, epoch);</span>
-<span class="nc" id="L290">        File outputFile = new File(filePath);</span>
-
-<span class="nc bnc" id="L292" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
-<span class="nc" id="L293">            logger.info(&quot;Skip to fetch SumOfMemberAndLeaderRewards for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
-<span class="nc" id="L294">            return;</span>
-        }
-
-<span class="nc" id="L297">        HashSet&lt;PoolReward&gt; totalPoolRewards = dbSyncDataProvider.getTotalPoolRewardsInEpoch(epoch);</span>
-<span class="nc bnc" id="L298" title="All 2 branches missed.">        if (totalPoolRewards == null) {</span>
-<span class="nc" id="L299">            logger.error(&quot;Failed to fetch SumOfMemberAndLeaderRewards for epoch &quot; + epoch);</span>
-<span class="nc" id="L300">            return;</span>
-        }
-
-        try {
-<span class="nc" id="L304">            writeObjectToJsonFile(totalPoolRewards, filePath);</span>
-<span class="nc" id="L305">        } catch (IOException e) {</span>
-<span class="nc" id="L306">            logger.error(&quot;Failed to write SumOfMemberAndLeaderRewards to json file for epoch &quot; + epoch);</span>
-<span class="nc" id="L307">        }</span>
-<span class="nc" id="L308">    }</span>
-
-    private void fetchSharedPoolRewardAddressWithoutReward(int epoch, boolean override) {
-<span class="nc" id="L311">        String filePath = String.format(&quot;%s/%s/epoch%d.json&quot;, sourceFolder, REWARDS_OUTLIER.resourceFolderName, epoch);</span>
-<span class="nc" id="L312">        File outputFile = new File(filePath);</span>
-
-<span class="nc bnc" id="L314" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
-<span class="nc" id="L315">            logger.info(&quot;Skip to fetch SharedPoolRewardAddressWithoutReward for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
-<span class="nc" id="L316">            return;</span>
-        }
-
-<span class="nc" id="L319">        HashSet&lt;String&gt; sharedPoolRewardAddressesWithoutReward = dbSyncDataProvider.findSharedPoolRewardAddressWithoutReward(epoch);</span>
-<span class="nc bnc" id="L320" title="All 2 branches missed.">        if (sharedPoolRewardAddressesWithoutReward == null) {</span>
-<span class="nc" id="L321">            logger.error(&quot;Failed to fetch SharedPoolRewardAddressWithoutReward for epoch &quot; + epoch);</span>
-<span class="nc" id="L322">            return;</span>
-        }
-
-        try {
-<span class="nc" id="L326">            writeObjectToJsonFile(sharedPoolRewardAddressesWithoutReward, filePath);</span>
-<span class="nc" id="L327">        } catch (IOException e) {</span>
-<span class="nc" id="L328">            logger.error(&quot;Failed to write SharedPoolRewardAddressWithoutReward to json file for epoch &quot; + epoch);</span>
-<span class="nc" id="L329">        }</span>
-<span class="nc" id="L330">    }</span>
-
     @Override
     public void fetch(int epoch, boolean override, boolean skipValidationData) {
-<span class="nc" id="L334">        fetchAdaPotsInEpoch(epoch, override);</span>
-<span class="nc" id="L335">        fetchEpochInfo(epoch, override);</span>
-<span class="nc" id="L336">        fetchProtocolParameters(epoch, override);</span>
-<span class="nc" id="L337">        fetchRetiredPoolsInEpoch(epoch, override);</span>
-<span class="nc" id="L338">        fetchHistoryOfAllPoolsInEpoch(epoch, override);</span>
-<span class="nc" id="L339">        fetchDeregisteredAccountsInEpoch(epoch, override, true);</span>
-<span class="nc" id="L340">        fetchSharedPoolRewardAddressWithoutReward(epoch, override);</span>
-<span class="nc" id="L341">        fetchMirCertificatesInEpoch(epoch, override);</span>
-<span class="nc" id="L342">        fetchStakeAddressesWithRegistrationsUntilEpoch(epoch, override, true);</span>
+<span class="nc" id="L45">        String filePath = String.format(&quot;%s/epoch-validation-input-%d.json.gz&quot;, sourceFolder, epoch);</span>
+<span class="nc" id="L46">        File outputFile = new File(filePath);</span>
 
-<span class="nc bnc" id="L344" title="All 2 branches missed.">        if (!skipValidationData) {</span>
-<span class="nc" id="L345">            fetchMemberRewardsInEpoch(epoch, override);</span>
-<span class="nc" id="L346">            fetchSumOfMemberAndLeaderRewardsInEpoch(epoch, override);</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        if (epoch &lt;= MAINNET_SHELLEY_START_EPOCH) {</span>
+<span class="nc" id="L49">            logger.info(&quot;Skip to fetch epoch validation input data for epoch &quot; + epoch + &quot; because the epoch is before the start of the Shelley era&quot;);</span>
+<span class="nc" id="L50">            return;</span>
         }
-<span class="nc" id="L348">    }</span>
+
+<span class="nc bnc" id="L53" title="All 4 branches missed.">        if (outputFile.exists() &amp;&amp; !override) {</span>
+<span class="nc" id="L54">            logger.info(&quot;Skip to fetch epoch validation input data for epoch &quot; + epoch + &quot; because the json file already exists&quot;);</span>
+<span class="nc" id="L55">            return;</span>
+        }
+
+<span class="nc" id="L58">        AdaPots adaPotsForPreviousEpoch = dbSyncDataProvider.getAdaPotsForEpoch(epoch - 1);</span>
+<span class="nc" id="L59">        BigInteger treasuryOfPreviousEpoch = adaPotsForPreviousEpoch.getTreasury();</span>
+<span class="nc" id="L60">        BigInteger reservesOfPreviousEpoch = adaPotsForPreviousEpoch.getReserves();</span>
+
+<span class="nc" id="L62">        ProtocolParameters protocolParameters = dbSyncDataProvider.getProtocolParametersForEpoch(epoch - 2);</span>
+<span class="nc" id="L63">        BigDecimal decentralisation = protocolParameters.getDecentralisation();</span>
+<span class="nc" id="L64">        BigDecimal treasuryGrowRate = protocolParameters.getTreasuryGrowRate();</span>
+<span class="nc" id="L65">        BigDecimal monetaryExpandRate = protocolParameters.getMonetaryExpandRate();</span>
+<span class="nc" id="L66">        Integer optimalPoolCount = protocolParameters.getOptimalPoolCount();</span>
+<span class="nc" id="L67">        BigDecimal poolOwnerInfluence = protocolParameters.getPoolOwnerInfluence();</span>
+
+<span class="nc" id="L69">        Epoch epochInfo = dbSyncDataProvider.getEpochInfo(epoch - 2);</span>
+<span class="nc" id="L70">        BigInteger fees = BigInteger.ZERO;</span>
+<span class="nc" id="L71">        int blockCount = 0;</span>
+<span class="nc" id="L72">        BigInteger activeStake = BigInteger.ZERO;</span>
+<span class="nc" id="L73">        int nonOBFTBlockCount = 0;</span>
+
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        if (epochInfo != null) {</span>
+<span class="nc" id="L76">            activeStake = epochInfo.getActiveStake();</span>
+<span class="nc" id="L77">            fees = epochInfo.getFees();</span>
+<span class="nc" id="L78">            blockCount = epochInfo.getBlockCount();</span>
+<span class="nc" id="L79">            nonOBFTBlockCount = epochInfo.getNonOBFTBlockCount();</span>
+        }
+
+<span class="nc" id="L82">        List&lt;MirCertificate&gt; mirCertificates = dbSyncDataProvider.getMirCertificatesInEpoch(epoch - 1);</span>
+<span class="nc" id="L83">        List&lt;PoolBlock&gt; blocksMadeByPoolsInEpoch = dbSyncDataProvider.getBlocksMadeByPoolsInEpoch(epoch - 2);</span>
+<span class="nc" id="L84">        List&lt;PoolState&gt; poolStates = dbSyncDataProvider.getHistoryOfAllPoolsInEpoch(epoch - 2, blocksMadeByPoolsInEpoch);</span>
+
+        HashSet&lt;String&gt; deregisteredAccounts;
+        HashSet&lt;String&gt; deregisteredAccountsOnEpochBoundary;
+<span class="nc" id="L88">        HashSet&lt;String&gt; lateDeregisteredAccounts = new HashSet&lt;&gt;();</span>
+<span class="nc" id="L89">        HashSet&lt;String&gt; rewardAddressesOfRetiredPoolsInEpoch = dbSyncDataProvider.getRewardAddressesOfRetiredPoolsInEpoch(epoch);</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        if (epoch - 2 &lt; MAINNET_VASIL_HARDFORK_EPOCH) {</span>
+<span class="nc" id="L91">            deregisteredAccounts = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);</span>
+<span class="nc" id="L92">            deregisteredAccountsOnEpochBoundary = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch - 1, EXPECTED_SLOTS_PER_EPOCH);</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">            lateDeregisteredAccounts = deregisteredAccountsOnEpochBoundary.stream().filter(account -&gt; !deregisteredAccounts.contains(account)).collect(Collectors.toCollection(HashSet::new));</span>
+        } else {
+<span class="nc" id="L95">            deregisteredAccounts = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch - 1, EXPECTED_SLOTS_PER_EPOCH);</span>
+<span class="nc" id="L96">            deregisteredAccountsOnEpochBoundary = deregisteredAccounts;</span>
+        }
+
+<span class="nc" id="L99">        HashSet&lt;String&gt; sharedPoolRewardAddressesWithoutReward = new HashSet&lt;&gt;();</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">        if (epoch - 2 &lt; MAINNET_ALLEGRA_HARDFORK_EPOCH) {</span>
+<span class="nc" id="L101">            sharedPoolRewardAddressesWithoutReward = dbSyncDataProvider.findSharedPoolRewardAddressWithoutReward(epoch - 2);</span>
+        }
+<span class="nc" id="L103">        HashSet&lt;String&gt; poolRewardAddresses = poolStates.stream().map(PoolState::getRewardAddress).collect(Collectors.toCollection(HashSet::new));</span>
+<span class="nc" id="L104">        poolRewardAddresses.addAll(rewardAddressesOfRetiredPoolsInEpoch);</span>
+
+<span class="nc" id="L106">        long stabilityWindow = RANDOMNESS_STABILISATION_WINDOW;</span>
+        // Since the Vasil hard fork, the unregistered accounts will not filter out before the
+        // rewards calculation starts (at the stability window). They will be filtered out on the
+        // epoch boundary when the reward update will be applied.
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        if (epoch - 2 &gt;= MAINNET_VASIL_HARDFORK_EPOCH) {</span>
+<span class="nc" id="L111">            stabilityWindow = EXPECTED_SLOTS_PER_EPOCH;</span>
+        }
+
+<span class="nc" id="L114">        HashSet&lt;String&gt; registeredAccountsSinceLastEpoch = dbSyncDataProvider.getRegisteredAccountsUntilLastEpoch(epoch, poolRewardAddresses, stabilityWindow);</span>
+<span class="nc" id="L115">        HashSet&lt;String&gt; registeredAccountsUntilNow = dbSyncDataProvider.getRegisteredAccountsUntilNow(epoch, poolRewardAddresses, stabilityWindow);</span>
+
+<span class="nc" id="L117">        HashSet&lt;Reward&gt; memberRewardsInEpoch = dbSyncDataProvider.getMemberRewardsInEpoch(epoch - 2);</span>
+<span class="nc" id="L118">        HashSet&lt;PoolReward&gt; totalPoolRewardsInEpoch = dbSyncDataProvider.getTotalPoolRewardsInEpoch(epoch - 2);</span>
+
+<span class="nc" id="L120">        HashSet&lt;EpochValidationPoolReward&gt; poolRewards = new HashSet&lt;&gt;();</span>
+<span class="nc bnc" id="L121" title="All 2 branches missed.">        for (PoolReward poolReward : totalPoolRewardsInEpoch) {</span>
+<span class="nc" id="L122">            EpochValidationPoolReward epochValidationPoolReward = EpochValidationPoolReward.builder()</span>
+<span class="nc" id="L123">                    .poolId(poolReward.getPoolId())</span>
+<span class="nc" id="L124">                    .totalPoolReward(poolReward.getAmount())</span>
+<span class="nc" id="L125">                    .delegatorRewards(memberRewardsInEpoch.stream()</span>
+<span class="nc" id="L126">                            .filter(reward -&gt; reward.getPoolId().equals(poolReward.getPoolId()))</span>
+<span class="nc" id="L127">                            .map(reward -&gt; EpochValidationDelegatorReward.builder()</span>
+<span class="nc" id="L128">                                    .stakeAddress(reward.getStakeAddress())</span>
+<span class="nc" id="L129">                                    .reward(reward.getAmount())</span>
+<span class="nc" id="L130">                                    .build())</span>
+<span class="nc" id="L131">                            .collect(Collectors.toCollection(HashSet::new)))</span>
+<span class="nc" id="L132">                    .build();</span>
+<span class="nc" id="L133">            poolRewards.add(epochValidationPoolReward);</span>
+<span class="nc" id="L134">        }</span>
+
+<span class="nc" id="L136">        EpochValidationInput epochValidationInput = EpochValidationInput.builder()</span>
+<span class="nc" id="L137">                .epoch(epoch)</span>
+<span class="nc" id="L138">                .treasuryOfPreviousEpoch(treasuryOfPreviousEpoch)</span>
+<span class="nc" id="L139">                .reservesOfPreviousEpoch(reservesOfPreviousEpoch)</span>
+<span class="nc" id="L140">                .decentralisation(decentralisation)</span>
+<span class="nc" id="L141">                .treasuryGrowRate(treasuryGrowRate)</span>
+<span class="nc" id="L142">                .monetaryExpandRate(monetaryExpandRate)</span>
+<span class="nc" id="L143">                .optimalPoolCount(optimalPoolCount)</span>
+<span class="nc" id="L144">                .poolOwnerInfluence(poolOwnerInfluence)</span>
+<span class="nc" id="L145">                .fees(fees)</span>
+<span class="nc" id="L146">                .blockCount(blockCount)</span>
+<span class="nc" id="L147">                .activeStake(activeStake)</span>
+<span class="nc" id="L148">                .nonOBFTBlockCount(nonOBFTBlockCount)</span>
+<span class="nc" id="L149">                .rewardAddressesOfRetiredPoolsInEpoch(rewardAddressesOfRetiredPoolsInEpoch)</span>
+<span class="nc" id="L150">                .deregisteredAccounts(deregisteredAccounts)</span>
+<span class="nc" id="L151">                .lateDeregisteredAccounts(lateDeregisteredAccounts)</span>
+<span class="nc" id="L152">                .registeredAccountsSinceLastEpoch(registeredAccountsSinceLastEpoch)</span>
+<span class="nc" id="L153">                .registeredAccountsUntilNow(registeredAccountsUntilNow)</span>
+<span class="nc" id="L154">                .sharedPoolRewardAddressesWithoutReward(sharedPoolRewardAddressesWithoutReward)</span>
+<span class="nc" id="L155">                .deregisteredAccountsOnEpochBoundary(deregisteredAccountsOnEpochBoundary)</span>
+<span class="nc" id="L156">                .poolStates(new HashSet&lt;&gt;(poolStates))</span>
+<span class="nc" id="L157">                .poolRewards(poolRewards)</span>
+<span class="nc" id="L158">                .mirCertificates(new HashSet&lt;&gt;(mirCertificates))</span>
+<span class="nc" id="L159">                .build();</span>
+        try {
+<span class="nc" id="L161">            JsonConverter.writeObjectToJsonFile(epochValidationInput, filePath);</span>
+<span class="nc" id="L162">        } catch (IOException e) {</span>
+<span class="nc" id="L163">            logger.error(&quot;Failed to write epoch validation input data to json file for epoch &quot; + epoch);</span>
+<span class="nc" id="L164">        }</span>
+<span class="nc" id="L165">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
