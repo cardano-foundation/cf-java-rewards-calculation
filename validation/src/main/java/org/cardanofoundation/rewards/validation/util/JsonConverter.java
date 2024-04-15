@@ -1,7 +1,8 @@
 package org.cardanofoundation.rewards.validation.util;
 
 import java.io.*;
-import java.util.ArrayList;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -9,7 +10,11 @@ public class JsonConverter {
 
     public static <T> T readJsonFile(String filePath, Class<T> targetClass) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(new File(filePath), targetClass);
+
+        FileInputStream fileInputStream = new FileInputStream(filePath);
+        GZIPInputStream gzipInputStream = new GZIPInputStream(fileInputStream);
+
+        return objectMapper.readValue(gzipInputStream, targetClass);
     }
 
     public static <T> void writeObjectToJsonFile(T objectToWrite, String filePath) throws IOException {
@@ -31,25 +36,13 @@ public class JsonConverter {
             }
         }
 
+        FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
+        GZIPOutputStream gzipOutputStream = new GZIPOutputStream(fileOutputStream);
+
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.writeValue(outputFile, objectToWrite);
-    }
+        objectMapper.writeValue(gzipOutputStream, objectToWrite);
 
-
-    public static <T> ArrayList<T> convertFileJsonToArrayList(String filePath, Class<T> objectClass) {
-        BufferedReader br;
-        try {
-            br = new BufferedReader(new FileReader(filePath));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(
-                    br, objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, objectClass));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        gzipOutputStream.close();
+        fileOutputStream.close();
     }
 }

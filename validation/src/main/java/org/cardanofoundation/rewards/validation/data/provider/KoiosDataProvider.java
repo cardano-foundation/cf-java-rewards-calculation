@@ -5,10 +5,6 @@ import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.domain.PoolReward;
 import org.cardanofoundation.rewards.validation.mapper.*;
 import org.springframework.stereotype.Service;
-import rest.koios.client.backend.api.account.model.AccountHistory;
-import rest.koios.client.backend.api.account.model.AccountHistoryInner;
-import rest.koios.client.backend.api.account.model.AccountUpdates;
-import rest.koios.client.backend.api.base.Result;
 import rest.koios.client.backend.api.base.exception.ApiException;
 import rest.koios.client.backend.api.block.model.Block;
 import rest.koios.client.backend.api.epoch.model.EpochInfo;
@@ -26,7 +22,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -98,11 +93,11 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
-    public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch, List<PoolBlock> blocksMadeByPoolsInEpoch) {
+    public List<PoolState> getHistoryOfAllPoolsInEpoch(int epoch, List<PoolBlock> blocksMadeByPoolsInEpoch) {
         return null;
     }
 
-    public PoolHistory getPoolHistory(String poolId, int epoch) {
+    public PoolState getPoolHistory(String poolId, int epoch) {
         rest.koios.client.backend.api.pool.model.PoolHistory poolHistory = null;
 
         try {
@@ -112,7 +107,7 @@ public class KoiosDataProvider implements DataProvider {
             e.printStackTrace();
         }
 
-        PoolHistory history = PoolHistoryMapper.fromKoiosPoolHistory(poolHistory);
+        PoolState history = PoolHistoryMapper.fromKoiosPoolHistory(poolHistory);
 
         if (history == null) return null;
 
@@ -145,16 +140,6 @@ public class KoiosDataProvider implements DataProvider {
 
     @Override
     public List<MirCertificate> getMirCertificatesInEpoch(int epoch) {
-        return null;
-    }
-
-    @Override
-    public int getPoolRegistrationsInEpoch(int epoch) {
-        return 0;
-    }
-
-    @Override
-    public List<org.cardanofoundation.rewards.calculation.domain.PoolUpdate> getPoolUpdateAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch) {
         return null;
     }
 

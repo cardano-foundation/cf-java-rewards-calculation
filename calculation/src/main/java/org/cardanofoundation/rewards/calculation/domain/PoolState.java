@@ -4,14 +4,13 @@ import lombok.*;
 
 import java.math.BigInteger;
 import java.util.HashSet;
-import java.util.List;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PoolHistory {
+public class PoolState {
     private String poolId;
     private BigInteger activeStake;
     private String rewardAddress;

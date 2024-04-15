@@ -31,9 +31,6 @@ public class RewardsApplication implements ApplicationRunner {
   @Value("${spring.profiles.active:Unknown}")
   private String activeProfiles;
 
-  @Value("${json.data-provider.source}")
-  private String sourceFolder;
-
   @Value("${json.data-fetcher.start-epoch}")
   private int dataFetcherStartEpoch;
 

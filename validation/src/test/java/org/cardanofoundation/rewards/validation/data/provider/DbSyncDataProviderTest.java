@@ -60,12 +60,12 @@ public class DbSyncDataProviderTest {
     public void testGetPoolHistory() {
         String poolId = "pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt";
         int epoch = 220;
-        PoolHistory poolHistory = dbSyncDataProvider.getPoolHistory(poolId, epoch);
-        Assertions.assertEquals(poolHistory.getActiveStake(), new BigInteger("27523186299296"));
-        Assertions.assertEquals(poolHistory.getBlockCount(), 10);
-        Assertions.assertEquals(poolHistory.getFixedCost(), new BigInteger("340000000"));
-        Assertions.assertEquals(poolHistory.getMargin(), 0.009);
-        Assertions.assertEquals(poolHistory.getPoolFees(), new BigInteger("475116283"));
+        PoolState poolState = dbSyncDataProvider.getPoolHistory(poolId, epoch);
+        Assertions.assertEquals(poolState.getActiveStake(), new BigInteger("27523186299296"));
+        Assertions.assertEquals(poolState.getBlockCount(), 10);
+        Assertions.assertEquals(poolState.getFixedCost(), new BigInteger("340000000"));
+        Assertions.assertEquals(poolState.getMargin(), 0.009);
+        Assertions.assertEquals(poolState.getPoolFees(), new BigInteger("475116283"));
     }
 
     @Test

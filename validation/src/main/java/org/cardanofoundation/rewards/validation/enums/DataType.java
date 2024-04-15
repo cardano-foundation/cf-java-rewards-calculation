@@ -3,6 +3,7 @@ package org.cardanofoundation.rewards.validation.enums;
 public enum DataType {
     ADA_POTS ("adaPots"),
     EPOCH_INFO ("epochInfo"),
+    EPOCH_VALIDATION_INPUT ("epochValidationInput"),
     PROTOCOL_PARAMETERS ("protocolParameters"),
     POOL_DEREGISTRATIONS ("poolDeregistrations"),
     POOL_PARAMETERS ("poolParameters"),

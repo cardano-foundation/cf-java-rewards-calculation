@@ -69,9 +69,4 @@ public class DepositsValidationTest {
         Test_calculateDeposit(246, DataProviderType.DB_SYNC);
     }
 
-    @Test
-    void Test_countPoolRegistrationsInEpoch211() {
-        Assertions.assertEquals(54, dbSyncDataProvider.getPoolRegistrationsInEpoch(211));
-    }
-
 }

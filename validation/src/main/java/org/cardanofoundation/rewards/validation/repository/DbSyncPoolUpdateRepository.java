@@ -37,15 +37,6 @@ public interface DbSyncPoolUpdateRepository extends ReadOnlyRepository<DbSyncPoo
     HashSet<LatestPoolUpdate> findLatestActiveUpdatesInEpoch(@Param("epoch") Integer epoch,
                                                              @Param("poolIds") List<String> poolIds);
 
-    @Query(nativeQuery = true, value = """
-            SELECT COUNT(*) FROM (
-            	SELECT hash_id, min(registered_tx_id) as registered_tx_id
-            	FROM pool_update
-            	GROUP BY hash_id) AS pool_registrations
-            JOIN tx ON pool_registrations.registered_tx_id=tx.id JOIN block ON tx.block_id=block.id WHERE block.epoch_no=:epoch
-            """)
-    Integer countPoolRegistrationsInEpoch(@Param("epoch") Integer epoch);
-
     @Query("""
            SELECT update FROM DbSyncPoolUpdate AS update
                WHERE update.pool.bech32PoolId = :poolId

@@ -26,7 +26,7 @@ public interface DbSyncRewardRepository extends ReadOnlyRepository<DbSyncReward,
 
     @Query(nativeQuery = true, value = """
             SELECT SUM(amount) AS totalRewards, type AS pot
-            FROM reward WHERE (reward.type = 'reserves' OR reward.type = 'treasury')
+            FROM instant_reward WHERE (type = 'reserves' OR type = 'treasury')
             AND earned_epoch = :epoch GROUP BY type
             """)
     List<MirTransition> getMIRCertificatesInEpoch(@Param("epoch") Integer epoch);

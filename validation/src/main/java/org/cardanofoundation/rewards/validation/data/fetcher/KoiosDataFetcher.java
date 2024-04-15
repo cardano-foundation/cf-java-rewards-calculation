@@ -108,14 +108,14 @@ public class KoiosDataFetcher implements DataFetcher {
         }
 
         if (outputFile.exists() && !override) {
-            logger.info("Skip to fetch PoolHistory for pool " + poolId + " in epoch " + epoch + " because the json file already exists");
+            logger.info("Skip to fetch PoolState for pool " + poolId + " in epoch " + epoch + " because the json file already exists");
             return;
         }
 
-        PoolHistory poolHistory = koiosDataProvider.getPoolHistory(poolId, epoch);
+        PoolState poolState = koiosDataProvider.getPoolHistory(poolId, epoch);
 
         try {
-            writeObjectToJsonFile(poolHistory, filePath);
+            writeObjectToJsonFile(poolState, filePath);
         } catch (IOException e) {
             logger.error("Failed to write pool history to json file for epoch " + epoch);
         }

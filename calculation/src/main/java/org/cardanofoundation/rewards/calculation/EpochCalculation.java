@@ -18,13 +18,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class EpochCalculation {
 
-    public static EpochCalculationResult calculateEpochRewardPots(final int epoch, final AdaPots adaPotsForPreviousEpoch,
+    public static EpochCalculationResult calculateEpochRewardPots(final int epoch,
+                                                                  final BigInteger reserveInPreviousEpoch,
+                                                                  final BigInteger treasuryInPreviousEpoch,
                                                                   final ProtocolParameters protocolParameters, final Epoch epochInfo,
                                                                   final HashSet<String> rewardAddressesOfRetiredPools,
                                                                   final HashSet<String> deregisteredAccounts,
                                                                   final List<MirCertificate> mirCertificates,
                                                                   final List<String> poolsThatProducedBlocksInEpoch,
-                                                                  final List<PoolHistory> poolHistories,
+                                                                  final List<PoolState> poolHistories,
                                                                   final HashSet<String> lateDeregisteredAccounts,
                                                                   final HashSet<String> registeredAccountsSinceLastEpoch,
                                                                   final HashSet<String> registeredAccountsUntilNow,
@@ -69,9 +71,6 @@ public class EpochCalculation {
         }
 
         final int blocksInEpoch = totalBlocksInEpoch;
-        final BigInteger reserveInPreviousEpoch = adaPotsForPreviousEpoch.getReserves();
-        final BigInteger treasuryInPreviousEpoch = adaPotsForPreviousEpoch.getTreasury();
-
         final BigInteger rewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(
                 monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserveInPreviousEpoch, totalFeesForCurrentEpoch);
 
@@ -120,15 +119,15 @@ public class EpochCalculation {
         int i = 1;
         for (String poolId : poolsThatProducedBlocksInEpoch) {
             log.debug("[" + i + " / " + poolsThatProducedBlocksInEpoch.size() + "] Processing pool: " + poolId);
-            PoolHistory poolHistory = poolHistories.stream().filter(history -> history.getPoolId().equals(poolId)).findFirst().orElse(null);
+            PoolState poolState = poolHistories.stream().filter(history -> history.getPoolId().equals(poolId)).findFirst().orElse(null);
             PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardCalculationResult
                     .builder().poolId(poolId).epoch(epoch).poolReward(BigInteger.ZERO).build();
 
-            if(poolHistory != null) {
+            if(poolState != null) {
                 // Get the reward addresses of the pool and the reward addresses of its delegators
                 final HashSet<String> stakeAddresses = new HashSet<>();
-                stakeAddresses.add(poolHistory.getRewardAddress());
-                stakeAddresses.addAll(poolHistory.getDelegators().stream().map(Delegator::getStakeAddress).toList());
+                stakeAddresses.add(poolState.getRewardAddress());
+                stakeAddresses.addAll(poolState.getDelegators().stream().map(Delegator::getStakeAddress).toList());
                 // We need the get the registration state of those accounts. If they were unregistered before
                 // the randomness stabilization window, they will not receive any rewards. The remaining of the
                 // reward pot will go back to the reserves
@@ -149,10 +148,10 @@ public class EpochCalculation {
                     ignoreLeaderReward = sharedPoolRewardAddressesWithoutReward.contains(poolId);
                 }
 
-                poolRewardCalculationResult = calculatePoolRewardInEpoch(poolId, poolHistory,
+                poolRewardCalculationResult = calculatePoolRewardInEpoch(poolId, poolState,
                         blocksInEpoch, protocolParameters,
                         adaInCirculation, activeStakeInEpoch, stakePoolRewardsPot,
-                        poolHistory.getOwnerActiveStake(), poolHistory.getOwners(),
+                        poolState.getOwnerActiveStake(), poolState.getOwners(),
                         delegatorAccountDeregistrations, ignoreLeaderReward, lateDeregisteredDelegators, registeredAccountsSinceLastEpoch);
             }
 

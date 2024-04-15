@@ -3,14 +3,14 @@ package org.cardanofoundation.rewards.validation;
 import org.cardanofoundation.rewards.calculation.EpochCalculation;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
-import org.cardanofoundation.rewards.validation.domain.PoolReward;
+import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
+import org.cardanofoundation.rewards.validation.domain.*;
 
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
-import org.cardanofoundation.rewards.validation.domain.PoolValidationResult;
 
 import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
 
@@ -54,65 +54,127 @@ public class EpochValidation {
         }
 
         long overallStart = System.currentTimeMillis();
-        long start = System.currentTimeMillis();
-        log.debug("Start obtaining the epoch data");
-        AdaPots adaPotsForPreviousEpoch = dataProvider.getAdaPotsForEpoch(epoch - 1);
-        ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch - 2);
-        Epoch epochInfo = dataProvider.getEpochInfo(epoch - 2);
-        HashSet<String> rewardAddressesOfRetiredPoolsInEpoch = dataProvider.getRewardAddressesOfRetiredPoolsInEpoch(epoch);
-        List<MirCertificate> mirCertificates = dataProvider.getMirCertificatesInEpoch(epoch - 1);
-        List<PoolBlock> blocksMadeByPoolsInEpoch = dataProvider.getBlocksMadeByPoolsInEpoch(epoch - 2);
-        List<String> poolIds = blocksMadeByPoolsInEpoch.stream().map(PoolBlock::getPoolId).distinct().toList();
-        List<PoolHistory> poolHistories = dataProvider.getHistoryOfAllPoolsInEpoch(epoch - 2, blocksMadeByPoolsInEpoch);
 
-        HashSet<String> deregisteredAccounts;
-        HashSet<String> deregisteredAccountsOnEpochBoundary;
-        HashSet<String> lateDeregisteredAccounts = new HashSet<>();
-        if (epoch - 2 < MAINNET_VASIL_HARDFORK_EPOCH) {
-            deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);
-            deregisteredAccountsOnEpochBoundary = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, EXPECTED_SLOTS_PER_EPOCH);
-            lateDeregisteredAccounts = deregisteredAccountsOnEpochBoundary.stream().filter(account -> !deregisteredAccounts.contains(account)).collect(Collectors.toCollection(HashSet::new));
-        } else {
-            deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, EXPECTED_SLOTS_PER_EPOCH);
-            deregisteredAccountsOnEpochBoundary = deregisteredAccounts;
-        }
-
-        HashSet<String> sharedPoolRewardAddressesWithoutReward = new HashSet<>();
-        if (epoch - 2 < MAINNET_ALLEGRA_HARDFORK_EPOCH) {
-            sharedPoolRewardAddressesWithoutReward = dataProvider.findSharedPoolRewardAddressWithoutReward(epoch - 2);
-        }
-        HashSet<String> poolRewardAddresses = poolHistories.stream().map(PoolHistory::getRewardAddress).collect(Collectors.toCollection(HashSet::new));
-        poolRewardAddresses.addAll(rewardAddressesOfRetiredPoolsInEpoch);
-
-        long stabilityWindow = RANDOMNESS_STABILISATION_WINDOW;
-        // Since the Vasil hard fork, the unregistered accounts will not filter out before the
-        // rewards calculation starts (at the stability window). They will be filtered out on the
-        // epoch boundary when the reward update will be applied.
-        if (epoch - 2 >= MAINNET_VASIL_HARDFORK_EPOCH) {
-            stabilityWindow = EXPECTED_SLOTS_PER_EPOCH;
-        }
-
-        HashSet<String> registeredAccountsSinceLastEpoch = dataProvider.getRegisteredAccountsUntilLastEpoch(epoch, poolRewardAddresses, stabilityWindow);
-        HashSet<String> registeredAccountsUntilNow = dataProvider.getRegisteredAccountsUntilNow(epoch, poolRewardAddresses, stabilityWindow);
-
+        EpochCalculationResult epochCalculationResult;
         HashSet<Reward> memberRewardsInEpoch = new HashSet<>();
         HashSet<PoolReward> totalPoolRewards = new HashSet<>();
-        if (detailedValidation) {
-            memberRewardsInEpoch = dataProvider.getMemberRewardsInEpoch(epoch - 2);
-            totalPoolRewards = dataProvider.getTotalPoolRewardsInEpoch(epoch - 2);
-        }
-        long end = System.currentTimeMillis();
-        log.debug("Obtaining the epoch data took " + Math.round((end - start) / 1000.0) + "s");
-        log.debug("Start epoch calculation");
+        if (dataProvider instanceof JsonDataProvider) {
+            long start = System.currentTimeMillis();
+            log.debug("Start obtaining the epoch data");
+            EpochValidationInput epochValidationInput = ((JsonDataProvider) dataProvider).getEpochValidationInput(epoch);
 
-        start = System.currentTimeMillis();
-        EpochCalculationResult epochCalculationResult = EpochCalculation.calculateEpochRewardPots(
-                epoch, adaPotsForPreviousEpoch, protocolParameters, epochInfo, rewardAddressesOfRetiredPoolsInEpoch, deregisteredAccounts,
-                mirCertificates, poolIds, poolHistories, lateDeregisteredAccounts,
-                registeredAccountsSinceLastEpoch, registeredAccountsUntilNow, sharedPoolRewardAddressesWithoutReward,
-                deregisteredAccountsOnEpochBoundary);
-        end = System.currentTimeMillis();
-        log.debug("Epoch calculation took " + Math.round((end - start) / 1000.0) + "s");
+            ProtocolParameters protocolParameters = ProtocolParameters.builder()
+                    .decentralisation(epochValidationInput.getDecentralisation())
+                    .monetaryExpandRate(epochValidationInput.getMonetaryExpandRate())
+                    .treasuryGrowRate(epochValidationInput.getTreasuryGrowRate())
+                    .optimalPoolCount(epochValidationInput.getOptimalPoolCount())
+                    .poolOwnerInfluence(epochValidationInput.getPoolOwnerInfluence())
+                    .build();
+
+            Epoch epochInfo = null;
+
+            if (epochValidationInput.getBlockCount() > 0) {
+                epochInfo = Epoch.builder()
+                    .number(epoch)
+                    .blockCount(epochValidationInput.getBlockCount())
+                    .fees(epochValidationInput.getFees())
+                    .activeStake(epochValidationInput.getActiveStake())
+                    .nonOBFTBlockCount(epochValidationInput.getNonOBFTBlockCount())
+                    .build();
+            }
+
+            HashSet<String> poolIds = epochValidationInput.getPoolRewards().stream().map(EpochValidationPoolReward::getPoolId).collect(Collectors.toCollection(HashSet::new));
+
+            if (detailedValidation) {
+                memberRewardsInEpoch = epochValidationInput.getPoolRewards().stream()
+                        .flatMap(poolReward -> poolReward.getDelegatorRewards().stream()
+                        .map(reward -> Reward.builder()
+                                .poolId(poolReward.getPoolId())
+                                .stakeAddress(reward.getStakeAddress())
+                                .amount(reward.getReward())
+                                .build()))
+                        .collect(Collectors.toCollection(HashSet::new));
+                totalPoolRewards = epochValidationInput.getPoolRewards().stream()
+                        .map(poolReward -> PoolReward.builder()
+                                .poolId(poolReward.getPoolId())
+                                .epoch(epoch)
+                                .amount(poolReward.getTotalPoolReward())
+                                .build())
+                        .collect(Collectors.toCollection(HashSet::new));
+            }
+
+            epochCalculationResult = EpochCalculation.calculateEpochRewardPots(
+                    epoch, epochValidationInput.getReservesOfPreviousEpoch(),
+                    epochValidationInput.getTreasuryOfPreviousEpoch(), protocolParameters, epochInfo, epochValidationInput.getRewardAddressesOfRetiredPoolsInEpoch(),
+                    epochValidationInput.getDeregisteredAccounts(),
+                    new ArrayList<>(epochValidationInput.getMirCertificates()),
+                    new ArrayList<>(poolIds),
+                    new ArrayList<>(epochValidationInput.getPoolStates()),
+                    epochValidationInput.getLateDeregisteredAccounts(),
+                    epochValidationInput.getRegisteredAccountsSinceLastEpoch(),
+                    epochValidationInput.getRegisteredAccountsUntilNow(), epochValidationInput.getSharedPoolRewardAddressesWithoutReward(),
+                    epochValidationInput.getDeregisteredAccountsOnEpochBoundary());
+            long end = System.currentTimeMillis();
+            log.debug("Epoch calculation took " + Math.round((end - start) / 1000.0) + "s");
+        } else {
+            long start = System.currentTimeMillis();
+            log.debug("Start obtaining the epoch data");
+            AdaPots adaPotsForPreviousEpoch = dataProvider.getAdaPotsForEpoch(epoch - 1);
+            ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch - 2);
+            Epoch epochInfo = dataProvider.getEpochInfo(epoch - 2);
+            HashSet<String> rewardAddressesOfRetiredPoolsInEpoch = dataProvider.getRewardAddressesOfRetiredPoolsInEpoch(epoch);
+            List<MirCertificate> mirCertificates = dataProvider.getMirCertificatesInEpoch(epoch - 1);
+            List<PoolBlock> blocksMadeByPoolsInEpoch = dataProvider.getBlocksMadeByPoolsInEpoch(epoch - 2);
+            List<String> poolIds = blocksMadeByPoolsInEpoch.stream().map(PoolBlock::getPoolId).distinct().toList();
+            List<PoolState> poolStates = dataProvider.getHistoryOfAllPoolsInEpoch(epoch - 2, blocksMadeByPoolsInEpoch);
+
+            HashSet<String> deregisteredAccounts;
+            HashSet<String> deregisteredAccountsOnEpochBoundary;
+            HashSet<String> lateDeregisteredAccounts = new HashSet<>();
+            if (epoch - 2 < MAINNET_VASIL_HARDFORK_EPOCH) {
+                deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);
+                deregisteredAccountsOnEpochBoundary = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, EXPECTED_SLOTS_PER_EPOCH);
+                lateDeregisteredAccounts = deregisteredAccountsOnEpochBoundary.stream().filter(account -> !deregisteredAccounts.contains(account)).collect(Collectors.toCollection(HashSet::new));
+            } else {
+                deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, EXPECTED_SLOTS_PER_EPOCH);
+                deregisteredAccountsOnEpochBoundary = deregisteredAccounts;
+            }
+
+            HashSet<String> sharedPoolRewardAddressesWithoutReward = new HashSet<>();
+            if (epoch - 2 < MAINNET_ALLEGRA_HARDFORK_EPOCH) {
+                sharedPoolRewardAddressesWithoutReward = dataProvider.findSharedPoolRewardAddressWithoutReward(epoch - 2);
+            }
+            HashSet<String> poolRewardAddresses = poolStates.stream().map(PoolState::getRewardAddress).collect(Collectors.toCollection(HashSet::new));
+            poolRewardAddresses.addAll(rewardAddressesOfRetiredPoolsInEpoch);
+
+            long stabilityWindow = RANDOMNESS_STABILISATION_WINDOW;
+            // Since the Vasil hard fork, the unregistered accounts will not filter out before the
+            // rewards calculation starts (at the stability window). They will be filtered out on the
+            // epoch boundary when the reward update will be applied.
+            if (epoch - 2 >= MAINNET_VASIL_HARDFORK_EPOCH) {
+                stabilityWindow = EXPECTED_SLOTS_PER_EPOCH;
+            }
+
+            HashSet<String> registeredAccountsSinceLastEpoch = dataProvider.getRegisteredAccountsUntilLastEpoch(epoch, poolRewardAddresses, stabilityWindow);
+            HashSet<String> registeredAccountsUntilNow = dataProvider.getRegisteredAccountsUntilNow(epoch, poolRewardAddresses, stabilityWindow);
+
+            if (detailedValidation) {
+                memberRewardsInEpoch = dataProvider.getMemberRewardsInEpoch(epoch - 2);
+                totalPoolRewards = dataProvider.getTotalPoolRewardsInEpoch(epoch - 2);
+            }
+            long end = System.currentTimeMillis();
+            log.debug("Obtaining the epoch data took " + Math.round((end - start) / 1000.0) + "s");
+            log.debug("Start epoch calculation");
+
+            start = System.currentTimeMillis();
+            epochCalculationResult = EpochCalculation.calculateEpochRewardPots(
+                    epoch, adaPotsForPreviousEpoch.getReserves(), adaPotsForPreviousEpoch.getTreasury(), protocolParameters, epochInfo, rewardAddressesOfRetiredPoolsInEpoch, deregisteredAccounts,
+                    mirCertificates, poolIds, poolStates, lateDeregisteredAccounts,
+                    registeredAccountsSinceLastEpoch, registeredAccountsUntilNow, sharedPoolRewardAddressesWithoutReward,
+                    deregisteredAccountsOnEpochBoundary);
+            end = System.currentTimeMillis();
+            log.debug("Epoch calculation took " + Math.round((end - start) / 1000.0) + "s");
+        }
 
         if (detailedValidation) {
             log.debug("Start epoch validation");
@@ -120,14 +182,14 @@ public class EpochValidation {
             long validationStart = System.currentTimeMillis();
             List<PoolValidationResult> poolValidationResults = new ArrayList<>();
             for (PoolRewardCalculationResult poolRewardCalculationResult : epochCalculationResult.getPoolRewardCalculationResults()) {
-                start = System.currentTimeMillis();
+                long start = System.currentTimeMillis();
                 PoolValidationResult poolValidationResult = PoolRewardValidation.validatePoolRewardCalculation(poolRewardCalculationResult, memberRewardsInEpoch, totalPoolRewards);
                 poolValidationResults.add(poolValidationResult);
 
                 if (!poolValidationResult.isValid()) {
                     log.info("Pool reward is invalid. Please check the details for pool " + poolRewardCalculationResult.getPoolId());
                 }
-                end = System.currentTimeMillis();
+                long end = System.currentTimeMillis();
                 log.debug("Validation of pool " + poolRewardCalculationResult.getPoolId() + " took " + Math.round((end - start) / 1000.0) + "s");
             }
             poolValidationResults.sort(Comparator.comparing(PoolValidationResult::getOffset).reversed());

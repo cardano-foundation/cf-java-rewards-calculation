@@ -126,14 +126,14 @@ public class PoolRewardsCalculation {
                 relativeMemberStake), relativeStakeOfPool));
     }
 
-    public static PoolRewardCalculationResult calculatePoolRewardInEpoch(final String poolId, final PoolHistory poolHistoryCurrentEpoch,
+    public static PoolRewardCalculationResult calculatePoolRewardInEpoch(final String poolId, final PoolState poolStateCurrentEpoch,
                                                                          final int totalBlocksInEpoch, final ProtocolParameters protocolParameters,
                                                                          final BigInteger adaInCirculation, final BigInteger activeStakeInEpoch, BigInteger stakePoolRewardsPot,
                                                                          final BigInteger totalActiveStakeOfOwners, final HashSet<String> poolOwnerStakeAddresses,
                                                                          final HashSet<String> deregisteredAccounts, final boolean ignoreLeaderReward,
                                                                          final HashSet<String> lateDeregisteredAccounts,
                                                                          final HashSet<String> accountsRegisteredInThePast) {
-        final int earnedEpoch = poolHistoryCurrentEpoch.getEpoch();
+        final int earnedEpoch = poolStateCurrentEpoch.getEpoch();
         final PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardCalculationResult.builder()
                 .epoch(earnedEpoch)
                 .poolId(poolId)
@@ -154,15 +154,15 @@ public class PoolRewardsCalculation {
             deregisteredAccounts.clear();
         }
 
-        final BigInteger poolStake = poolHistoryCurrentEpoch.getActiveStake();
-        final BigInteger poolPledge = poolHistoryCurrentEpoch.getPledge();
-        final double poolMargin = poolHistoryCurrentEpoch.getMargin();
-        final BigInteger poolFixedCost = poolHistoryCurrentEpoch.getFixedCost();
-        final int blocksPoolHasMinted = poolHistoryCurrentEpoch.getBlockCount();
+        final BigInteger poolStake = poolStateCurrentEpoch.getActiveStake();
+        final BigInteger poolPledge = poolStateCurrentEpoch.getPledge();
+        final double poolMargin = poolStateCurrentEpoch.getMargin();
+        final BigInteger poolFixedCost = poolStateCurrentEpoch.getFixedCost();
+        final int blocksPoolHasMinted = poolStateCurrentEpoch.getBlockCount();
 
         poolRewardCalculationResult.setPoolMargin(poolMargin);
         poolRewardCalculationResult.setPoolCost(poolFixedCost);
-        poolRewardCalculationResult.setRewardAddress(poolHistoryCurrentEpoch.getRewardAddress());
+        poolRewardCalculationResult.setRewardAddress(poolStateCurrentEpoch.getRewardAddress());
 
         if (blocksPoolHasMinted == 0) {
             return poolRewardCalculationResult;
@@ -233,7 +233,7 @@ public class PoolRewardsCalculation {
         // Step 11: Calculate pool member reward
         BigInteger poolMemberRewards = BigInteger.ZERO;
         final HashSet<Reward> memberRewards = new HashSet<>();
-        for (Delegator delegator : poolHistoryCurrentEpoch.getDelegators()) {
+        for (Delegator delegator : poolStateCurrentEpoch.getDelegators()) {
             final String stakeAddress = delegator.getStakeAddress();
 
             /*
@@ -243,7 +243,7 @@ public class PoolRewardsCalculation {
 
                 shelley-ledger.pdf | 17.4 Reward aggregation | p. 114
              */
-            if (stakeAddress.equals(poolHistoryCurrentEpoch.getRewardAddress())
+            if (stakeAddress.equals(poolStateCurrentEpoch.getRewardAddress())
                     && earnedEpoch < MAINNET_ALLEGRA_HARDFORK_EPOCH) {
                 continue;
             }

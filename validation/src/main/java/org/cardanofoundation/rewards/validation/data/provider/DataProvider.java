@@ -15,16 +15,12 @@ public interface DataProvider {
 
     public ProtocolParameters getProtocolParametersForEpoch(int epoch);
 
-    public List<PoolHistory> getHistoryOfAllPoolsInEpoch(int epoch, List<PoolBlock> blocksMadeByPoolsInEpoch);
-    public PoolHistory getPoolHistory(String poolId, int epoch);
+    public List<PoolState> getHistoryOfAllPoolsInEpoch(int epoch, List<PoolBlock> blocksMadeByPoolsInEpoch);
+    public PoolState getPoolHistory(String poolId, int epoch);
 
     public HashSet<String> getRewardAddressesOfRetiredPoolsInEpoch(int epoch);
 
     public List<MirCertificate> getMirCertificatesInEpoch(int epoch);
-
-    public int getPoolRegistrationsInEpoch(int epoch);
-
-    public List<PoolUpdate> getPoolUpdateAfterTransactionIdInEpoch(String poolId, long transactionId, int epoch);
 
     public BigInteger getTransactionDepositsInEpoch(int epoch);
 
