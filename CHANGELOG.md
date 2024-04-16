@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.9.0...v0.10.0) (2024-04-16)
+
+
+### Features
+
+* optimize JSON schema and apply gzip compression ([91a1623](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/91a162397e378748bac03de16057e5b84a509e2a))
+
 ## [0.9.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.8.0...v0.9.0) (2024-03-09)
 
 
