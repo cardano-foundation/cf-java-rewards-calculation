@@ -56,6 +56,18 @@ public class EpochValidationTest {
         testCalculateEpochPots(epoch, jsonDataProvider, false);
     }
 
+    static Stream<Integer> testEpochs() {
+        return Stream.of(
+                360, 475
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("testEpochs")
+    public void testYoungerEpochRewardsWithJsonDataProvider(int epoch) {
+        testCalculateEpochPots(epoch, jsonDataProvider, false);
+    }
+
     @Test
     @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     public void testCalculateEpochRewardsForEpoch417() {
