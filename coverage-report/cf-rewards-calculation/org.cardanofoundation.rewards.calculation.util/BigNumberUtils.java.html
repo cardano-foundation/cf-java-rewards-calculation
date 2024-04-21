@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>BigNumberUtils.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">cf-rewards-validation</a> &gt; <a href="../index.html" class="el_bundle">cf-rewards-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.calculation.util</a> &gt; <span class="el_source">BigNumberUtils.java</span></div><h1>BigNumberUtils.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.calculation.util;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.MathContext;
+import java.math.RoundingMode;
+
+<span class="nc" id="L8">public class BigNumberUtils {</span>
+
+<span class="fc" id="L10">    public final static MathContext mathContext = new MathContext(20);</span>
+
+    public static BigInteger add(BigInteger a, BigInteger b) {
+<span class="fc" id="L13">        return a.add(b);</span>
+    }
+
+    public static BigInteger multiplyAndFloor(BigInteger a, BigDecimal b, BigDecimal c) {
+<span class="fc" id="L17">        return new BigDecimal(a).multiply(b).multiply(c).round(new MathContext(0, RoundingMode.FLOOR)).toBigInteger();</span>
+    }
+
+    public static BigInteger multiplyAndFloor(BigInteger a, BigDecimal b) {
+<span class="fc" id="L21">        return new BigDecimal(a).multiply(b)</span>
+<span class="fc" id="L22">                .round(new MathContext(0, RoundingMode.FLOOR)).toBigInteger();</span>
+    }
+
+    public static BigInteger multiply(BigInteger a, BigInteger b, BigInteger c) {
+<span class="nc" id="L26">        return a.multiply(b).multiply(c);</span>
+    }
+
+    public static BigDecimal multiply(BigInteger a, BigDecimal b, BigDecimal c) {
+<span class="fc" id="L30">        return new BigDecimal(a).multiply(b).multiply(c);</span>
+    }
+
+    public static BigDecimal add(BigDecimal a, BigDecimal b) {
+<span class="fc" id="L34">        return a.add(b);</span>
+    }
+
+    public static BigDecimal add(double a, BigDecimal b) {
+<span class="fc" id="L38">        return BigDecimal.valueOf(a).add(b);</span>
+    }
+
+    public static BigDecimal add(BigDecimal a, double b) {
+<span class="nc" id="L42">        return a.add(BigDecimal.valueOf(b));</span>
+    }
+
+    public static BigDecimal add(double a, double b) {
+<span class="nc" id="L46">        return BigDecimal.valueOf(a).add(BigDecimal.valueOf(b));</span>
+    }
+
+    public static BigDecimal add(long a, double b) {
+<span class="nc" id="L50">        return BigDecimal.valueOf(a).add(BigDecimal.valueOf(b));</span>
+    }
+
+    public static BigDecimal add(double a, long b) {
+<span class="nc" id="L54">        return BigDecimal.valueOf(a).add(BigDecimal.valueOf(b));</span>
+    }
+
+    public static BigDecimal subtract(BigDecimal a, BigDecimal b) {
+<span class="fc" id="L58">        return a.subtract(b);</span>
+    }
+
+    public static BigInteger subtract(BigInteger a, BigInteger b) {
+<span class="fc" id="L62">        return a.subtract(b);</span>
+    }
+
+    public static BigDecimal subtract(double a, BigDecimal b) {
+<span class="nc" id="L66">        return BigDecimal.valueOf(a).subtract(b);</span>
+    }
+
+    public static BigDecimal subtract(BigDecimal a, double b) {
+<span class="fc" id="L70">        return a.subtract(BigDecimal.valueOf(b));</span>
+    }
+
+    public static BigDecimal subtract(BigInteger a, double b) {
+<span class="nc" id="L74">        return new BigDecimal(a).subtract(BigDecimal.valueOf(b));</span>
+    }
+
+    public static BigDecimal multiply(BigDecimal a, BigDecimal b) {
+<span class="fc" id="L78">        return a.multiply(b);</span>
+    }
+
+    public static BigDecimal multiply(BigInteger a, BigDecimal b) {
+<span class="fc" id="L82">        return new BigDecimal(a).multiply(b);</span>
+    }
+
+    public static BigDecimal multiply(BigInteger a, double b) {
+<span class="nc" id="L86">        return new BigDecimal(a).multiply(new BigDecimal(b));</span>
+    }
+
+    public static BigDecimal multiply(BigDecimal a, BigDecimal b, BigDecimal c) {
+<span class="fc" id="L90">        return a.multiply(b).multiply(c);</span>
+    }
+
+    public static BigDecimal multiply(BigDecimal a, double b, BigDecimal c) {
+<span class="nc" id="L94">        return a.multiply(BigDecimal.valueOf(b)).multiply(c);</span>
+    }
+
+    public static BigDecimal multiply(double a, BigDecimal b) {
+<span class="fc" id="L98">        return BigDecimal.valueOf(a).multiply(b);</span>
+    }
+
+    public static BigDecimal multiply(BigDecimal a, double b) {
+<span class="nc" id="L102">        return a.multiply(BigDecimal.valueOf(b));</span>
+    }
+
+    public static BigDecimal multiply(double a, double b) {
+<span class="nc" id="L106">        return BigDecimal.valueOf(a).multiply(BigDecimal.valueOf(b));</span>
+    }
+
+    public static BigInteger multiply(int a, BigInteger b) {
+<span class="nc" id="L110">        return BigInteger.valueOf(a).multiply(b);</span>
+    }
+
+    public static BigDecimal multiply(double a, BigInteger b) {
+<span class="nc" id="L114">        return BigDecimal.valueOf(a).multiply(new BigDecimal(b));</span>
+    }
+
+    public static BigDecimal multiply(long a, double b) {
+<span class="nc" id="L118">        return BigDecimal.valueOf(a).multiply(BigDecimal.valueOf(b));</span>
+    }
+
+    public static BigDecimal multiply(double a, long b) {
+<span class="nc" id="L122">        return BigDecimal.valueOf(a).multiply(BigDecimal.valueOf(b));</span>
+    }
+
+    public static BigDecimal divide(BigDecimal a, BigDecimal b) {
+<span class="fc" id="L126">        return a.divide(b, mathContext);</span>
+    }
+
+    public static BigDecimal divide(BigInteger a, BigDecimal b) {
+<span class="fc" id="L130">        return new BigDecimal(a).divide(b, mathContext);</span>
+    }
+
+    public static BigDecimal divide(double a, BigInteger b) {
+<span class="nc" id="L134">        return BigDecimal.valueOf(a).divide(new BigDecimal(b), mathContext);</span>
+    }
+
+    public static BigDecimal divide(BigInteger a, BigInteger b) {
+<span class="fc" id="L138">        return new BigDecimal(a).divide(new BigDecimal(b), mathContext);</span>
+    }
+
+    public static BigDecimal divide(double a, BigDecimal b) {
+<span class="nc" id="L142">        return BigDecimal.valueOf(a).divide(b, mathContext);</span>
+    }
+
+    public static BigDecimal divide(BigDecimal a, double b) {
+<span class="fc" id="L146">        return a.divide(BigDecimal.valueOf(b), mathContext);</span>
+    }
+
+    public static BigDecimal divide(double a, double b) {
+<span class="nc" id="L150">        return BigDecimal.valueOf(a).divide(BigDecimal.valueOf(b), mathContext);</span>
+    }
+
+    public static BigDecimal divide(long a, double b) {
+<span class="nc" id="L154">        return BigDecimal.valueOf(a).divide(BigDecimal.valueOf(b), mathContext);</span>
+    }
+
+    public static BigDecimal divide(long a, long b) {
+<span class="fc" id="L158">        return BigDecimal.valueOf(a).divide(BigDecimal.valueOf(b), mathContext);</span>
+    }
+
+    public static BigDecimal divide(double a, long b) {
+<span class="nc" id="L162">        return BigDecimal.valueOf(a).divide(BigDecimal.valueOf(b), mathContext);</span>
+    }
+
+    public static BigDecimal min(BigDecimal a, BigDecimal b) {
+<span class="fc" id="L166">        return a.min(b);</span>
+    }
+
+    public static BigInteger floor(BigDecimal a) {
+<span class="fc" id="L170">        return a.round(new MathContext(0, RoundingMode.FLOOR)).toBigInteger();</span>
+    }
+
+    public static boolean isLowerOrEquals(BigInteger a, BigInteger b) {
+<span class="fc bfc" id="L174" title="All 2 branches covered.">        return a.compareTo(b) &lt;= 0;</span>
+    }
+
+    public static boolean isLower(BigInteger a, BigInteger b) {
+<span class="fc bfc" id="L178" title="All 2 branches covered.">        return a.compareTo(b) &lt; 0;</span>
+    }
+
+    public static boolean isLower(BigDecimal a, BigDecimal b) {
+<span class="fc bfc" id="L182" title="All 2 branches covered.">        return a.compareTo(b) &lt; 0;</span>
+    }
+
+    public static boolean isHigher(BigInteger a, BigInteger b) {
+<span class="pc bpc" id="L186" title="1 of 2 branches missed.">        return a.compareTo(b) &gt; 0;</span>
+    }
+
+    public static boolean isHigher(BigDecimal a, BigDecimal b) {
+<span class="fc bfc" id="L190" title="All 2 branches covered.">        return a.compareTo(b) &gt; 0;</span>
+    }
+
+    public static boolean isZero(BigDecimal a) {
+<span class="pc bpc" id="L194" title="1 of 2 branches missed.">        return a.compareTo(BigDecimal.ZERO) == 0;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
