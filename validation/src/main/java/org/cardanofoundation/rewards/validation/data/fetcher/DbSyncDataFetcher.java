@@ -158,7 +158,7 @@ public class DbSyncDataFetcher implements DataFetcher {
                 .mirCertificates(new HashSet<>(mirCertificates))
                 .build();
         try {
-            JsonConverter.writeObjectToJsonFile(epochValidationInput, filePath);
+            JsonConverter.writeObjectToCompressedJsonFile(epochValidationInput, filePath);
         } catch (IOException e) {
             logger.error("Failed to write epoch validation input data to json file for epoch " + epoch);
         }

@@ -83,7 +83,7 @@ public class EpochValidation {
                     .build();
             }
 
-            HashSet<String> poolIds = epochValidationInput.getPoolRewards().stream().map(EpochValidationPoolReward::getPoolId).collect(Collectors.toCollection(HashSet::new));
+            HashSet<String> poolIds = epochValidationInput.getPoolStates().stream().map(PoolState::getPoolId).collect(Collectors.toCollection(HashSet::new));
 
             if (detailedValidation) {
                 memberRewardsInEpoch = epochValidationInput.getPoolRewards().stream()

@@ -17,7 +17,7 @@ public class JsonConverter {
         return objectMapper.readValue(gzipInputStream, targetClass);
     }
 
-    public static <T> void writeObjectToJsonFile(T objectToWrite, String filePath) throws IOException {
+    public static <T> void writeObjectToCompressedJsonFile(T objectToWrite, String filePath) throws IOException {
         File outputFile = new File(filePath);
 
         if(outputFile.isDirectory()){
@@ -43,6 +43,33 @@ public class JsonConverter {
         objectMapper.writeValue(gzipOutputStream, objectToWrite);
 
         gzipOutputStream.close();
+        fileOutputStream.close();
+    }
+
+    public static <T> void writeObjectToJsonFile(T objectToWrite, String filePath) throws IOException {
+        File outputFile = new File(filePath);
+
+        if(outputFile.isDirectory()){
+            if (!outputFile.exists()) {
+                boolean output = outputFile.mkdirs();
+                if (!output) {
+                    throw new IOException("Failed to create directory: " + outputFile.getAbsolutePath());
+                }
+            }
+        } else {
+            if (!outputFile.getAbsoluteFile().getParentFile().exists()) {
+                boolean output = outputFile.getAbsoluteFile().getParentFile().mkdirs();
+                if (!output) {
+                    throw new IOException("Failed to create directory: " + outputFile.getAbsoluteFile().getParentFile());
+                }
+            }
+        }
+
+        FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.writeValue(fileOutputStream, objectToWrite);
+
         fileOutputStream.close();
     }
 }

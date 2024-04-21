@@ -7,6 +7,8 @@ import org.cardanofoundation.rewards.validation.domain.PoolReward;
 import org.cardanofoundation.rewards.validation.util.JsonConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
@@ -23,22 +25,24 @@ public class JsonDataProvider implements DataProvider {
 
     private EpochValidationInput epochValidationInput;
 
-    private void loadEpochValidationInput(int epoch) {
+    private void loadEpochValidationInput(int epoch) throws IOException {
         if (epoch != this.epoch) {
             log.info("Loading epoch validation input for epoch " + epoch + " into memory");
 
             String filePath = String.format("%s/epoch-validation-input-%d.json.gz", sourceFolder, epoch);
-            try {
-                this.epochValidationInput = JsonConverter.readJsonFile(filePath, EpochValidationInput.class);
-                this.epoch = epoch;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            this.epochValidationInput = JsonConverter.readJsonFile(filePath, EpochValidationInput.class);
+            this.epoch = epoch;
         }
     }
     @Override
     public AdaPots getAdaPotsForEpoch(int epoch) {
-        loadEpochValidationInput(epoch + 1);
+        try {
+            loadEpochValidationInput(epoch + 1);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+
         return AdaPots.builder()
                 .treasury(epochValidationInput.getTreasuryOfPreviousEpoch())
                 .reserves(epochValidationInput.getReservesOfPreviousEpoch())
@@ -50,7 +54,12 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public Epoch getEpochInfo(int epoch) {
-        loadEpochValidationInput(epoch);
+        try {
+            loadEpochValidationInput(epoch);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
 
         if (epochValidationInput.getBlockCount() == 0) {
             return null;
@@ -67,7 +76,13 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public ProtocolParameters getProtocolParametersForEpoch(int epoch) {
-        loadEpochValidationInput(epoch);
+        try {
+            loadEpochValidationInput(epoch);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+
         return ProtocolParameters.builder()
                 .decentralisation(epochValidationInput.getDecentralisation())
                 .treasuryGrowRate(epochValidationInput.getTreasuryGrowRate())
@@ -79,13 +94,25 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public List<PoolState> getHistoryOfAllPoolsInEpoch(int epoch, List<PoolBlock> blocksMadeByPoolsInEpoch) {
-        loadEpochValidationInput(epoch);
+        try {
+            loadEpochValidationInput(epoch);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+
         return epochValidationInput.getPoolStates().stream().toList();
     }
 
     @Override
     public PoolState getPoolHistory(String poolId, int epoch) {
-        loadEpochValidationInput(epoch);
+        try {
+            loadEpochValidationInput(epoch);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+
         return epochValidationInput.getPoolStates().stream()
                 .filter(poolState -> poolState.getPoolId().equals(poolId))
                 .findFirst()
@@ -94,13 +121,25 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public HashSet<String> getRewardAddressesOfRetiredPoolsInEpoch(int epoch) {
-        loadEpochValidationInput(epoch);
+        try {
+            loadEpochValidationInput(epoch);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+
         return epochValidationInput.getRewardAddressesOfRetiredPoolsInEpoch();
     }
 
     @Override
     public List<MirCertificate> getMirCertificatesInEpoch(int epoch) {
-        loadEpochValidationInput(epoch);
+        try {
+            loadEpochValidationInput(epoch);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+
         return epochValidationInput.getMirCertificates().stream().toList();
     }
 
@@ -121,7 +160,13 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public HashSet<Reward> getMemberRewardsInEpoch(int epoch) {
-        loadEpochValidationInput(epoch);
+        try {
+            loadEpochValidationInput(epoch);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+
         return epochValidationInput.getPoolRewards().stream()
                 .flatMap(reward -> reward.getDelegatorRewards().stream().map(
                         delegatorReward -> Reward.builder()
@@ -135,7 +180,13 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public List<PoolBlock> getBlocksMadeByPoolsInEpoch(int epoch) {
-        loadEpochValidationInput(epoch);
+        try {
+            loadEpochValidationInput(epoch);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+
         return epochValidationInput.getPoolStates().stream()
                 .map(poolState -> PoolBlock.builder()
                         .poolId(poolState.getPoolId())
@@ -146,7 +197,13 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public HashSet<PoolReward> getTotalPoolRewardsInEpoch(int epoch) {
-        loadEpochValidationInput(epoch);
+        try {
+            loadEpochValidationInput(epoch);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+
         return epochValidationInput.getPoolRewards().stream()
                 .map(reward -> PoolReward.builder()
                         .poolId(reward.getPoolId())
@@ -158,30 +215,60 @@ public class JsonDataProvider implements DataProvider {
 
     @Override
     public HashSet<String> findSharedPoolRewardAddressWithoutReward(int epoch) {
-        loadEpochValidationInput(epoch);
+        try {
+            loadEpochValidationInput(epoch);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+
         return epochValidationInput.getSharedPoolRewardAddressesWithoutReward();
     }
 
     @Override
     public HashSet<String> getDeregisteredAccountsInEpoch(int epoch, long stabilityWindow) {
-        loadEpochValidationInput(epoch);
+        try {
+            loadEpochValidationInput(epoch);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+
         return epochValidationInput.getDeregisteredAccounts();
     }
 
     @Override
     public HashSet<String> getRegisteredAccountsUntilLastEpoch(Integer epoch, HashSet<String> stakeAddresses, Long stabilityWindow) {
-        loadEpochValidationInput(epoch);
+        try {
+            loadEpochValidationInput(epoch);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+
         return epochValidationInput.getRegisteredAccountsSinceLastEpoch();
     }
 
     @Override
     public HashSet<String> getRegisteredAccountsUntilNow(Integer epoch, HashSet<String> stakeAddresses, Long stabilityWindow) {
-        loadEpochValidationInput(epoch);
+        try {
+            loadEpochValidationInput(epoch);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+
         return epochValidationInput.getRegisteredAccountsUntilNow();
     }
 
     public EpochValidationInput getEpochValidationInput(int epoch) {
-        loadEpochValidationInput(epoch);
+        try {
+            loadEpochValidationInput(epoch);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return null;
+        }
+
         return epochValidationInput;
     }
 }

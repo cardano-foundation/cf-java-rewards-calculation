@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.cardanofoundation.rewards.validation.enums.DataType.*;
-import static org.cardanofoundation.rewards.validation.util.JsonConverter.writeObjectToJsonFile;
+import static org.cardanofoundation.rewards.validation.util.JsonConverter.writeObjectToCompressedJsonFile;
 
 @Service
 public class KoiosDataFetcher implements DataFetcher {
@@ -45,7 +45,7 @@ public class KoiosDataFetcher implements DataFetcher {
         }
 
         try {
-            writeObjectToJsonFile(adaPots, filePath);
+            writeObjectToCompressedJsonFile(adaPots, filePath);
         } catch (IOException e) {
             logger.error("Failed to write AdaPots to json file for epoch " + epoch);
         }
@@ -67,7 +67,7 @@ public class KoiosDataFetcher implements DataFetcher {
         }
 
         try {
-            writeObjectToJsonFile(epochInfo, filePath);
+            writeObjectToCompressedJsonFile(epochInfo, filePath);
         } catch (IOException e) {
             logger.error("Failed to write EpochInfo to json file for epoch " + epoch);
         }
@@ -89,7 +89,7 @@ public class KoiosDataFetcher implements DataFetcher {
         }
 
         try {
-            writeObjectToJsonFile(protocolParameters, filePath);
+            writeObjectToCompressedJsonFile(protocolParameters, filePath);
         } catch (IOException e) {
             logger.error("Failed to write ProtocolParameters to json file for epoch " + epoch);
         }
@@ -115,7 +115,7 @@ public class KoiosDataFetcher implements DataFetcher {
         PoolState poolState = koiosDataProvider.getPoolHistory(poolId, epoch);
 
         try {
-            writeObjectToJsonFile(poolState, filePath);
+            writeObjectToCompressedJsonFile(poolState, filePath);
         } catch (IOException e) {
             logger.error("Failed to write pool history to json file for epoch " + epoch);
         }

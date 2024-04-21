@@ -39,8 +39,13 @@ public class JsonDataPlotter implements DataPlotter {
             TreasuryValidationResult treasuryValidationResult = TreasuryValidationResult
                     .fromTreasuryCalculationResult(epochCalculationResult.getTreasuryCalculationResult());
             AdaPots adaPotsForCurrentEpoch = jsonDataProvider.getAdaPotsForEpoch(epoch);
-            treasuryValidationResult.setActualTreasury(adaPotsForCurrentEpoch.getTreasury());
-            epochTreasuryValidationResultMap.put(epoch, treasuryValidationResult);
+
+            if (adaPotsForCurrentEpoch != null) {
+                treasuryValidationResult.setActualTreasury(adaPotsForCurrentEpoch.getTreasury());
+                epochTreasuryValidationResultMap.put(epoch, treasuryValidationResult);
+            } else {
+                logger.warn("Failed to get AdaPots for epoch " + epoch + ". Skipping epoch.");
+            }
         }
 
         try {

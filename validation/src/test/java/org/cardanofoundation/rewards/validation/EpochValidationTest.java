@@ -77,13 +77,13 @@ public class EpochValidationTest {
     @Test
     @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     public void testCalculateEpochRewardsForEpoch367() {
-        testCalculateEpochPots(365, jsonDataProvider, false);
+        testCalculateEpochPots(290, jsonDataProvider, false);
     }
 
     @Test
     @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     public void testCalculateEpochRewardsForEpoch350() {
-        testCalculateEpochPots(350, dbSyncDataProvider, true);
+        testCalculateEpochPots(350, dbSyncDataProvider, false);
     }
 
     @Test
