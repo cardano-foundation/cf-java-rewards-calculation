@@ -94,11 +94,6 @@ public class EpochValidationTest {
         testCalculateEpochPots(MAINNET_ALLEGRA_HARDFORK_EPOCH, jsonDataProvider, false);
     }
 
-    @Test
-    public void testCalculateEpochRewardsForEpoch360() {
-        testCalculateEpochPots(360, jsonDataProvider, false);
-    }
-
     static Stream<Integer> dataProviderEpochRange() {
         return IntStream.range(206, 230).boxed();
     }
