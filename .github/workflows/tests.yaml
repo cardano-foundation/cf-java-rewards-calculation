@@ -44,7 +44,7 @@ jobs:
 
       - name: 🎳 Test
         run: |
-          ./mvnw --batch-mode --update-snapshots test
+          ./mvnw clean verify
 
       - name: 📊️ Publish coverage report to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
