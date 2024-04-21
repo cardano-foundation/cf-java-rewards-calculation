@@ -3,18 +3,72 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.cardanofoundation</groupId>
-        <artifactId>cf-rewards</artifactId>
-        <version>0.11.0</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
 
+    <groupId>org.cardanofoundation</groupId>
     <artifactId>cf-rewards-calculation</artifactId>
+    <version>0.12.0</version>
+
+    <name>cardano-reward-calculation</name>
 
     <description>This project aims to be a cardano reward calculation, java formula implementation and edge case
         documentation
     </description>
+
+    <scm>
+        <connection>scm:git:git://github.com/cardano-foundation/cf-java-rewards-calculation.git</connection>
+        <url>https://github.com/cardano-foundation/cf-java-rewards-calculation</url>
+        <developerConnection>scm:git:git://github.com/cardano-foundation/cf-java-rewards-calculation.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <issueManagement>
+        <url>https://github.com/cardano-foundation/cf-java-rewards-calculation/issues</url>
+        <system>GitHub issues</system>
+    </issueManagement>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <organization>Cardano Foundation</organization>
+            <organizationUrl>https://cardanofoundation.org</organizationUrl>
+        </developer>
+    </developers>
+
+    <organization>
+        <name>Cardano Foundation</name>
+        <url>https://cardanofoundation.org</url>
+    </organization>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <version.java>17</version.java>
+        <version.lombok>1.18.30</version.lombok>
+        <version.slf4j>2.0.12</version.slf4j>
+        <version.maven-site-plugin>4.0.0-M2</version.maven-site-plugin>
+        <version.maven-javadoc-plugin>3.6.3</version.maven-javadoc-plugin>
+        <version.maven-gpg-plugin>3.1.0</version.maven-gpg-plugin>
+        <version.flatten-maven-plugin>1.2.7</version.flatten-maven-plugin>
+        <version.maven-project-info-reports-plugin>3.3.0</version.maven-project-info-reports-plugin>
+    </properties>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+    </distributionManagement>
 
     <dependencies>
         <dependency>
@@ -33,6 +87,11 @@
             <artifactId>maven-gpg-plugin</artifactId>
             <version>${version.maven-gpg-plugin}</version>
             <type>maven-plugin</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>${version.maven-javadoc-plugin}</version>
         </dependency>
     </dependencies>
 
@@ -79,7 +138,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.4.1</version>
+                        <version>${version.maven-javadoc-plugin}</version>
                         <configuration>
                             <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
                             <doclint>none</doclint>
