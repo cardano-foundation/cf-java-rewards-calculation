@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.1](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.11.0...v0.11.1) (2024-04-21)
+
+
+### Bug Fixes
+
+* restructure parent dependencies to repair the package on maven central ([ee060ca](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/ee060ca30cd8ba43d655f2e9986c98382574fc11))
+
 ## [0.11.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.10.0...v0.11.0) (2024-04-21)
 
 
