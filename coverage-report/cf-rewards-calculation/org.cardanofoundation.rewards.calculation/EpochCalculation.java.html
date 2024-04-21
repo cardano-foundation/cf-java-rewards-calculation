@@ -34,23 +34,23 @@ import lombok.extern.slf4j.Slf4j;
                                                                   final HashSet&lt;String&gt; deregisteredAccountsOnEpochBoundary) {
 <span class="fc" id="L35">        final EpochCalculationResult epochCalculationResult = EpochCalculationResult.builder().epoch(epoch).build();</span>
 
-<span class="pc bpc" id="L37" title="1 of 2 branches missed.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) {</span>
-<span class="nc" id="L38">            log.warn(&quot;Epoch &quot; + epoch + &quot; is before the start of the Shelley era. No rewards were calculated in this epoch.&quot;);</span>
-<span class="nc" id="L39">            epochCalculationResult.setReserves(BigInteger.ZERO);</span>
-<span class="nc" id="L40">            epochCalculationResult.setTreasury(BigInteger.ZERO);</span>
-<span class="nc" id="L41">            epochCalculationResult.setTotalDistributedRewards(BigInteger.ZERO);</span>
-<span class="nc" id="L42">            epochCalculationResult.setTotalRewardsPot(BigInteger.ZERO);</span>
-<span class="nc" id="L43">            epochCalculationResult.setTotalPoolRewardsPot(BigInteger.ZERO);</span>
-<span class="nc" id="L44">            epochCalculationResult.setTotalAdaInCirculation(BigInteger.ZERO);</span>
-<span class="nc" id="L45">            return epochCalculationResult;</span>
-<span class="pc bpc" id="L46" title="1 of 2 branches missed.">        } else if (epoch == MAINNET_SHELLEY_START_EPOCH) {</span>
-<span class="nc" id="L47">            epochCalculationResult.setReserves(MAINNET_SHELLEY_INITIAL_RESERVES);</span>
-<span class="nc" id="L48">            epochCalculationResult.setTreasury(MAINNET_SHELLEY_INITIAL_TREASURY);</span>
-<span class="nc" id="L49">            epochCalculationResult.setTotalDistributedRewards(BigInteger.ZERO);</span>
-<span class="nc" id="L50">            epochCalculationResult.setTotalRewardsPot(BigInteger.ZERO);</span>
-<span class="nc" id="L51">            epochCalculationResult.setTotalPoolRewardsPot(BigInteger.ZERO);</span>
-<span class="nc" id="L52">            epochCalculationResult.setTotalAdaInCirculation(MAINNET_SHELLEY_INITIAL_UTXO);</span>
-<span class="nc" id="L53">            return epochCalculationResult;</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        if (epoch &lt; MAINNET_SHELLEY_START_EPOCH) {</span>
+<span class="fc" id="L38">            log.warn(&quot;Epoch &quot; + epoch + &quot; is before the start of the Shelley era. No rewards were calculated in this epoch.&quot;);</span>
+<span class="fc" id="L39">            epochCalculationResult.setReserves(BigInteger.ZERO);</span>
+<span class="fc" id="L40">            epochCalculationResult.setTreasury(BigInteger.ZERO);</span>
+<span class="fc" id="L41">            epochCalculationResult.setTotalDistributedRewards(BigInteger.ZERO);</span>
+<span class="fc" id="L42">            epochCalculationResult.setTotalRewardsPot(BigInteger.ZERO);</span>
+<span class="fc" id="L43">            epochCalculationResult.setTotalPoolRewardsPot(BigInteger.ZERO);</span>
+<span class="fc" id="L44">            epochCalculationResult.setTotalAdaInCirculation(BigInteger.ZERO);</span>
+<span class="fc" id="L45">            return epochCalculationResult;</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">        } else if (epoch == MAINNET_SHELLEY_START_EPOCH) {</span>
+<span class="fc" id="L47">            epochCalculationResult.setReserves(MAINNET_SHELLEY_INITIAL_RESERVES);</span>
+<span class="fc" id="L48">            epochCalculationResult.setTreasury(MAINNET_SHELLEY_INITIAL_TREASURY);</span>
+<span class="fc" id="L49">            epochCalculationResult.setTotalDistributedRewards(BigInteger.ZERO);</span>
+<span class="fc" id="L50">            epochCalculationResult.setTotalRewardsPot(BigInteger.ZERO);</span>
+<span class="fc" id="L51">            epochCalculationResult.setTotalPoolRewardsPot(BigInteger.ZERO);</span>
+<span class="fc" id="L52">            epochCalculationResult.setTotalAdaInCirculation(MAINNET_SHELLEY_INITIAL_UTXO);</span>
+<span class="fc" id="L53">            return epochCalculationResult;</span>
         }
 
 <span class="fc" id="L56">        BigInteger totalFeesForCurrentEpoch = BigInteger.ZERO;</span>
@@ -165,7 +165,7 @@ import lombok.extern.slf4j.Slf4j;
 <span class="fc" id="L165">        calculatedReserve = add(calculatedReserve, undistributedRewards);</span>
 <span class="fc" id="L166">        calculatedReserve = subtract(calculatedReserve, unspendableEarnedRewards);</span>
 
-<span class="pc bpc" id="L168" title="1 of 2 branches missed.">        if (epoch == MAINNET_ALLEGRA_HARDFORK_EPOCH) {</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">        if (epoch == MAINNET_ALLEGRA_HARDFORK_EPOCH) {</span>
             /*
                 &quot;The bootstrap addresses from Figure 6 were not intended to include the Byron era redeem
                 addresses (those with addrtype 2, see the Byron CDDL spec). These addresses were, however,
@@ -173,7 +173,7 @@ import lombok.extern.slf4j.Slf4j;
                 and the Ada contained in them was returned to the reserves.&quot;
                     - shelley-spec-ledger.pdf 17.5 p.115
              */
-<span class="nc" id="L176">            calculatedReserve = calculatedReserve.add(MAINNET_BOOTSTRAP_ADDRESS_AMOUNT);</span>
+<span class="fc" id="L176">            calculatedReserve = calculatedReserve.add(MAINNET_BOOTSTRAP_ADDRESS_AMOUNT);</span>
         }
 
 <span class="fc" id="L179">        log.debug(&quot;Unspendable earned rewards: &quot; + unspendableEarnedRewards.longValue() + &quot; Lovelace&quot;);</span>
