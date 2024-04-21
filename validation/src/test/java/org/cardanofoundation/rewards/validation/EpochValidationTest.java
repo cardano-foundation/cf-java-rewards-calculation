@@ -1,8 +1,8 @@
 package org.cardanofoundation.rewards.validation;
 
 import lombok.extern.slf4j.Slf4j;
-import org.cardanofoundation.rewards.calculation.domain.AdaPots;
-import org.cardanofoundation.rewards.calculation.domain.EpochCalculationResult;
+import org.cardanofoundation.rewards.calculation.EpochCalculation;
+import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
@@ -14,8 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
 
 @SpringBootTest
 @ComponentScan
@@ -31,6 +37,14 @@ public class EpochValidationTest {
         EpochCalculationResult epochCalculationResult = EpochValidation.calculateEpochRewardPots(epoch, dataProvider, detailedValidation);
         AdaPots adaPotsForCurrentEpoch = dataProvider.getAdaPotsForEpoch(epoch);
 
+        if (epoch < MAINNET_SHELLEY_START_EPOCH) {
+            log.info("Epoch " + epoch + " is before Shelley era, no rewards are calculated");
+            return;
+        } else if (epoch == MAINNET_SHELLEY_START_EPOCH) {
+            log.info("Epoch " + epoch + " is the first Shelley era epoch, no rewards are calculated");
+            return;
+        }
+
         log.info("Treasury difference: " + adaPotsForCurrentEpoch.getTreasury().subtract(epochCalculationResult.getTreasury()).longValue() + " Lovelace");
         log.info("Reserves difference: " + adaPotsForCurrentEpoch.getReserves().subtract(epochCalculationResult.getReserves()).longValue() + " Lovelace");
 
@@ -39,8 +53,54 @@ public class EpochValidationTest {
         Assertions.assertEquals(adaPotsForCurrentEpoch.getReserves(), epochCalculationResult.getReserves());
     }
 
+    @Test
+    public void testCalculateEpochRewardsForEpoch207() {
+        EpochCalculationResult epochCalculationResult = EpochCalculation.calculateEpochRewardPots(207,
+                BigInteger.ZERO,
+                BigInteger.ZERO,
+                new ProtocolParameters(),
+                new Epoch(),
+                new HashSet<>(),
+                new HashSet<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>()
+        );
+        Assertions.assertEquals(epochCalculationResult.getReserves(), BigInteger.ZERO);
+        Assertions.assertEquals(epochCalculationResult.getTreasury(), BigInteger.ZERO);
+    }
+
+    @Test
+    public void testCalculateEpochRewardsForEpoch208() {
+        EpochCalculationResult epochCalculationResult = EpochCalculation.calculateEpochRewardPots(208,
+                BigInteger.ZERO,
+                BigInteger.ZERO,
+                new ProtocolParameters(),
+                new Epoch(),
+                new HashSet<>(),
+                new HashSet<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>()
+        );
+        Assertions.assertEquals(epochCalculationResult.getReserves(), MAINNET_SHELLEY_INITIAL_RESERVES);
+        Assertions.assertEquals(epochCalculationResult.getTreasury(), MAINNET_SHELLEY_INITIAL_TREASURY);
+    }
+
+    @Test
+    public void testAllegraHardForkEpoch() {
+        testCalculateEpochPots(MAINNET_ALLEGRA_HARDFORK_EPOCH, jsonDataProvider, false);
+    }
+
+    @Test
+    public void testCalculateEpochRewardsForEpoch360() {
+        testCalculateEpochPots(360, jsonDataProvider, false);
+    }
+
     static Stream<Integer> dataProviderEpochRange() {
-        return IntStream.range(208, 230).boxed();
+        return IntStream.range(206, 230).boxed();
     }
 
     @ParameterizedTest
