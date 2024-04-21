@@ -2,7 +2,7 @@
 
 <p align="left">
 <a href="https://cardano-foundation.github.io/cf-java-rewards-calculation/coverage-report/"><img alt="Tests" src="https://github.com/cardano-foundation/cf-java-rewards-calculation/actions/workflows/tests.yaml/badge.svg?branch=main" /></a>
-<a href="https://cardano-foundation.github.io/cf-java-rewards-calculation/coverage-report/"><img alt="Coverage" src="https://github.com/cardano-foundation/cf-java-rewards-calculation/blob/gh-pages/badges/jacoco.svg?raw=true" /></a>
+<a href="https://cardano-foundation.github.io/cf-java-rewards-calculation/coverage-report/"><img alt="Coverage" src="https://cardano-foundation.github.io/cf-java-rewards-calculation/badges/jacoco.svg" /></a>
 <img alt="Release" src="https://github.com/cardano-foundation/cf-java-rewards-calculation/actions/workflows/release.yaml/badge.svg?branch=main" />
 <a href="https://central.sonatype.com/artifact/org.cardanofoundation/cf-rewards-calculation"><img alt="Publish" src="https://github.com/cardano-foundation/cf-java-rewards-calculation/actions/workflows/publish.yaml/badge.svg?branch=main" /></a>
 <a href="https://cardano-foundation.github.io/cf-java-rewards-calculation/report-latest/treasury_calculation.html"><img alt="Report" src="https://github.com/cardano-foundation/cf-java-rewards-calculation/actions/workflows/report.yaml/badge.svg?branch=main" /></a>
