@@ -7,8 +7,8 @@
     <groupId>org.cardanofoundation</groupId>
     <artifactId>cf-rewards-calculation</artifactId>
     <version>0.11.1</version>
-
     <name>cardano-reward-calculation</name>
+    <url>https://github.com/cardano-foundation/cf-java-rewards-calculation.git</url>
 
     <description>This project aims to be a cardano reward calculation, java formula implementation and edge case
         documentation
