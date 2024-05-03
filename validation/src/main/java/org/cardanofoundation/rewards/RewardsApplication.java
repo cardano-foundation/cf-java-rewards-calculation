@@ -2,6 +2,7 @@ package org.cardanofoundation.rewards;
 
 import org.cardanofoundation.rewards.validation.data.fetcher.DbSyncDataFetcher;
 import org.cardanofoundation.rewards.validation.data.fetcher.KoiosDataFetcher;
+import org.cardanofoundation.rewards.validation.data.plotter.CsvDataPlotter;
 import org.cardanofoundation.rewards.validation.data.plotter.JsonDataPlotter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,9 @@ public class RewardsApplication implements ApplicationRunner {
   private JsonDataPlotter jsonDataPlotter;
 
   @Autowired
+  private CsvDataPlotter csvDataPlotter;
+
+  @Autowired
   private KoiosDataFetcher koiosDataFetcher;
 
   @Autowired(required = false)
@@ -89,7 +93,11 @@ public class RewardsApplication implements ApplicationRunner {
             }
           }
       } else if (runMode.equals("plot")) {
-        jsonDataPlotter.plot(startEpoch, endEpoch);
+          if (activeProfiles.contains("csv")) {
+              csvDataPlotter.plot(startEpoch, endEpoch);
+          } else {
+              jsonDataPlotter.plot(startEpoch, endEpoch);
+          }
       } else if (!runMode.equals("test")) {
           logger.warn("Unknown run mode: " + runMode);
       }

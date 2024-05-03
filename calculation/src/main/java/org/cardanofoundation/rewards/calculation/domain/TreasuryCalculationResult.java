@@ -15,4 +15,5 @@ public class TreasuryCalculationResult {
     BigInteger totalRewardPot;
     BigInteger treasuryWithdrawals;
     BigInteger unspendableEarnedRewards;
+    BigInteger unclaimedRefunds;
 }

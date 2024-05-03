@@ -80,6 +80,7 @@ public class EpochCalculation {
 
         // The sum of all the refunds attached to unregistered reward accounts are added to the
         // treasury (see: Pool Reap Transition, p.53, figure 40, shelley-ledger.pdf)
+        BigInteger unclaimedRefunds = BigInteger.ZERO;
         if (rewardAddressesOfRetiredPools.size() > 0) {
             List<String> deregisteredOwnerAccounts = deregisteredAccountsOnEpochBoundary.stream()
                     .filter(rewardAddressesOfRetiredPools::contains).toList();
@@ -95,6 +96,7 @@ public class EpochCalculation {
                     // If the reward address has been unregistered, the deposit can not be returned
                     // and will be added to the treasury instead (Pool Reap see: shelley-ledger.pdf p.53)
                     treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(POOL_DEPOSIT_IN_LOVELACE);
+                    unclaimedRefunds = unclaimedRefunds.add(POOL_DEPOSIT_IN_LOVELACE);
                 }
             }
         }
@@ -185,6 +187,7 @@ public class EpochCalculation {
                 .totalRewardPot(rewardPot)
                 .treasuryWithdrawals(treasuryWithdrawals)
                 .unspendableEarnedRewards(unspendableEarnedRewards)
+                .unclaimedRefunds(unclaimedRefunds)
                 .build();
 
         epochCalculationResult.setTotalDistributedRewards(totalDistributedRewards);

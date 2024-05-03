@@ -31,6 +31,7 @@ public class TreasuryCalculation {
               .totalRewardPot(BigInteger.ZERO)
               .treasuryWithdrawals(BigInteger.ZERO)
               .unspendableEarnedRewards(BigInteger.ZERO)
+              .unclaimedRefunds(BigInteger.ZERO)
               .build();
     }
 
@@ -58,13 +59,14 @@ public class TreasuryCalculation {
     final BigInteger treasuryCut = multiplyAndFloor(totalRewardPot, treasuryGrowthRate);
     BigInteger treasuryForCurrentEpoch = treasuryInPreviousEpoch.add(treasuryCut);
 
+    BigInteger unclaimedRefunds = BigInteger.ZERO;
     if (rewardAddressesOfRetiredPools.size() > 0) {
       HashSet<String> deregisteredRewardAccounts = deregisteredAccounts.stream()
               .filter(rewardAddressesOfRetiredPools::contains).collect(Collectors.toCollection(HashSet::new));
       List<String> ownerAccountsRegisteredInThePast = registeredAccountsUntilNow.stream()
               .filter(rewardAddressesOfRetiredPools::contains).toList();
 
-      BigInteger unclaimedRefunds = calculateUnclaimedRefundsForRetiredPools(rewardAddressesOfRetiredPools, deregisteredRewardAccounts, ownerAccountsRegisteredInThePast);
+      unclaimedRefunds = calculateUnclaimedRefundsForRetiredPools(rewardAddressesOfRetiredPools, deregisteredRewardAccounts, ownerAccountsRegisteredInThePast);
       treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(unclaimedRefunds);
     }
 
@@ -84,6 +86,7 @@ public class TreasuryCalculation {
             .totalRewardPot(totalRewardPot)
             .treasuryWithdrawals(treasuryWithdrawals)
             .unspendableEarnedRewards(unspendableEarnedRewards)
+            .unclaimedRefunds(unclaimedRefunds)
             .build();
     }
 
