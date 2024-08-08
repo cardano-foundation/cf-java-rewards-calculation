@@ -1,10 +1,14 @@
 package org.cardanofoundation.rewards.validation.data.provider;
 
+import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.calculation.enums.MirPot;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
@@ -14,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 
 @SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ComponentScan
 @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
 public class DbSyncDataProviderTest {
@@ -21,9 +26,20 @@ public class DbSyncDataProviderTest {
     @Autowired
     DbSyncDataProvider dbSyncDataProvider;
 
+    @Value("${cardano.protocol.magic}")
+    private int cardanoProtocolMagic;
+
+    NetworkConfig networkConfig;
+
+    @BeforeAll
+    public void setup() {
+        networkConfig = NetworkConfig.getNetworkConfigByNetworkMagic(cardanoProtocolMagic);
+    }
+
+
     @Test
     public void testGetEpochs() {
-        Epoch epoch = dbSyncDataProvider.getEpochInfo(220);
+        Epoch epoch = dbSyncDataProvider.getEpochInfo(220, networkConfig);
         Assertions.assertEquals(epoch.getNumber(), 220);
         Assertions.assertEquals(epoch.getFees(), new BigInteger("5135934788"));
         Assertions.assertEquals(epoch.getBlockCount(), 21627);
@@ -31,7 +47,7 @@ public class DbSyncDataProviderTest {
 
     @Test
     public void testGetEpochInfoOf215() {
-        Epoch epoch = dbSyncDataProvider.getEpochInfo(215);
+        Epoch epoch = dbSyncDataProvider.getEpochInfo(215, networkConfig);
         Assertions.assertEquals(epoch.getNumber(), 215);
         Assertions.assertEquals(epoch.getFees(), new BigInteger("8110049274"));
         Assertions.assertEquals(epoch.getBlockCount(), 21572);

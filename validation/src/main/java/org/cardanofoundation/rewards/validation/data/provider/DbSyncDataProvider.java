@@ -1,6 +1,7 @@
 package org.cardanofoundation.rewards.validation.data.provider;
 
 import lombok.extern.slf4j.Slf4j;
+import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.calculation.domain.PoolBlock;
 import org.cardanofoundation.rewards.validation.domain.PoolReward;
@@ -18,8 +19,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.MAINNET_SHELLEY_START_EPOCH;
 
 @Service
 @Slf4j
@@ -66,8 +65,8 @@ public class DbSyncDataProvider implements DataProvider {
     }
 
     @Override
-    public Epoch getEpochInfo(int epoch) {
-        if (epoch < MAINNET_SHELLEY_START_EPOCH) {
+    public Epoch getEpochInfo(int epoch, NetworkConfig networkConfig) {
+        if (epoch < networkConfig.getShelleyStartEpoch()) {
             return null;
         }
 

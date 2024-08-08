@@ -1,5 +1,6 @@
 package org.cardanofoundation.rewards.validation.data.plotter;
 
+import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.calculation.domain.AdaPots;
 import org.cardanofoundation.rewards.calculation.domain.EpochCalculationResult;
 import org.cardanofoundation.rewards.validation.EpochValidation;
@@ -25,7 +26,7 @@ public class JsonDataPlotter implements DataPlotter {
     private JsonDataProvider jsonDataProvider;
 
     @Override
-    public void plot(int epochStart, int epochEnd) {
+    public void plot(int epochStart, int epochEnd, NetworkConfig networkConfig) {
         if (epochStart > epochEnd) {
             throw new IllegalArgumentException("epochStart must be less than or equal to epochEnd");
         }
@@ -35,7 +36,7 @@ public class JsonDataPlotter implements DataPlotter {
         for (int epoch = epochStart; epoch < epochEnd; epoch++) {
             boolean detailedValidation = false;
             EpochCalculationResult epochCalculationResult = EpochValidation.calculateEpochRewardPots(epoch,
-                    jsonDataProvider, detailedValidation);
+                    jsonDataProvider, detailedValidation, networkConfig);
             TreasuryValidationResult treasuryValidationResult = TreasuryValidationResult
                     .fromTreasuryCalculationResult(epochCalculationResult.getTreasuryCalculationResult());
             AdaPots adaPotsForCurrentEpoch = jsonDataProvider.getAdaPotsForEpoch(epoch);
