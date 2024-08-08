@@ -21,7 +21,7 @@ public class EpochValidation {
     }
 
     public static EpochCalculationResult calculateEpochRewardPots(int epoch, DataProvider dataProvider, boolean detailedValidation, NetworkConfig networkConfig) {
-        if (epoch < networkConfig.getMainnetShelleyStartEpoch()) {
+        if (epoch < networkConfig.getShelleyStartEpoch()) {
             log.warn("Epoch " + epoch + " is before the start of the Shelley era. No rewards were calculated in this epoch.");
             return EpochCalculationResult.builder()
                     .totalRewardsPot(BigInteger.ZERO)
@@ -36,7 +36,7 @@ public class EpochValidation {
                     .totalDistributedRewards(BigInteger.ZERO)
                     .epoch(epoch)
                     .build();
-        } else if (epoch == networkConfig.getMainnetShelleyStartEpoch()) {
+        } else if (epoch == networkConfig.getShelleyStartEpoch()) {
             return EpochCalculationResult.builder()
                     .totalRewardsPot(BigInteger.ZERO)
                     .treasury(BigInteger.ZERO)
@@ -46,7 +46,7 @@ public class EpochValidation {
                             .treasuryWithdrawals(BigInteger.ZERO)
                             .unspendableEarnedRewards(BigInteger.ZERO)
                             .epoch(epoch).build())
-                    .reserves(networkConfig.getMainnetShelleyInitialReserves())
+                    .reserves(networkConfig.getShelleyInitialReserves())
                     .totalDistributedRewards(BigInteger.ZERO)
                     .epoch(epoch)
                     .build();
@@ -130,7 +130,7 @@ public class EpochValidation {
             HashSet<String> deregisteredAccounts;
             HashSet<String> deregisteredAccountsOnEpochBoundary;
             HashSet<String> lateDeregisteredAccounts = new HashSet<>();
-            if (epoch - 2 < networkConfig.getMainnetVasilHardforkEpoch()) {
+            if (epoch - 2 < networkConfig.getVasilHardforkEpoch()) {
                 deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, networkConfig.getRandomnessStabilisationWindow());
                 deregisteredAccountsOnEpochBoundary = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, networkConfig.getExpectedSlotsPerEpoch());
                 lateDeregisteredAccounts = deregisteredAccountsOnEpochBoundary.stream().filter(account -> !deregisteredAccounts.contains(account)).collect(Collectors.toCollection(HashSet::new));
@@ -140,7 +140,7 @@ public class EpochValidation {
             }
 
             HashSet<String> sharedPoolRewardAddressesWithoutReward = new HashSet<>();
-            if (epoch - 2 < networkConfig.getMainnetAllegraHardforkEpoch()) {
+            if (epoch - 2 < networkConfig.getAllegraHardforkEpoch()) {
                 sharedPoolRewardAddressesWithoutReward = dataProvider.findSharedPoolRewardAddressWithoutReward(epoch - 2);
             }
             HashSet<String> poolRewardAddresses = poolStates.stream().map(PoolState::getRewardAddress).collect(Collectors.toCollection(HashSet::new));
@@ -150,7 +150,7 @@ public class EpochValidation {
             // Since the Vasil hard fork, the unregistered accounts will not filter out before the
             // rewards calculation starts (at the stability window). They will be filtered out on the
             // epoch boundary when the reward update will be applied.
-            if (epoch - 2 >= networkConfig.getMainnetVasilHardforkEpoch()) {
+            if (epoch - 2 >= networkConfig.getVasilHardforkEpoch()) {
                 stabilityWindow = networkConfig.getExpectedSlotsPerEpoch();
             }
 

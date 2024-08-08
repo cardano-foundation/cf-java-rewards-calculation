@@ -25,7 +25,7 @@ public class TreasuryCalculation {
                                                                    NetworkConfig networkConfig) {
     // The Shelley era and the ada pot system started on mainnet in epoch 208.
     // Fee and treasury values are 0 for epoch 208.
-    if (epoch <= networkConfig.getMainnetShelleyStartEpoch()) {
+    if (epoch <= networkConfig.getShelleyStartEpoch()) {
       return TreasuryCalculationResult.builder()
               .treasury(BigInteger.ZERO)
               .epoch(epoch)

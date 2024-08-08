@@ -50,10 +50,10 @@ public class EpochValidationTest {
         EpochCalculationResult epochCalculationResult = EpochValidation.calculateEpochRewardPots(epoch, dataProvider, detailedValidation, networkConfig);
         AdaPots adaPotsForCurrentEpoch = dataProvider.getAdaPotsForEpoch(epoch);
 
-        if (epoch < networkConfig.getMainnetShelleyStartEpoch()) {
+        if (epoch < networkConfig.getShelleyStartEpoch()) {
             log.info("Epoch " + epoch + " is before Shelley era, no rewards are calculated");
             return;
-        } else if (epoch == networkConfig.getMainnetShelleyStartEpoch()) {
+        } else if (epoch == networkConfig.getShelleyStartEpoch()) {
             log.info("Epoch " + epoch + " is the first Shelley era epoch, no rewards are calculated");
             return;
         }
@@ -98,13 +98,13 @@ public class EpochValidationTest {
                 new ArrayList<>(),
                 new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(), networkConfig
         );
-        Assertions.assertEquals(epochCalculationResult.getReserves(), networkConfig.getMainnetShelleyInitialReserves());
-        Assertions.assertEquals(epochCalculationResult.getTreasury(), networkConfig.getMainnetShelleyInitialTreasury());
+        Assertions.assertEquals(epochCalculationResult.getReserves(), networkConfig.getShelleyInitialReserves());
+        Assertions.assertEquals(epochCalculationResult.getTreasury(), networkConfig.getShelleyInitialTreasury());
     }
 
     @Test
     public void testAllegraHardForkEpoch() {
-        testCalculateEpochPots(networkConfig.getMainnetAllegraHardforkEpoch(), jsonDataProvider, false);
+        testCalculateEpochPots(networkConfig.getAllegraHardforkEpoch(), jsonDataProvider, false);
     }
 
     static Stream<Integer> dataProviderEpochRange() {

@@ -15,21 +15,21 @@ public class NetworkConfig {
     private BigInteger totalLovelace;
     private BigInteger poolDepositInLovelace;
     private long expectedSlotsPerEpoch;
-    private BigInteger mainnetShelleyInitialReserves;
-    private BigInteger mainnetShelleyInitialTreasury;
-    private BigInteger mainnetShelleyInitialUtxo;
+    private BigInteger shelleyInitialReserves;
+    private BigInteger shelleyInitialTreasury;
+    private BigInteger shelleyInitialUtxo;
     private int genesisConfigSecurityParameter;
-    private int mainnetShelleyStartEpoch;
-    private int mainnetAllegraHardforkEpoch;
-    private int mainnetVasilHardforkEpoch;
-    private BigInteger mainnetBootstrapAddressAmount;
+    private int shelleyStartEpoch;
+    private int allegraHardforkEpoch;
+    private int vasilHardforkEpoch;
+    private BigInteger bootstrapAddressAmount;
     private double activeSlotCoefficient;
     private long randomnessStabilisationWindow;
-    private BigDecimal mainnetShelleyStartDecentralisation;
-    private BigDecimal mainnetShelleyStartTreasuryGrowRate;
-    private BigDecimal mainnetShelleyStartMonetaryExpandRate;
-    private int mainnetShelleyStartOptimalPoolCount;
-    private BigDecimal mainnetShelleyStartPoolOwnerInfluence;
+    private BigDecimal shelleyStartDecentralisation;
+    private BigDecimal shelleyStartTreasuryGrowRate;
+    private BigDecimal shelleyStartMonetaryExpandRate;
+    private int shelleyStartOptimalPoolCount;
+    private BigDecimal shelleyStartPoolOwnerInfluence;
 
     public static final int MAINNET_NETWORK_MAGIC = 764824073;
     public static final int PREPROD_NETWORK_MAGIC = 1;
@@ -42,21 +42,21 @@ public class NetworkConfig {
                 .totalLovelace(new BigInteger("45000000000000000"))
                 .poolDepositInLovelace(BigInteger.valueOf(500000000))
                 .expectedSlotsPerEpoch(432000)
-                .mainnetShelleyInitialReserves(new BigInteger("13888022852926644"))
-                .mainnetShelleyInitialTreasury(new BigInteger("0"))
-                .mainnetShelleyInitialUtxo(new BigInteger("31111977147073356"))
+                .shelleyInitialReserves(new BigInteger("13888022852926644"))
+                .shelleyInitialTreasury(new BigInteger("0"))
+                .shelleyInitialUtxo(new BigInteger("31111977147073356"))
                 .genesisConfigSecurityParameter(2160)
-                .mainnetShelleyStartEpoch(208)
-                .mainnetAllegraHardforkEpoch(236)
-                .mainnetVasilHardforkEpoch(365)
-                .mainnetBootstrapAddressAmount(new BigInteger("318200635000000"))
+                .shelleyStartEpoch(208)
+                .allegraHardforkEpoch(236)
+                .vasilHardforkEpoch(365)
+                .bootstrapAddressAmount(new BigInteger("318200635000000"))
                 .activeSlotCoefficient(0.05)
                 .randomnessStabilisationWindow(172800)
-                .mainnetShelleyStartDecentralisation(BigDecimal.valueOf(1.0))
-                .mainnetShelleyStartTreasuryGrowRate(BigDecimal.valueOf(0.2))
-                .mainnetShelleyStartMonetaryExpandRate(BigDecimal.valueOf(0.003))
-                .mainnetShelleyStartOptimalPoolCount(150)
-                .mainnetShelleyStartPoolOwnerInfluence(BigDecimal.valueOf(0.03))
+                .shelleyStartDecentralisation(BigDecimal.valueOf(1.0))
+                .shelleyStartTreasuryGrowRate(BigDecimal.valueOf(0.2))
+                .shelleyStartMonetaryExpandRate(BigDecimal.valueOf(0.003))
+                .shelleyStartOptimalPoolCount(150)
+                .shelleyStartPoolOwnerInfluence(BigDecimal.valueOf(0.03))
                 .build();
     }
 
@@ -66,21 +66,21 @@ public class NetworkConfig {
                 .totalLovelace(new BigInteger("45000000000000000"))
                 .poolDepositInLovelace(BigInteger.valueOf(500000000))
                 .expectedSlotsPerEpoch(432000)
-                .mainnetShelleyInitialReserves(new BigInteger("14991000000000000"))
-                .mainnetShelleyInitialTreasury(new BigInteger("9000000000000"))
-                .mainnetShelleyInitialUtxo(new BigInteger("30009000000000000"))
+                .shelleyInitialReserves(new BigInteger("14991000000000000"))
+                .shelleyInitialTreasury(new BigInteger("9000000000000"))
+                .shelleyInitialUtxo(new BigInteger("30009000000000000"))
                 .genesisConfigSecurityParameter(2160)
-                .mainnetShelleyStartEpoch(4)
-                .mainnetAllegraHardforkEpoch(5)
-                .mainnetVasilHardforkEpoch(12)
-                .mainnetBootstrapAddressAmount(new BigInteger("0"))
+                .shelleyStartEpoch(4)
+                .allegraHardforkEpoch(5)
+                .vasilHardforkEpoch(12)
+                .bootstrapAddressAmount(new BigInteger("0"))
                 .activeSlotCoefficient(0.05)
                 .randomnessStabilisationWindow(172800) // (4 * GENESIS_CONFIG_SECURITY_PARAMETER) / ACTIVE_SLOT_COEFFICIENT
-                .mainnetShelleyStartDecentralisation(BigDecimal.valueOf(1.0))
-                .mainnetShelleyStartTreasuryGrowRate(BigDecimal.valueOf(0.2))
-                .mainnetShelleyStartMonetaryExpandRate(BigDecimal.valueOf(0.003))
-                .mainnetShelleyStartOptimalPoolCount(150)
-                .mainnetShelleyStartPoolOwnerInfluence(BigDecimal.valueOf(0.03))
+                .shelleyStartDecentralisation(BigDecimal.valueOf(1.0))
+                .shelleyStartTreasuryGrowRate(BigDecimal.valueOf(0.2))
+                .shelleyStartMonetaryExpandRate(BigDecimal.valueOf(0.003))
+                .shelleyStartOptimalPoolCount(150)
+                .shelleyStartPoolOwnerInfluence(BigDecimal.valueOf(0.03))
                 .build();
     }
 
@@ -90,21 +90,21 @@ public class NetworkConfig {
                 .totalLovelace(new BigInteger("45000000000000000"))
                 .poolDepositInLovelace(BigInteger.valueOf(500000000))
                 .expectedSlotsPerEpoch(86400)
-                .mainnetShelleyInitialReserves(new BigInteger("14991000000000000"))
-                .mainnetShelleyInitialTreasury(new BigInteger("9000000000000"))
-                .mainnetShelleyInitialUtxo(new BigInteger("30009000000000000"))
+                .shelleyInitialReserves(new BigInteger("14991000000000000"))
+                .shelleyInitialTreasury(new BigInteger("9000000000000"))
+                .shelleyInitialUtxo(new BigInteger("30009000000000000"))
                 .genesisConfigSecurityParameter(432)
-                .mainnetShelleyStartEpoch(1)
-                .mainnetAllegraHardforkEpoch(1)
-                .mainnetVasilHardforkEpoch(3)
-                .mainnetBootstrapAddressAmount(new BigInteger("0"))
+                .shelleyStartEpoch(1)
+                .allegraHardforkEpoch(1)
+                .vasilHardforkEpoch(3)
+                .bootstrapAddressAmount(new BigInteger("0"))
                 .activeSlotCoefficient(0.05)
                 .randomnessStabilisationWindow(34560) // (4 * GENESIS_CONFIG_SECURITY_PARAMETER) / ACTIVE_SLOT_COEFFICIENT
-                .mainnetShelleyStartDecentralisation(BigDecimal.valueOf(1.0))
-                .mainnetShelleyStartTreasuryGrowRate(BigDecimal.valueOf(0.2))
-                .mainnetShelleyStartMonetaryExpandRate(BigDecimal.valueOf(0.003))
-                .mainnetShelleyStartOptimalPoolCount(150)
-                .mainnetShelleyStartPoolOwnerInfluence(BigDecimal.valueOf(0.03))
+                .shelleyStartDecentralisation(BigDecimal.valueOf(1.0))
+                .shelleyStartTreasuryGrowRate(BigDecimal.valueOf(0.2))
+                .shelleyStartMonetaryExpandRate(BigDecimal.valueOf(0.003))
+                .shelleyStartOptimalPoolCount(150)
+                .shelleyStartPoolOwnerInfluence(BigDecimal.valueOf(0.03))
                 .build();
     }
 
@@ -114,21 +114,21 @@ public class NetworkConfig {
                 .totalLovelace(new BigInteger("45000000000000000"))
                 .poolDepositInLovelace(BigInteger.valueOf(500000000))
                 .expectedSlotsPerEpoch(86400)
-                .mainnetShelleyInitialReserves(new BigInteger("14991000000000000"))
-                .mainnetShelleyInitialTreasury(new BigInteger("9000000000000"))
-                .mainnetShelleyInitialUtxo(new BigInteger("30009000000000000"))
+                .shelleyInitialReserves(new BigInteger("14991000000000000"))
+                .shelleyInitialTreasury(new BigInteger("9000000000000"))
+                .shelleyInitialUtxo(new BigInteger("30009000000000000"))
                 .genesisConfigSecurityParameter(432)
-                .mainnetShelleyStartEpoch(1)
-                .mainnetAllegraHardforkEpoch(1)
-                .mainnetVasilHardforkEpoch(3)
-                .mainnetBootstrapAddressAmount(new BigInteger("0"))
+                .shelleyStartEpoch(1)
+                .allegraHardforkEpoch(1)
+                .vasilHardforkEpoch(3)
+                .bootstrapAddressAmount(new BigInteger("0"))
                 .activeSlotCoefficient(0.05)
                 .randomnessStabilisationWindow(34560) // (4 * GENESIS_CONFIG_SECURITY_PARAMETER) / ACTIVE_SLOT_COEFFICIENT
-                .mainnetShelleyStartDecentralisation(BigDecimal.valueOf(1.0))
-                .mainnetShelleyStartTreasuryGrowRate(BigDecimal.valueOf(0.2))
-                .mainnetShelleyStartMonetaryExpandRate(BigDecimal.valueOf(0.003))
-                .mainnetShelleyStartOptimalPoolCount(150)
-                .mainnetShelleyStartPoolOwnerInfluence(BigDecimal.valueOf(0.03))
+                .shelleyStartDecentralisation(BigDecimal.valueOf(1.0))
+                .shelleyStartTreasuryGrowRate(BigDecimal.valueOf(0.2))
+                .shelleyStartMonetaryExpandRate(BigDecimal.valueOf(0.003))
+                .shelleyStartOptimalPoolCount(150)
+                .shelleyStartPoolOwnerInfluence(BigDecimal.valueOf(0.03))
                 .build();
     }
 

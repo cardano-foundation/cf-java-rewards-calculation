@@ -67,7 +67,7 @@ public class PoolRewardValidation {
         // Until the Allegra hard fork, this method will be used to emulate the old behavior
         boolean ignoreLeaderReward = false;
 
-        if (epoch < networkConfig.getMainnetAllegraHardforkEpoch()) {
+        if (epoch < networkConfig.getAllegraHardforkEpoch()) {
             ignoreLeaderReward = poolIdsWithSharedRewardAddresses.contains(poolId);
         }
 
@@ -89,10 +89,10 @@ public class PoolRewardValidation {
 
         PoolRewardCalculationResult poolRewardsCalculationResult = PoolRewardCalculationResult.builder()
                 .poolId(poolId).epoch(epoch).poolReward(BigInteger.ZERO).build();
-        if (epoch < networkConfig.getMainnetShelleyStartEpoch()) {
+        if (epoch < networkConfig.getShelleyStartEpoch()) {
             log.warn("Epoch " + epoch + " is before the start of the Shelley era. No rewards were calculated in this epoch.");
             return poolRewardsCalculationResult;
-        } else if (epoch == networkConfig.getMainnetShelleyStartEpoch()) {
+        } else if (epoch == networkConfig.getShelleyStartEpoch()) {
             return poolRewardsCalculationResult;
         }
 
@@ -186,7 +186,7 @@ public class PoolRewardValidation {
 
             HashSet<String> accountDeregistrations;
             HashSet<String> lateAccountDeregistrations = new HashSet<>();
-            if (epoch < networkConfig.getMainnetVasilHardforkEpoch()) {
+            if (epoch < networkConfig.getVasilHardforkEpoch()) {
                 accountDeregistrations = dataProvider.getDeregisteredAccountsInEpoch(epoch + 1, networkConfig.getRandomnessStabilisationWindow());
                 HashSet<String> deregisteredAccountsOnEpochBoundary = dataProvider.getDeregisteredAccountsInEpoch(epoch + 1, networkConfig.getExpectedSlotsPerEpoch());
                 lateAccountDeregistrations = deregisteredAccountsOnEpochBoundary.stream().filter(account -> !accountDeregistrations.contains(account)).collect(Collectors.toCollection(HashSet::new));
@@ -204,7 +204,7 @@ public class PoolRewardValidation {
             // Since the Vasil hard fork, the unregistered accounts will not filter out before the
             // rewards calculation starts (at the stability window). They will be filtered out on the
             // epoch boundary when the reward update will be applied.
-            if (epoch >= networkConfig.getMainnetVasilHardforkEpoch()) {
+            if (epoch >= networkConfig.getVasilHardforkEpoch()) {
                 stabilityWindow = networkConfig.getExpectedSlotsPerEpoch();
             }
 

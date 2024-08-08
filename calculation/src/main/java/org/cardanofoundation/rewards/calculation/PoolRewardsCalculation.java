@@ -149,7 +149,7 @@ public class PoolRewardsCalculation {
             a reward update. As in the Shelley era, though, they are still filtered on the epoch boundary
             when the reward update is applied
         */
-        if (earnedEpoch >= networkConfig.getMainnetVasilHardforkEpoch()) {
+        if (earnedEpoch >= networkConfig.getVasilHardforkEpoch()) {
             lateDeregisteredAccounts.addAll(deregisteredAccounts);
             deregisteredAccounts.clear();
         }
@@ -212,7 +212,7 @@ public class PoolRewardsCalculation {
 
         if (!accountsRegisteredInThePast.contains(rewardAddress)) {
             log.info(poolRewardCalculationResult.getRewardAddress() + " has never been registered. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
-            if (earnedEpoch >= networkConfig.getMainnetVasilHardforkEpoch()) {
+            if (earnedEpoch >= networkConfig.getVasilHardforkEpoch()) {
                 unspendableEarnedRewards = poolOperatorReward;
             }
             poolOperatorReward = BigInteger.ZERO;
@@ -244,7 +244,7 @@ public class PoolRewardsCalculation {
                 shelley-ledger.pdf | 17.4 Reward aggregation | p. 114
              */
             if (stakeAddress.equals(poolStateCurrentEpoch.getRewardAddress())
-                    && earnedEpoch < networkConfig.getMainnetAllegraHardforkEpoch()) {
+                    && earnedEpoch < networkConfig.getAllegraHardforkEpoch()) {
                 continue;
             }
 

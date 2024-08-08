@@ -44,7 +44,7 @@ public class DbSyncDataFetcher implements DataFetcher {
         String filePath = String.format("%s/epoch-validation-input-%d.json.gz", sourceFolder, epoch);
         File outputFile = new File(filePath);
 
-        if (epoch <= networkConfig.getMainnetShelleyStartEpoch()) {
+        if (epoch <= networkConfig.getShelleyStartEpoch()) {
             logger.info("Skip to fetch epoch validation input data for epoch " + epoch + " because the epoch is before the start of the Shelley era");
             return;
         }
@@ -86,7 +86,7 @@ public class DbSyncDataFetcher implements DataFetcher {
         HashSet<String> deregisteredAccountsOnEpochBoundary;
         HashSet<String> lateDeregisteredAccounts = new HashSet<>();
         HashSet<String> rewardAddressesOfRetiredPoolsInEpoch = dbSyncDataProvider.getRewardAddressesOfRetiredPoolsInEpoch(epoch);
-        if (epoch - 2 < networkConfig.getMainnetVasilHardforkEpoch()) {
+        if (epoch - 2 < networkConfig.getVasilHardforkEpoch()) {
             deregisteredAccounts = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch - 1, networkConfig.getRandomnessStabilisationWindow());
             deregisteredAccountsOnEpochBoundary = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch - 1, networkConfig.getExpectedSlotsPerEpoch());
             lateDeregisteredAccounts = deregisteredAccountsOnEpochBoundary.stream().filter(account -> !deregisteredAccounts.contains(account)).collect(Collectors.toCollection(HashSet::new));
@@ -96,7 +96,7 @@ public class DbSyncDataFetcher implements DataFetcher {
         }
 
         HashSet<String> sharedPoolRewardAddressesWithoutReward = new HashSet<>();
-        if (epoch - 2 < networkConfig.getMainnetAllegraHardforkEpoch()) {
+        if (epoch - 2 < networkConfig.getAllegraHardforkEpoch()) {
             sharedPoolRewardAddressesWithoutReward = dbSyncDataProvider.findSharedPoolRewardAddressWithoutReward(epoch - 2);
         }
         HashSet<String> poolRewardAddresses = poolStates.stream().map(PoolState::getRewardAddress).collect(Collectors.toCollection(HashSet::new));
@@ -106,7 +106,7 @@ public class DbSyncDataFetcher implements DataFetcher {
         // Since the Vasil hard fork, the unregistered accounts will not filter out before the
         // rewards calculation starts (at the stability window). They will be filtered out on the
         // epoch boundary when the reward update will be applied.
-        if (epoch - 2 >= networkConfig.getMainnetVasilHardforkEpoch()) {
+        if (epoch - 2 >= networkConfig.getVasilHardforkEpoch()) {
             stabilityWindow = networkConfig.getExpectedSlotsPerEpoch();
         }
 

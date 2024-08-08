@@ -66,7 +66,7 @@ public class DbSyncDataProvider implements DataProvider {
 
     @Override
     public Epoch getEpochInfo(int epoch, NetworkConfig networkConfig) {
-        if (epoch < networkConfig.getMainnetShelleyStartEpoch()) {
+        if (epoch < networkConfig.getShelleyStartEpoch()) {
             return null;
         }
 
