@@ -1,5 +1,6 @@
 package org.cardanofoundation.rewards.validation.data.fetcher;
 
+import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
@@ -22,8 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
-
 @Service
 public class DbSyncDataFetcher implements DataFetcher {
 
@@ -41,11 +40,11 @@ public class DbSyncDataFetcher implements DataFetcher {
     private String sourceFolder;
 
     @Override
-    public void fetch(int epoch, boolean override, boolean skipValidationData) {
+    public void fetch(int epoch, boolean override, boolean skipValidationData, NetworkConfig networkConfig) {
         String filePath = String.format("%s/epoch-validation-input-%d.json.gz", sourceFolder, epoch);
         File outputFile = new File(filePath);
 
-        if (epoch <= MAINNET_SHELLEY_START_EPOCH) {
+        if (epoch <= networkConfig.getMainnetShelleyStartEpoch()) {
             logger.info("Skip to fetch epoch validation input data for epoch " + epoch + " because the epoch is before the start of the Shelley era");
             return;
         }
@@ -66,7 +65,7 @@ public class DbSyncDataFetcher implements DataFetcher {
         Integer optimalPoolCount = protocolParameters.getOptimalPoolCount();
         BigDecimal poolOwnerInfluence = protocolParameters.getPoolOwnerInfluence();
 
-        Epoch epochInfo = dbSyncDataProvider.getEpochInfo(epoch - 2);
+        Epoch epochInfo = dbSyncDataProvider.getEpochInfo(epoch - 2, networkConfig);
         BigInteger fees = BigInteger.ZERO;
         int blockCount = 0;
         BigInteger activeStake = BigInteger.ZERO;
@@ -87,28 +86,28 @@ public class DbSyncDataFetcher implements DataFetcher {
         HashSet<String> deregisteredAccountsOnEpochBoundary;
         HashSet<String> lateDeregisteredAccounts = new HashSet<>();
         HashSet<String> rewardAddressesOfRetiredPoolsInEpoch = dbSyncDataProvider.getRewardAddressesOfRetiredPoolsInEpoch(epoch);
-        if (epoch - 2 < MAINNET_VASIL_HARDFORK_EPOCH) {
-            deregisteredAccounts = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);
-            deregisteredAccountsOnEpochBoundary = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch - 1, EXPECTED_SLOTS_PER_EPOCH);
+        if (epoch - 2 < networkConfig.getMainnetVasilHardforkEpoch()) {
+            deregisteredAccounts = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch - 1, networkConfig.getRandomnessStabilisationWindow());
+            deregisteredAccountsOnEpochBoundary = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch - 1, networkConfig.getExpectedSlotsPerEpoch());
             lateDeregisteredAccounts = deregisteredAccountsOnEpochBoundary.stream().filter(account -> !deregisteredAccounts.contains(account)).collect(Collectors.toCollection(HashSet::new));
         } else {
-            deregisteredAccounts = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch - 1, EXPECTED_SLOTS_PER_EPOCH);
+            deregisteredAccounts = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch - 1, networkConfig.getExpectedSlotsPerEpoch());
             deregisteredAccountsOnEpochBoundary = deregisteredAccounts;
         }
 
         HashSet<String> sharedPoolRewardAddressesWithoutReward = new HashSet<>();
-        if (epoch - 2 < MAINNET_ALLEGRA_HARDFORK_EPOCH) {
+        if (epoch - 2 < networkConfig.getMainnetAllegraHardforkEpoch()) {
             sharedPoolRewardAddressesWithoutReward = dbSyncDataProvider.findSharedPoolRewardAddressWithoutReward(epoch - 2);
         }
         HashSet<String> poolRewardAddresses = poolStates.stream().map(PoolState::getRewardAddress).collect(Collectors.toCollection(HashSet::new));
         poolRewardAddresses.addAll(rewardAddressesOfRetiredPoolsInEpoch);
 
-        long stabilityWindow = RANDOMNESS_STABILISATION_WINDOW;
+        long stabilityWindow = networkConfig.getRandomnessStabilisationWindow();
         // Since the Vasil hard fork, the unregistered accounts will not filter out before the
         // rewards calculation starts (at the stability window). They will be filtered out on the
         // epoch boundary when the reward update will be applied.
-        if (epoch - 2 >= MAINNET_VASIL_HARDFORK_EPOCH) {
-            stabilityWindow = EXPECTED_SLOTS_PER_EPOCH;
+        if (epoch - 2 >= networkConfig.getMainnetVasilHardforkEpoch()) {
+            stabilityWindow = networkConfig.getExpectedSlotsPerEpoch();
         }
 
         HashSet<String> registeredAccountsSinceLastEpoch = dbSyncDataProvider.getRegisteredAccountsUntilLastEpoch(epoch, poolRewardAddresses, stabilityWindow);

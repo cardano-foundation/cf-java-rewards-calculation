@@ -1,5 +1,6 @@
 package org.cardanofoundation.rewards.calculation;
 
+import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.calculation.enums.MirPot;
 
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.cardanofoundation.rewards.calculation.PoolRewardsCalculation.calculatePoolRewardInEpoch;
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,10 +31,11 @@ public class EpochCalculation {
                                                                   final HashSet<String> registeredAccountsSinceLastEpoch,
                                                                   final HashSet<String> registeredAccountsUntilNow,
                                                                   final HashSet<String> sharedPoolRewardAddressesWithoutReward,
-                                                                  final HashSet<String> deregisteredAccountsOnEpochBoundary) {
+                                                                  final HashSet<String> deregisteredAccountsOnEpochBoundary,
+                                                                  final NetworkConfig networkConfig) {
         final EpochCalculationResult epochCalculationResult = EpochCalculationResult.builder().epoch(epoch).build();
 
-        if (epoch < MAINNET_SHELLEY_START_EPOCH) {
+        if (epoch < networkConfig.getMainnetShelleyStartEpoch()) {
             log.warn("Epoch " + epoch + " is before the start of the Shelley era. No rewards were calculated in this epoch.");
             epochCalculationResult.setReserves(BigInteger.ZERO);
             epochCalculationResult.setTreasury(BigInteger.ZERO);
@@ -43,13 +44,13 @@ public class EpochCalculation {
             epochCalculationResult.setTotalPoolRewardsPot(BigInteger.ZERO);
             epochCalculationResult.setTotalAdaInCirculation(BigInteger.ZERO);
             return epochCalculationResult;
-        } else if (epoch == MAINNET_SHELLEY_START_EPOCH) {
-            epochCalculationResult.setReserves(MAINNET_SHELLEY_INITIAL_RESERVES);
-            epochCalculationResult.setTreasury(MAINNET_SHELLEY_INITIAL_TREASURY);
+        } else if (epoch == networkConfig.getMainnetShelleyStartEpoch()) {
+            epochCalculationResult.setReserves(networkConfig.getMainnetShelleyInitialReserves());
+            epochCalculationResult.setTreasury(networkConfig.getMainnetShelleyInitialTreasury());
             epochCalculationResult.setTotalDistributedRewards(BigInteger.ZERO);
             epochCalculationResult.setTotalRewardsPot(BigInteger.ZERO);
             epochCalculationResult.setTotalPoolRewardsPot(BigInteger.ZERO);
-            epochCalculationResult.setTotalAdaInCirculation(MAINNET_SHELLEY_INITIAL_UTXO);
+            epochCalculationResult.setTotalAdaInCirculation(networkConfig.getMainnetShelleyInitialUtxo());
             return epochCalculationResult;
         }
 
@@ -72,7 +73,7 @@ public class EpochCalculation {
 
         final int blocksInEpoch = totalBlocksInEpoch;
         final BigInteger rewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(
-                monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserveInPreviousEpoch, totalFeesForCurrentEpoch);
+                monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserveInPreviousEpoch, totalFeesForCurrentEpoch, networkConfig);
 
         final BigInteger treasuryCut = multiplyAndFloor(rewardPot, treasuryGrowthRate);
         BigInteger treasuryForCurrentEpoch = treasuryInPreviousEpoch.add(treasuryCut);
@@ -95,8 +96,8 @@ public class EpochCalculation {
                         !ownerAccountsRegisteredInThePast.contains(rewardAddress)) {
                     // If the reward address has been unregistered, the deposit can not be returned
                     // and will be added to the treasury instead (Pool Reap see: shelley-ledger.pdf p.53)
-                    treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(POOL_DEPOSIT_IN_LOVELACE);
-                    unclaimedRefunds = unclaimedRefunds.add(POOL_DEPOSIT_IN_LOVELACE);
+                    treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(networkConfig.getPoolDepositInLovelace());
+                    unclaimedRefunds = unclaimedRefunds.add(networkConfig.getPoolDepositInLovelace());
                 }
             }
         }
@@ -114,7 +115,7 @@ public class EpochCalculation {
 
         treasuryForCurrentEpoch = treasuryForCurrentEpoch.subtract(treasuryWithdrawals);
         BigInteger totalDistributedRewards = BigInteger.ZERO;
-        final BigInteger adaInCirculation = TOTAL_LOVELACE.subtract(reserveInPreviousEpoch);
+        final BigInteger adaInCirculation = networkConfig.getTotalLovelace().subtract(reserveInPreviousEpoch);
         final List<PoolRewardCalculationResult> poolRewardCalculationResults = new ArrayList<>();
         BigInteger unspendableEarnedRewards = BigInteger.ZERO;
 
@@ -146,7 +147,7 @@ public class EpochCalculation {
                 // This is not the case anymore and the stake account receives the reward for all pools
                 // Until the Allegra hard fork, this method will be used to emulate the old behavior
                 boolean ignoreLeaderReward = false;
-                if (epoch - 2 < MAINNET_ALLEGRA_HARDFORK_EPOCH) {
+                if (epoch - 2 < networkConfig.getMainnetAllegraHardforkEpoch()) {
                     ignoreLeaderReward = sharedPoolRewardAddressesWithoutReward.contains(poolId);
                 }
 
@@ -154,7 +155,7 @@ public class EpochCalculation {
                         blocksInEpoch, protocolParameters,
                         adaInCirculation, activeStakeInEpoch, stakePoolRewardsPot,
                         poolState.getOwnerActiveStake(), poolState.getOwners(),
-                        delegatorAccountDeregistrations, ignoreLeaderReward, lateDeregisteredDelegators, registeredAccountsSinceLastEpoch);
+                        delegatorAccountDeregistrations, ignoreLeaderReward, lateDeregisteredDelegators, registeredAccountsSinceLastEpoch, networkConfig);
             }
 
             totalDistributedRewards = add(totalDistributedRewards, poolRewardCalculationResult.getDistributedPoolReward());
@@ -167,7 +168,7 @@ public class EpochCalculation {
         calculatedReserve = add(calculatedReserve, undistributedRewards);
         calculatedReserve = subtract(calculatedReserve, unspendableEarnedRewards);
 
-        if (epoch == MAINNET_ALLEGRA_HARDFORK_EPOCH) {
+        if (epoch == networkConfig.getMainnetAllegraHardforkEpoch()) {
             /*
                 "The bootstrap addresses from Figure 6 were not intended to include the Byron era redeem
                 addresses (those with addrtype 2, see the Byron CDDL spec). These addresses were, however,
@@ -175,7 +176,7 @@ public class EpochCalculation {
                 and the Ada contained in them was returned to the reserves."
                     - shelley-spec-ledger.pdf 17.5 p.115
              */
-            calculatedReserve = calculatedReserve.add(MAINNET_BOOTSTRAP_ADDRESS_AMOUNT);
+            calculatedReserve = calculatedReserve.add(networkConfig.getMainnetBootstrapAddressAmount());
         }
 
         log.debug("Unspendable earned rewards: " + unspendableEarnedRewards.longValue() + " Lovelace");

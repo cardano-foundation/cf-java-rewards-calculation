@@ -1,6 +1,7 @@
 package org.cardanofoundation.rewards.validation.data.provider;
 
 import lombok.RequiredArgsConstructor;
+import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.domain.PoolReward;
 import org.cardanofoundation.rewards.validation.mapper.*;
@@ -46,7 +47,7 @@ public class KoiosDataProvider implements DataProvider {
         return AdaPotsMapper.fromKoiosTotals(totals);
     }
 
-    public Epoch getEpochInfo(int epoch) {
+    public Epoch getEpochInfo(int epoch, NetworkConfig networkConfig) {
         Epoch epochEntity;
 
         try {

@@ -1,5 +1,6 @@
 package org.cardanofoundation.rewards.validation.data.fetcher;
 
+import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.KoiosDataProvider;
@@ -51,7 +52,7 @@ public class KoiosDataFetcher implements DataFetcher {
         }
     }
 
-    private void fetchEpochInfo(int epoch, boolean override) {
+    private void fetchEpochInfo(int epoch, boolean override, NetworkConfig networkConfig) {
         String filePath = String.format("%s/%s/epoch%d.json", sourceFolder, EPOCH_INFO.resourceFolderName, epoch);
         File outputFile = new File(filePath);
 
@@ -60,7 +61,7 @@ public class KoiosDataFetcher implements DataFetcher {
             return;
         }
 
-        Epoch epochInfo = koiosDataProvider.getEpochInfo(epoch);
+        Epoch epochInfo = koiosDataProvider.getEpochInfo(epoch, networkConfig);
         if (epochInfo == null) {
             logger.error("Failed to fetch EpochInfo for epoch " + epoch);
             return;
@@ -122,9 +123,9 @@ public class KoiosDataFetcher implements DataFetcher {
     }
 
     @Override
-    public void fetch(int epoch, boolean override, boolean skipValidationData) {
+    public void fetch(int epoch, boolean override, boolean skipValidationData, NetworkConfig networkConfig) {
         fetchAdaPots(epoch, override);
-        fetchEpochInfo(epoch, override);
+        fetchEpochInfo(epoch, override, networkConfig);
         fetchProtocolParameters(epoch, override);
 
         List<String> poolIds = List.of(

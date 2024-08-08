@@ -1,5 +1,6 @@
 package org.cardanofoundation.rewards.validation;
 
+import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
@@ -7,10 +8,13 @@ import org.cardanofoundation.rewards.validation.data.provider.KoiosDataProvider;
 import org.cardanofoundation.rewards.calculation.domain.AdaPots;
 import org.cardanofoundation.rewards.validation.enums.DataProviderType;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
@@ -21,6 +25,7 @@ import java.util.stream.Stream;
 
 @SpringBootTest
 @ComponentScan
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
 public class DepositsValidationTest {
 
@@ -32,6 +37,16 @@ public class DepositsValidationTest {
 
     @Autowired
     DbSyncDataProvider dbSyncDataProvider;
+
+    @Value("${cardano.protocol.magic}")
+    private int cardanoProtocolMagic;
+
+    NetworkConfig networkConfig;
+
+    @BeforeAll
+    public void setup() {
+        networkConfig = NetworkConfig.getNetworkConfigByNetworkMagic(cardanoProtocolMagic);
+    }
 
     void Test_calculateDeposit(final int epoch, DataProviderType dataProviderType) {
 
@@ -48,7 +63,7 @@ public class DepositsValidationTest {
 
         AdaPots adaPotsForNextEpoch = dataProvider.getAdaPotsForEpoch(epoch + 1);
         BigInteger actualDepositsInNextEpoch = adaPotsForNextEpoch.getDeposits();
-        BigInteger calculatedDepositsInNextEpoch = DepositsValidation.computeDepositsInEpoch(epoch, dataProvider);
+        BigInteger calculatedDepositsInNextEpoch = DepositsValidation.computeDepositsInEpoch(epoch, dataProvider, networkConfig);
 
         BigInteger difference = actualDepositsInNextEpoch.subtract(calculatedDepositsInNextEpoch);
         Assertions.assertEquals(BigInteger.ZERO, difference);

@@ -1,6 +1,7 @@
 package org.cardanofoundation.rewards.validation;
 
 import org.cardanofoundation.rewards.calculation.EpochCalculation;
+import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
@@ -12,17 +13,15 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
-
 @Slf4j
 public class EpochValidation {
 
-    public static EpochCalculationResult calculateEpochRewardPots(int epoch, DataProvider dataProvider) {
-        return calculateEpochRewardPots(epoch, dataProvider, true);
+    public static EpochCalculationResult calculateEpochRewardPots(int epoch, DataProvider dataProvider, NetworkConfig networkConfig) {
+        return calculateEpochRewardPots(epoch, dataProvider, true, networkConfig);
     }
 
-    public static EpochCalculationResult calculateEpochRewardPots(int epoch, DataProvider dataProvider, boolean detailedValidation) {
-        if (epoch < MAINNET_SHELLEY_START_EPOCH) {
+    public static EpochCalculationResult calculateEpochRewardPots(int epoch, DataProvider dataProvider, boolean detailedValidation, NetworkConfig networkConfig) {
+        if (epoch < networkConfig.getMainnetShelleyStartEpoch()) {
             log.warn("Epoch " + epoch + " is before the start of the Shelley era. No rewards were calculated in this epoch.");
             return EpochCalculationResult.builder()
                     .totalRewardsPot(BigInteger.ZERO)
@@ -37,7 +36,7 @@ public class EpochValidation {
                     .totalDistributedRewards(BigInteger.ZERO)
                     .epoch(epoch)
                     .build();
-        } else if (epoch == MAINNET_SHELLEY_START_EPOCH) {
+        } else if (epoch == networkConfig.getMainnetShelleyStartEpoch()) {
             return EpochCalculationResult.builder()
                     .totalRewardsPot(BigInteger.ZERO)
                     .treasury(BigInteger.ZERO)
@@ -47,7 +46,7 @@ public class EpochValidation {
                             .treasuryWithdrawals(BigInteger.ZERO)
                             .unspendableEarnedRewards(BigInteger.ZERO)
                             .epoch(epoch).build())
-                    .reserves(MAINNET_SHELLEY_INITIAL_RESERVES)
+                    .reserves(networkConfig.getMainnetShelleyInitialReserves())
                     .totalDistributedRewards(BigInteger.ZERO)
                     .epoch(epoch)
                     .build();
@@ -113,7 +112,7 @@ public class EpochValidation {
                     epochValidationInput.getLateDeregisteredAccounts(),
                     epochValidationInput.getRegisteredAccountsSinceLastEpoch(),
                     epochValidationInput.getRegisteredAccountsUntilNow(), epochValidationInput.getSharedPoolRewardAddressesWithoutReward(),
-                    epochValidationInput.getDeregisteredAccountsOnEpochBoundary());
+                    epochValidationInput.getDeregisteredAccountsOnEpochBoundary(), networkConfig);
             long end = System.currentTimeMillis();
             log.debug("Epoch calculation took " + Math.round((end - start) / 1000.0) + "s");
         } else {
@@ -121,7 +120,7 @@ public class EpochValidation {
             log.debug("Start obtaining the epoch data");
             AdaPots adaPotsForPreviousEpoch = dataProvider.getAdaPotsForEpoch(epoch - 1);
             ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch - 2);
-            Epoch epochInfo = dataProvider.getEpochInfo(epoch - 2);
+            Epoch epochInfo = dataProvider.getEpochInfo(epoch - 2, networkConfig);
             HashSet<String> rewardAddressesOfRetiredPoolsInEpoch = dataProvider.getRewardAddressesOfRetiredPoolsInEpoch(epoch);
             List<MirCertificate> mirCertificates = dataProvider.getMirCertificatesInEpoch(epoch - 1);
             List<PoolBlock> blocksMadeByPoolsInEpoch = dataProvider.getBlocksMadeByPoolsInEpoch(epoch - 2);
@@ -131,28 +130,28 @@ public class EpochValidation {
             HashSet<String> deregisteredAccounts;
             HashSet<String> deregisteredAccountsOnEpochBoundary;
             HashSet<String> lateDeregisteredAccounts = new HashSet<>();
-            if (epoch - 2 < MAINNET_VASIL_HARDFORK_EPOCH) {
-                deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, RANDOMNESS_STABILISATION_WINDOW);
-                deregisteredAccountsOnEpochBoundary = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, EXPECTED_SLOTS_PER_EPOCH);
+            if (epoch - 2 < networkConfig.getMainnetVasilHardforkEpoch()) {
+                deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, networkConfig.getRandomnessStabilisationWindow());
+                deregisteredAccountsOnEpochBoundary = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, networkConfig.getExpectedSlotsPerEpoch());
                 lateDeregisteredAccounts = deregisteredAccountsOnEpochBoundary.stream().filter(account -> !deregisteredAccounts.contains(account)).collect(Collectors.toCollection(HashSet::new));
             } else {
-                deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, EXPECTED_SLOTS_PER_EPOCH);
+                deregisteredAccounts = dataProvider.getDeregisteredAccountsInEpoch(epoch - 1, networkConfig.getExpectedSlotsPerEpoch());
                 deregisteredAccountsOnEpochBoundary = deregisteredAccounts;
             }
 
             HashSet<String> sharedPoolRewardAddressesWithoutReward = new HashSet<>();
-            if (epoch - 2 < MAINNET_ALLEGRA_HARDFORK_EPOCH) {
+            if (epoch - 2 < networkConfig.getMainnetAllegraHardforkEpoch()) {
                 sharedPoolRewardAddressesWithoutReward = dataProvider.findSharedPoolRewardAddressWithoutReward(epoch - 2);
             }
             HashSet<String> poolRewardAddresses = poolStates.stream().map(PoolState::getRewardAddress).collect(Collectors.toCollection(HashSet::new));
             poolRewardAddresses.addAll(rewardAddressesOfRetiredPoolsInEpoch);
 
-            long stabilityWindow = RANDOMNESS_STABILISATION_WINDOW;
+            long stabilityWindow = networkConfig.getRandomnessStabilisationWindow();
             // Since the Vasil hard fork, the unregistered accounts will not filter out before the
             // rewards calculation starts (at the stability window). They will be filtered out on the
             // epoch boundary when the reward update will be applied.
-            if (epoch - 2 >= MAINNET_VASIL_HARDFORK_EPOCH) {
-                stabilityWindow = EXPECTED_SLOTS_PER_EPOCH;
+            if (epoch - 2 >= networkConfig.getMainnetVasilHardforkEpoch()) {
+                stabilityWindow = networkConfig.getExpectedSlotsPerEpoch();
             }
 
             HashSet<String> registeredAccountsSinceLastEpoch = dataProvider.getRegisteredAccountsUntilLastEpoch(epoch, poolRewardAddresses, stabilityWindow);
@@ -171,7 +170,7 @@ public class EpochValidation {
                     epoch, adaPotsForPreviousEpoch.getReserves(), adaPotsForPreviousEpoch.getTreasury(), protocolParameters, epochInfo, rewardAddressesOfRetiredPoolsInEpoch, deregisteredAccounts,
                     mirCertificates, poolIds, poolStates, lateDeregisteredAccounts,
                     registeredAccountsSinceLastEpoch, registeredAccountsUntilNow, sharedPoolRewardAddressesWithoutReward,
-                    deregisteredAccountsOnEpochBoundary);
+                    deregisteredAccountsOnEpochBoundary, networkConfig);
             end = System.currentTimeMillis();
             log.debug("Epoch calculation took " + Math.round((end - start) / 1000.0) + "s");
         }

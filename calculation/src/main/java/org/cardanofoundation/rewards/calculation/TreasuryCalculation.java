@@ -1,5 +1,6 @@
 package org.cardanofoundation.rewards.calculation;
 
+import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.calculation.enums.MirPot;
 
@@ -10,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 
 public class TreasuryCalculation {
@@ -21,10 +21,11 @@ public class TreasuryCalculation {
                                                                    List<MirCertificate> mirCertificates,
                                                                    final HashSet<String> deregisteredAccounts,
                                                                    final HashSet<String> registeredAccountsUntilNow,
-                                                                   BigInteger unspendableEarnedRewards) {
+                                                                   BigInteger unspendableEarnedRewards,
+                                                                   NetworkConfig networkConfig) {
     // The Shelley era and the ada pot system started on mainnet in epoch 208.
     // Fee and treasury values are 0 for epoch 208.
-    if (epoch <= MAINNET_SHELLEY_START_EPOCH) {
+    if (epoch <= networkConfig.getMainnetShelleyStartEpoch()) {
       return TreasuryCalculationResult.builder()
               .treasury(BigInteger.ZERO)
               .epoch(epoch)
@@ -54,7 +55,7 @@ public class TreasuryCalculation {
     final BigInteger treasuryInPreviousEpoch = adaPotsForPreviousEpoch.getTreasury();
 
     final BigInteger totalRewardPot = calculateTotalRewardPotWithEta(
-            monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserveInPreviousEpoch, totalFeesForCurrentEpoch);
+            monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserveInPreviousEpoch, totalFeesForCurrentEpoch, networkConfig);
 
     final BigInteger treasuryCut = multiplyAndFloor(totalRewardPot, treasuryGrowthRate);
     BigInteger treasuryForCurrentEpoch = treasuryInPreviousEpoch.add(treasuryCut);
@@ -66,7 +67,7 @@ public class TreasuryCalculation {
       List<String> ownerAccountsRegisteredInThePast = registeredAccountsUntilNow.stream()
               .filter(rewardAddressesOfRetiredPools::contains).toList();
 
-      unclaimedRefunds = calculateUnclaimedRefundsForRetiredPools(rewardAddressesOfRetiredPools, deregisteredRewardAccounts, ownerAccountsRegisteredInThePast);
+      unclaimedRefunds = calculateUnclaimedRefundsForRetiredPools(rewardAddressesOfRetiredPools, deregisteredRewardAccounts, ownerAccountsRegisteredInThePast, networkConfig);
       treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(unclaimedRefunds);
     }
 
@@ -97,8 +98,8 @@ public class TreasuryCalculation {
    * rewards(e) = 0, if e < 209
    */
   public static BigInteger calculateTotalRewardPotWithEta(BigDecimal monetaryExpandRate, int totalBlocksInEpochByPools,
-                                                          BigDecimal decentralizationParameter, BigInteger reserve, BigInteger fee) {
-    BigDecimal eta = calculateEta(totalBlocksInEpochByPools, decentralizationParameter);
+                                                          BigDecimal decentralizationParameter, BigInteger reserve, BigInteger fee, NetworkConfig networkConfig) {
+    BigDecimal eta = calculateEta(totalBlocksInEpochByPools, decentralizationParameter, networkConfig);
     return multiplyAndFloor(reserve, monetaryExpandRate, eta).add(fee);
   }
 
@@ -111,7 +112,7 @@ public class TreasuryCalculation {
   *
   * See: https://github.com/input-output-hk/cardano-ledger/commit/c4f10d286faadcec9e4437411bce9c6c3b6e51c2
   */
-  private static BigDecimal calculateEta(int totalBlocksInEpochByPools, BigDecimal decentralizationParameter) {
+  private static BigDecimal calculateEta(int totalBlocksInEpochByPools, BigDecimal decentralizationParameter, NetworkConfig networkConfig) {
     // shelley-delegation.pdf 5.4.3
 
     BigDecimal decentralisationThreshold = new BigDecimal("0.8");
@@ -120,12 +121,12 @@ public class TreasuryCalculation {
     }
 
     // The number of expected blocks will be the number of slots per epoch times the active slots coefficient
-    BigDecimal activeSlotsCoeff = new BigDecimal(ACTIVE_SLOT_COEFFICIENT); // See: Non-Updatable Parameters: https://cips.cardano.org/cips/cip9/
+    BigDecimal activeSlotsCoeff = BigDecimal.valueOf(networkConfig.getActiveSlotCoefficient()); // See: Non-Updatable Parameters: https://cips.cardano.org/cips/cip9/
 
     // decentralizationParameter is the proportion of blocks that are expected to be produced by stake pools
     // instead of the OBFT (Ouroboros Byzantine Fault Tolerance) nodes. It was introduced close before the Shelley era:
     // https://github.com/input-output-hk/cardano-ledger/commit/c4f10d286faadcec9e4437411bce9c6c3b6e51c2
-    BigDecimal expectedBlocksInNonOBFTSlots = new BigDecimal(EXPECTED_SLOTS_PER_EPOCH)
+    BigDecimal expectedBlocksInNonOBFTSlots = new BigDecimal(networkConfig.getExpectedSlotsPerEpoch())
             .multiply(activeSlotsCoeff).multiply(BigDecimal.ONE.subtract(decentralizationParameter));
 
     // eta is the ratio between the number of blocks that have been produced during the epoch, and
@@ -142,7 +143,8 @@ public class TreasuryCalculation {
    */
   public static BigInteger calculateUnclaimedRefundsForRetiredPools(HashSet<String> rewardAddressesOfRetiredPools,
                                                                     HashSet<String> deregisteredRewardAccounts,
-                                                                    List<String> ownerAccountsRegisteredInThePast) {
+                                                                    List<String> ownerAccountsRegisteredInThePast,
+                                                                    NetworkConfig networkConfig) {
     BigInteger unclaimedRefunds = BigInteger.ZERO;
     if (rewardAddressesOfRetiredPools.size() > 0) {
     /* Check if the reward address of the retired pool has been unregistered before
@@ -153,7 +155,7 @@ public class TreasuryCalculation {
                 !ownerAccountsRegisteredInThePast.contains(rewardAddress)) {
           // If the reward address has been unregistered, the deposit can not be returned
           // and will be added to the treasury instead (Pool Reap see: shelley-ledger.pdf p.53)
-          unclaimedRefunds = unclaimedRefunds.add(POOL_DEPOSIT_IN_LOVELACE);
+          unclaimedRefunds = unclaimedRefunds.add(networkConfig.getPoolDepositInLovelace());
         }
       }
     }

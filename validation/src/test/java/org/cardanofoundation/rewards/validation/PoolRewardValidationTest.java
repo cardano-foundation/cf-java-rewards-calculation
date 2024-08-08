@@ -1,5 +1,6 @@
 package org.cardanofoundation.rewards.validation;
 
+import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.calculation.domain.PoolRewardCalculationResult;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
@@ -7,10 +8,13 @@ import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.KoiosDataProvider;
 import org.cardanofoundation.rewards.validation.enums.DataProviderType;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
@@ -18,6 +22,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ComponentScan
 public class PoolRewardValidationTest {
 
@@ -29,6 +34,16 @@ public class PoolRewardValidationTest {
 
     @Autowired(required = false)
     DbSyncDataProvider dbSyncDataProvider;
+
+    @Value("${cardano.protocol.magic}")
+    private int cardanoProtocolMagic;
+
+    NetworkConfig networkConfig;
+
+    @BeforeAll
+    public void setup() {
+        networkConfig = NetworkConfig.getNetworkConfigByNetworkMagic(cardanoProtocolMagic);
+    }
 
     private void Test_calculatePoolReward(final String poolId,
                                           final int epoch,
@@ -45,7 +60,7 @@ public class PoolRewardValidationTest {
         }
 
         PoolRewardCalculationResult poolRewardCalculationResult =
-                PoolRewardValidation.computePoolRewardInEpoch(poolId, epoch, dataProvider);
+                PoolRewardValidation.computePoolRewardInEpoch(poolId, epoch, dataProvider, networkConfig);
         Assertions.assertTrue(PoolRewardValidation.validatePoolRewardCalculation(poolRewardCalculationResult, dataProvider).isValid());
     }
 

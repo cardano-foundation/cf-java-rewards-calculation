@@ -1,5 +1,6 @@
 package org.cardanofoundation.rewards;
 
+import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.validation.data.fetcher.DbSyncDataFetcher;
 import org.cardanofoundation.rewards.validation.data.fetcher.KoiosDataFetcher;
 import org.cardanofoundation.rewards.validation.data.plotter.CsvDataPlotter;
@@ -41,6 +42,9 @@ public class RewardsApplication implements ApplicationRunner {
   @Value("${json.data-fetcher.skip-validation-data}")
   private boolean skipValidationData;
 
+  @Value("${cardano.protocol.magic}")
+  private int cardanoProtocolMagic;
+
   @Autowired
   private ApplicationContext context;
 
@@ -69,6 +73,13 @@ public class RewardsApplication implements ApplicationRunner {
         System.exit(exitCode);
       }
 
+      NetworkConfig networkConfig = NetworkConfig.getNetworkConfigByNetworkMagic(cardanoProtocolMagic);
+      if (networkConfig == null) {
+        logger.error("Unknown Cardano protocol magic: " + cardanoProtocolMagic);
+        int exitCode = SpringApplication.exit(context, () -> 1);
+        System.exit(exitCode);
+      }
+
       int startEpoch = dataFetcherStartEpoch;
       int endEpoch = dataFetcherEndEpoch;
 
@@ -81,7 +92,7 @@ public class RewardsApplication implements ApplicationRunner {
 
             for (int epoch = startEpoch; epoch < endEpoch; epoch++) {
               logger.info("Fetching data for epoch with the DB sync data provider " + epoch);
-              dbSyncDataFetcher.fetch(epoch, override, skipValidationData);
+              dbSyncDataFetcher.fetch(epoch, override, skipValidationData, networkConfig);
             }
           }
 
@@ -89,14 +100,14 @@ public class RewardsApplication implements ApplicationRunner {
             logger.info("Koios data provider is active. Fetching data from Koios...");
             for (int epoch = startEpoch; epoch < endEpoch; epoch++) {
                 logger.info("Fetching data for epoch with the Koios data provider " + epoch);
-                koiosDataFetcher.fetch(epoch, override, skipValidationData);
+                koiosDataFetcher.fetch(epoch, override, skipValidationData, networkConfig);
             }
           }
       } else if (runMode.equals("plot")) {
           if (activeProfiles.contains("csv")) {
-              csvDataPlotter.plot(startEpoch, endEpoch);
+              csvDataPlotter.plot(startEpoch, endEpoch, networkConfig);
           } else {
-              jsonDataPlotter.plot(startEpoch, endEpoch);
+              jsonDataPlotter.plot(startEpoch, endEpoch, networkConfig);
           }
       } else if (!runMode.equals("test")) {
           logger.warn("Unknown run mode: " + runMode);

@@ -2,15 +2,19 @@ package org.cardanofoundation.rewards.validation;
 
 import lombok.extern.slf4j.Slf4j;
 import org.cardanofoundation.rewards.calculation.EpochCalculation;
+import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
@@ -21,10 +25,9 @@ import java.util.HashSet;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.*;
-
 @SpringBootTest
 @ComponentScan
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Slf4j
 public class EpochValidationTest {
     @Autowired(required = false)
@@ -33,14 +36,24 @@ public class EpochValidationTest {
     @Autowired
     JsonDataProvider jsonDataProvider;
 
+    @Value("${cardano.protocol.magic}")
+    private int cardanoProtocolMagic;
+
+    NetworkConfig networkConfig;
+
+    @BeforeAll
+    public void setup() {
+        networkConfig = NetworkConfig.getNetworkConfigByNetworkMagic(cardanoProtocolMagic);
+    }
+
     public void testCalculateEpochPots(final int epoch, DataProvider dataProvider, boolean detailedValidation) {
-        EpochCalculationResult epochCalculationResult = EpochValidation.calculateEpochRewardPots(epoch, dataProvider, detailedValidation);
+        EpochCalculationResult epochCalculationResult = EpochValidation.calculateEpochRewardPots(epoch, dataProvider, detailedValidation, networkConfig);
         AdaPots adaPotsForCurrentEpoch = dataProvider.getAdaPotsForEpoch(epoch);
 
-        if (epoch < MAINNET_SHELLEY_START_EPOCH) {
+        if (epoch < networkConfig.getMainnetShelleyStartEpoch()) {
             log.info("Epoch " + epoch + " is before Shelley era, no rewards are calculated");
             return;
-        } else if (epoch == MAINNET_SHELLEY_START_EPOCH) {
+        } else if (epoch == networkConfig.getMainnetShelleyStartEpoch()) {
             log.info("Epoch " + epoch + " is the first Shelley era epoch, no rewards are calculated");
             return;
         }
@@ -65,7 +78,7 @@ public class EpochValidationTest {
                 new ArrayList<>(),
                 new ArrayList<>(),
                 new ArrayList<>(),
-                new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>()
+                new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(), networkConfig
         );
         Assertions.assertEquals(epochCalculationResult.getReserves(), BigInteger.ZERO);
         Assertions.assertEquals(epochCalculationResult.getTreasury(), BigInteger.ZERO);
@@ -83,15 +96,15 @@ public class EpochValidationTest {
                 new ArrayList<>(),
                 new ArrayList<>(),
                 new ArrayList<>(),
-                new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>()
+                new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(), networkConfig
         );
-        Assertions.assertEquals(epochCalculationResult.getReserves(), MAINNET_SHELLEY_INITIAL_RESERVES);
-        Assertions.assertEquals(epochCalculationResult.getTreasury(), MAINNET_SHELLEY_INITIAL_TREASURY);
+        Assertions.assertEquals(epochCalculationResult.getReserves(), networkConfig.getMainnetShelleyInitialReserves());
+        Assertions.assertEquals(epochCalculationResult.getTreasury(), networkConfig.getMainnetShelleyInitialTreasury());
     }
 
     @Test
     public void testAllegraHardForkEpoch() {
-        testCalculateEpochPots(MAINNET_ALLEGRA_HARDFORK_EPOCH, jsonDataProvider, false);
+        testCalculateEpochPots(networkConfig.getMainnetAllegraHardforkEpoch(), jsonDataProvider, false);
     }
 
     static Stream<Integer> dataProviderEpochRange() {

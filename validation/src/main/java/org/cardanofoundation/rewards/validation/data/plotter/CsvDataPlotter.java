@@ -1,5 +1,6 @@
 package org.cardanofoundation.rewards.validation.data.plotter;
 
+import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.calculation.domain.EpochCalculationResult;
 import org.cardanofoundation.rewards.calculation.domain.PoolState;
 import org.cardanofoundation.rewards.validation.EpochValidation;
@@ -15,8 +16,6 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.TOTAL_LOVELACE;
-
 @Service
 public class CsvDataPlotter implements DataPlotter {
     private static final Logger logger = LoggerFactory.getLogger(JsonDataPlotter.class);
@@ -25,7 +24,7 @@ public class CsvDataPlotter implements DataPlotter {
     private JsonDataProvider jsonDataProvider;
 
     @Override
-    public void plot(int epochStart, int epochEnd) {
+    public void plot(int epochStart, int epochEnd, NetworkConfig networkConfig) {
         if (epochStart > epochEnd) {
             throw new IllegalArgumentException("epochStart must be less than or equal to epochEnd");
         }
@@ -40,13 +39,13 @@ public class CsvDataPlotter implements DataPlotter {
             EpochValidationInput epochValidationInput = jsonDataProvider.getEpochValidationInput(epoch);
             HashSet<String> poolIds = epochValidationInput.getPoolStates().stream().map(PoolState::getPoolId).collect(Collectors.toCollection(HashSet::new));
             EpochCalculationResult epochCalculationResult = EpochValidation.calculateEpochRewardPots(epoch,
-                    jsonDataProvider, detailedValidation);
+                    jsonDataProvider, detailedValidation,networkConfig);
 
             row.put("epoch", String.valueOf(epoch));
             row.put("reserves", String.valueOf(epochCalculationResult.getReserves()));
             row.put("total_rewards_pot", String.valueOf(epochCalculationResult.getTotalRewardsPot()));
             row.put("total_distributed_rewards", String.valueOf(epochCalculationResult.getTotalDistributedRewards()));
-            row.put("total_supply", String.valueOf(TOTAL_LOVELACE.subtract(epochCalculationResult.getReserves())));
+            row.put("total_supply", String.valueOf(networkConfig.getTotalLovelace().subtract(epochCalculationResult.getReserves())));
             row.put("treasury", String.valueOf(epochCalculationResult.getTreasury()));
             row.put("epoch_fees", String.valueOf(epochValidationInput.getFees()));
             row.put("unspendable_earned_rewards", String.valueOf(epochCalculationResult.getTreasuryCalculationResult().getUnspendableEarnedRewards()));

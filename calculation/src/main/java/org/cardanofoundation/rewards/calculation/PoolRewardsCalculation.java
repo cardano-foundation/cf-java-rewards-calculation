@@ -1,13 +1,12 @@
 package org.cardanofoundation.rewards.calculation;
 
+import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.calculation.domain.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.MAINNET_ALLEGRA_HARDFORK_EPOCH;
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.MAINNET_VASIL_HARDFORK_EPOCH;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.divide;
 
@@ -132,7 +131,8 @@ public class PoolRewardsCalculation {
                                                                          final BigInteger totalActiveStakeOfOwners, final HashSet<String> poolOwnerStakeAddresses,
                                                                          final HashSet<String> deregisteredAccounts, final boolean ignoreLeaderReward,
                                                                          final HashSet<String> lateDeregisteredAccounts,
-                                                                         final HashSet<String> accountsRegisteredInThePast) {
+                                                                         final HashSet<String> accountsRegisteredInThePast,
+                                                                         final NetworkConfig networkConfig) {
         final int earnedEpoch = poolStateCurrentEpoch.getEpoch();
         final PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardCalculationResult.builder()
                 .epoch(earnedEpoch)
@@ -149,7 +149,7 @@ public class PoolRewardsCalculation {
             a reward update. As in the Shelley era, though, they are still filtered on the epoch boundary
             when the reward update is applied
         */
-        if (earnedEpoch >= MAINNET_VASIL_HARDFORK_EPOCH) {
+        if (earnedEpoch >= networkConfig.getMainnetVasilHardforkEpoch()) {
             lateDeregisteredAccounts.addAll(deregisteredAccounts);
             deregisteredAccounts.clear();
         }
@@ -212,7 +212,7 @@ public class PoolRewardsCalculation {
 
         if (!accountsRegisteredInThePast.contains(rewardAddress)) {
             log.info(poolRewardCalculationResult.getRewardAddress() + " has never been registered. Operator would have received " + poolOperatorReward + " but will not receive any rewards.");
-            if (earnedEpoch >= MAINNET_VASIL_HARDFORK_EPOCH) {
+            if (earnedEpoch >= networkConfig.getMainnetVasilHardforkEpoch()) {
                 unspendableEarnedRewards = poolOperatorReward;
             }
             poolOperatorReward = BigInteger.ZERO;
@@ -244,7 +244,7 @@ public class PoolRewardsCalculation {
                 shelley-ledger.pdf | 17.4 Reward aggregation | p. 114
              */
             if (stakeAddress.equals(poolStateCurrentEpoch.getRewardAddress())
-                    && earnedEpoch < MAINNET_ALLEGRA_HARDFORK_EPOCH) {
+                    && earnedEpoch < networkConfig.getMainnetAllegraHardforkEpoch()) {
                 continue;
             }
 

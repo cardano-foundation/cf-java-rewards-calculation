@@ -1,5 +1,6 @@
 package org.cardanofoundation.rewards.validation.data.provider;
 
+import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.validation.domain.PoolReward;
 
@@ -11,7 +12,7 @@ public interface DataProvider {
 
     public AdaPots getAdaPotsForEpoch(int epoch);
 
-    public Epoch getEpochInfo(int epoch);
+    public Epoch getEpochInfo(int epoch, NetworkConfig networkConfig);
 
     public ProtocolParameters getProtocolParametersForEpoch(int epoch);
 
