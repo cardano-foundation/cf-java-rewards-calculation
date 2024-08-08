@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>NetworkConfig.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">cf-rewards-validation</a> &gt; <a href="../index.html" class="el_bundle">cf-rewards-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.calculation.config</a> &gt; <span class="el_source">NetworkConfig.java</span></div><h1>NetworkConfig.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.calculation.config;
+
+import lombok.*;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class NetworkConfig {
+    private int networkMagic;
+    private BigInteger totalLovelace;
+    private BigInteger poolDepositInLovelace;
+    private long expectedSlotsPerEpoch;
+    private BigInteger shelleyInitialReserves;
+    private BigInteger shelleyInitialTreasury;
+    private BigInteger shelleyInitialUtxo;
+    private int genesisConfigSecurityParameter;
+    private int shelleyStartEpoch;
+    private int allegraHardforkEpoch;
+    private int vasilHardforkEpoch;
+    private BigInteger bootstrapAddressAmount;
+    private double activeSlotCoefficient;
+    private long randomnessStabilisationWindow;
+    private BigDecimal shelleyStartDecentralisation;
+    private BigDecimal shelleyStartTreasuryGrowRate;
+    private BigDecimal shelleyStartMonetaryExpandRate;
+    private int shelleyStartOptimalPoolCount;
+    private BigDecimal shelleyStartPoolOwnerInfluence;
+
+    public static final int MAINNET_NETWORK_MAGIC = 764824073;
+    public static final int PREPROD_NETWORK_MAGIC = 1;
+    public static final int PREVIEW_NETWORK_MAGIC = 2;
+    public static final int SANCHONET_NETWORK_MAGIC = 4;
+
+    public static NetworkConfig getMainnetConfig() {
+<span class="fc" id="L40">        return NetworkConfig.builder()</span>
+<span class="fc" id="L41">                .networkMagic(764824073)</span>
+<span class="fc" id="L42">                .totalLovelace(new BigInteger(&quot;45000000000000000&quot;))</span>
+<span class="fc" id="L43">                .poolDepositInLovelace(BigInteger.valueOf(500000000))</span>
+<span class="fc" id="L44">                .expectedSlotsPerEpoch(432000)</span>
+<span class="fc" id="L45">                .shelleyInitialReserves(new BigInteger(&quot;13888022852926644&quot;))</span>
+<span class="fc" id="L46">                .shelleyInitialTreasury(new BigInteger(&quot;0&quot;))</span>
+<span class="fc" id="L47">                .shelleyInitialUtxo(new BigInteger(&quot;31111977147073356&quot;))</span>
+<span class="fc" id="L48">                .genesisConfigSecurityParameter(2160)</span>
+<span class="fc" id="L49">                .shelleyStartEpoch(208)</span>
+<span class="fc" id="L50">                .allegraHardforkEpoch(236)</span>
+<span class="fc" id="L51">                .vasilHardforkEpoch(365)</span>
+<span class="fc" id="L52">                .bootstrapAddressAmount(new BigInteger(&quot;318200635000000&quot;))</span>
+<span class="fc" id="L53">                .activeSlotCoefficient(0.05)</span>
+<span class="fc" id="L54">                .randomnessStabilisationWindow(172800)</span>
+<span class="fc" id="L55">                .shelleyStartDecentralisation(BigDecimal.valueOf(1.0))</span>
+<span class="fc" id="L56">                .shelleyStartTreasuryGrowRate(BigDecimal.valueOf(0.2))</span>
+<span class="fc" id="L57">                .shelleyStartMonetaryExpandRate(BigDecimal.valueOf(0.003))</span>
+<span class="fc" id="L58">                .shelleyStartOptimalPoolCount(150)</span>
+<span class="fc" id="L59">                .shelleyStartPoolOwnerInfluence(BigDecimal.valueOf(0.03))</span>
+<span class="fc" id="L60">                .build();</span>
+    }
+
+    public static NetworkConfig getPreprodConfig() {
+<span class="nc" id="L64">        return NetworkConfig.builder()</span>
+<span class="nc" id="L65">                .networkMagic(1)</span>
+<span class="nc" id="L66">                .totalLovelace(new BigInteger(&quot;45000000000000000&quot;))</span>
+<span class="nc" id="L67">                .poolDepositInLovelace(BigInteger.valueOf(500000000))</span>
+<span class="nc" id="L68">                .expectedSlotsPerEpoch(432000)</span>
+<span class="nc" id="L69">                .shelleyInitialReserves(new BigInteger(&quot;14991000000000000&quot;))</span>
+<span class="nc" id="L70">                .shelleyInitialTreasury(new BigInteger(&quot;9000000000000&quot;))</span>
+<span class="nc" id="L71">                .shelleyInitialUtxo(new BigInteger(&quot;30009000000000000&quot;))</span>
+<span class="nc" id="L72">                .genesisConfigSecurityParameter(2160)</span>
+<span class="nc" id="L73">                .shelleyStartEpoch(4)</span>
+<span class="nc" id="L74">                .allegraHardforkEpoch(5)</span>
+<span class="nc" id="L75">                .vasilHardforkEpoch(12)</span>
+<span class="nc" id="L76">                .bootstrapAddressAmount(new BigInteger(&quot;0&quot;))</span>
+<span class="nc" id="L77">                .activeSlotCoefficient(0.05)</span>
+<span class="nc" id="L78">                .randomnessStabilisationWindow(172800) // (4 * GENESIS_CONFIG_SECURITY_PARAMETER) / ACTIVE_SLOT_COEFFICIENT</span>
+<span class="nc" id="L79">                .shelleyStartDecentralisation(BigDecimal.valueOf(1.0))</span>
+<span class="nc" id="L80">                .shelleyStartTreasuryGrowRate(BigDecimal.valueOf(0.2))</span>
+<span class="nc" id="L81">                .shelleyStartMonetaryExpandRate(BigDecimal.valueOf(0.003))</span>
+<span class="nc" id="L82">                .shelleyStartOptimalPoolCount(150)</span>
+<span class="nc" id="L83">                .shelleyStartPoolOwnerInfluence(BigDecimal.valueOf(0.03))</span>
+<span class="nc" id="L84">                .build();</span>
+    }
+
+    public static NetworkConfig getPreviewConfig() {
+<span class="nc" id="L88">        return NetworkConfig.builder()</span>
+<span class="nc" id="L89">                .networkMagic(2)</span>
+<span class="nc" id="L90">                .totalLovelace(new BigInteger(&quot;45000000000000000&quot;))</span>
+<span class="nc" id="L91">                .poolDepositInLovelace(BigInteger.valueOf(500000000))</span>
+<span class="nc" id="L92">                .expectedSlotsPerEpoch(86400)</span>
+<span class="nc" id="L93">                .shelleyInitialReserves(new BigInteger(&quot;14991000000000000&quot;))</span>
+<span class="nc" id="L94">                .shelleyInitialTreasury(new BigInteger(&quot;9000000000000&quot;))</span>
+<span class="nc" id="L95">                .shelleyInitialUtxo(new BigInteger(&quot;30009000000000000&quot;))</span>
+<span class="nc" id="L96">                .genesisConfigSecurityParameter(432)</span>
+<span class="nc" id="L97">                .shelleyStartEpoch(1)</span>
+<span class="nc" id="L98">                .allegraHardforkEpoch(1)</span>
+<span class="nc" id="L99">                .vasilHardforkEpoch(3)</span>
+<span class="nc" id="L100">                .bootstrapAddressAmount(new BigInteger(&quot;0&quot;))</span>
+<span class="nc" id="L101">                .activeSlotCoefficient(0.05)</span>
+<span class="nc" id="L102">                .randomnessStabilisationWindow(34560) // (4 * GENESIS_CONFIG_SECURITY_PARAMETER) / ACTIVE_SLOT_COEFFICIENT</span>
+<span class="nc" id="L103">                .shelleyStartDecentralisation(BigDecimal.valueOf(1.0))</span>
+<span class="nc" id="L104">                .shelleyStartTreasuryGrowRate(BigDecimal.valueOf(0.2))</span>
+<span class="nc" id="L105">                .shelleyStartMonetaryExpandRate(BigDecimal.valueOf(0.003))</span>
+<span class="nc" id="L106">                .shelleyStartOptimalPoolCount(150)</span>
+<span class="nc" id="L107">                .shelleyStartPoolOwnerInfluence(BigDecimal.valueOf(0.03))</span>
+<span class="nc" id="L108">                .build();</span>
+    }
+
+    public static NetworkConfig getSanchonetConfig() {
+<span class="nc" id="L112">        return NetworkConfig.builder()</span>
+<span class="nc" id="L113">                .networkMagic(2)</span>
+<span class="nc" id="L114">                .totalLovelace(new BigInteger(&quot;45000000000000000&quot;))</span>
+<span class="nc" id="L115">                .poolDepositInLovelace(BigInteger.valueOf(500000000))</span>
+<span class="nc" id="L116">                .expectedSlotsPerEpoch(86400)</span>
+<span class="nc" id="L117">                .shelleyInitialReserves(new BigInteger(&quot;14991000000000000&quot;))</span>
+<span class="nc" id="L118">                .shelleyInitialTreasury(new BigInteger(&quot;9000000000000&quot;))</span>
+<span class="nc" id="L119">                .shelleyInitialUtxo(new BigInteger(&quot;30009000000000000&quot;))</span>
+<span class="nc" id="L120">                .genesisConfigSecurityParameter(432)</span>
+<span class="nc" id="L121">                .shelleyStartEpoch(1)</span>
+<span class="nc" id="L122">                .allegraHardforkEpoch(1)</span>
+<span class="nc" id="L123">                .vasilHardforkEpoch(3)</span>
+<span class="nc" id="L124">                .bootstrapAddressAmount(new BigInteger(&quot;0&quot;))</span>
+<span class="nc" id="L125">                .activeSlotCoefficient(0.05)</span>
+<span class="nc" id="L126">                .randomnessStabilisationWindow(34560) // (4 * GENESIS_CONFIG_SECURITY_PARAMETER) / ACTIVE_SLOT_COEFFICIENT</span>
+<span class="nc" id="L127">                .shelleyStartDecentralisation(BigDecimal.valueOf(1.0))</span>
+<span class="nc" id="L128">                .shelleyStartTreasuryGrowRate(BigDecimal.valueOf(0.2))</span>
+<span class="nc" id="L129">                .shelleyStartMonetaryExpandRate(BigDecimal.valueOf(0.003))</span>
+<span class="nc" id="L130">                .shelleyStartOptimalPoolCount(150)</span>
+<span class="nc" id="L131">                .shelleyStartPoolOwnerInfluence(BigDecimal.valueOf(0.03))</span>
+<span class="nc" id="L132">                .build();</span>
+    }
+
+    public static NetworkConfig getNetworkConfigByNetworkMagic(int networkMagic) {
+<span class="pc bpc" id="L136" title="4 of 5 branches missed.">        return switch (networkMagic) {</span>
+<span class="fc" id="L137">            case MAINNET_NETWORK_MAGIC -&gt; getMainnetConfig();</span>
+<span class="nc" id="L138">            case PREPROD_NETWORK_MAGIC -&gt; getPreprodConfig();</span>
+<span class="nc" id="L139">            case PREVIEW_NETWORK_MAGIC -&gt; getPreviewConfig();</span>
+<span class="nc" id="L140">            case SANCHONET_NETWORK_MAGIC -&gt; getSanchonetConfig();</span>
+<span class="nc" id="L141">            default -&gt; throw new IllegalArgumentException(&quot;Invalid network magic: &quot; + networkMagic);</span>
+        };
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

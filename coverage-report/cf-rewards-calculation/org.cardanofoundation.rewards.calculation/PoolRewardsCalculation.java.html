@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>PoolRewardsCalculation.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">cf-rewards-validation</a> &gt; <a href="../index.html" class="el_bundle">cf-rewards-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.calculation</a> &gt; <span class="el_source">PoolRewardsCalculation.java</span></div><h1>PoolRewardsCalculation.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.calculation;
 
+import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.calculation.domain.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.MAINNET_ALLEGRA_HARDFORK_EPOCH;
-import static org.cardanofoundation.rewards.calculation.constants.RewardConstants.MAINNET_VASIL_HARDFORK_EPOCH;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.divide;
 
 import lombok.extern.slf4j.Slf4j;
 
-<span class="fc" id="L16">@Slf4j</span>
-<span class="nc" id="L17">public class PoolRewardsCalculation {</span>
+<span class="fc" id="L15">@Slf4j</span>
+<span class="nc" id="L16">public class PoolRewardsCalculation {</span>
 
     /*
      * https://github.com/input-output-hk/cardano-ledger/releases/latest/download/shelley-delegation.pdf
@@ -29,17 +28,17 @@ import lombok.extern.slf4j.Slf4j;
      * See Haskell implementation: https://github.com/input-output-hk/cardano-ledger/blob/64459cc87094331c79d11880e0a4c81b9a721ab0/eras/shelley/impl/src/Cardano/Ledger/Shelley/Rewards.hs#L87C32-L87C44
      */
     public static BigDecimal calculateApparentPoolPerformance(final BigInteger activePoolStake, final BigInteger totalActiveEpochStake, final int blocksMintedByPool, final int blocksMintedByStakePools, final BigDecimal decentralizationParam) {
-<span class="fc" id="L32">        BigDecimal poolStake = new BigDecimal(activePoolStake);</span>
-<span class="fc" id="L33">        BigDecimal totalEpochStake = new BigDecimal(totalActiveEpochStake);</span>
+<span class="fc" id="L31">        BigDecimal poolStake = new BigDecimal(activePoolStake);</span>
+<span class="fc" id="L32">        BigDecimal totalEpochStake = new BigDecimal(totalActiveEpochStake);</span>
 
-<span class="fc bfc" id="L35" title="All 2 branches covered.">        if (decentralizationParam.compareTo(BigDecimal.valueOf(0.8)) &gt;= 0) {</span>
-<span class="fc" id="L36">            return BigDecimal.ONE;</span>
-<span class="pc bpc" id="L37" title="2 of 4 branches missed.">        } else if (isZero(poolStake) || isZero(totalEpochStake)) {</span>
-<span class="nc" id="L38">            return BigDecimal.ZERO;</span>
+<span class="fc bfc" id="L34" title="All 2 branches covered.">        if (decentralizationParam.compareTo(BigDecimal.valueOf(0.8)) &gt;= 0) {</span>
+<span class="fc" id="L35">            return BigDecimal.ONE;</span>
+<span class="pc bpc" id="L36" title="2 of 4 branches missed.">        } else if (isZero(poolStake) || isZero(totalEpochStake)) {</span>
+<span class="nc" id="L37">            return BigDecimal.ZERO;</span>
         } else {
-<span class="fc" id="L40">            final BigDecimal relativeBlocksCreatedInEpoch = divide(blocksMintedByPool, blocksMintedByStakePools);</span>
-<span class="fc" id="L41">            final BigDecimal relativeActiveStake = divide(poolStake, totalEpochStake);</span>
-<span class="fc" id="L42">            return divide(relativeBlocksCreatedInEpoch, relativeActiveStake);</span>
+<span class="fc" id="L39">            final BigDecimal relativeBlocksCreatedInEpoch = divide(blocksMintedByPool, blocksMintedByStakePools);</span>
+<span class="fc" id="L40">            final BigDecimal relativeActiveStake = divide(poolStake, totalEpochStake);</span>
+<span class="fc" id="L41">            return divide(relativeBlocksCreatedInEpoch, relativeActiveStake);</span>
         }
     }
 
@@ -67,23 +66,23 @@ import lombok.extern.slf4j.Slf4j;
      */
     public static BigInteger calculateOptimalPoolReward(BigInteger totalAvailableRewards, int optimalPoolCount, BigDecimal influence, BigDecimal relativeStakeOfPool, BigDecimal relativeStakeOfPoolOwner) {
 
-<span class="fc" id="L70">        BigDecimal sizeOfASaturatedPool = divide(BigDecimal.ONE, optimalPoolCount);</span>
-<span class="fc" id="L71">        BigDecimal cappedRelativeStake = min(relativeStakeOfPool, sizeOfASaturatedPool);</span>
-<span class="fc" id="L72">        BigDecimal cappedRelativeStakeOfPoolOwner = min(relativeStakeOfPoolOwner, sizeOfASaturatedPool);</span>
+<span class="fc" id="L69">        BigDecimal sizeOfASaturatedPool = divide(BigDecimal.ONE, optimalPoolCount);</span>
+<span class="fc" id="L70">        BigDecimal cappedRelativeStake = min(relativeStakeOfPool, sizeOfASaturatedPool);</span>
+<span class="fc" id="L71">        BigDecimal cappedRelativeStakeOfPoolOwner = min(relativeStakeOfPoolOwner, sizeOfASaturatedPool);</span>
 
         // R / (1 + a0)
         // &quot;R are the total available rewards for the epoch (in ada).&quot; (shelley-delegation.pdf 5.5.3)
-<span class="fc" id="L76">        BigDecimal rewardsDividedByOnePlusInfluence = divide(totalAvailableRewards, add(BigDecimal.ONE, influence));</span>
+<span class="fc" id="L75">        BigDecimal rewardsDividedByOnePlusInfluence = divide(totalAvailableRewards, add(BigDecimal.ONE, influence));</span>
 
         // (z0 - sigma') / z0
-<span class="fc" id="L79">        BigDecimal relativeStakeOfSaturatedPool = divide(subtract(sizeOfASaturatedPool, cappedRelativeStake), sizeOfASaturatedPool);</span>
+<span class="fc" id="L78">        BigDecimal relativeStakeOfSaturatedPool = divide(subtract(sizeOfASaturatedPool, cappedRelativeStake), sizeOfASaturatedPool);</span>
 
         // (sigma' - s' * relativeStakeOfSaturatedPool) / z0
-<span class="fc" id="L82">        BigDecimal saturatedPoolWeight = divide(subtract(cappedRelativeStake, multiply(cappedRelativeStakeOfPoolOwner, relativeStakeOfSaturatedPool)), sizeOfASaturatedPool);</span>
+<span class="fc" id="L81">        BigDecimal saturatedPoolWeight = divide(subtract(cappedRelativeStake, multiply(cappedRelativeStakeOfPoolOwner, relativeStakeOfSaturatedPool)), sizeOfASaturatedPool);</span>
 
         // R / (1+a0) * (sigma' + s' * a0 * saturatedPoolWeight)
-<span class="fc" id="L85">        return floor(multiply(rewardsDividedByOnePlusInfluence,</span>
-<span class="fc" id="L86">                add(cappedRelativeStake, multiply(cappedRelativeStakeOfPoolOwner, influence, saturatedPoolWeight))));</span>
+<span class="fc" id="L84">        return floor(multiply(rewardsDividedByOnePlusInfluence,</span>
+<span class="fc" id="L85">                add(cappedRelativeStake, multiply(cappedRelativeStakeOfPoolOwner, influence, saturatedPoolWeight))));</span>
     }
 
     /*
@@ -91,7 +90,7 @@ import lombok.extern.slf4j.Slf4j;
      *  actualRewards = poolPerformance * optimalPoolReward
      */
     public static BigInteger calculatePoolReward(BigInteger optimalPoolReward, BigDecimal poolPerformance) {
-<span class="fc" id="L94">        return floor(multiply(optimalPoolReward, poolPerformance));</span>
+<span class="fc" id="L93">        return floor(multiply(optimalPoolReward, poolPerformance));</span>
     }
 
     /*
@@ -100,12 +99,12 @@ import lombok.extern.slf4j.Slf4j;
      */
     public static BigInteger calculateLeaderReward(BigInteger poolReward, double margin, BigInteger poolCost,
                                                    BigDecimal relativeOwnerStake, BigDecimal relativeStakeOfPool) {
-<span class="fc bfc" id="L103" title="All 2 branches covered.">        if (isLowerOrEquals(poolReward, poolCost)) {</span>
-<span class="fc" id="L104">            return poolReward;</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        if (isLowerOrEquals(poolReward, poolCost)) {</span>
+<span class="fc" id="L103">            return poolReward;</span>
         }
 
-<span class="fc" id="L107">        return add(poolCost, floor(multiply(subtract(poolReward, poolCost),</span>
-<span class="fc" id="L108">                add(margin, multiply((1 - margin), divide(relativeOwnerStake, relativeStakeOfPool))))));</span>
+<span class="fc" id="L106">        return add(poolCost, floor(multiply(subtract(poolReward, poolCost),</span>
+<span class="fc" id="L107">                add(margin, multiply((1 - margin), divide(relativeOwnerStake, relativeStakeOfPool))))));</span>
     }
 
     /*
@@ -116,13 +115,13 @@ import lombok.extern.slf4j.Slf4j;
      */
     public static BigInteger calculateMemberReward(BigInteger poolReward, double margin, BigInteger poolCost,
                                                    BigDecimal relativeMemberStake, BigDecimal relativeStakeOfPool) {
-<span class="fc bfc" id="L119" title="All 2 branches covered.">        if (isLowerOrEquals(poolReward, poolCost)) {</span>
-<span class="fc" id="L120">            return BigInteger.ZERO;</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">        if (isLowerOrEquals(poolReward, poolCost)) {</span>
+<span class="fc" id="L119">            return BigInteger.ZERO;</span>
         }
 
-<span class="fc" id="L123">        return floor(divide(multiply(</span>
-<span class="fc" id="L124">                poolReward.subtract(poolCost),</span>
-<span class="fc" id="L125">                subtract(BigDecimal.ONE, margin),</span>
+<span class="fc" id="L122">        return floor(divide(multiply(</span>
+<span class="fc" id="L123">                poolReward.subtract(poolCost),</span>
+<span class="fc" id="L124">                subtract(BigDecimal.ONE, margin),</span>
                 relativeMemberStake), relativeStakeOfPool));
     }
 
@@ -132,7 +131,8 @@ import lombok.extern.slf4j.Slf4j;
                                                                          final BigInteger totalActiveStakeOfOwners, final HashSet&lt;String&gt; poolOwnerStakeAddresses,
                                                                          final HashSet&lt;String&gt; deregisteredAccounts, final boolean ignoreLeaderReward,
                                                                          final HashSet&lt;String&gt; lateDeregisteredAccounts,
-                                                                         final HashSet&lt;String&gt; accountsRegisteredInThePast) {
+                                                                         final HashSet&lt;String&gt; accountsRegisteredInThePast,
+                                                                         final NetworkConfig networkConfig) {
 <span class="fc" id="L136">        final int earnedEpoch = poolStateCurrentEpoch.getEpoch();</span>
 <span class="fc" id="L137">        final PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardCalculationResult.builder()</span>
 <span class="fc" id="L138">                .epoch(earnedEpoch)</span>
@@ -149,7 +149,7 @@ import lombok.extern.slf4j.Slf4j;
             a reward update. As in the Shelley era, though, they are still filtered on the epoch boundary
             when the reward update is applied
         */
-<span class="fc bfc" id="L152" title="All 2 branches covered.">        if (earnedEpoch &gt;= MAINNET_VASIL_HARDFORK_EPOCH) {</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">        if (earnedEpoch &gt;= networkConfig.getVasilHardforkEpoch()) {</span>
 <span class="fc" id="L153">            lateDeregisteredAccounts.addAll(deregisteredAccounts);</span>
 <span class="fc" id="L154">            deregisteredAccounts.clear();</span>
         }
@@ -212,7 +212,7 @@ import lombok.extern.slf4j.Slf4j;
 
 <span class="fc bfc" id="L213" title="All 2 branches covered.">        if (!accountsRegisteredInThePast.contains(rewardAddress)) {</span>
 <span class="fc" id="L214">            log.info(poolRewardCalculationResult.getRewardAddress() + &quot; has never been registered. Operator would have received &quot; + poolOperatorReward + &quot; but will not receive any rewards.&quot;);</span>
-<span class="pc bpc" id="L215" title="1 of 2 branches missed.">            if (earnedEpoch &gt;= MAINNET_VASIL_HARDFORK_EPOCH) {</span>
+<span class="pc bpc" id="L215" title="1 of 2 branches missed.">            if (earnedEpoch &gt;= networkConfig.getVasilHardforkEpoch()) {</span>
 <span class="nc" id="L216">                unspendableEarnedRewards = poolOperatorReward;</span>
             }
 <span class="fc" id="L218">            poolOperatorReward = BigInteger.ZERO;</span>
@@ -243,8 +243,8 @@ import lombok.extern.slf4j.Slf4j;
 
                 shelley-ledger.pdf | 17.4 Reward aggregation | p. 114
              */
-<span class="fc bfc" id="L246" title="All 4 branches covered.">            if (stakeAddress.equals(poolStateCurrentEpoch.getRewardAddress())</span>
-                    &amp;&amp; earnedEpoch &lt; MAINNET_ALLEGRA_HARDFORK_EPOCH) {
+<span class="fc bfc" id="L246" title="All 2 branches covered.">            if (stakeAddress.equals(poolStateCurrentEpoch.getRewardAddress())</span>
+<span class="fc bfc" id="L247" title="All 2 branches covered.">                    &amp;&amp; earnedEpoch &lt; networkConfig.getAllegraHardforkEpoch()) {</span>
 <span class="fc" id="L248">                continue;</span>
             }
 
