@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.11.1...v0.12.0) (2024-08-08)
+
+
+### Features
+
+* introduce network config ([b219064](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/b2190644ad99aa45c08e6ce68e15dbcef1be18fa))
+
 ## [0.11.1](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.11.0...v0.11.1) (2024-04-21)
 
 
