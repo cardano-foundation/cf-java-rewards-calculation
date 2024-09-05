@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.12.0...v0.13.0) (2024-09-05)
+
+
+### Features
+
+* conway changes to fit the new dbsync schema ([cb32389](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/cb32389b8c59c878fef9c6fa99cc0586860baf06))
+
 ## [0.12.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.11.1...v0.12.0) (2024-08-08)
 
 
