@@ -34,7 +34,7 @@ public class DbSyncAdaPots {
     @Column(name = "utxo")
     private BigInteger utxo;
 
-    @Column(name = "deposits")
+    @Column(name = "deposits_stake")
     private BigInteger deposits;
 
     @Column(name = "fees")
