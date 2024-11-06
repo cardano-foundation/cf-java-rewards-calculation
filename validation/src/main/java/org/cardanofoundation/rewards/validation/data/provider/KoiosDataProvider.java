@@ -1,5 +1,6 @@
 package org.cardanofoundation.rewards.validation.data.provider;
 
+import com.bloxbean.cardano.client.common.ADAConversionUtil;
 import lombok.RequiredArgsConstructor;
 import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.calculation.domain.*;
@@ -20,9 +21,8 @@ import rest.koios.client.backend.factory.options.filters.Filter;
 import rest.koios.client.backend.factory.options.filters.FilterType;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -118,9 +118,7 @@ public class KoiosDataProvider implements DataProvider {
     }
 
     @Override
-    public HashSet<String> getRewardAddressesOfRetiredPoolsInEpoch(int epoch) {
-        HashSet<String> rewardAddressesOfRetiredPools = new HashSet<>();
-
+    public Set<RetiredPool> getRetiredPoolsInEpoch(int epoch) {
         // TODO: It seems as this is not a sufficient method to get the retired pools
         try {
             List<PoolUpdate> poolUpdateList = koiosBackendService.getPoolService().getPoolUpdates(Options.builder()
@@ -131,12 +129,14 @@ public class KoiosDataProvider implements DataProvider {
 
             if (poolUpdateList == null) return new HashSet<>();
 
-            rewardAddressesOfRetiredPools.addAll(poolUpdateList.stream().map(PoolUpdate::getRewardAddr).toList());
+            return poolUpdateList.stream()
+                            .map(poolUpdate -> new RetiredPool(poolUpdate.getPoolIdBech32(), poolUpdate.getRewardAddr(), ADAConversionUtil.adaToLovelace(500)))
+                                    .collect(Collectors.toSet());
         } catch (ApiException e) {
             e.printStackTrace();
         }
 
-        return rewardAddressesOfRetiredPools;
+        return Collections.emptySet();
     }
 
     @Override

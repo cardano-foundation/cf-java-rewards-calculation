@@ -3,10 +3,12 @@ package org.cardanofoundation.rewards.validation.domain;
 import lombok.*;
 import org.cardanofoundation.rewards.calculation.domain.MirCertificate;
 import org.cardanofoundation.rewards.calculation.domain.PoolState;
+import org.cardanofoundation.rewards.calculation.domain.RetiredPool;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -30,7 +32,7 @@ public class EpochValidationInput {
     private BigInteger activeStake;
     private int nonOBFTBlockCount;
 
-    private HashSet<String> rewardAddressesOfRetiredPoolsInEpoch;
+    private Set<RetiredPool> retiredPools;
     private HashSet<String> deregisteredAccounts;
     private HashSet<String> lateDeregisteredAccounts;
     private HashSet<String> registeredAccountsSinceLastEpoch;

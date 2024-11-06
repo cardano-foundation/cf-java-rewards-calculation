@@ -14,8 +14,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -100,10 +100,10 @@ public class DbSyncDataProviderTest {
     }
 
     @Test
-    public void testGetRewardAddressesOfRetiredPoolsInEpoch218() {
+    public void testGetRetiredPoolsInEpoch218() {
         int epoch = 218;
-        HashSet<String> rewardAddressesOfRetiredPoolsInEpoch = dbSyncDataProvider.getRewardAddressesOfRetiredPoolsInEpoch(epoch);
+        Set<RetiredPool> retiredPools = dbSyncDataProvider.getRetiredPoolsInEpoch(epoch);
 
-        Assertions.assertEquals(7, rewardAddressesOfRetiredPoolsInEpoch.size());
+        Assertions.assertEquals(7, retiredPools.size());
     }
 }

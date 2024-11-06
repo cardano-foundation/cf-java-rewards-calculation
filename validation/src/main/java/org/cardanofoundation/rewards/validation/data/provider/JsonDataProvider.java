@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -121,7 +122,7 @@ public class JsonDataProvider implements DataProvider {
     }
 
     @Override
-    public HashSet<String> getRewardAddressesOfRetiredPoolsInEpoch(int epoch) {
+    public Set<RetiredPool> getRetiredPoolsInEpoch(int epoch) {
         try {
             loadEpochValidationInput(epoch);
         } catch (IOException e) {
@@ -129,7 +130,7 @@ public class JsonDataProvider implements DataProvider {
             return null;
         }
 
-        return epochValidationInput.getRewardAddressesOfRetiredPoolsInEpoch();
+        return epochValidationInput.getRetiredPools();
     }
 
     @Override

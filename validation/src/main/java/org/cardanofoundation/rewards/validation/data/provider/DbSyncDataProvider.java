@@ -18,6 +18,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -253,9 +254,9 @@ public class DbSyncDataProvider implements DataProvider {
     }
 
     @Override
-    public HashSet<String> getRewardAddressesOfRetiredPoolsInEpoch(int epoch) {
+    public Set<RetiredPool> getRetiredPoolsInEpoch(int epoch) {
         List<DbSyncPoolRetirement> poolDeregistrations = dbSyncPoolRetirementRepository.getPoolRetirementsByEpoch(epoch);
-        HashSet<String> rewardAddressesOfRetiredPools = new HashSet<>();
+        Set<RetiredPool> retiredPools = new HashSet<>();
 
         for (DbSyncPoolRetirement poolDeregistration : poolDeregistrations) {
             boolean poolDeregistrationLaterInEpoch = poolDeregistrations.stream().anyMatch(
@@ -282,11 +283,13 @@ public class DbSyncDataProvider implements DataProvider {
                 }
 
                 DbSyncPoolUpdate dbSyncPoolUpdate = dbSyncPoolUpdateRepository.findLatestUpdateInEpoch(poolDeregistration.getPool().getBech32PoolId(), epoch);
-                rewardAddressesOfRetiredPools.add(dbSyncPoolUpdate.getStakeAddress().getView());
+                var retiredPool = new RetiredPool(dbSyncPoolUpdate.getPool().getBech32PoolId(), dbSyncPoolUpdate.getStakeAddress().getView(),
+                        dbSyncPoolUpdate.getDeposit());
+                retiredPools.add(retiredPool);
             }
         }
 
-        return rewardAddressesOfRetiredPools;
+        return retiredPools;
     }
 
     @Override
