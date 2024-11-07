@@ -1,5 +1,6 @@
 package org.cardanofoundation.rewards.validation.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.cardanofoundation.rewards.calculation.domain.MirCertificate;
 import org.cardanofoundation.rewards.calculation.domain.PoolState;
@@ -15,6 +16,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EpochValidationInput {
     private int epoch;
 
