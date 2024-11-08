@@ -9,6 +9,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.cardanofoundation.rewards.calculation.PoolRewardsCalculation.calculatePoolRewardInEpoch;
@@ -22,7 +23,7 @@ public class EpochCalculation {
                                                                   final BigInteger reserveInPreviousEpoch,
                                                                   final BigInteger treasuryInPreviousEpoch,
                                                                   final ProtocolParameters protocolParameters, final Epoch epochInfo,
-                                                                  final HashSet<String> rewardAddressesOfRetiredPools,
+                                                                  final Set<RetiredPool> retiredPools,
                                                                   final HashSet<String> deregisteredAccounts,
                                                                   final List<MirCertificate> mirCertificates,
                                                                   final List<String> poolsThatProducedBlocksInEpoch,
@@ -82,6 +83,9 @@ public class EpochCalculation {
         // The sum of all the refunds attached to unregistered reward accounts are added to the
         // treasury (see: Pool Reap Transition, p.53, figure 40, shelley-ledger.pdf)
         BigInteger unclaimedRefunds = BigInteger.ZERO;
+        var rewardAddressesOfRetiredPools = retiredPools.stream()
+                .map(retiredPool -> retiredPool.getRewardAddress()).collect(Collectors.toSet());
+
         if (rewardAddressesOfRetiredPools.size() > 0) {
             List<String> deregisteredOwnerAccounts = deregisteredAccountsOnEpochBoundary.stream()
                     .filter(rewardAddressesOfRetiredPools::contains).toList();
@@ -91,13 +95,13 @@ public class EpochCalculation {
             /* Check if the reward address of the retired pool has been unregistered before
                or if the reward address has been unregistered after the randomness stabilization window
                or if the reward address has not been registered at all */
-            for (String rewardAddress : rewardAddressesOfRetiredPools) {
-                if (deregisteredOwnerAccounts.contains(rewardAddress) ||
-                        !ownerAccountsRegisteredInThePast.contains(rewardAddress)) {
+            for (var retiredPool : retiredPools) {
+                if (deregisteredOwnerAccounts.contains(retiredPool.getRewardAddress()) ||
+                        !ownerAccountsRegisteredInThePast.contains(retiredPool.getRewardAddress())) {
                     // If the reward address has been unregistered, the deposit can not be returned
                     // and will be added to the treasury instead (Pool Reap see: shelley-ledger.pdf p.53)
-                    treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(networkConfig.getPoolDepositInLovelace());
-                    unclaimedRefunds = unclaimedRefunds.add(networkConfig.getPoolDepositInLovelace());
+                    treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(retiredPool.getDepositAmount());
+                    unclaimedRefunds = unclaimedRefunds.add(retiredPool.getDepositAmount());
                 }
             }
         }

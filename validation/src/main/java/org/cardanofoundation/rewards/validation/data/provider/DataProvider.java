@@ -7,6 +7,7 @@ import org.cardanofoundation.rewards.validation.domain.PoolReward;
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public interface DataProvider {
 
@@ -19,7 +20,7 @@ public interface DataProvider {
     public List<PoolState> getHistoryOfAllPoolsInEpoch(int epoch, List<PoolBlock> blocksMadeByPoolsInEpoch);
     public PoolState getPoolHistory(String poolId, int epoch);
 
-    public HashSet<String> getRewardAddressesOfRetiredPoolsInEpoch(int epoch);
+    public Set<RetiredPool> getRetiredPoolsInEpoch(int epoch);
 
     public List<MirCertificate> getMirCertificatesInEpoch(int epoch);
 

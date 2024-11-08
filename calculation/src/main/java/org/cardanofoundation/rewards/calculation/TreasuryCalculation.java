@@ -9,6 +9,7 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
@@ -17,7 +18,7 @@ public class TreasuryCalculation {
 
   public static TreasuryCalculationResult calculateTreasuryInEpoch(int epoch, ProtocolParameters protocolParameters,
                                                                    AdaPots adaPotsForPreviousEpoch, Epoch epochInfo,
-                                                                   HashSet<String> rewardAddressesOfRetiredPools,
+                                                                   Set<RetiredPool> retiredPools,
                                                                    List<MirCertificate> mirCertificates,
                                                                    final HashSet<String> deregisteredAccounts,
                                                                    final HashSet<String> registeredAccountsUntilNow,
@@ -60,6 +61,7 @@ public class TreasuryCalculation {
     final BigInteger treasuryCut = multiplyAndFloor(totalRewardPot, treasuryGrowthRate);
     BigInteger treasuryForCurrentEpoch = treasuryInPreviousEpoch.add(treasuryCut);
 
+    var rewardAddressesOfRetiredPools = retiredPools.stream().map(RetiredPool::getRewardAddress).collect(Collectors.toSet());
     BigInteger unclaimedRefunds = BigInteger.ZERO;
     if (rewardAddressesOfRetiredPools.size() > 0) {
       HashSet<String> deregisteredRewardAccounts = deregisteredAccounts.stream()
@@ -67,7 +69,7 @@ public class TreasuryCalculation {
       List<String> ownerAccountsRegisteredInThePast = registeredAccountsUntilNow.stream()
               .filter(rewardAddressesOfRetiredPools::contains).toList();
 
-      unclaimedRefunds = calculateUnclaimedRefundsForRetiredPools(rewardAddressesOfRetiredPools, deregisteredRewardAccounts, ownerAccountsRegisteredInThePast, networkConfig);
+      unclaimedRefunds = calculateUnclaimedRefundsForRetiredPools(retiredPools, deregisteredRewardAccounts, ownerAccountsRegisteredInThePast, networkConfig);
       treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(unclaimedRefunds);
     }
 
@@ -141,21 +143,21 @@ public class TreasuryCalculation {
     pool's registered reward account, provided the reward account is still registered." -
     https://github.com/input-output-hk/cardano-ledger/blob/9e2f8151e3b9a0dde9faeb29a7dd2456e854427c/eras/shelley/formal-spec/epoch.tex#L546C9-L547C87
    */
-  public static BigInteger calculateUnclaimedRefundsForRetiredPools(HashSet<String> rewardAddressesOfRetiredPools,
+  public static BigInteger calculateUnclaimedRefundsForRetiredPools(Set<RetiredPool> retiredPools,
                                                                     HashSet<String> deregisteredRewardAccounts,
                                                                     List<String> ownerAccountsRegisteredInThePast,
                                                                     NetworkConfig networkConfig) {
     BigInteger unclaimedRefunds = BigInteger.ZERO;
-    if (rewardAddressesOfRetiredPools.size() > 0) {
+    if (retiredPools.size() > 0) {
     /* Check if the reward address of the retired pool has been unregistered before
        or if the reward address has been unregistered after the randomness stabilization window
        or if the reward address has not been registered at all */
-      for (String rewardAddress : rewardAddressesOfRetiredPools) {
-        if (deregisteredRewardAccounts.contains(rewardAddress) ||
-                !ownerAccountsRegisteredInThePast.contains(rewardAddress)) {
+      for (var retiredPool : retiredPools) {
+        if (deregisteredRewardAccounts.contains(retiredPool.getRewardAddress()) ||
+                !ownerAccountsRegisteredInThePast.contains(retiredPool.getRewardAddress())) {
           // If the reward address has been unregistered, the deposit can not be returned
           // and will be added to the treasury instead (Pool Reap see: shelley-ledger.pdf p.53)
-          unclaimedRefunds = unclaimedRefunds.add(networkConfig.getPoolDepositInLovelace());
+          unclaimedRefunds = unclaimedRefunds.add(retiredPool.getDepositAmount());
         }
       }
     }

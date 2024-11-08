@@ -31,6 +31,9 @@ public class DbSyncPoolUpdate {
     @Column(name = "fixed_cost")
     private BigInteger fixedCost;
 
+    @Column(name = "deposit")
+    private BigInteger deposit;
+
     @ManyToOne
     @JoinColumn(name = "registered_tx_id", nullable = false,
             foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "none"))

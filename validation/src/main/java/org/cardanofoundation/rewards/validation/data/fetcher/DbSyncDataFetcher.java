@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -85,7 +86,10 @@ public class DbSyncDataFetcher implements DataFetcher {
         HashSet<String> deregisteredAccounts;
         HashSet<String> deregisteredAccountsOnEpochBoundary;
         HashSet<String> lateDeregisteredAccounts = new HashSet<>();
-        HashSet<String> rewardAddressesOfRetiredPoolsInEpoch = dbSyncDataProvider.getRewardAddressesOfRetiredPoolsInEpoch(epoch);
+        Set<RetiredPool> retiredPools = new HashSet<>();
+        retiredPools = dbSyncDataProvider.getRetiredPoolsInEpoch(epoch);
+        Set<String> rewardAddressesOfRetiredPoolsInEpoch = retiredPools.stream().map(RetiredPool::getRewardAddress).collect(Collectors.toSet());
+
         if (epoch - 2 < networkConfig.getVasilHardforkEpoch()) {
             deregisteredAccounts = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch - 1, networkConfig.getRandomnessStabilisationWindow());
             deregisteredAccountsOnEpochBoundary = dbSyncDataProvider.getDeregisteredAccountsInEpoch(epoch - 1, networkConfig.getExpectedSlotsPerEpoch());
@@ -145,7 +149,7 @@ public class DbSyncDataFetcher implements DataFetcher {
                 .blockCount(blockCount)
                 .activeStake(activeStake)
                 .nonOBFTBlockCount(nonOBFTBlockCount)
-                .rewardAddressesOfRetiredPoolsInEpoch(rewardAddressesOfRetiredPoolsInEpoch)
+                .retiredPools(retiredPools)
                 .deregisteredAccounts(deregisteredAccounts)
                 .lateDeregisteredAccounts(lateDeregisteredAccounts)
                 .registeredAccountsSinceLastEpoch(registeredAccountsSinceLastEpoch)

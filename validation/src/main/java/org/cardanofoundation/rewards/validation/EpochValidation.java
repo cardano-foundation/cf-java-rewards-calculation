@@ -104,7 +104,7 @@ public class EpochValidation {
 
             epochCalculationResult = EpochCalculation.calculateEpochRewardPots(
                     epoch, epochValidationInput.getReservesOfPreviousEpoch(),
-                    epochValidationInput.getTreasuryOfPreviousEpoch(), protocolParameters, epochInfo, epochValidationInput.getRewardAddressesOfRetiredPoolsInEpoch(),
+                    epochValidationInput.getTreasuryOfPreviousEpoch(), protocolParameters, epochInfo, epochValidationInput.getRetiredPools(),
                     epochValidationInput.getDeregisteredAccounts(),
                     new ArrayList<>(epochValidationInput.getMirCertificates()),
                     new ArrayList<>(poolIds),
@@ -121,7 +121,10 @@ public class EpochValidation {
             AdaPots adaPotsForPreviousEpoch = dataProvider.getAdaPotsForEpoch(epoch - 1);
             ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch - 2);
             Epoch epochInfo = dataProvider.getEpochInfo(epoch - 2, networkConfig);
-            HashSet<String> rewardAddressesOfRetiredPoolsInEpoch = dataProvider.getRewardAddressesOfRetiredPoolsInEpoch(epoch);
+
+            Set<RetiredPool> retiredPoolsInEpoch = dataProvider.getRetiredPoolsInEpoch(epoch);
+            Set<String> rewardAddressesOfRetiredPoolsInEpoch = retiredPoolsInEpoch.stream().map(RetiredPool::getRewardAddress).collect(Collectors.toSet());
+
             List<MirCertificate> mirCertificates = dataProvider.getMirCertificatesInEpoch(epoch - 1);
             List<PoolBlock> blocksMadeByPoolsInEpoch = dataProvider.getBlocksMadeByPoolsInEpoch(epoch - 2);
             List<String> poolIds = blocksMadeByPoolsInEpoch.stream().map(PoolBlock::getPoolId).distinct().toList();
@@ -167,7 +170,7 @@ public class EpochValidation {
 
             start = System.currentTimeMillis();
             epochCalculationResult = EpochCalculation.calculateEpochRewardPots(
-                    epoch, adaPotsForPreviousEpoch.getReserves(), adaPotsForPreviousEpoch.getTreasury(), protocolParameters, epochInfo, rewardAddressesOfRetiredPoolsInEpoch, deregisteredAccounts,
+                    epoch, adaPotsForPreviousEpoch.getReserves(), adaPotsForPreviousEpoch.getTreasury(), protocolParameters, epochInfo, retiredPoolsInEpoch, deregisteredAccounts,
                     mirCertificates, poolIds, poolStates, lateDeregisteredAccounts,
                     registeredAccountsSinceLastEpoch, registeredAccountsUntilNow, sharedPoolRewardAddressesWithoutReward,
                     deregisteredAccountsOnEpochBoundary, networkConfig);
