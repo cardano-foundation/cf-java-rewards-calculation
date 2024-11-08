@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.1](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.13.0...v0.13.1) (2024-11-08)
+
+
+### Bug Fixes
+
+* Update network config for Preprod ([dae9b65](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/dae9b656d47cd7e09764a10d181e173a89ec6896))
+
 ## [0.13.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.12.0...v0.13.0) (2024-09-05)
 
 
