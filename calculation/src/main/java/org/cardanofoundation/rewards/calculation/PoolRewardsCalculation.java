@@ -128,10 +128,10 @@ public class PoolRewardsCalculation {
     public static PoolRewardCalculationResult calculatePoolRewardInEpoch(final String poolId, final PoolState poolStateCurrentEpoch,
                                                                          final int totalBlocksInEpoch, final ProtocolParameters protocolParameters,
                                                                          final BigInteger adaInCirculation, final BigInteger activeStakeInEpoch, BigInteger stakePoolRewardsPot,
-                                                                         final BigInteger totalActiveStakeOfOwners, final HashSet<String> poolOwnerStakeAddresses,
-                                                                         final HashSet<String> deregisteredAccounts, final boolean ignoreLeaderReward,
-                                                                         final HashSet<String> lateDeregisteredAccounts,
-                                                                         final HashSet<String> accountsRegisteredInThePast,
+                                                                         final BigInteger totalActiveStakeOfOwners, final Set<String> poolOwnerStakeAddresses,
+                                                                         final Set<String> deregisteredAccounts, final boolean ignoreLeaderReward,
+                                                                         final Set<String> lateDeregisteredAccounts,
+                                                                         final Set<String> accountsRegisteredInThePast,
                                                                          final NetworkConfig networkConfig) {
         final int earnedEpoch = poolStateCurrentEpoch.getEpoch();
         final PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardCalculationResult.builder()

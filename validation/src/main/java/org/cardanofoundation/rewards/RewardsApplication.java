@@ -106,9 +106,9 @@ public class RewardsApplication implements ApplicationRunner {
       } else if (runMode.equals("plot")) {
           if (activeProfiles.contains("csv")) {
               csvDataPlotter.plot(startEpoch, endEpoch, networkConfig);
-          } else {
-              jsonDataPlotter.plot(startEpoch, endEpoch, networkConfig);
           }
+
+          jsonDataPlotter.plot(startEpoch, endEpoch, networkConfig);
       } else if (!runMode.equals("test")) {
           logger.warn("Unknown run mode: " + runMode);
       }

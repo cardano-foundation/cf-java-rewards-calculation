@@ -16,6 +16,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toCollection;
@@ -28,10 +29,21 @@ public class PoolRewardValidation {
     public static PoolRewardCalculationResult computePoolRewardInEpoch(String poolId, int epoch, ProtocolParameters protocolParameters,
                                                                        Epoch epochInfo, BigInteger stakePoolRewardsPot,
                                                                        BigInteger adaInCirculation, PoolState poolStateCurrentEpoch,
-                                                                       HashSet<String> accountDeregistrations, HashSet<String> lateAccountDeregistrations,
-                                                                       HashSet<String> accountsRegisteredInThePast,
-                                                                       HashSet<String> poolIdsWithSharedRewardAddresses,
+                                                                       Set<String> accountDeregistrations, Set<String> lateAccountDeregistrations,
+                                                                       Set<String> accountsRegisteredInThePast,
+                                                                       Set<String> poolIdsWithSharedRewardAddresses,
                                                                        NetworkConfig networkConfig) {
+        return computePoolRewardInEpoch(poolId, epoch, protocolParameters, epochInfo, stakePoolRewardsPot, adaInCirculation, poolStateCurrentEpoch,
+                accountDeregistrations, lateAccountDeregistrations, accountsRegisteredInThePast, poolIdsWithSharedRewardAddresses, networkConfig, new HashSet<>());
+    }
+
+    public static PoolRewardCalculationResult computePoolRewardInEpoch(String poolId, int epoch, ProtocolParameters protocolParameters,
+                                                                       Epoch epochInfo, BigInteger stakePoolRewardsPot,
+                                                                       BigInteger adaInCirculation, PoolState poolStateCurrentEpoch,
+                                                                       Set<String> accountDeregistrations, Set<String> lateAccountDeregistrations,
+                                                                       Set<String> accountsRegisteredInThePast,
+                                                                       Set<String> poolIdsWithSharedRewardAddresses,
+                                                                       NetworkConfig networkConfig, Set<String> excludedStakeAddresses) {
         // Step 1: Get Pool information of current epoch
         // Example: https://api.koios.rest/api/v0/pool_history?_pool_bech32=pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt&_epoch_no=210
 
@@ -55,7 +67,13 @@ public class PoolRewardValidation {
         // Step 10 a: Check if pool reward address or member stake addresses have been unregistered before
         List<String> stakeAddresses = new ArrayList<>();
         stakeAddresses.add(poolStateCurrentEpoch.getRewardAddress());
-        stakeAddresses.addAll(poolStateCurrentEpoch.getDelegators().stream().map(Delegator::getStakeAddress).toList());
+        stakeAddresses.addAll(poolStateCurrentEpoch.getDelegators().stream().map(Delegator::getStakeAddress).filter(address -> !excludedStakeAddresses.contains(address)).toList());
+
+        for (Delegator delegator : poolStateCurrentEpoch.getDelegators()) {
+            if (excludedStakeAddresses.contains(delegator.getStakeAddress())) {
+                poolStateCurrentEpoch.setActiveStake(poolStateCurrentEpoch.getActiveStake().subtract(delegator.getActiveStake()));
+            }
+        }
 
         HashSet<String> delegatorDeregistrations = accountDeregistrations.stream()
                 .filter(stakeAddresses::contains).collect(toCollection(HashSet::new));
@@ -84,6 +102,10 @@ public class PoolRewardValidation {
     }
 
     public static PoolRewardCalculationResult computePoolRewardInEpoch(String poolId, int epoch, DataProvider dataProvider, NetworkConfig networkConfig) {
+        return computePoolRewardInEpoch(poolId, epoch, dataProvider, networkConfig, new HashSet<>());
+    }
+
+    public static PoolRewardCalculationResult computePoolRewardInEpoch(String poolId, int epoch, DataProvider dataProvider, NetworkConfig networkConfig, Set<String> excludedStakeAddresses) {
         // The Shelley era and the ada pot system started on mainnet in epoch 208.
         // Fee and treasury values are 0 for epoch 208.
 
