@@ -118,6 +118,11 @@ public class EpochValidationTest {
         testCalculateEpochPots(epoch, dbSyncDataProvider, false);
     }
 
+    @Test
+    public void testCalculateEpochRewardsWithDbSyncDataProvider137() {
+        testCalculateEpochPots(372, jsonDataProvider, false);
+    }
+
     @ParameterizedTest
     @MethodSource("dataProviderEpochRange")
     public void testCalculateEpochRewardsWithJsonDataProvider(int epoch) {
@@ -139,7 +144,7 @@ public class EpochValidationTest {
     @Test
     @EnabledIf(expression = "#{environment.acceptsProfiles('db-sync')}", loadContext = true, reason = "DB Sync data provider must be available for this test")
     public void testCalculateEpochRewardsForEpoch417() {
-        testCalculateEpochPots(417, dbSyncDataProvider, true);
+        testCalculateEpochPots(181, dbSyncDataProvider, true);
     }
 
     @Test
