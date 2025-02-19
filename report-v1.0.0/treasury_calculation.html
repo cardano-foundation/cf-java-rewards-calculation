@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1" />
+    <title>Treasury Calculation Results</title>
+    <script src="plotly-2.26.0.min.js" charset="utf-8"></script>
+    <script src="treasury_calculation_result.js"></script>
+    <script src="./index.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f6f9ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .plots {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .plot {
+            padding: 16px;
+            width: 100%;
+            border-radius: 12px;
+        }
+
+        #content {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        h2 {
+            margin: 0;
+        }
+
+        .cards {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 25vw;
+            height: 25vw;
+            margin: 16px;
+            max-height: 150px;
+            max-width: 150px;
+            border-radius: 12px;
+            background: #fff;
+        }
+
+        .card .subtitle {
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            overflow: scroll;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f6f9ff;
+        }
+
+        tr.huge-difference {
+            background-color: #F6C667 !important;
+        }
+
+        td,
+        th {
+            padding: 8px;
+        }
+
+        .table-container {
+            width: 100%;
+            background-color: #fff;
+            padding: 16px;
+            border-radius: 12px;
+        }
+
+        footer {
+            padding: 8px 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="content">
+        <h2>Treasury Calculation Report</h2>
+        <h4 id="epoch-info"></h4>
+        <div class="cards">
+            <div class="card" id="highest-difference-percentage"></div>
+            <div class="card" id="total-absolute-difference"></div>
+            <div class="card" id="highest-absolut-difference"></div>
+            <div class="card" id="average-absolut-difference"></div>
+            <div class="card" id="exact-matches"></div>
+            <div class="card" id="difference-1-100-ADA"></div>
+            <div class="card" id="difference-100-500-ADA"></div>
+            <div class="card" id="difference-500-1000-ADA"></div>
+            <div class="card" id="difference-1k-5k-ADA"></div>
+            <div class="card" id="difference-5k-10k-ADA"></div>
+            <div class="card" id="difference-10k-50k-ADA"></div>
+            <div class="card" id="difference-above-50k-ADA"></div>
+        </div>
+        <div class="plots">
+            <div class="plot" id="calculated-vs-actual-plot"></div>
+            <div class="plot" id="difference-plot"></div>
+            <div class="plot" id="difference-percentage-plot"></div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Epoch</th>
+                        <th>Calculated</th>
+                        <th>Actual</th>
+                        <th>Difference</th>
+                        <th>Difference Percentage</th>
+                        <th>Additional Information</th>
+                    </tr>
+                </thead>
+                <tbody id="treasury-calculation-table">
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Treasury Development</h3>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Epoch</th>
+                        <th>ADA Added to Treasury</th>
+                        <th>Total Rewards Pot Size</th>
+                        <th>% Added to Treasury from Total Rewards Pot</th>
+                        <th>ADA Added on Top of Treasury Cut (PoolReap, etc.)</th>
+                        <th>ADA Removed from Treasury (MIR Cert)</th>
+                    </tr>
+                </thead>
+                <tbody id="treasury-development-table">
+                </tbody>
+            </table>
+
+            <footer><p>Created on Wed, 19 Feb 2025 17:05:55  UTC as a result of modifications triggered by <a href="https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/1b23de5868125fd955adc4eeb51bcb7cf94be68b">1b23de5</a></p></footer>
+        </div>
+
+        <div class="cards">
+            <div class="card" id="ada-added-to-treasury"></div>
+            <div class="card" id="ada-withdrawled-from-treasury"></div>
+            <div class="card" id="total-ada-added-on-top-of-treasury-cut"></div>
+        </div>
+</body>
+
+</html>
