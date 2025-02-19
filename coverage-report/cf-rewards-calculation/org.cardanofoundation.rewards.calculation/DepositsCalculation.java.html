@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>DepositsCalculation.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">cf-rewards-validation</a> &gt; <a href="../index.html" class="el_bundle">cf-rewards-calculation</a> &gt; <a href="index.source.html" class="el_package">org.cardanofoundation.rewards.calculation</a> &gt; <span class="el_source">DepositsCalculation.java</span></div><h1>DepositsCalculation.java</h1><pre class="source lang-java linenums">package org.cardanofoundation.rewards.calculation;
 
-import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
+import org.cardanofoundation.rewards.calculation.domain.RetiredPool;
 
 import java.math.BigInteger;
-import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.multiply;
+import java.util.Set;
 
 <span class="nc" id="L8">public class DepositsCalculation {</span>
 
     public static BigInteger calculateDepositsInEpoch(BigInteger depositsInPreviousEpoch,
                                                       BigInteger transactionDepositsInEpoch,
-                                                      int retiredPoolsInEpoch,
-                                                      NetworkConfig networkConfig) {
-<span class="nc" id="L14">        BigInteger deposits = BigInteger.ZERO;</span>
-<span class="nc" id="L15">        deposits = deposits.add(transactionDepositsInEpoch);</span>
-<span class="nc" id="L16">        deposits = deposits.subtract(</span>
-<span class="nc" id="L17">                    multiply(retiredPoolsInEpoch, networkConfig.getPoolDepositInLovelace()));</span>
-<span class="nc" id="L18">        return depositsInPreviousEpoch.add(deposits);</span>
+                                                      Set&lt;RetiredPool&gt; retiredPoolsInEpoch) {
+<span class="nc" id="L13">        BigInteger deposits = BigInteger.ZERO;</span>
+<span class="nc" id="L14">        deposits = deposits.add(transactionDepositsInEpoch);</span>
+
+        //add deposits of retired pools
+<span class="nc" id="L17">        var refundAmount = retiredPoolsInEpoch.stream()</span>
+<span class="nc" id="L18">                .reduce(BigInteger.ZERO, (sum, retiredPool) -&gt; sum.add(retiredPool.getDepositAmount()), BigInteger::add);</span>
+
+<span class="nc" id="L20">        deposits = deposits.subtract(refundAmount);</span>
+<span class="nc" id="L21">        return depositsInPreviousEpoch.add(deposits);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

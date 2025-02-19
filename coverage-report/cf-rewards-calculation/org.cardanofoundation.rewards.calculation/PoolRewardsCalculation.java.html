@@ -128,10 +128,10 @@ import lombok.extern.slf4j.Slf4j;
     public static PoolRewardCalculationResult calculatePoolRewardInEpoch(final String poolId, final PoolState poolStateCurrentEpoch,
                                                                          final int totalBlocksInEpoch, final ProtocolParameters protocolParameters,
                                                                          final BigInteger adaInCirculation, final BigInteger activeStakeInEpoch, BigInteger stakePoolRewardsPot,
-                                                                         final BigInteger totalActiveStakeOfOwners, final HashSet&lt;String&gt; poolOwnerStakeAddresses,
-                                                                         final HashSet&lt;String&gt; deregisteredAccounts, final boolean ignoreLeaderReward,
-                                                                         final HashSet&lt;String&gt; lateDeregisteredAccounts,
-                                                                         final HashSet&lt;String&gt; accountsRegisteredInThePast,
+                                                                         final BigInteger totalActiveStakeOfOwners, final Set&lt;String&gt; poolOwnerStakeAddresses,
+                                                                         final Set&lt;String&gt; deregisteredAccounts, final boolean ignoreLeaderReward,
+                                                                         final Set&lt;String&gt; lateDeregisteredAccounts,
+                                                                         final Set&lt;String&gt; accountsRegisteredInThePast,
                                                                          final NetworkConfig networkConfig) {
 <span class="fc" id="L136">        final int earnedEpoch = poolStateCurrentEpoch.getEpoch();</span>
 <span class="fc" id="L137">        final PoolRewardCalculationResult poolRewardCalculationResult = PoolRewardCalculationResult.builder()</span>
@@ -219,10 +219,10 @@ import lombok.extern.slf4j.Slf4j;
 <span class="fc bfc" id="L219" title="All 2 branches covered.">        } else if (deregisteredAccounts.contains(rewardAddress)) {</span>
 <span class="fc" id="L220">            log.info(poolRewardCalculationResult.getRewardAddress() + &quot; has been deregistered. Operator would have received &quot; + poolOperatorReward + &quot; but will not receive any rewards.&quot;);</span>
 <span class="fc" id="L221">            poolOperatorReward = BigInteger.ZERO;</span>
-<span class="pc bpc" id="L222" title="1 of 2 branches missed.">        } else if (lateDeregisteredAccounts.contains(rewardAddress)) {</span>
-<span class="nc" id="L223">            log.info(&quot;[unregRU]: &quot; + poolRewardCalculationResult.getRewardAddress() + &quot; has been deregistered lately. Operator would have received &quot; + poolOperatorReward + &quot; but will not receive any rewards.&quot;);</span>
-<span class="nc" id="L224">            unspendableEarnedRewards = poolOperatorReward;</span>
-<span class="nc" id="L225">            poolOperatorReward = BigInteger.ZERO;</span>
+<span class="fc bfc" id="L222" title="All 2 branches covered.">        } else if (lateDeregisteredAccounts.contains(rewardAddress)) {</span>
+<span class="fc" id="L223">            log.info(&quot;[unregRU]: &quot; + poolRewardCalculationResult.getRewardAddress() + &quot; has been deregistered lately. Operator would have received &quot; + poolOperatorReward + &quot; but will not receive any rewards.&quot;);</span>
+<span class="fc" id="L224">            unspendableEarnedRewards = poolOperatorReward;</span>
+<span class="fc" id="L225">            poolOperatorReward = BigInteger.ZERO;</span>
         }
 
 <span class="fc bfc" id="L228" title="All 2 branches covered.">        if (ignoreLeaderReward) {</span>

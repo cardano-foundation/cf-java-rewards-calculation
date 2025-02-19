@@ -9,15 +9,16 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 
-<span class="nc" id="L16">public class TreasuryCalculation {</span>
+<span class="nc" id="L17">public class TreasuryCalculation {</span>
 
   public static TreasuryCalculationResult calculateTreasuryInEpoch(int epoch, ProtocolParameters protocolParameters,
                                                                    AdaPots adaPotsForPreviousEpoch, Epoch epochInfo,
-                                                                   HashSet&lt;String&gt; rewardAddressesOfRetiredPools,
+                                                                   Set&lt;RetiredPool&gt; retiredPools,
                                                                    List&lt;MirCertificate&gt; mirCertificates,
                                                                    final HashSet&lt;String&gt; deregisteredAccounts,
                                                                    final HashSet&lt;String&gt; registeredAccountsUntilNow,
@@ -25,70 +26,71 @@ import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
                                                                    NetworkConfig networkConfig) {
     // The Shelley era and the ada pot system started on mainnet in epoch 208.
     // Fee and treasury values are 0 for epoch 208.
-<span class="pc bpc" id="L28" title="1 of 2 branches missed.">    if (epoch &lt;= networkConfig.getShelleyStartEpoch()) {</span>
-<span class="nc" id="L29">      return TreasuryCalculationResult.builder()</span>
-<span class="nc" id="L30">              .treasury(BigInteger.ZERO)</span>
-<span class="nc" id="L31">              .epoch(epoch)</span>
-<span class="nc" id="L32">              .totalRewardPot(BigInteger.ZERO)</span>
-<span class="nc" id="L33">              .treasuryWithdrawals(BigInteger.ZERO)</span>
-<span class="nc" id="L34">              .unspendableEarnedRewards(BigInteger.ZERO)</span>
-<span class="nc" id="L35">              .unclaimedRefunds(BigInteger.ZERO)</span>
-<span class="nc" id="L36">              .build();</span>
+<span class="pc bpc" id="L29" title="1 of 2 branches missed.">    if (epoch &lt;= networkConfig.getShelleyStartEpoch()) {</span>
+<span class="nc" id="L30">      return TreasuryCalculationResult.builder()</span>
+<span class="nc" id="L31">              .treasury(BigInteger.ZERO)</span>
+<span class="nc" id="L32">              .epoch(epoch)</span>
+<span class="nc" id="L33">              .totalRewardPot(BigInteger.ZERO)</span>
+<span class="nc" id="L34">              .treasuryWithdrawals(BigInteger.ZERO)</span>
+<span class="nc" id="L35">              .unspendableEarnedRewards(BigInteger.ZERO)</span>
+<span class="nc" id="L36">              .unclaimedRefunds(BigInteger.ZERO)</span>
+<span class="nc" id="L37">              .build();</span>
     }
 
-<span class="fc" id="L39">    BigInteger totalFeesForCurrentEpoch = BigInteger.ZERO;</span>
-<span class="fc" id="L40">    int totalBlocksInEpoch = 0;</span>
+<span class="fc" id="L40">    BigInteger totalFeesForCurrentEpoch = BigInteger.ZERO;</span>
+<span class="fc" id="L41">    int totalBlocksInEpoch = 0;</span>
 
-<span class="fc" id="L42">    BigDecimal treasuryGrowthRate = protocolParameters.getTreasuryGrowRate();</span>
-<span class="fc" id="L43">    BigDecimal monetaryExpandRate = protocolParameters.getMonetaryExpandRate();</span>
-<span class="fc" id="L44">    BigDecimal decentralizationParameter = protocolParameters.getDecentralisation();</span>
+<span class="fc" id="L43">    BigDecimal treasuryGrowthRate = protocolParameters.getTreasuryGrowRate();</span>
+<span class="fc" id="L44">    BigDecimal monetaryExpandRate = protocolParameters.getMonetaryExpandRate();</span>
+<span class="fc" id="L45">    BigDecimal decentralizationParameter = protocolParameters.getDecentralisation();</span>
 
-<span class="fc bfc" id="L46" title="All 2 branches covered.">    if (epochInfo != null) {</span>
-<span class="fc" id="L47">      totalFeesForCurrentEpoch = epochInfo.getFees();</span>
-<span class="fc" id="L48">      totalBlocksInEpoch = epochInfo.getBlockCount();</span>
-<span class="pc bpc" id="L49" title="3 of 4 branches missed.">      if (isLower(decentralizationParameter, BigDecimal.valueOf(0.8)) &amp;&amp; isHigher(decentralizationParameter, BigDecimal.ZERO)) {</span>
-<span class="nc" id="L50">        totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();</span>
+<span class="pc bpc" id="L47" title="1 of 2 branches missed.">    if (epochInfo != null) {</span>
+<span class="fc" id="L48">      totalFeesForCurrentEpoch = epochInfo.getFees();</span>
+<span class="fc" id="L49">      totalBlocksInEpoch = epochInfo.getBlockCount();</span>
+<span class="pc bpc" id="L50" title="1 of 4 branches missed.">      if (isLower(decentralizationParameter, BigDecimal.valueOf(0.8)) &amp;&amp; isHigher(decentralizationParameter, BigDecimal.ZERO)) {</span>
+<span class="fc" id="L51">        totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();</span>
       }
     }
 
-<span class="fc" id="L54">    final BigInteger reserveInPreviousEpoch = adaPotsForPreviousEpoch.getReserves();</span>
-<span class="fc" id="L55">    final BigInteger treasuryInPreviousEpoch = adaPotsForPreviousEpoch.getTreasury();</span>
+<span class="fc" id="L55">    final BigInteger reserveInPreviousEpoch = adaPotsForPreviousEpoch.getReserves();</span>
+<span class="fc" id="L56">    final BigInteger treasuryInPreviousEpoch = adaPotsForPreviousEpoch.getTreasury();</span>
 
-<span class="fc" id="L57">    final BigInteger totalRewardPot = calculateTotalRewardPotWithEta(</span>
+<span class="fc" id="L58">    final BigInteger totalRewardPot = calculateTotalRewardPotWithEta(</span>
             monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserveInPreviousEpoch, totalFeesForCurrentEpoch, networkConfig);
 
-<span class="fc" id="L60">    final BigInteger treasuryCut = multiplyAndFloor(totalRewardPot, treasuryGrowthRate);</span>
-<span class="fc" id="L61">    BigInteger treasuryForCurrentEpoch = treasuryInPreviousEpoch.add(treasuryCut);</span>
+<span class="fc" id="L61">    final BigInteger treasuryCut = multiplyAndFloor(totalRewardPot, treasuryGrowthRate);</span>
+<span class="fc" id="L62">    BigInteger treasuryForCurrentEpoch = treasuryInPreviousEpoch.add(treasuryCut);</span>
 
-<span class="fc" id="L63">    BigInteger unclaimedRefunds = BigInteger.ZERO;</span>
-<span class="pc bpc" id="L64" title="1 of 2 branches missed.">    if (rewardAddressesOfRetiredPools.size() &gt; 0) {</span>
-<span class="fc" id="L65">      HashSet&lt;String&gt; deregisteredRewardAccounts = deregisteredAccounts.stream()</span>
-<span class="fc" id="L66">              .filter(rewardAddressesOfRetiredPools::contains).collect(Collectors.toCollection(HashSet::new));</span>
-<span class="fc" id="L67">      List&lt;String&gt; ownerAccountsRegisteredInThePast = registeredAccountsUntilNow.stream()</span>
-<span class="fc" id="L68">              .filter(rewardAddressesOfRetiredPools::contains).toList();</span>
+<span class="fc" id="L64">    var rewardAddressesOfRetiredPools = retiredPools.stream().map(RetiredPool::getRewardAddress).collect(Collectors.toSet());</span>
+<span class="fc" id="L65">    BigInteger unclaimedRefunds = BigInteger.ZERO;</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">    if (rewardAddressesOfRetiredPools.size() &gt; 0) {</span>
+<span class="fc" id="L67">      HashSet&lt;String&gt; deregisteredRewardAccounts = deregisteredAccounts.stream()</span>
+<span class="fc" id="L68">              .filter(rewardAddressesOfRetiredPools::contains).collect(Collectors.toCollection(HashSet::new));</span>
+<span class="fc" id="L69">      List&lt;String&gt; ownerAccountsRegisteredInThePast = registeredAccountsUntilNow.stream()</span>
+<span class="fc" id="L70">              .filter(rewardAddressesOfRetiredPools::contains).toList();</span>
 
-<span class="fc" id="L70">      unclaimedRefunds = calculateUnclaimedRefundsForRetiredPools(rewardAddressesOfRetiredPools, deregisteredRewardAccounts, ownerAccountsRegisteredInThePast, networkConfig);</span>
-<span class="fc" id="L71">      treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(unclaimedRefunds);</span>
+<span class="fc" id="L72">      unclaimedRefunds = calculateUnclaimedRefundsForRetiredPools(retiredPools, deregisteredRewardAccounts, ownerAccountsRegisteredInThePast, networkConfig);</span>
+<span class="fc" id="L73">      treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(unclaimedRefunds);</span>
     }
 
-<span class="fc" id="L74">    BigInteger treasuryWithdrawals = BigInteger.ZERO;</span>
-<span class="fc bfc" id="L75" title="All 2 branches covered.">    for (MirCertificate mirCertificate : mirCertificates) {</span>
-<span class="pc bpc" id="L76" title="1 of 2 branches missed.">      if (mirCertificate.getPot() == MirPot.TREASURY) {</span>
-<span class="nc" id="L77">        treasuryWithdrawals = treasuryWithdrawals.add(mirCertificate.getTotalRewards());</span>
+<span class="fc" id="L76">    BigInteger treasuryWithdrawals = BigInteger.ZERO;</span>
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">    for (MirCertificate mirCertificate : mirCertificates) {</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">      if (mirCertificate.getPot() == MirPot.TREASURY) {</span>
+<span class="nc" id="L79">        treasuryWithdrawals = treasuryWithdrawals.add(mirCertificate.getTotalRewards());</span>
       }
-<span class="fc" id="L79">    }</span>
+<span class="nc" id="L81">    }</span>
 
-<span class="fc" id="L81">    treasuryForCurrentEpoch = treasuryForCurrentEpoch.subtract(treasuryWithdrawals);</span>
-<span class="fc" id="L82">    treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(unspendableEarnedRewards);</span>
+<span class="fc" id="L83">    treasuryForCurrentEpoch = treasuryForCurrentEpoch.subtract(treasuryWithdrawals);</span>
+<span class="fc" id="L84">    treasuryForCurrentEpoch = treasuryForCurrentEpoch.add(unspendableEarnedRewards);</span>
 
-<span class="fc" id="L84">    return TreasuryCalculationResult.builder()</span>
-<span class="fc" id="L85">            .treasury(treasuryForCurrentEpoch)</span>
-<span class="fc" id="L86">            .epoch(epoch)</span>
-<span class="fc" id="L87">            .totalRewardPot(totalRewardPot)</span>
-<span class="fc" id="L88">            .treasuryWithdrawals(treasuryWithdrawals)</span>
-<span class="fc" id="L89">            .unspendableEarnedRewards(unspendableEarnedRewards)</span>
-<span class="fc" id="L90">            .unclaimedRefunds(unclaimedRefunds)</span>
-<span class="fc" id="L91">            .build();</span>
+<span class="fc" id="L86">    return TreasuryCalculationResult.builder()</span>
+<span class="fc" id="L87">            .treasury(treasuryForCurrentEpoch)</span>
+<span class="fc" id="L88">            .epoch(epoch)</span>
+<span class="fc" id="L89">            .totalRewardPot(totalRewardPot)</span>
+<span class="fc" id="L90">            .treasuryWithdrawals(treasuryWithdrawals)</span>
+<span class="fc" id="L91">            .unspendableEarnedRewards(unspendableEarnedRewards)</span>
+<span class="fc" id="L92">            .unclaimedRefunds(unclaimedRefunds)</span>
+<span class="fc" id="L93">            .build();</span>
     }
 
   /*
@@ -99,8 +101,8 @@ import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
    */
   public static BigInteger calculateTotalRewardPotWithEta(BigDecimal monetaryExpandRate, int totalBlocksInEpochByPools,
                                                           BigDecimal decentralizationParameter, BigInteger reserve, BigInteger fee, NetworkConfig networkConfig) {
-<span class="fc" id="L102">    BigDecimal eta = calculateEta(totalBlocksInEpochByPools, decentralizationParameter, networkConfig);</span>
-<span class="fc" id="L103">    return multiplyAndFloor(reserve, monetaryExpandRate, eta).add(fee);</span>
+<span class="fc" id="L104">    BigDecimal eta = calculateEta(totalBlocksInEpochByPools, decentralizationParameter, networkConfig);</span>
+<span class="fc" id="L105">    return multiplyAndFloor(reserve, monetaryExpandRate, eta).add(fee);</span>
   }
 
   /*
@@ -115,25 +117,25 @@ import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
   private static BigDecimal calculateEta(int totalBlocksInEpochByPools, BigDecimal decentralizationParameter, NetworkConfig networkConfig) {
     // shelley-delegation.pdf 5.4.3
 
-<span class="fc" id="L118">    BigDecimal decentralisationThreshold = new BigDecimal(&quot;0.8&quot;);</span>
-<span class="fc bfc" id="L119" title="All 2 branches covered.">    if (decentralizationParameter.compareTo(decentralisationThreshold) &gt;= 0) {</span>
-<span class="fc" id="L120">      return BigDecimal.ONE;</span>
+<span class="fc" id="L120">    BigDecimal decentralisationThreshold = new BigDecimal(&quot;0.8&quot;);</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">    if (decentralizationParameter.compareTo(decentralisationThreshold) &gt;= 0) {</span>
+<span class="fc" id="L122">      return BigDecimal.ONE;</span>
     }
 
     // The number of expected blocks will be the number of slots per epoch times the active slots coefficient
-<span class="fc" id="L124">    BigDecimal activeSlotsCoeff = BigDecimal.valueOf(networkConfig.getActiveSlotCoefficient()); // See: Non-Updatable Parameters: https://cips.cardano.org/cips/cip9/</span>
+<span class="fc" id="L126">    BigDecimal activeSlotsCoeff = BigDecimal.valueOf(networkConfig.getActiveSlotCoefficient()); // See: Non-Updatable Parameters: https://cips.cardano.org/cips/cip9/</span>
 
     // decentralizationParameter is the proportion of blocks that are expected to be produced by stake pools
     // instead of the OBFT (Ouroboros Byzantine Fault Tolerance) nodes. It was introduced close before the Shelley era:
     // https://github.com/input-output-hk/cardano-ledger/commit/c4f10d286faadcec9e4437411bce9c6c3b6e51c2
-<span class="fc" id="L129">    BigDecimal expectedBlocksInNonOBFTSlots = new BigDecimal(networkConfig.getExpectedSlotsPerEpoch())</span>
-<span class="fc" id="L130">            .multiply(activeSlotsCoeff).multiply(BigDecimal.ONE.subtract(decentralizationParameter));</span>
+<span class="fc" id="L131">    BigDecimal expectedBlocksInNonOBFTSlots = new BigDecimal(networkConfig.getExpectedSlotsPerEpoch())</span>
+<span class="fc" id="L132">            .multiply(activeSlotsCoeff).multiply(BigDecimal.ONE.subtract(decentralizationParameter));</span>
 
     // eta is the ratio between the number of blocks that have been produced during the epoch, and
     // the expectation value of blocks that should have been produced during the epoch under
     // ideal conditions.
-<span class="fc" id="L135">    MathContext mathContext = new MathContext(32);</span>
-<span class="fc" id="L136">    return new BigDecimal(totalBlocksInEpochByPools).divide(expectedBlocksInNonOBFTSlots, mathContext).min(BigDecimal.ONE);</span>
+<span class="fc" id="L137">    MathContext mathContext = new MathContext(32);</span>
+<span class="fc" id="L138">    return new BigDecimal(totalBlocksInEpochByPools).divide(expectedBlocksInNonOBFTSlots, mathContext).min(BigDecimal.ONE);</span>
   }
 
   /*
@@ -141,26 +143,31 @@ import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
     pool's registered reward account, provided the reward account is still registered.&quot; -
     https://github.com/input-output-hk/cardano-ledger/blob/9e2f8151e3b9a0dde9faeb29a7dd2456e854427c/eras/shelley/formal-spec/epoch.tex#L546C9-L547C87
    */
-  public static BigInteger calculateUnclaimedRefundsForRetiredPools(HashSet&lt;String&gt; rewardAddressesOfRetiredPools,
+  public static BigInteger calculateUnclaimedRefundsForRetiredPools(Set&lt;RetiredPool&gt; retiredPools,
                                                                     HashSet&lt;String&gt; deregisteredRewardAccounts,
                                                                     List&lt;String&gt; ownerAccountsRegisteredInThePast,
                                                                     NetworkConfig networkConfig) {
-<span class="fc" id="L148">    BigInteger unclaimedRefunds = BigInteger.ZERO;</span>
-<span class="pc bpc" id="L149" title="1 of 2 branches missed.">    if (rewardAddressesOfRetiredPools.size() &gt; 0) {</span>
+<span class="fc" id="L150">    BigInteger unclaimedRefunds = BigInteger.ZERO;</span>
+<span class="pc bpc" id="L151" title="1 of 2 branches missed.">    if (retiredPools.size() &gt; 0) {</span>
     /* Check if the reward address of the retired pool has been unregistered before
        or if the reward address has been unregistered after the randomness stabilization window
        or if the reward address has not been registered at all */
-<span class="fc bfc" id="L153" title="All 2 branches covered.">      for (String rewardAddress : rewardAddressesOfRetiredPools) {</span>
-<span class="fc bfc" id="L154" title="All 2 branches covered.">        if (deregisteredRewardAccounts.contains(rewardAddress) ||</span>
-<span class="pc bpc" id="L155" title="1 of 2 branches missed.">                !ownerAccountsRegisteredInThePast.contains(rewardAddress)) {</span>
+<span class="fc bfc" id="L155" title="All 2 branches covered.">      for (var retiredPool : retiredPools) {</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">        if (deregisteredRewardAccounts.contains(retiredPool.getRewardAddress()) ||</span>
+<span class="pc bpc" id="L157" title="1 of 2 branches missed.">                !ownerAccountsRegisteredInThePast.contains(retiredPool.getRewardAddress())) {</span>
           // If the reward address has been unregistered, the deposit can not be returned
           // and will be added to the treasury instead (Pool Reap see: shelley-ledger.pdf p.53)
-<span class="fc" id="L158">          unclaimedRefunds = unclaimedRefunds.add(networkConfig.getPoolDepositInLovelace());</span>
+<span class="fc" id="L160">          BigInteger depositAmount = BigInteger.valueOf(500_000_000); // default pool deposit of 500 Ada</span>
+<span class="fc bfc" id="L161" title="All 2 branches covered.">          if (retiredPool.getDepositAmount() != null) {</span>
+<span class="fc" id="L162">            depositAmount = retiredPool.getDepositAmount();</span>
+          }
+
+<span class="fc" id="L165">          unclaimedRefunds = unclaimedRefunds.add(depositAmount);</span>
         }
-<span class="fc" id="L160">      }</span>
+<span class="fc" id="L167">      }</span>
     }
 
-<span class="fc" id="L163">    return unclaimedRefunds;</span>
+<span class="fc" id="L170">    return unclaimedRefunds;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
