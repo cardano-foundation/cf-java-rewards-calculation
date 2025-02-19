@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.14.0...v1.0.0) (2025-02-19)
+
+
+### Features
+
+* release stable major version ([74cb097](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/74cb09799c91b11ac9380d1a9ef1344de3df0db2))
+
+
+### Miscellaneous Chores
+
+* release 1.0.0 ([827cb49](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/827cb491c16daf5c26a9d64874be2c375d986ede))
+
 ## [0.14.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.13.1...v0.14.0) (2025-02-19)
 
 
