@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.14.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.13.1...v0.14.0) (2025-02-19)
+
+
+### Features
+
+* follow the standard release flow ([3d2aacb](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/3d2aacb3614099e321a3371eee3c141ef574d0ad))
+
+
+### Bug Fixes
+
+* Convert poolMargin from double to BigDecimal to fix rounding issue in preview (1 lovelace diff in preview epoch 372 where margin = 99.99%) ([ea12af7](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/ea12af72274e89e268b0a51c2bff340dac4732e4))
+
 ## [0.13.1](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.13.0...v0.13.1) (2024-11-08)
 
 
