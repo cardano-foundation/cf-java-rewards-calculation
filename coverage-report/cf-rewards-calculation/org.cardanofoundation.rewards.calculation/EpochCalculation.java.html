@@ -65,7 +65,7 @@ import lombok.extern.slf4j.Slf4j;
 
 <span class="pc bpc" id="L66" title="1 of 2 branches missed.">        if (epochInfo != null) {</span>
 <span class="fc" id="L67">            activeStakeInEpoch = epochInfo.getActiveStake();</span>
-<span class="fc" id="L68">            totalFeesForCurrentEpoch = epochInfo.getFees();</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">            totalFeesForCurrentEpoch = epochInfo.getFees() != null? epochInfo.getFees(): BigInteger.ZERO;</span>
 <span class="fc" id="L69">            totalBlocksInEpoch = epochInfo.getBlockCount();</span>
 <span class="fc bfc" id="L70" title="All 4 branches covered.">            if (isLower(decentralizationParameter, BigDecimal.valueOf(0.8)) &amp;&amp; isHigher(decentralizationParameter, BigDecimal.ZERO)) {</span>
 <span class="fc" id="L71">                totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();</span>
