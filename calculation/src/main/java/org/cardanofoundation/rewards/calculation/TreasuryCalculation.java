@@ -157,7 +157,12 @@ public class TreasuryCalculation {
                 !ownerAccountsRegisteredInThePast.contains(retiredPool.getRewardAddress())) {
           // If the reward address has been unregistered, the deposit can not be returned
           // and will be added to the treasury instead (Pool Reap see: shelley-ledger.pdf p.53)
-          unclaimedRefunds = unclaimedRefunds.add(retiredPool.getDepositAmount());
+          BigInteger depositAmount = BigInteger.valueOf(500_000_000); // default pool deposit of 500 Ada
+          if (retiredPool.getDepositAmount() != null) {
+            depositAmount = retiredPool.getDepositAmount();
+          }
+
+          unclaimedRefunds = unclaimedRefunds.add(depositAmount);
         }
       }
     }

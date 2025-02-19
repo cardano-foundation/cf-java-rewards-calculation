@@ -7,6 +7,8 @@ import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.JsonDataProvider;
 import org.cardanofoundation.rewards.validation.domain.EpochValidationInput;
 import org.cardanofoundation.rewards.validation.domain.TreasuryValidationResult;
+
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
@@ -15,7 +17,8 @@ import java.util.stream.Collectors;
 
 public class TreasuryValidation {
 
-  public static TreasuryValidationResult calculateTreasuryForEpoch(int epoch, DataProvider dataProvider, NetworkConfig networkConfig) {
+  public static TreasuryValidationResult calculateTreasuryForEpoch(int epoch, DataProvider dataProvider, NetworkConfig networkConfig,
+                                                                   BigInteger unspendableEarnedRewards) {
     TreasuryCalculationResult treasuryCalculationResult;
 
     if (dataProvider instanceof JsonDataProvider) {
@@ -53,7 +56,7 @@ public class TreasuryValidation {
               epochValidationInput.getRetiredPools(),
               epochValidationInput.getMirCertificates().stream().toList(),
               epochValidationInput.getDeregisteredAccountsOnEpochBoundary(),
-              epochValidationInput.getRegisteredAccountsUntilNow(), BigInteger.ZERO, networkConfig);
+              epochValidationInput.getRegisteredAccountsUntilNow(), unspendableEarnedRewards, networkConfig);
     } else {
       AdaPots adaPotsForPreviousEpoch = dataProvider.getAdaPotsForEpoch(epoch - 1);
       ProtocolParameters protocolParameters = dataProvider.getProtocolParametersForEpoch(epoch - 2);

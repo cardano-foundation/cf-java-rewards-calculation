@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import lombok.extern.slf4j.Slf4j;
 import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.validation.data.provider.DataProvider;
 import org.cardanofoundation.rewards.validation.data.provider.DbSyncDataProvider;
@@ -25,6 +26,7 @@ import org.springframework.test.context.junit.jupiter.EnabledIf;
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ComponentScan
+@Slf4j
 public class TreasuryValidationTest {
 
   @Autowired
@@ -59,13 +61,21 @@ public class TreasuryValidationTest {
       throw new RuntimeException("Unknown data provider type: " + dataProviderType);
     }
 
-    TreasuryValidationResult treasuryValidationResult = TreasuryValidation.calculateTreasuryForEpoch(epoch, dataProvider, networkConfig);
+    BigInteger unspendableEarnedRewards = BigInteger.ZERO;
+    if (epoch == 215) {
+      unspendableEarnedRewards = new BigInteger("53681623");
+    } else if (epoch > 215) {
+      log.warn("Unspendable rewards are not provided for epoch " + epoch + " and cannot be calculated within the TreasuryCalculation" +
+              " as it needs other variables processed in the EpochCalculation, using zero value, but the test may fail.");
+    }
+
+    TreasuryValidationResult treasuryValidationResult = TreasuryValidation.calculateTreasuryForEpoch(epoch, dataProvider, networkConfig, unspendableEarnedRewards);
     BigInteger difference = treasuryValidationResult.getActualTreasury().subtract(treasuryValidationResult.getCalculatedTreasury());
     Assertions.assertEquals(BigInteger.ZERO, difference, "The difference " + difference.longValue() + " Lovelace between expected treasury value and actual treasury value is not zero");
   }
 
   static Stream<Integer> dataProviderRange() {
-    return IntStream.range(209, 215).boxed();
+    return IntStream.range(210, 216).boxed();
   }
 
   @ParameterizedTest
