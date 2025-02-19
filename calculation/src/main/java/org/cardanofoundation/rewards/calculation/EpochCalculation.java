@@ -65,7 +65,7 @@ public class EpochCalculation {
 
         if (epochInfo != null) {
             activeStakeInEpoch = epochInfo.getActiveStake();
-            totalFeesForCurrentEpoch = epochInfo.getFees();
+            totalFeesForCurrentEpoch = epochInfo.getFees() != null? epochInfo.getFees(): BigInteger.ZERO;
             totalBlocksInEpoch = epochInfo.getBlockCount();
             if (isLower(decentralizationParameter, BigDecimal.valueOf(0.8)) && isHigher(decentralizationParameter, BigDecimal.ZERO)) {
                 totalBlocksInEpoch = epochInfo.getNonOBFTBlockCount();

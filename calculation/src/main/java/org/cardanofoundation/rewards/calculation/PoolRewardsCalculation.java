@@ -1,16 +1,15 @@
 package org.cardanofoundation.rewards.calculation;
 
+import lombok.extern.slf4j.Slf4j;
 import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.calculation.domain.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
-import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.divide;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class PoolRewardsCalculation {
@@ -97,14 +96,14 @@ public class PoolRewardsCalculation {
      * This method calculates the pool operator reward regarding the formula described
      * in the shelly-ledger.pdf p. 61, figure 47
      */
-    public static BigInteger calculateLeaderReward(BigInteger poolReward, double margin, BigInteger poolCost,
+    public static BigInteger calculateLeaderReward(BigInteger poolReward, BigDecimal margin, BigInteger poolCost,
                                                    BigDecimal relativeOwnerStake, BigDecimal relativeStakeOfPool) {
         if (isLowerOrEquals(poolReward, poolCost)) {
             return poolReward;
         }
 
         return add(poolCost, floor(multiply(subtract(poolReward, poolCost),
-                add(margin, multiply((1 - margin), divide(relativeOwnerStake, relativeStakeOfPool))))));
+                add(margin, multiply(BigDecimal.ONE.subtract(margin), divide(relativeOwnerStake, relativeStakeOfPool))))));
     }
 
     /*
@@ -113,7 +112,7 @@ public class PoolRewardsCalculation {
      *
      * See Haskell implementation: https://github.com/input-output-hk/cardano-ledger/blob/aed5dde9cd1096cfc2e255879cd617c0d64f8d9d/eras/shelley/impl/src/Cardano/Ledger/Shelley/Rewards.hs#L117
      */
-    public static BigInteger calculateMemberReward(BigInteger poolReward, double margin, BigInteger poolCost,
+    public static BigInteger calculateMemberReward(BigInteger poolReward, BigDecimal margin, BigInteger poolCost,
                                                    BigDecimal relativeMemberStake, BigDecimal relativeStakeOfPool) {
         if (isLowerOrEquals(poolReward, poolCost)) {
             return BigInteger.ZERO;
@@ -156,11 +155,11 @@ public class PoolRewardsCalculation {
 
         final BigInteger poolStake = poolStateCurrentEpoch.getActiveStake();
         final BigInteger poolPledge = poolStateCurrentEpoch.getPledge();
-        final double poolMargin = poolStateCurrentEpoch.getMargin();
+        final BigDecimal poolMargin = BigDecimal.valueOf(poolStateCurrentEpoch.getMargin());
         final BigInteger poolFixedCost = poolStateCurrentEpoch.getFixedCost();
         final int blocksPoolHasMinted = poolStateCurrentEpoch.getBlockCount();
 
-        poolRewardCalculationResult.setPoolMargin(poolMargin);
+        poolRewardCalculationResult.setPoolMargin(poolStateCurrentEpoch.getMargin());
         poolRewardCalculationResult.setPoolCost(poolFixedCost);
         poolRewardCalculationResult.setRewardAddress(poolStateCurrentEpoch.getRewardAddress());
 
