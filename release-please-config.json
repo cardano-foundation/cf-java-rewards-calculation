@@ -7,17 +7,17 @@
           {
             "type": "xml",
             "path": "pom.xml",
-            "xpath": "/project/version"
+            "xpath": "//project/version"
           },
           {
             "type": "xml",
             "path": "calculation/pom.xml",
-            "xpath": "/project/parent/version"
+            "xpath": "//project/parent/version"
           },
           {
             "type": "xml",
             "path": "validation/pom.xml",
-            "xpath": "/project/parent/version"
+            "xpath": "//project/parent/version"
           },
           "README.md"
         ]
