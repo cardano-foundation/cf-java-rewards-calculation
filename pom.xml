@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.cardanofoundation</groupId>
     <artifactId>cf-rewards</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <name>cardano-reward-calculation</name>
     <url>https://github.com/cardano-foundation/cf-java-rewards-calculation.git</url>
 
