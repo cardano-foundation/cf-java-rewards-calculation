@@ -6,6 +6,7 @@ import lombok.Getter;
 import org.hibernate.annotations.Immutable;
 import org.springframework.context.annotation.Profile;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 @Entity
@@ -24,7 +25,7 @@ public class DbSyncPoolUpdate {
     private DbSyncPoolHash pool;
 
     private BigInteger pledge;
-    private Double margin;
+    private BigDecimal margin;
     @Column(name = "active_epoch_no")
     private Long activeEpochNumber;
 

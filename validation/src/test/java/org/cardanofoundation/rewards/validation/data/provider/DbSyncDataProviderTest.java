@@ -80,7 +80,7 @@ public class DbSyncDataProviderTest {
         Assertions.assertEquals(poolState.getActiveStake(), new BigInteger("27523186299296"));
         Assertions.assertEquals(poolState.getBlockCount(), 10);
         Assertions.assertEquals(poolState.getFixedCost(), new BigInteger("340000000"));
-        Assertions.assertEquals(poolState.getMargin(), 0.009);
+        Assertions.assertEquals(poolState.getMargin(), new BigDecimal("0.009"));
         Assertions.assertEquals(poolState.getPoolFees(), new BigInteger("475116283"));
     }
 

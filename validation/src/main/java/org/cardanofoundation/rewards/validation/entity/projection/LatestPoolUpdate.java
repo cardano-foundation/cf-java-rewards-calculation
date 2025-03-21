@@ -1,5 +1,6 @@
 package org.cardanofoundation.rewards.validation.entity.projection;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public interface LatestPoolUpdate {
@@ -7,6 +8,6 @@ public interface LatestPoolUpdate {
     String getPoolId();
     BigInteger getPledge();
     BigInteger getFixedCost();
-    Double getMargin();
+    BigDecimal getMargin();
     String getRewardAddress();
 }

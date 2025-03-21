@@ -155,7 +155,7 @@ public class PoolRewardsCalculation {
 
         final BigInteger poolStake = poolStateCurrentEpoch.getActiveStake();
         final BigInteger poolPledge = poolStateCurrentEpoch.getPledge();
-        final BigDecimal poolMargin = BigDecimal.valueOf(poolStateCurrentEpoch.getMargin());
+        final BigDecimal poolMargin = poolStateCurrentEpoch.getMargin();
         final BigInteger poolFixedCost = poolStateCurrentEpoch.getFixedCost();
         final int blocksPoolHasMinted = poolStateCurrentEpoch.getBlockCount();
 
