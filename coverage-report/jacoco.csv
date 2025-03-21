@@ -5,5 +5,5 @@ cf-rewards-validation/cf-rewards-calculation,org.cardanofoundation.rewards.calcu
 cf-rewards-validation/cf-rewards-calculation,org.cardanofoundation.rewards.calculation,TreasuryCalculation,32,231,9,17,12,58,9,9,1,4
 cf-rewards-validation/cf-rewards-calculation,org.cardanofoundation.rewards.calculation,EpochCalculation,28,442,9,27,6,109,8,15,1,4
 cf-rewards-validation/cf-rewards-calculation,org.cardanofoundation.rewards.calculation,DepositsCalculation,30,0,0,0,7,0,3,0,3,0
-cf-rewards-validation/cf-rewards-calculation,org.cardanofoundation.rewards.calculation,PoolRewardsCalculation,9,409,4,34,4,110,5,22,1,7
+cf-rewards-validation/cf-rewards-calculation,org.cardanofoundation.rewards.calculation,PoolRewardsCalculation,9,407,4,34,4,110,5,22,1,7
 cf-rewards-validation/cf-rewards-calculation,org.cardanofoundation.rewards.calculation.domain,RetiredPool,33,14,10,0,4,1,6,1,1,1
