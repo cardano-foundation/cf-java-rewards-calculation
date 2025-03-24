@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v1.0.0...v1.0.1) (2025-03-24)
+
+
+### Bug Fixes
+
+* update root path in release-please-config.json ([2a2f6ff](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/2a2f6ffb29c346a32f1eba197622321b3edca9c8))
+
 ## [1.0.0](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v0.14.0...v1.0.0) (2025-02-19)
 
 
