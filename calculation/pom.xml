@@ -52,6 +52,8 @@
         <version.java>17</version.java>
         <version.lombok>1.18.30</version.lombok>
         <version.slf4j>2.0.12</version.slf4j>
+        <version.junit-jupiter>5.10.2</version.junit-jupiter>
+        <version.maven-surefire-plugin>3.2.5</version.maven-surefire-plugin>
         <version.maven-site-plugin>4.0.0-M2</version.maven-site-plugin>
         <version.maven-javadoc-plugin>3.6.3</version.maven-javadoc-plugin>
         <version.maven-gpg-plugin>3.1.0</version.maven-gpg-plugin>
@@ -92,6 +94,12 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
             <version>${version.maven-javadoc-plugin}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${version.junit-jupiter}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -202,6 +210,11 @@
                     <scmCommentPrefix>[ci skip]</scmCommentPrefix>
                     <tagNameFormat>@{project.version}</tagNameFormat>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${version.maven-surefire-plugin}</version>
             </plugin>
         </plugins>
     </build>
