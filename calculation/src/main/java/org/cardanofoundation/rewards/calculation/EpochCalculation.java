@@ -3,6 +3,7 @@ package org.cardanofoundation.rewards.calculation;
 import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.calculation.enums.MirPot;
+import org.cardanofoundation.rewards.calculation.util.Ratio;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -76,7 +77,7 @@ public class EpochCalculation {
         final BigInteger rewardPot = TreasuryCalculation.calculateTotalRewardPotWithEta(
                 monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserveInPreviousEpoch, totalFeesForCurrentEpoch, networkConfig);
 
-        final BigInteger treasuryCut = multiplyAndFloor(rewardPot, treasuryGrowthRate);
+        final BigInteger treasuryCut = Ratio.from(treasuryGrowthRate).multiplyAndFloor(rewardPot);
         BigInteger treasuryForCurrentEpoch = treasuryInPreviousEpoch.add(treasuryCut);
         final BigInteger stakePoolRewardsPot = rewardPot.subtract(treasuryCut);
 

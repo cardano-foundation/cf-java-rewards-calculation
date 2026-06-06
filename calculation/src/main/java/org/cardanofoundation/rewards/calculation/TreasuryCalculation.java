@@ -3,10 +3,10 @@ package org.cardanofoundation.rewards.calculation;
 import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.calculation.enums.MirPot;
+import org.cardanofoundation.rewards.calculation.util.Ratio;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.MathContext;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -58,7 +58,7 @@ public class TreasuryCalculation {
     final BigInteger totalRewardPot = calculateTotalRewardPotWithEta(
             monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserveInPreviousEpoch, totalFeesForCurrentEpoch, networkConfig);
 
-    final BigInteger treasuryCut = multiplyAndFloor(totalRewardPot, treasuryGrowthRate);
+    final BigInteger treasuryCut = Ratio.from(treasuryGrowthRate).multiplyAndFloor(totalRewardPot);
     BigInteger treasuryForCurrentEpoch = treasuryInPreviousEpoch.add(treasuryCut);
 
     var rewardAddressesOfRetiredPools = retiredPools.stream().map(RetiredPool::getRewardAddress).collect(Collectors.toSet());
@@ -98,11 +98,12 @@ public class TreasuryCalculation {
    *
    * rewards(e) = floor(monetary_expand_rate * eta * reserve(e - 1) + fee(e - 1))
    * rewards(e) = 0, if e < 209
-   */
+  */
   public static BigInteger calculateTotalRewardPotWithEta(BigDecimal monetaryExpandRate, int totalBlocksInEpochByPools,
                                                           BigDecimal decentralizationParameter, BigInteger reserve, BigInteger fee, NetworkConfig networkConfig) {
-    BigDecimal eta = calculateEta(totalBlocksInEpochByPools, decentralizationParameter, networkConfig);
-    return multiplyAndFloor(reserve, monetaryExpandRate, eta).add(fee);
+    Ratio rho = Ratio.from(monetaryExpandRate);
+    Ratio eta = calculateEtaRatio(totalBlocksInEpochByPools, decentralizationParameter, networkConfig);
+    return rho.multiply(eta).multiplyAndFloor(reserve).add(fee);
   }
 
   /*
@@ -114,28 +115,40 @@ public class TreasuryCalculation {
   *
   * See: https://github.com/input-output-hk/cardano-ledger/commit/c4f10d286faadcec9e4437411bce9c6c3b6e51c2
   */
-  private static BigDecimal calculateEta(int totalBlocksInEpochByPools, BigDecimal decentralizationParameter, NetworkConfig networkConfig) {
+  private static Ratio calculateEtaRatio(int totalBlocksInEpochByPools, BigDecimal decentralizationParameter, NetworkConfig networkConfig) {
     // shelley-delegation.pdf 5.4.3
 
     BigDecimal decentralisationThreshold = new BigDecimal("0.8");
     if (decentralizationParameter.compareTo(decentralisationThreshold) >= 0) {
-      return BigDecimal.ONE;
+      return Ratio.ONE;
     }
 
     // The number of expected blocks will be the number of slots per epoch times the active slots coefficient
-    BigDecimal activeSlotsCoeff = BigDecimal.valueOf(networkConfig.getActiveSlotCoefficient()); // See: Non-Updatable Parameters: https://cips.cardano.org/cips/cip9/
+    Ratio activeSlotsCoeff = Ratio.from(BigDecimal.valueOf(networkConfig.getActiveSlotCoefficient())); // See: Non-Updatable Parameters: https://cips.cardano.org/cips/cip9/
 
     // decentralizationParameter is the proportion of blocks that are expected to be produced by stake pools
     // instead of the OBFT (Ouroboros Byzantine Fault Tolerance) nodes. It was introduced close before the Shelley era:
     // https://github.com/input-output-hk/cardano-ledger/commit/c4f10d286faadcec9e4437411bce9c6c3b6e51c2
-    BigDecimal expectedBlocksInNonOBFTSlots = new BigDecimal(networkConfig.getExpectedSlotsPerEpoch())
-            .multiply(activeSlotsCoeff).multiply(BigDecimal.ONE.subtract(decentralizationParameter));
+    Ratio expectedBlocksInNonOBFTSlots = Ratio.of(BigInteger.valueOf(networkConfig.getExpectedSlotsPerEpoch()))
+            .multiply(activeSlotsCoeff)
+            .multiply(Ratio.ONE.subtract(Ratio.from(decentralizationParameter)));
+    BigInteger expectedBlocks = expectedBlocksInNonOBFTSlots.floor();
+    if (expectedBlocks.signum() <= 0) {
+      throw new IllegalArgumentException("Expected blocks must be positive but was " + expectedBlocksInNonOBFTSlots
+              + " (floored=" + expectedBlocks
+              + ", slotsPerEpoch=" + networkConfig.getExpectedSlotsPerEpoch()
+              + ", activeSlotCoefficient=" + networkConfig.getActiveSlotCoefficient()
+              + ", decentralization=" + decentralizationParameter + ")");
+    }
+    BigInteger blocksMade = BigInteger.valueOf(totalBlocksInEpochByPools);
+    if (blocksMade.compareTo(expectedBlocks) >= 0) {
+      return Ratio.ONE;
+    }
 
     // eta is the ratio between the number of blocks that have been produced during the epoch, and
     // the expectation value of blocks that should have been produced during the epoch under
     // ideal conditions.
-    MathContext mathContext = new MathContext(32);
-    return new BigDecimal(totalBlocksInEpochByPools).divide(expectedBlocksInNonOBFTSlots, mathContext).min(BigDecimal.ONE);
+    return Ratio.of(blocksMade, expectedBlocks);
   }
 
   /*
