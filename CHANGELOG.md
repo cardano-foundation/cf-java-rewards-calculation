@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.2](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v1.0.1...v1.0.2) (2026-06-06)
+
+
+### Bug Fixes
+
+* **calculation:** use exact rational arithmetic for reward pots ([279e0d6](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/279e0d6750d3b38fb005b975d4c822b53e12d379))
+* **calculation:** use exact rational arithmetic for reward pots ([acf63f3](https://github.com/cardano-foundation/cf-java-rewards-calculation/commit/acf63f32a7817674fea435443b7461c314f25ca2))
+
 ## [1.0.1](https://github.com/cardano-foundation/cf-java-rewards-calculation/compare/v1.0.0...v1.0.1) (2025-03-24)
 
 
