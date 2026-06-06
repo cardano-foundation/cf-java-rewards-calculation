@@ -3,10 +3,10 @@
 import org.cardanofoundation.rewards.calculation.config.NetworkConfig;
 import org.cardanofoundation.rewards.calculation.domain.*;
 import org.cardanofoundation.rewards.calculation.enums.MirPot;
+import org.cardanofoundation.rewards.calculation.util.Ratio;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.MathContext;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -58,7 +58,7 @@ import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
 <span class="fc" id="L58">    final BigInteger totalRewardPot = calculateTotalRewardPotWithEta(</span>
             monetaryExpandRate, totalBlocksInEpoch, decentralizationParameter, reserveInPreviousEpoch, totalFeesForCurrentEpoch, networkConfig);
 
-<span class="fc" id="L61">    final BigInteger treasuryCut = multiplyAndFloor(totalRewardPot, treasuryGrowthRate);</span>
+<span class="fc" id="L61">    final BigInteger treasuryCut = Ratio.from(treasuryGrowthRate).multiplyAndFloor(totalRewardPot);</span>
 <span class="fc" id="L62">    BigInteger treasuryForCurrentEpoch = treasuryInPreviousEpoch.add(treasuryCut);</span>
 
 <span class="fc" id="L64">    var rewardAddressesOfRetiredPools = retiredPools.stream().map(RetiredPool::getRewardAddress).collect(Collectors.toSet());</span>
@@ -98,11 +98,12 @@ import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
    *
    * rewards(e) = floor(monetary_expand_rate * eta * reserve(e - 1) + fee(e - 1))
    * rewards(e) = 0, if e &lt; 209
-   */
+  */
   public static BigInteger calculateTotalRewardPotWithEta(BigDecimal monetaryExpandRate, int totalBlocksInEpochByPools,
                                                           BigDecimal decentralizationParameter, BigInteger reserve, BigInteger fee, NetworkConfig networkConfig) {
-<span class="fc" id="L104">    BigDecimal eta = calculateEta(totalBlocksInEpochByPools, decentralizationParameter, networkConfig);</span>
-<span class="fc" id="L105">    return multiplyAndFloor(reserve, monetaryExpandRate, eta).add(fee);</span>
+<span class="fc" id="L104">    Ratio rho = Ratio.from(monetaryExpandRate);</span>
+<span class="fc" id="L105">    Ratio eta = calculateEtaRatio(totalBlocksInEpochByPools, decentralizationParameter, networkConfig);</span>
+<span class="fc" id="L106">    return rho.multiply(eta).multiplyAndFloor(reserve).add(fee);</span>
   }
 
   /*
@@ -114,28 +115,40 @@ import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
   *
   * See: https://github.com/input-output-hk/cardano-ledger/commit/c4f10d286faadcec9e4437411bce9c6c3b6e51c2
   */
-  private static BigDecimal calculateEta(int totalBlocksInEpochByPools, BigDecimal decentralizationParameter, NetworkConfig networkConfig) {
+  private static Ratio calculateEtaRatio(int totalBlocksInEpochByPools, BigDecimal decentralizationParameter, NetworkConfig networkConfig) {
     // shelley-delegation.pdf 5.4.3
 
-<span class="fc" id="L120">    BigDecimal decentralisationThreshold = new BigDecimal(&quot;0.8&quot;);</span>
-<span class="fc bfc" id="L121" title="All 2 branches covered.">    if (decentralizationParameter.compareTo(decentralisationThreshold) &gt;= 0) {</span>
-<span class="fc" id="L122">      return BigDecimal.ONE;</span>
+<span class="fc" id="L121">    BigDecimal decentralisationThreshold = new BigDecimal(&quot;0.8&quot;);</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">    if (decentralizationParameter.compareTo(decentralisationThreshold) &gt;= 0) {</span>
+<span class="fc" id="L123">      return Ratio.ONE;</span>
     }
 
     // The number of expected blocks will be the number of slots per epoch times the active slots coefficient
-<span class="fc" id="L126">    BigDecimal activeSlotsCoeff = BigDecimal.valueOf(networkConfig.getActiveSlotCoefficient()); // See: Non-Updatable Parameters: https://cips.cardano.org/cips/cip9/</span>
+<span class="fc" id="L127">    Ratio activeSlotsCoeff = Ratio.from(BigDecimal.valueOf(networkConfig.getActiveSlotCoefficient())); // See: Non-Updatable Parameters: https://cips.cardano.org/cips/cip9/</span>
 
     // decentralizationParameter is the proportion of blocks that are expected to be produced by stake pools
     // instead of the OBFT (Ouroboros Byzantine Fault Tolerance) nodes. It was introduced close before the Shelley era:
     // https://github.com/input-output-hk/cardano-ledger/commit/c4f10d286faadcec9e4437411bce9c6c3b6e51c2
-<span class="fc" id="L131">    BigDecimal expectedBlocksInNonOBFTSlots = new BigDecimal(networkConfig.getExpectedSlotsPerEpoch())</span>
-<span class="fc" id="L132">            .multiply(activeSlotsCoeff).multiply(BigDecimal.ONE.subtract(decentralizationParameter));</span>
+<span class="fc" id="L132">    Ratio expectedBlocksInNonOBFTSlots = Ratio.of(BigInteger.valueOf(networkConfig.getExpectedSlotsPerEpoch()))</span>
+<span class="fc" id="L133">            .multiply(activeSlotsCoeff)</span>
+<span class="fc" id="L134">            .multiply(Ratio.ONE.subtract(Ratio.from(decentralizationParameter)));</span>
+<span class="fc" id="L135">    BigInteger expectedBlocks = expectedBlocksInNonOBFTSlots.floor();</span>
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">    if (expectedBlocks.signum() &lt;= 0) {</span>
+<span class="nc" id="L137">      throw new IllegalArgumentException(&quot;Expected blocks must be positive but was &quot; + expectedBlocksInNonOBFTSlots</span>
+              + &quot; (floored=&quot; + expectedBlocks
+<span class="nc" id="L139">              + &quot;, slotsPerEpoch=&quot; + networkConfig.getExpectedSlotsPerEpoch()</span>
+<span class="nc" id="L140">              + &quot;, activeSlotCoefficient=&quot; + networkConfig.getActiveSlotCoefficient()</span>
+              + &quot;, decentralization=&quot; + decentralizationParameter + &quot;)&quot;);
+    }
+<span class="fc" id="L143">    BigInteger blocksMade = BigInteger.valueOf(totalBlocksInEpochByPools);</span>
+<span class="fc bfc" id="L144" title="All 2 branches covered.">    if (blocksMade.compareTo(expectedBlocks) &gt;= 0) {</span>
+<span class="fc" id="L145">      return Ratio.ONE;</span>
+    }
 
     // eta is the ratio between the number of blocks that have been produced during the epoch, and
     // the expectation value of blocks that should have been produced during the epoch under
     // ideal conditions.
-<span class="fc" id="L137">    MathContext mathContext = new MathContext(32);</span>
-<span class="fc" id="L138">    return new BigDecimal(totalBlocksInEpochByPools).divide(expectedBlocksInNonOBFTSlots, mathContext).min(BigDecimal.ONE);</span>
+<span class="fc" id="L151">    return Ratio.of(blocksMade, expectedBlocks);</span>
   }
 
   /*
@@ -147,27 +160,27 @@ import static org.cardanofoundation.rewards.calculation.util.BigNumberUtils.*;
                                                                     HashSet&lt;String&gt; deregisteredRewardAccounts,
                                                                     List&lt;String&gt; ownerAccountsRegisteredInThePast,
                                                                     NetworkConfig networkConfig) {
-<span class="fc" id="L150">    BigInteger unclaimedRefunds = BigInteger.ZERO;</span>
-<span class="pc bpc" id="L151" title="1 of 2 branches missed.">    if (retiredPools.size() &gt; 0) {</span>
+<span class="fc" id="L163">    BigInteger unclaimedRefunds = BigInteger.ZERO;</span>
+<span class="pc bpc" id="L164" title="1 of 2 branches missed.">    if (retiredPools.size() &gt; 0) {</span>
     /* Check if the reward address of the retired pool has been unregistered before
        or if the reward address has been unregistered after the randomness stabilization window
        or if the reward address has not been registered at all */
-<span class="fc bfc" id="L155" title="All 2 branches covered.">      for (var retiredPool : retiredPools) {</span>
-<span class="fc bfc" id="L156" title="All 2 branches covered.">        if (deregisteredRewardAccounts.contains(retiredPool.getRewardAddress()) ||</span>
-<span class="pc bpc" id="L157" title="1 of 2 branches missed.">                !ownerAccountsRegisteredInThePast.contains(retiredPool.getRewardAddress())) {</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">      for (var retiredPool : retiredPools) {</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">        if (deregisteredRewardAccounts.contains(retiredPool.getRewardAddress()) ||</span>
+<span class="pc bpc" id="L170" title="1 of 2 branches missed.">                !ownerAccountsRegisteredInThePast.contains(retiredPool.getRewardAddress())) {</span>
           // If the reward address has been unregistered, the deposit can not be returned
           // and will be added to the treasury instead (Pool Reap see: shelley-ledger.pdf p.53)
-<span class="fc" id="L160">          BigInteger depositAmount = BigInteger.valueOf(500_000_000); // default pool deposit of 500 Ada</span>
-<span class="fc bfc" id="L161" title="All 2 branches covered.">          if (retiredPool.getDepositAmount() != null) {</span>
-<span class="fc" id="L162">            depositAmount = retiredPool.getDepositAmount();</span>
+<span class="fc" id="L173">          BigInteger depositAmount = BigInteger.valueOf(500_000_000); // default pool deposit of 500 Ada</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">          if (retiredPool.getDepositAmount() != null) {</span>
+<span class="fc" id="L175">            depositAmount = retiredPool.getDepositAmount();</span>
           }
 
-<span class="fc" id="L165">          unclaimedRefunds = unclaimedRefunds.add(depositAmount);</span>
+<span class="fc" id="L178">          unclaimedRefunds = unclaimedRefunds.add(depositAmount);</span>
         }
-<span class="fc" id="L167">      }</span>
+<span class="fc" id="L180">      }</span>
     }
 
-<span class="fc" id="L170">    return unclaimedRefunds;</span>
+<span class="fc" id="L183">    return unclaimedRefunds;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

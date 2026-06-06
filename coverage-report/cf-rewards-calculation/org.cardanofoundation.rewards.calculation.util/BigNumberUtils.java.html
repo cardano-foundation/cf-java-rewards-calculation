@@ -14,12 +14,12 @@ import java.math.RoundingMode;
     }
 
     public static BigInteger multiplyAndFloor(BigInteger a, BigDecimal b, BigDecimal c) {
-<span class="fc" id="L17">        return new BigDecimal(a).multiply(b).multiply(c).round(new MathContext(0, RoundingMode.FLOOR)).toBigInteger();</span>
+<span class="nc" id="L17">        return new BigDecimal(a).multiply(b).multiply(c).round(new MathContext(0, RoundingMode.FLOOR)).toBigInteger();</span>
     }
 
     public static BigInteger multiplyAndFloor(BigInteger a, BigDecimal b) {
-<span class="fc" id="L21">        return new BigDecimal(a).multiply(b)</span>
-<span class="fc" id="L22">                .round(new MathContext(0, RoundingMode.FLOOR)).toBigInteger();</span>
+<span class="nc" id="L21">        return new BigDecimal(a).multiply(b)</span>
+<span class="nc" id="L22">                .round(new MathContext(0, RoundingMode.FLOOR)).toBigInteger();</span>
     }
 
     public static BigInteger multiply(BigInteger a, BigInteger b, BigInteger c) {
